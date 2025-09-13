@@ -1,0 +1,13 @@
+/*
+Test Package: Semantic-1
+Test Target: array
+Author: Wenxin Zheng
+Time: 2025-08-07
+Verdict: Fail
+Comment: array test, array initialization with error length
+*/
+
+fn main() {
+    let numbers: [i32; 3] = [1, 2, 3, 4];
+    exit(0);
+}

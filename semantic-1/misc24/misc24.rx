@@ -1,0 +1,227 @@
+/*
+Test Package: Semantic-1
+Test Target: misc
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: AVL Tree implementation (self-balancing binary search tree)
+*/
+
+// AVL Tree implementation (self-balancing binary search tree)
+// Maintains balance through rotations to ensure O(log n) operations
+struct AVLNode {
+    value: i32,
+    height: i32,
+    left: i32,  // Index to left child, -1 for null
+    right: i32, // Index to right child, -1 for null
+}
+
+struct AVLTree {
+    nodes: [AVLNode; 1000],
+    root: i32,
+    node_count: i32,
+}
+
+impl AVLNode {
+    fn new(value: i32) -> AVLNode {
+        AVLNode {
+            value: value,
+            height: 1,
+            left: -1,
+            right: -1,
+        }
+    }
+}
+
+impl AVLTree {
+    fn new() -> AVLTree {
+        AVLTree {
+            nodes: [AVLNode::new(0); 1000],
+            root: -1,
+            node_count: 0,
+        }
+    }
+    
+    fn create_node(&mut self, value: i32) -> i32 {
+        if (self.node_count >= 1000) {
+            return -1;
+        }
+        
+        let index: i32 = self.node_count;
+        self.nodes[index as usize] = AVLNode::new(value);
+        self.node_count += 1;
+        return index;
+    }
+    
+    fn get_height(&self, node_index: i32) -> i32 {
+        if (node_index == -1) {
+            return 0;
+        }
+        return self.nodes[node_index as usize].height;
+    }
+    
+    fn update_height(&mut self, node_index: i32) {
+        if (node_index == -1) {
+            return;
+        }
+        
+        let left_height: i32 = self.get_height(self.nodes[node_index as usize].left);
+        let right_height: i32 = self.get_height(self.nodes[node_index as usize].right);
+        self.nodes[node_index as usize].height = 1 + if (left_height > right_height) { left_height } else { right_height };
+    }
+    
+    fn get_balance(&self, node_index: i32) -> i32 {
+        if (node_index == -1) {
+            return 0;
+        }
+        
+        let left_height: i32 = self.get_height(self.nodes[node_index as usize].left);
+        let right_height: i32 = self.get_height(self.nodes[node_index as usize].right);
+        return left_height - right_height;
+    }
+    
+    fn rotate_right(&mut self, y: i32) -> i32 {
+        let x: i32 = self.nodes[y as usize].left;
+        let t2: i32 = self.nodes[x as usize].right;
+        
+        // Perform rotation
+        self.nodes[x as usize].right = y;
+        self.nodes[y as usize].left = t2;
+        
+        // Update heights
+        self.update_height(y);
+        self.update_height(x);
+        
+        return x;
+    }
+    
+    fn rotate_left(&mut self, x: i32) -> i32 {
+        let y: i32 = self.nodes[x as usize].right;
+        let t2: i32 = self.nodes[y as usize].left;
+        
+        // Perform rotation
+        self.nodes[y as usize].left = x;
+        self.nodes[x as usize].right = t2;
+        
+        // Update heights
+        self.update_height(x);
+        self.update_height(y);
+        
+        return y;
+    }
+    
+    fn insert_recursive(&mut self, node_index: i32, value: i32) -> i32 {
+        // Standard BST insertion
+        if (node_index == -1) {
+            return self.create_node(value);
+        }
+        
+        if (value < self.nodes[node_index as usize].value) {
+            self.nodes[node_index as usize].left = self.insert_recursive(self.nodes[node_index as usize].left, value);
+        } else if (value > self.nodes[node_index as usize].value) {
+            self.nodes[node_index as usize].right = self.insert_recursive(self.nodes[node_index as usize].right, value);
+        } else {
+            return node_index; // Duplicate values not allowed
+        }
+        
+        // Update height
+        self.update_height(node_index);
+        
+        // Get balance factor
+        let balance: i32 = self.get_balance(node_index);
+        
+        // Left Left Case
+        if (balance > 1 && value < self.nodes[self.nodes[node_index as usize].left as usize].value) {
+            return self.rotate_right(node_index);
+        }
+        
+        // Right Right Case
+        if (balance < -1 && value > self.nodes[self.nodes[node_index as usize].right as usize].value) {
+            return self.rotate_left(node_index);
+        }
+        
+        // Left Right Case
+        if (balance > 1 && value > self.nodes[self.nodes[node_index as usize].left as usize].value) {
+            self.nodes[node_index as usize].left = self.rotate_left(self.nodes[node_index as usize].left);
+            return self.rotate_right(node_index);
+        }
+        
+        // Right Left Case
+        if (balance < -1 && value < self.nodes[self.nodes[node_index as usize].right as usize].value) {
+            self.nodes[node_index as usize].right = self.rotate_right(self.nodes[node_index as usize].right);
+            return self.rotate_left(node_index);
+        }
+        
+        return node_index;
+    }
+    
+    fn insert(&mut self, value: i32) {
+        self.root = self.insert_recursive(self.root, value);
+    }
+    
+    fn search_recursive(&self, node_index: i32, value: i32) -> bool {
+        if (node_index == -1) {
+            return false;
+        }
+        
+        if (value == self.nodes[node_index as usize].value) {
+            return true;
+        } else if (value < self.nodes[node_index as usize].value) {
+            return self.search_recursive(self.nodes[node_index as usize].left, value);
+        } else {
+            return self.search_recursive(self.nodes[node_index as usize].right, value);
+        }
+    }
+    
+    fn search(&self, value: i32) -> bool {
+        return self.search_recursive(self.root, value);
+    }
+    
+    fn inorder_recursive(&self, node_index: i32) {
+        if (node_index == -1) {
+            return;
+        }
+        
+        self.inorder_recursive(self.nodes[node_index as usize].left);
+        printInt(self.nodes[node_index as usize].value);
+        self.inorder_recursive(self.nodes[node_index as usize].right);
+    }
+    
+    fn inorder_traversal(&self) {
+        self.inorder_recursive(self.root);
+    }
+    
+    fn get_tree_height(&self) -> i32 {
+        return self.get_height(self.root);
+    }
+}
+
+fn main() {
+    let mut avl: AVLTree = AVLTree::new();
+    let n: i32 = getInt();
+    
+    let mut i: i32 = 0;
+    while (i < n) {
+        let operation: i32 = getInt();
+        
+        if (operation == 1) { // Insert
+            let value: i32 = getInt();
+            avl.insert(value);
+        } else if (operation == 2) { // Search
+            let value: i32 = getInt();
+            if (avl.search(value)) {
+                printInt(1);
+            } else {
+                printInt(0);
+            }
+        } else if (operation == 3) { // Inorder traversal
+            avl.inorder_traversal();
+        } else if (operation == 4) { // Get height
+            let height: i32 = avl.get_tree_height();
+            printInt(height);
+        }
+        
+        i += 1;
+    }
+    exit(0);
+}

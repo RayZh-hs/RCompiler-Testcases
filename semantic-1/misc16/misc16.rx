@@ -1,0 +1,113 @@
+/*
+Test Package: Semantic-1
+Test Target: misc
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: Binary Search Tree implementation using arrays
+*/
+
+// Binary Search Tree implementation using arrays
+// Simple BST with insertion and search operations
+struct BinarySearchTree {
+    values: [i32; 1000],
+    left_children: [i32; 1000],
+    right_children: [i32; 1000],
+    node_count: i32,
+}
+
+impl BinarySearchTree {
+    fn new() -> BinarySearchTree {
+        BinarySearchTree {
+            values: [0; 1000],
+            left_children: [-1; 1000],
+            right_children: [-1; 1000],
+            node_count: 0,
+        }
+    }
+    
+    fn create_node(&mut self, value: i32) -> i32 {
+        let index: i32 = self.node_count;
+        self.values[index as usize] = value;
+        self.left_children[index as usize] = -1;
+        self.right_children[index as usize] = -1;
+        self.node_count += 1;
+        return index;
+    }
+    
+    fn insert_recursive(&mut self, root_index: i32, value: i32) -> i32 {
+        if (root_index == -1) {
+            return self.create_node(value);
+        }
+        
+        if (value < self.values[root_index as usize]) {
+            self.left_children[root_index as usize] = 
+                self.insert_recursive(self.left_children[root_index as usize], value);
+        } else if (value > self.values[root_index as usize]) {
+            self.right_children[root_index as usize] = 
+                self.insert_recursive(self.right_children[root_index as usize], value);
+        }
+        
+        return root_index;
+    }
+    
+    fn insert(&mut self, value: i32) {
+        if (self.node_count == 0) {
+            self.create_node(value);
+        } else {
+            self.insert_recursive(0, value);
+        }
+    }
+    
+    fn search_recursive(&self, root_index: i32, value: i32) -> bool {
+        if (root_index == -1) {
+            return false;
+        }
+        
+        if (value == self.values[root_index as usize]) {
+            return true;
+        } else if (value < self.values[root_index as usize]) {
+            return self.search_recursive(self.left_children[root_index as usize], value);
+        } else {
+            return self.search_recursive(self.right_children[root_index as usize], value);
+        }
+    }
+    
+    fn search(&self, value: i32) -> bool {
+        if (self.node_count == 0) {
+            return false;
+        }
+        return self.search_recursive(0, value);
+    }
+    
+    fn inorder_recursive(&self, root_index: i32) {
+        if (root_index == -1) {
+            return;
+        }
+        
+        self.inorder_recursive(self.left_children[root_index as usize]);
+        printInt(self.values[root_index as usize]);
+        self.inorder_recursive(self.right_children[root_index as usize]);
+    }
+    
+    fn inorder_traversal(&self) {
+        if (self.node_count > 0) {
+            self.inorder_recursive(0);
+        }
+    }
+}
+
+fn main() {
+    let mut bst: BinarySearchTree = BinarySearchTree::new();
+    let n: i32 = getInt();
+    
+    let mut i: i32 = 0;
+    while (i < n) {
+        let value: i32 = getInt();
+        bst.insert(value);
+        i += 1;
+    }
+    
+    bst.inorder_traversal();
+    exit(0);
+}

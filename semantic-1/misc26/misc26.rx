@@ -1,0 +1,251 @@
+/*
+Test Package: Semantic-1
+Test Target: misc
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: Union-Find (Disjoint Set Union) data structure
+*/
+
+// Union-Find (Disjoint Set Union) data structure
+// Efficient implementation with path compression and union by rank
+struct UnionFind {
+    parent: [i32; 1000],
+    rank: [i32; 1000],
+    size: i32,
+    component_count: i32,
+}
+
+impl UnionFind {
+    fn new(n: i32) -> UnionFind {
+        let mut uf: UnionFind = UnionFind {
+            parent: [0; 1000],
+            rank: [0; 1000],
+            size: n,
+            component_count: n,
+        };
+        
+        // Initialize each element as its own parent
+        let mut i: i32 = 0;
+        while (i < n) {
+            uf.parent[i as usize] = i;
+            uf.rank[i as usize] = 0;
+            i += 1;
+        }
+        
+        return uf;
+    }
+    
+    fn find(&mut self, x: i32) -> i32 {
+        if (x < 0 || x >= self.size) {
+            return -1;
+        }
+        
+        if (self.parent[x as usize] != x) {
+            // Path compression: make parent point directly to root
+            self.parent[x as usize] = self.find(self.parent[x as usize]);
+        }
+        return self.parent[x as usize];
+    }
+    
+    fn union(&mut self, x: i32, y: i32) -> bool {
+        let root_x: i32 = self.find(x);
+        let root_y: i32 = self.find(y);
+        
+        if (root_x == -1 || root_y == -1) {
+            return false;
+        }
+        
+        if (root_x == root_y) {
+            return false; // Already in same set
+        }
+        
+        // Union by rank: attach smaller rank tree under root of higher rank tree
+        if (self.rank[root_x as usize] < self.rank[root_y as usize]) {
+            self.parent[root_x as usize] = root_y;
+        } else if (self.rank[root_x as usize] > self.rank[root_y as usize]) {
+            self.parent[root_y as usize] = root_x;
+        } else {
+            self.parent[root_y as usize] = root_x;
+            self.rank[root_x as usize] += 1;
+        }
+        
+        self.component_count -= 1;
+        return true;
+    }
+    
+    fn is_connected(&mut self, x: i32, y: i32) -> bool {
+        let root_x: i32 = self.find(x);
+        let root_y: i32 = self.find(y);
+        return (root_x != -1 && root_y != -1 && root_x == root_y);
+    }
+    
+    fn get_component_count(&self) -> i32 {
+        return self.component_count;
+    }
+    
+    fn get_component_size(&mut self, x: i32) -> i32 {
+        let root: i32 = self.find(x);
+        if (root == -1) {
+            return 0;
+        }
+        
+        let mut size: i32 = 0;
+        let mut i: i32 = 0;
+        while (i < self.size) {
+            if (self.find(i) == root) {
+                size += 1;
+            }
+            i += 1;
+        }
+        
+        return size;
+    }
+    
+    fn print_components(&mut self) {
+        let mut i: i32 = 0;
+        while (i < self.size) {
+            let root: i32 = self.find(i);
+            printInt(root);
+            i += 1;
+        }
+    }
+    
+    // Check if the graph is connected using Union-Find
+    fn is_graph_connected(&self) -> bool {
+        return self.component_count == 1;
+    }
+    
+    // Count number of edges needed to connect all components
+    fn edges_to_connect(&self) -> i32 {
+        return self.component_count - 1;
+    }
+}
+
+// Kruskal's algorithm for Minimum Spanning Tree using Union-Find
+struct Edge {
+    src: i32,
+    dest: i32,
+    weight: i32,
+}
+
+struct KruskalMST {
+    edges: [Edge; 1000],
+    edge_count: i32,
+    vertex_count: i32,
+}
+
+impl Edge {
+    fn new(src: i32, dest: i32, weight: i32) -> Edge {
+        Edge {
+            src: src,
+            dest: dest,
+            weight: weight,
+        }
+    }
+}
+
+impl KruskalMST {
+    fn new(vertices: i32) -> KruskalMST {
+        KruskalMST {
+            edges: [Edge::new(0, 0, 0); 1000],
+            edge_count: 0,
+            vertex_count: vertices,
+        }
+    }
+    
+    fn add_edge(&mut self, src: i32, dest: i32, weight: i32) {
+        if (self.edge_count < 1000) {
+            self.edges[self.edge_count as usize] = Edge::new(src, dest, weight);
+            self.edge_count += 1;
+        }
+    }
+    
+    // Simple bubble sort for edges by weight
+    fn sort_edges(&mut self) {
+        let mut i: i32 = 0;
+        while (i < self.edge_count - 1) {
+            let mut j: i32 = 0;
+            while (j < self.edge_count - i - 1) {
+                if (self.edges[j as usize].weight > self.edges[(j + 1) as usize].weight) {
+                    // Swap edges
+                    let temp_src: i32 = self.edges[j as usize].src;
+                    let temp_dest: i32 = self.edges[j as usize].dest;
+                    let temp_weight: i32 = self.edges[j as usize].weight;
+                    
+                    self.edges[j as usize].src = self.edges[(j + 1) as usize].src;
+                    self.edges[j as usize].dest = self.edges[(j + 1) as usize].dest;
+                    self.edges[j as usize].weight = self.edges[(j + 1) as usize].weight;
+                    
+                    self.edges[(j + 1) as usize].src = temp_src;
+                    self.edges[(j + 1) as usize].dest = temp_dest;
+                    self.edges[(j + 1) as usize].weight = temp_weight;
+                }
+                j += 1;
+            }
+            i += 1;
+        }
+    }
+    
+    fn find_mst(&mut self) -> i32 {
+        self.sort_edges();
+        let mut uf: UnionFind = UnionFind::new(self.vertex_count);
+        let mut mst_weight: i32 = 0;
+        let mut edges_added: i32 = 0;
+        
+        let mut i: i32 = 0;
+        while ((i < self.edge_count && edges_added < self.vertex_count - 1)) {
+            let edge: &Edge = &self.edges[i as usize];
+            
+            if (!uf.is_connected(edge.src, edge.dest)) {
+                uf.union(edge.src, edge.dest);
+                mst_weight += edge.weight;
+                edges_added += 1;
+            }
+            
+            i += 1;
+        }
+        
+        return mst_weight;
+    }
+}
+
+fn main() {
+    let n: i32 = getInt();
+    let mut uf: UnionFind = UnionFind::new(n);
+    
+    let operations: i32 = getInt();
+    let mut i: i32 = 0;
+    
+    while (i < operations) {
+        let operation: i32 = getInt();
+        
+        if (operation == 1) { // Union
+            let x: i32 = getInt();
+            let y: i32 = getInt();
+            uf.union(x, y);
+        } else if (operation == 2) { // Find
+            let x: i32 = getInt();
+            let root: i32 = uf.find(x);
+            printInt(root);
+        } else if (operation == 3) { // Is connected
+            let x: i32 = getInt();
+            let y: i32 = getInt();
+            if (uf.is_connected(x, y)) {
+                printInt(1);
+            } else {
+                printInt(0);
+            }
+        } else if (operation == 4) { // Component count
+            let count: i32 = uf.get_component_count();
+            printInt(count);
+        } else if (operation == 5) { // Component size
+            let x: i32 = getInt();
+            let size: i32 = uf.get_component_size(x);
+            printInt(size);
+        }
+        
+        i += 1;
+    }
+    exit(0);
+}

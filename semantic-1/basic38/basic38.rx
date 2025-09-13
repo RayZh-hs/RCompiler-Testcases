@@ -1,0 +1,81 @@
+/*
+Test Package: Semantic-1
+Test Target: basic
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: basic test, merge sort with type mismatch in division (i32 / usize)
+*/
+
+const LEN: usize = 12;
+
+fn merge_sort(a: &mut [i32; LEN], l: usize, r: usize) {
+    if (l >= r) {
+        return;
+    }
+    let m = (l + r) / 2;
+    merge_sort(a, l, m);
+    merge_sort(a, m + 1, r);
+    let mut tmp: [i32; LEN] = [0; LEN];
+    let mut i: usize = l;
+    let mut j: usize = m + 1;
+    let mut k: usize = l;
+    while (i <= m && j <= r) {
+        if (a[i] <= a[j]) {
+            tmp[k] = a[i];
+            i += 1;
+        } else {
+            tmp[k] = a[j];
+            j += 1;
+        }
+        k += 1;
+    }
+    while (i <= m) {
+        tmp[k] = a[i];
+        i += 1;
+        k += 1;
+    }
+    while (j <= r) {
+        tmp[k] = a[j];
+        j += 1;
+        k += 1;
+    }
+    let mut p: usize = l;
+    while (p <= r) {
+        a[p] = tmp[p];
+        p += 1;
+    }
+}
+
+fn median(v: [i32; LEN]) -> i32 {
+    let pos: usize = LEN / 2;
+    v[pos]
+}
+
+fn checksum(b: [i32; LEN]) -> i32 {
+    let mut total: i32 = 0;
+    let mut t: usize = 0;
+    while (t < LEN) {
+        total = total + b[t];
+        t += 1;
+    }
+    total
+}
+
+fn main() {
+    let mut arr: [i32; LEN] = [
+        34, 12, 5, 66, 29, 18,
+        50, 7, 1, 90, 31, 42,
+    ];
+    merge_sort(&mut arr, 0, LEN - 1);
+    let mid: i32 = median(arr);
+    let mut repl: usize = 0;
+    while (repl < LEN) {
+        arr[repl] = arr[repl] - mid;
+        repl += 1;
+    }
+    let s: i32 = checksum(arr);
+    let ratio: i32 = mid / LEN;
+    let final_value: i32 = s + ratio;
+    exit(0);
+}

@@ -1,0 +1,903 @@
+/*
+Test Package: Semantic-2
+Test Target: comprehensive
+Author: Wenxin Zheng
+Time: 2025-08-17
+Verdict: Success
+Test Name: Comprehensive Test 14: Advanced Data Structures and Memory Management Simulation
+Summary: This test implements complex data structures and simulates memory management:
+Details:
+1. Advanced Binary Search Tree with balancing operations
+2. Hash Table with collision resolution and dynamic resizing
+3. Complex linked list operations with merge and split
+4. Memory pool simulation with allocation and deallocation
+5. Cache simulation with LRU replacement policy
+6. Database-like operations with indexing and querying
+*/
+
+// Comprehensive Test 14: Advanced Data Structures and Memory Management Simulation
+// This test implements complex data structures and simulates memory management:
+// 1. Advanced Binary Search Tree with balancing operations
+// 2. Hash Table with collision resolution and dynamic resizing
+// 3. Complex linked list operations with merge and split
+// 4. Memory pool simulation with allocation and deallocation
+// 5. Cache simulation with LRU replacement policy
+// 6. Database-like operations with indexing and querying
+
+// Node structure for various data structures
+struct Node {
+    value: i32,
+    key: i32,
+    height: i32,
+    balance_factor: i32,
+    color: bool, // For red-black tree operations
+    frequency: i32,
+    timestamp: i32,
+    next: i32,
+    prev: i32,
+    left: i32,
+    right: i32,
+    parent: i32,
+}
+
+// Advanced AVL Tree implementation
+struct AVLTree {
+    nodes: [Node; 2000],
+    node_count: i32,
+    root: i32,
+    free_list: [i32; 2000],
+    free_count: i32,
+    
+    // Tree statistics
+    tree_height: i32,
+    node_insertions: i32,
+    node_deletions: i32,
+    rotation_count: i32,
+    search_operations: i32,
+}
+
+impl Node {
+    fn new(value: i32, key: i32) -> Node {
+        Node {
+            value: value,
+            key: key,
+            height: 1,
+            balance_factor: 0,
+            color: true, // Red initially
+            frequency: 1,
+            timestamp: 0,
+            next: -1,
+            prev: -1,
+            left: -1,
+            right: -1,
+            parent: -1,
+        }
+    }
+}
+
+impl AVLTree {
+    fn new() -> AVLTree {
+        let mut tree = AVLTree {
+            nodes: [Node::new(0, 0); 2000],
+            node_count: 0,
+            root: -1,
+            free_list: [0; 2000],
+            free_count: 0,
+            tree_height: 0,
+            node_insertions: 0,
+            node_deletions: 0,
+            rotation_count: 0,
+            search_operations: 0,
+        };
+        
+        // Initialize free list
+        let mut i = 0;
+        while (i < 2000) {
+            tree.free_list[i as usize] = i;
+            i += 1;
+        }
+        tree.free_count = 2000;
+        
+        return tree;
+    }
+    
+    fn allocate_node(&mut self, value: i32, key: i32) -> i32 {
+        if (self.free_count == 0) {
+            return -1; // No free nodes available
+        }
+        
+        self.free_count -= 1;
+        let node_index = self.free_list[self.free_count as usize];
+        self.nodes[node_index as usize] = Node::new(value, key);
+        self.node_count += 1;
+        
+        return node_index;
+    }
+    
+    fn deallocate_node(&mut self, node_index: i32) {
+        if (self.free_count < 2000) {
+            self.free_list[self.free_count as usize] = node_index;
+            self.free_count += 1;
+            self.node_count -= 1;
+        }
+    }
+    
+    fn get_height(&self, node: i32) -> i32 {
+        if (node == -1) {
+            return 0;
+        }
+        return self.nodes[node as usize].height;
+    }
+    
+    fn get_balance(&self, node: i32) -> i32 {
+        if (node == -1) {
+            return 0;
+        }
+        return self.get_height(self.nodes[node as usize].left) - self.get_height(self.nodes[node as usize].right);
+    }
+    
+    fn update_height(&mut self, node: i32) {
+        if (node != -1) {
+            let left_height = self.get_height(self.nodes[node as usize].left);
+            let right_height = self.get_height(self.nodes[node as usize].right);
+            self.nodes[node as usize].height = 1 + if (left_height > right_height) { left_height } else { right_height };
+            self.nodes[node as usize].balance_factor = self.get_balance(node);
+        }
+    }
+    
+    fn right_rotate(&mut self, y: i32) -> i32 {
+        let x = self.nodes[y as usize].left;
+        let t2 = self.nodes[x as usize].right;
+        
+        // Perform rotation
+        self.nodes[x as usize].right = y;
+        self.nodes[y as usize].left = t2;
+        
+        // Update parent pointers
+        self.nodes[y as usize].parent = x;
+        if (t2 != -1) {
+            self.nodes[t2 as usize].parent = y;
+        }
+        
+        // Update heights
+        self.update_height(y);
+        self.update_height(x);
+        
+        self.rotation_count += 1;
+        return x;
+    }
+    
+    fn left_rotate(&mut self, x: i32) -> i32 {
+        let y = self.nodes[x as usize].right;
+        let t2 = self.nodes[y as usize].left;
+        
+        // Perform rotation
+        self.nodes[y as usize].left = x;
+        self.nodes[x as usize].right = t2;
+        
+        // Update parent pointers
+        self.nodes[x as usize].parent = y;
+        if (t2 != -1) {
+            self.nodes[t2 as usize].parent = x;
+        }
+        
+        // Update heights
+        self.update_height(x);
+        self.update_height(y);
+        
+        self.rotation_count += 1;
+        return y;
+    }
+    
+    fn insert(&mut self, root: i32, key: i32, value: i32) -> i32 {
+        // Standard BST insertion
+        if (root == -1) {
+            let new_node = self.allocate_node(value, key);
+            self.node_insertions += 1;
+            return new_node;
+        }
+        
+        if (key < self.nodes[root as usize].key) {
+            let new_left = self.insert(self.nodes[root as usize].left, key, value);
+            self.nodes[root as usize].left = new_left;
+            if (new_left != -1) {
+                self.nodes[new_left as usize].parent = root;
+            }
+        } else if (key > self.nodes[root as usize].key) {
+            let new_right = self.insert(self.nodes[root as usize].right, key, value);
+            self.nodes[root as usize].right = new_right;
+            if (new_right != -1) {
+                self.nodes[new_right as usize].parent = root;
+            }
+        } else {
+            // Key already exists, update value and frequency
+            self.nodes[root as usize].value = value;
+            self.nodes[root as usize].frequency += 1;
+            return root;
+        }
+        
+        // Update height and balance factor
+        self.update_height(root);
+        let balance = self.get_balance(root);
+        
+        // Left Left Case
+        if (balance > 1 && key < self.nodes[self.nodes[root as usize].left as usize].key) {
+            return self.right_rotate(root);
+        }
+        
+        // Right Right Case
+        if (balance < -1 && key > self.nodes[self.nodes[root as usize].right as usize].key) {
+            return self.left_rotate(root);
+        }
+        
+        // Left Right Case
+        if (balance > 1 && key > self.nodes[self.nodes[root as usize].left as usize].key) {
+            let new_left = self.left_rotate(self.nodes[root as usize].left);
+            self.nodes[root as usize].left = new_left;
+            if (new_left != -1) {
+                self.nodes[new_left as usize].parent = root;
+            }
+            return self.right_rotate(root);
+        }
+        
+        // Right Left Case
+        if (balance < -1 && key < self.nodes[self.nodes[root as usize].right as usize].key) {
+            let new_right = self.right_rotate(self.nodes[root as usize].right);
+            self.nodes[root as usize].right = new_right;
+            if (new_right != -1) {
+                self.nodes[new_right as usize].parent = root;
+            }
+            return self.left_rotate(root);
+        }
+        
+        return root;
+    }
+    
+    fn search(&mut self, root: i32, key: i32) -> i32 {
+        self.search_operations += 1;
+        
+        if (root == -1 || self.nodes[root as usize].key == key) {
+            return root;
+        }
+        
+        if (key < self.nodes[root as usize].key) {
+            return self.search(self.nodes[root as usize].left, key);
+        } else {
+            return self.search(self.nodes[root as usize].right, key);
+        }
+    }
+    
+    fn find_min(&self, root: i32) -> i32 {
+        if root == -1 {
+            return -1;
+        }
+        
+        let mut current = root;
+        while (self.nodes[current as usize].left != -1) {
+            current = self.nodes[current as usize].left;
+        }
+        return current;
+    }
+    
+    fn delete_node(&mut self, root: i32, key: i32) -> i32 {
+        if root == -1 {
+            return root;
+        }
+        
+        if key < self.nodes[root as usize].key {
+            let new_left = self.delete_node(self.nodes[root as usize].left, key);
+            self.nodes[root as usize].left = new_left;
+            if new_left != -1 {
+                self.nodes[new_left as usize].parent = root;
+            }
+        } else if key > self.nodes[root as usize].key {
+            let new_right = self.delete_node(self.nodes[root as usize].right, key);
+            self.nodes[root as usize].right = new_right;
+            if new_right != -1 {
+                self.nodes[new_right as usize].parent = root;
+            }
+        } else {
+            // Node to be deleted found
+            if self.nodes[root as usize].frequency > 1 {
+                self.nodes[root as usize].frequency -= 1;
+                return root;
+            }
+            
+            // Node with only one child or no child
+            if self.nodes[root as usize].left == -1 {
+                let temp = self.nodes[root as usize].right;
+                self.deallocate_node(root);
+                self.node_deletions += 1;
+                return temp;
+            } else if self.nodes[root as usize].right == -1 {
+                let temp = self.nodes[root as usize].left;
+                self.deallocate_node(root);
+                self.node_deletions += 1;
+                return temp;
+            }
+            
+            // Node with two children
+            let temp = self.find_min(self.nodes[root as usize].right);
+            self.nodes[root as usize].key = self.nodes[temp as usize].key;
+            self.nodes[root as usize].value = self.nodes[temp as usize].value;
+            self.nodes[root as usize].frequency = self.nodes[temp as usize].frequency;
+            
+            let new_right = self.delete_node(self.nodes[root as usize].right, self.nodes[temp as usize].key);
+            self.nodes[root as usize].right = new_right;
+            if new_right != -1 {
+                self.nodes[new_right as usize].parent = root;
+            }
+        }
+        
+        // Update height and balance
+        self.update_height(root);
+        let balance = self.get_balance(root);
+        
+        // Left Left Case
+        if balance > 1 && self.get_balance(self.nodes[root as usize].left) >= 0 {
+            return self.right_rotate(root);
+        }
+        
+        // Left Right Case
+        if balance > 1 && self.get_balance(self.nodes[root as usize].left) < 0 {
+            let new_left = self.left_rotate(self.nodes[root as usize].left);
+            self.nodes[root as usize].left = new_left;
+            if new_left != -1 {
+                self.nodes[new_left as usize].parent = root;
+            }
+            return self.right_rotate(root);
+        }
+        
+        // Right Right Case
+        if balance < -1 && self.get_balance(self.nodes[root as usize].right) <= 0 {
+            return self.left_rotate(root);
+        }
+        
+        // Right Left Case
+        if balance < -1 && self.get_balance(self.nodes[root as usize].right) > 0 {
+            let new_right = self.right_rotate(self.nodes[root as usize].right);
+            self.nodes[root as usize].right = new_right;
+            if new_right != -1 {
+                self.nodes[new_right as usize].parent = root;
+            }
+            return self.left_rotate(root);
+        }
+        
+        return root;
+    }
+    
+    fn inorder_traversal(&self, root: i32, result: &mut [i32; 1000], index: &mut i32) {
+        if root != -1 && *index < 1000 {
+            self.inorder_traversal(self.nodes[root as usize].left, result, index);
+            result[*index as usize] = self.nodes[root as usize].value;
+            *index += 1;
+            self.inorder_traversal(self.nodes[root as usize].right, result, index);
+        }
+    }
+}
+
+// Advanced Hash Table with dynamic resizing
+struct HashTable {
+    buckets: [[i32; 20]; 1000],
+    bucket_sizes: [i32; 1000],
+    keys: [[i32; 20]; 1000],
+    capacity: i32,
+    size: i32,
+    collision_count: i32,
+    resize_count: i32,
+    
+    // Hash function parameters
+    hash_a: i32,
+    hash_b: i32,
+    hash_p: i32,
+}
+
+impl HashTable {
+    fn new(initial_capacity: i32) -> HashTable {
+        HashTable {
+            buckets: [[0; 20]; 1000],
+            bucket_sizes: [0; 1000],
+            keys: [[0; 20]; 1000],
+            capacity: initial_capacity,
+            size: 0,
+            collision_count: 0,
+            resize_count: 0,
+            hash_a: 31,
+            hash_b: 17,
+            hash_p: 1000003,
+        }
+    }
+    
+    fn hash_function(&self, key: i32) -> i32 {
+        let hash_value = ((self.hash_a * key + self.hash_b) % self.hash_p) % self.capacity;
+        if hash_value < 0 {
+            return hash_value + self.capacity;
+        }
+        return hash_value;
+    }
+    
+    fn insert(&mut self, key: i32, value: i32) {
+        let index = self.hash_function(key);
+        
+        // Check if key already exists
+        let mut i = 0;
+        while (i < self.bucket_sizes[index as usize]) {
+            if (self.keys[index as usize][i as usize] == key) {
+                self.buckets[index as usize][i as usize] = value;
+                return;
+            }
+            i += 1;
+        }
+        
+        // Add new key-value pair
+        if self.bucket_sizes[index as usize] < 20 {
+            self.keys[index as usize][self.bucket_sizes[index as usize] as usize] = key;
+            self.buckets[index as usize][self.bucket_sizes[index as usize] as usize] = value;
+            self.bucket_sizes[index as usize] += 1;
+            self.size += 1;
+            
+            if self.bucket_sizes[index as usize] > 1 {
+                self.collision_count += 1;
+            }
+            
+            // Check if resize is needed
+            if self.size > self.capacity * 3 / 4 {
+                self.resize();
+            }
+        }
+    }
+    
+    fn search(&self, key: i32) -> i32 {
+        let index = self.hash_function(key);
+        
+        let mut i = 0;
+        while (i < self.bucket_sizes[index as usize]) {
+            if (self.keys[index as usize][i as usize] == key) {
+                return self.buckets[index as usize][i as usize];
+            }
+            i += 1;
+        }
+        
+        return -1; // Key not found
+    }
+    
+    fn delete(&mut self, key: i32) -> bool {
+        let index = self.hash_function(key);
+        
+        let mut i = 0;
+        while (i < self.bucket_sizes[index as usize]) {
+            if (self.keys[index as usize][i as usize] == key) {
+                // Shift elements to fill the gap
+                let mut j = i;
+                while (j < self.bucket_sizes[index as usize] - 1) {
+                    self.keys[index as usize][j as usize] = self.keys[index as usize][(j + 1) as usize];
+                    self.buckets[index as usize][j as usize] = self.buckets[index as usize][(j + 1) as usize];
+                    j += 1;
+                }
+                self.bucket_sizes[index as usize] -= 1;
+                self.size -= 1;
+                return true;
+            }
+            i += 1;
+        }
+        
+        return false;
+    }
+    
+    fn resize(&mut self) {
+        if self.capacity >= 900 {
+            return; // Prevent overflow
+        }
+        
+        // Save old data
+        let old_buckets = self.buckets;
+        let old_keys = self.keys;
+        let old_bucket_sizes = self.bucket_sizes;
+        let old_capacity = self.capacity;
+        
+        // Initialize new larger table
+        self.capacity = self.capacity * 2;
+        if self.capacity > 1000 {
+            self.capacity = 1000;
+        }
+        
+        self.buckets = [[0; 20]; 1000];
+        self.keys = [[0; 20]; 1000];
+        self.bucket_sizes = [0; 1000];
+        self.size = 0;
+        self.resize_count += 1;
+        
+        // Rehash all elements
+        let mut i = 0;
+        while (i < old_capacity) {
+            let mut j = 0;
+            while (j < old_bucket_sizes[i as usize]) {
+                self.insert(old_keys[i as usize][j as usize], old_buckets[i as usize][j as usize]);
+                j += 1;
+            }
+            i += 1;
+        }
+    }
+}
+
+// LRU Cache implementation
+struct LRUCache {
+    cache_data: [i32; 500],
+    cache_keys: [i32; 500],
+    usage_order: [i32; 500],
+    key_to_index: [i32; 10000],
+    capacity: i32,
+    size: i32,
+    access_count: i32,
+    hit_count: i32,
+    miss_count: i32,
+}
+
+impl LRUCache {
+    fn new(capacity: i32) -> LRUCache {
+        let mut cache = LRUCache {
+            cache_data: [0; 500],
+            cache_keys: [0; 500],
+            usage_order: [0; 500],
+            key_to_index: [-1; 10000],
+            capacity: capacity,
+            size: 0,
+            access_count: 0,
+            hit_count: 0,
+            miss_count: 0,
+        };
+        
+        // Initialize key mapping
+        let mut i = 0;
+        while (i < 10000) {
+            cache.key_to_index[i as usize] = -1;
+            i += 1;
+        }
+        
+        return cache;
+    }
+    
+    fn get(&mut self, key: i32) -> i32 {
+        self.access_count += 1;
+        
+        if key < 0 || key >= 10000 {
+            self.miss_count += 1;
+            return -1;
+        }
+        
+        let index = self.key_to_index[key as usize];
+        if index == -1 {
+            self.miss_count += 1;
+            return -1;
+        }
+        
+        // Update usage order
+        self.update_usage_order(index);
+        self.hit_count += 1;
+        return self.cache_data[index as usize];
+    }
+    
+    fn put(&mut self, key: i32, value: i32) {
+        if key < 0 || key >= 10000 {
+            return;
+        }
+        
+        let existing_index = self.key_to_index[key as usize];
+        if existing_index != -1 {
+            // Update existing entry
+            self.cache_data[existing_index as usize] = value;
+            self.update_usage_order(existing_index);
+            return;
+        }
+        
+        if self.size < self.capacity {
+            // Add new entry
+            let new_index = self.size;
+            self.cache_keys[new_index as usize] = key;
+            self.cache_data[new_index as usize] = value;
+            self.key_to_index[key as usize] = new_index;
+            self.usage_order[new_index as usize] = self.access_count;
+            self.size += 1;
+        } else {
+            // Find LRU entry to replace
+            let mut lru_index = 0;
+            let mut min_usage = self.usage_order[0];
+            
+            let mut i = 1;
+            while (i < self.capacity) {
+                if (self.usage_order[i as usize] < min_usage) {
+                    min_usage = self.usage_order[i as usize];
+                    lru_index = i;
+                }
+                i += 1;
+            }
+            
+            // Remove old mapping and add new entry
+            let old_key = self.cache_keys[lru_index as usize];
+            if old_key >= 0 && old_key < 10000 {
+                self.key_to_index[old_key as usize] = -1;
+            }
+            
+            self.cache_keys[lru_index as usize] = key;
+            self.cache_data[lru_index as usize] = value;
+            self.key_to_index[key as usize] = lru_index;
+            self.usage_order[lru_index as usize] = self.access_count;
+        }
+    }
+    
+    fn update_usage_order(&mut self, index: i32) {
+        self.usage_order[index as usize] = self.access_count;
+    }
+    
+    fn get_cache_statistics(&self) -> [i32; 5] {
+        let hit_rate = if self.access_count > 0 { (self.hit_count * 100) / self.access_count } else { 0 };
+        [self.hit_count, self.miss_count, self.access_count, hit_rate, self.size]
+    }
+}
+
+// Memory Management Simulator
+struct MemoryManager {
+    memory_blocks: [i32; 10000],
+    block_status: [bool; 10000], // true = allocated, false = free
+    block_sizes: [i32; 10000],
+    total_memory: i32,
+    allocated_memory: i32,
+    free_memory: i32,
+    allocation_count: i32,
+    deallocation_count: i32,
+    fragmentation_score: i32,
+}
+
+impl MemoryManager {
+    fn new(total_size: i32) -> MemoryManager {
+        let mut manager = MemoryManager {
+            memory_blocks: [0; 10000],
+            block_status: [false; 10000],
+            block_sizes: [0; 10000],
+            total_memory: total_size,
+            allocated_memory: 0,
+            free_memory: total_size,
+            allocation_count: 0,
+            deallocation_count: 0,
+            fragmentation_score: 0,
+        };
+        
+        // Initialize with one large free block
+        manager.block_sizes[0] = total_size;
+        
+        return manager;
+    }
+    
+    fn allocate(&mut self, size: i32) -> i32 {
+        if size <= 0 || size > self.free_memory {
+            return -1;
+        }
+        
+        // Find first fit
+        let mut i = 0;
+        while (i < 10000) {
+            if (!self.block_status[i as usize] && self.block_sizes[i as usize] >= size) {
+                // Allocate this block
+                self.block_status[i as usize] = true;
+                self.memory_blocks[i as usize] = i; // Block ID
+                
+                // Split block if necessary
+                if self.block_sizes[i as usize] > size {
+                    let remaining_size = self.block_sizes[i as usize] - size;
+                    self.block_sizes[i as usize] = size;
+                    
+                    // Find free slot for remaining block
+                    let mut j = 0;
+                    while (j < 10000) {
+                        if (self.block_sizes[j as usize] == 0) {
+                            self.block_sizes[j as usize] = remaining_size;
+                            break;
+                        }
+                        j += 1;
+                    }
+                }
+                
+                self.allocated_memory += size;
+                self.free_memory -= size;
+                self.allocation_count += 1;
+                self.calculate_fragmentation();
+                
+                return i;
+            }
+            i += 1;
+        }
+        
+        return -1; // Allocation failed
+    }
+    
+    fn deallocate(&mut self, block_id: i32) -> bool {
+        if block_id < 0 || block_id >= 10000 || !self.block_status[block_id as usize] {
+            return false;
+        }
+        
+        let size = self.block_sizes[block_id as usize];
+        self.block_status[block_id as usize] = false;
+        self.allocated_memory -= size;
+        self.free_memory += size;
+        self.deallocation_count += 1;
+        
+        // Attempt to coalesce with adjacent free blocks
+        self.coalesce_free_blocks();
+        self.calculate_fragmentation();
+        
+        return true;
+    }
+    
+    fn coalesce_free_blocks(&mut self) {
+        // Simple coalescing strategy
+        let mut i = 0;
+        while (i < 9999) {
+            if (!self.block_status[i as usize] && !self.block_status[(i + 1) as usize]) {
+                self.block_sizes[i as usize] += self.block_sizes[(i + 1) as usize];
+                self.block_sizes[(i + 1) as usize] = 0;
+            }
+            i += 1;
+        }
+    }
+    
+    fn calculate_fragmentation(&mut self) {
+        let mut free_block_count = 0;
+        let mut largest_free_block = 0;
+        
+        let mut i = 0;
+        while (i < 10000) {
+            if (!self.block_status[i as usize] && self.block_sizes[i as usize] > 0) {
+                free_block_count += 1;
+                if self.block_sizes[i as usize] > largest_free_block {
+                    largest_free_block = self.block_sizes[i as usize];
+                }
+            }
+            i += 1;
+        }
+        
+        if self.free_memory > 0 {
+            self.fragmentation_score = 100 - (largest_free_block * 100) / self.free_memory;
+        } else {
+            self.fragmentation_score = 0;
+        }
+    }
+    
+    fn get_memory_statistics(&self) -> [i32; 6] {
+        [
+            self.allocated_memory,
+            self.free_memory,
+            self.allocation_count,
+            self.deallocation_count,
+            self.fragmentation_score,
+            self.total_memory
+        ]
+    }
+}
+
+// Main comprehensive data structure test
+fn main() {
+    // Initialize AVL Tree
+    let mut avl_tree = AVLTree::new();
+    
+    // Read tree operations
+    let tree_operations = readInt();
+    let mut i = 0;
+    while (i < tree_operations) {
+        let operation = readInt();
+        let key = readInt();
+        let value = readInt();
+        
+        if operation == 1 {
+            avl_tree.root = avl_tree.insert(avl_tree.root, key, value);
+        } else if operation == 2 {
+            avl_tree.root = avl_tree.delete_node(avl_tree.root, key);
+        } else if operation == 3 {
+            let result = avl_tree.search(avl_tree.root, key);
+            if result != -1 {
+                printInt(avl_tree.nodes[result as usize].value);
+            } else {
+                printInt(-1);
+            }
+        }
+        i += 1;
+    }
+    
+    // Initialize Hash Table
+    let hash_capacity = readInt();
+    let mut hash_table = HashTable::new(hash_capacity);
+    
+    // Read hash table operations
+    let hash_operations = readInt();
+    i = 0;
+    while (i < hash_operations) {
+        let operation = readInt();
+        let key = readInt();
+        
+        if operation == 1 {
+            let value = readInt();
+            hash_table.insert(key, value);
+        } else if operation == 2 {
+            let result = hash_table.search(key);
+            printInt(result);
+        } else if operation == 3 {
+            let deleted = hash_table.delete(key);
+            printInt(if deleted { 1 } else { 0 });
+        }
+        i += 1;
+    }
+    
+    // Initialize LRU Cache
+    let cache_capacity = readInt();
+    let mut lru_cache = LRUCache::new(cache_capacity);
+    
+    // Read cache operations
+    let cache_operations = readInt();
+    i = 0;
+    while (i < cache_operations) {
+        let operation = readInt();
+        let key = readInt();
+        
+        if operation == 1 {
+            let value = readInt();
+            lru_cache.put(key, value);
+        } else if operation == 2 {
+            let result = lru_cache.get(key);
+            printInt(result);
+        }
+        i += 1;
+    }
+    
+    // Initialize Memory Manager
+    let memory_size = readInt();
+    let mut memory_manager = MemoryManager::new(memory_size);
+    
+    // Read memory operations
+    let memory_operations = readInt();
+    i = 0;
+    while (i < memory_operations) {
+        let operation = readInt();
+        
+        if operation == 1 {
+            let size = readInt();
+            let block_id = memory_manager.allocate(size);
+            printInt(block_id);
+        } else if operation == 2 {
+            let block_id = readInt();
+            let success = memory_manager.deallocate(block_id);
+            printInt(if success { 1 } else { 0 });
+        }
+        i += 1;
+    }
+    
+    // Output comprehensive statistics
+    printInt(avl_tree.node_count);
+    printInt(avl_tree.rotation_count);
+    printInt(avl_tree.search_operations);
+    
+    printInt(hash_table.size);
+    printInt(hash_table.collision_count);
+    printInt(hash_table.resize_count);
+    
+    let cache_stats = lru_cache.get_cache_statistics();
+    i = 0;
+    while (i < 5) {
+        printInt(cache_stats[i as usize]);
+        i += 1;
+    }
+    
+    let memory_stats = memory_manager.get_memory_statistics();
+    i = 0;
+    while (i < 6) {
+        printInt(memory_stats[i as usize]);
+        i += 1;
+    }
+    
+    // Final comprehensive analysis
+    let tree_score = avl_tree.node_count * 10 + avl_tree.rotation_count;
+    let hash_score = hash_table.size * 5 + hash_table.collision_count;
+    let cache_score = cache_stats[3]; // Hit rate
+    let memory_score = 100 - memory_stats[4]; // Inverse of fragmentation
+    
+    let total_score = tree_score + hash_score + cache_score + memory_score;
+    printInt(total_score);
+}

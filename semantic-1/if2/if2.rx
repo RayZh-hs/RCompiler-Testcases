@@ -1,0 +1,18 @@
+/*
+Test Package: Semantic-1
+Test Target: if
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: if statement test, if-else with mutable variable modification
+*/
+
+fn main() {
+    let mut flag: bool = true;
+    if (flag) {
+        flag = false;
+    } else {
+        flag = true;
+    }
+    exit(0);
+}

@@ -1,0 +1,212 @@
+/*
+Test Package: Semantic-1
+Test Target: misc
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: Strongly Connected Components using Kosaraju's Algorithm
+*/
+
+// Strongly Connected Components using Kosaraju's Algorithm
+// Finds all maximal strongly connected components in a directed graph
+struct Graph {
+    adjacency_list: [[i32; 100]; 100],
+    edge_counts: [i32; 100],
+    vertex_count: i32,
+}
+
+struct Stack {
+    data: [i32; 1000],
+    top: i32,
+}
+
+impl Graph {
+    fn new(vertices: i32) -> Graph {
+        Graph {
+            adjacency_list: [[-1; 100]; 100],
+            edge_counts: [0; 100],
+            vertex_count: vertices,
+        }
+    }
+    
+    fn add_edge(&mut self, src: i32, dest: i32) {
+        if (src >= 0 && src < self.vertex_count && dest >= 0 && dest < self.vertex_count) {
+            let count: i32 = self.edge_counts[src as usize];
+            if (count < 100) {
+                self.adjacency_list[src as usize][count as usize] = dest;
+                self.edge_counts[src as usize] += 1;
+            }
+        }
+    }
+    
+    fn get_transpose(&self) -> Graph {
+        let mut transposed: Graph = Graph::new(self.vertex_count);
+        
+        let mut i: i32 = 0;
+        while (i < self.vertex_count) {
+            let mut j: i32 = 0;
+            while (j < self.edge_counts[i as usize]) {
+                let dest: i32 = self.adjacency_list[i as usize][j as usize];
+                transposed.add_edge(dest, i);
+                j += 1;
+            }
+            i += 1;
+        }
+        
+        return transposed;
+    }
+    
+    fn dfs_fill_order(&self, vertex: i32, visited: &mut [bool; 100], stack: &mut Stack) {
+        visited[vertex as usize] = true;
+        
+        let mut i: i32 = 0;
+        while (i < self.edge_counts[vertex as usize]) {
+            let neighbor: i32 = self.adjacency_list[vertex as usize][i as usize];
+            if (!visited[neighbor as usize]) {
+                self.dfs_fill_order(neighbor, visited, stack);
+            }
+            i += 1;
+        }
+        
+        stack.push(vertex);
+    }
+    
+    fn dfs_component(&self, vertex: i32, visited: &mut [bool; 100], component: &mut [i32; 100], comp_size: &mut i32) {
+        visited[vertex as usize] = true;
+        component[*comp_size as usize] = vertex;
+        *comp_size += 1;
+        
+        let mut i: i32 = 0;
+        while (i < self.edge_counts[vertex as usize]) {
+            let neighbor: i32 = self.adjacency_list[vertex as usize][i as usize];
+            if (!visited[neighbor as usize]) {
+                self.dfs_component(neighbor, visited, component, comp_size);
+            }
+            i += 1;
+        }
+    }
+    
+    fn find_strongly_connected_components(&self) -> [[i32; 100]; 50] {
+        let mut visited: [bool; 100] = [false; 100];
+        let mut stack: Stack = Stack::new();
+        let mut components: [[i32; 100]; 50] = [[-1; 100]; 50];
+        
+        // Fill vertices in stack according to their finishing times
+        let mut i: i32 = 0;
+        while (i < self.vertex_count) {
+            if (!visited[i as usize]) {
+                self.dfs_fill_order(i, &mut visited, &mut stack);
+            }
+            i += 1;
+        }
+        
+        // Create transpose of graph
+        let transposed: Graph = self.get_transpose();
+        
+        // Reset visited array
+        visited = [false; 100];
+        let mut component_count: i32 = 0;
+        
+        // Process vertices in order defined by stack
+        while (!stack.is_empty()) {
+            let vertex: i32 = stack.pop();
+            if (!visited[vertex as usize] && component_count < 50) {
+                let mut component: [i32; 100] = [-1; 100];
+                let mut comp_size: i32 = 0;
+                transposed.dfs_component(vertex, &mut visited, &mut component, &mut comp_size);
+                components[component_count as usize] = component;
+                component_count += 1;
+            }
+        }
+        
+        return components;
+    }
+    
+    fn count_strongly_connected_components(&self) -> i32 {
+        let components: [[i32; 100]; 50] = self.find_strongly_connected_components();
+        let mut count: i32 = 0;
+        
+        let mut i: i32 = 0;
+        while (i < 50) {
+            if (components[i as usize][0] != -1) {
+                count += 1;
+            }
+            i += 1;
+        }
+        
+        return count;
+    }
+    
+    fn is_strongly_connected(&self) -> bool {
+        return self.count_strongly_connected_components() == 1;
+    }
+}
+
+impl Stack {
+    fn new() -> Stack {
+        Stack {
+            data: [0; 1000],
+            top: -1,
+        }
+    }
+    
+    fn push(&mut self, value: i32) {
+        if (self.top < 999) {
+            self.top += 1;
+            self.data[self.top as usize] = value;
+        }
+    }
+    
+    fn pop(&mut self) -> i32 {
+        if (self.top >= 0) {
+            let value: i32 = self.data[self.top as usize];
+            self.top -= 1;
+            return value;
+        }
+        return -1;
+    }
+    
+    fn is_empty(&self) -> bool {
+        return (self.top == -1);
+    }
+}
+
+fn main() {
+    let vertices: i32 = getInt();
+    let mut graph: Graph = Graph::new(vertices);
+    
+    let edges: i32 = getInt();
+    let mut i: i32 = 0;
+    while (i < edges) {
+        let src: i32 = getInt();
+        let dest: i32 = getInt();
+        graph.add_edge(src, dest);
+        i += 1;
+    }
+    
+    let operation: i32 = getInt();
+    
+    if (operation == 1) { // Count strongly connected components
+        let scc_count: i32 = graph.count_strongly_connected_components();
+        printInt(scc_count);
+    } else if (operation == 2) { // Check if graph is strongly connected
+        if (graph.is_strongly_connected()) {
+            printInt(1);
+        } else {
+            printInt(0);
+        }
+    } else if (operation == 3) { // Print all strongly connected components
+        let components: [[i32; 100]; 50] = graph.find_strongly_connected_components();
+        i = 0;
+        while (i < 50 && components[i as usize][0] != -1) {
+            printInt(-1); // Component separator
+            let mut j: i32 = 0;
+            while (j < 100 && components[i as usize][j as usize] != -1) {
+                printInt(components[i as usize][j as usize]);
+                j += 1;
+            }
+            i += 1;
+        }
+    }
+    exit(0);
+}

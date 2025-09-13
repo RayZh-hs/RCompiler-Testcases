@@ -1,0 +1,32 @@
+{
+    "active": 1,
+    "cmp": [
+        "compileexitcode"
+    ],
+    "compileexitcode": -1,
+    "compilememorylimit": 256,
+    "compiletimelimit": 15,
+    "exitcode": 0,
+    "id": 2032046,
+    "input_path": "src/misc64/misc64.in",
+    "input_visible": 1,
+    "metainfo": {
+        "caseauthor": "Wenxin Zheng",
+        "comment": "Heavy-Light Decomposition with Link-Cut Tree operations with missing struct field initialization error",
+        "lastmodified": "2025-08-08"
+    },
+    "name": "misc64",
+    "name_visible": 1,
+    "output_path": "src/misc64/misc64.out",
+    "output_visible": 1,
+    "provide": [
+        "compilestderr",
+        "compileexitcode"
+    ],
+    "runtimelimit": -1,
+    "runtimememorylimit": 256,
+    "source_path": "src/misc64/misc64.rx",
+    "source_visible": 1,
+    "stage_id": 23891,
+    "stage_name": "semantic-1"
+}

@@ -1,0 +1,74 @@
+/*
+Test Package: Semantic-1
+Test Target: misc
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: misc test, simple sorting and processing with structs
+*/
+
+// Simple sorting and number processing
+// Bubble sort implementation with struct methods
+struct NumberProcessor {
+    value: i32,
+}
+
+impl NumberProcessor {
+    fn new(val: i32) -> NumberProcessor {
+        NumberProcessor { value: val }
+    }
+    
+    fn get_value(&self) -> i32 {
+        return self.value;
+    }
+    
+    fn is_greater(&self, other: &NumberProcessor) -> bool {
+        return self.value > other.value;
+    }
+}
+
+fn sort_array(arr: &mut [NumberProcessor; 10], n: usize) {
+    let mut i: usize = 0;
+    while (i < n) {
+        let mut j: usize = 0;
+        while (j < n - 1 - i) {
+            if (arr[j].is_greater(&arr[j + 1])) {
+                // Swap elements
+                let temp_val: i32 = arr[j].value;
+                arr[j].value = arr[j + 1].value;
+                arr[j + 1].value = temp_val;
+            }
+            j += 1;
+        }
+        i += 1;
+    }
+}
+
+fn main() {
+    // Read input numbers
+    let n: i32 = getInt();
+    let mut processors: [NumberProcessor; 10] = [
+        NumberProcessor::new(0), NumberProcessor::new(0), NumberProcessor::new(0), 
+        NumberProcessor::new(0), NumberProcessor::new(0), NumberProcessor::new(0),
+        NumberProcessor::new(0), NumberProcessor::new(0), NumberProcessor::new(0), 
+        NumberProcessor::new(0)
+    ];
+    
+    let mut i: i32 = 0;
+    while (i < n) {
+        let val: i32 = getInt();
+        processors[i as usize] = NumberProcessor::new(val);
+        i += 1;
+    }
+    
+    // Sort the array
+    sort_array(&mut processors, n as usize);
+    
+    // Output sorted numbers
+    i = 0;
+    while (i < n) {
+        printInt(processors[i as usize].get_value());
+        i += 1;
+    }
+    exit(0);
+}

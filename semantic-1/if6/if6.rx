@@ -1,0 +1,20 @@
+/*
+Test Package: Semantic-1
+Test Target: if
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: if statement test, nested if in while loop
+*/
+
+fn main() {
+    let mut counter: i32 = 0;
+    while (counter < 3) {
+        if (counter == 1) {
+            counter += 1;
+        } else {
+            counter += 1;
+        }
+    }
+    exit(0);
+}

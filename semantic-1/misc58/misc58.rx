@@ -1,0 +1,255 @@
+/*
+Test Package: Semantic-1
+Test Target: misc
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: Tarjan's strongly connected components algorithm with function redefinition error
+*/
+
+// Tarjan's algorithm for finding strongly connected components
+// Uses DFS with low-link values and explicit stack management
+
+struct Node {
+    id: i32,
+    visited: bool,
+    on_stack: bool,
+    low_link: i32,
+    index: i32,
+}
+
+struct Graph {
+    nodes: [Node; 10],
+    adjacency: [[bool; 10]; 10],
+    node_count: i32,
+}
+
+struct TarjanState {
+    index_counter: i32,
+    stack: [i32; 10],
+    stack_size: i32,
+    scc_count: i32,
+}
+
+// Initialize a graph node
+fn init_node(id: i32) -> Node {
+    Node {
+        id: id,
+        visited: false,
+        on_stack: false,
+        low_link: -1,
+        index: -1,
+    }
+}
+
+// Add edge to adjacency matrix
+fn add_edge(graph: &mut Graph, from: i32, to: i32) {
+    if from >= 0 && from < graph.node_count && to >= 0 && to < graph.node_count {
+        graph.adjacency[from as usize][to as usize] = true;
+    }
+}
+
+// Push to stack
+fn push_stack(state: &mut TarjanState, node_id: i32) {
+    if state.stack_size < 10 {
+        state.stack[state.stack_size as usize] = node_id;
+        state.stack_size += 1;
+    }
+}
+
+// Pop from stack
+fn pop_stack(state: &mut TarjanState) -> i32 {
+    if state.stack_size > 0 {
+        state.stack_size -= 1;
+        return state.stack[state.stack_size as usize];
+    }
+    return -1;
+}
+
+// Check if node is on stack
+fn is_on_stack(state: &TarjanState, node_id: i32) -> bool {
+    let mut i: i32 = 0;
+    while i < state.stack_size {
+        if state.stack[i as usize] == node_id {
+            return true;
+        }
+        i += 1;
+    }
+    return false;
+}
+
+// Find minimum of two values
+fn min_value(a: i32, b: i32) -> i32 {
+    if a < b {
+        return a;
+    }
+    return b;
+}
+
+// Main Tarjan's SCC algorithm - first definition
+fn tarjan_scc_dfs(graph: &mut Graph, state: &mut TarjanState, node_id: i32) -> i32 {
+    // Set the depth index for this node
+    graph.nodes[node_id as usize].index = state.index_counter;
+    graph.nodes[node_id as usize].low_link = state.index_counter;
+    state.index_counter += 1;
+    
+    graph.nodes[node_id as usize].visited = true;
+    graph.nodes[node_id as usize].on_stack = true;
+    push_stack(state, node_id);
+    
+    // Explore all neighbors
+    let mut neighbor: i32 = 0;
+    while neighbor < graph.node_count {
+        if graph.adjacency[node_id as usize][neighbor as usize] {
+            if graph.nodes[neighbor as usize].index == -1 {
+                // Recursive call for unvisited neighbor
+                tarjan_scc_dfs(graph, state, neighbor);
+                let neighbor_low: i32 = graph.nodes[neighbor as usize].low_link;
+                let current_low: i32 = graph.nodes[node_id as usize].low_link;
+                graph.nodes[node_id as usize].low_link = min_value(current_low, neighbor_low);
+            } else if graph.nodes[neighbor as usize].on_stack {
+                let neighbor_index: i32 = graph.nodes[neighbor as usize].index;
+                let current_low: i32 = graph.nodes[node_id as usize].low_link;
+                graph.nodes[node_id as usize].low_link = min_value(current_low, neighbor_index);
+            }
+        }
+        neighbor += 1;
+    }
+    
+    // If node is a root node, pop the stack and create SCC
+    if graph.nodes[node_id as usize].low_link == graph.nodes[node_id as usize].index {
+        state.scc_count += 1;
+        let mut component_size: i32 = 0;
+        
+        loop {
+            let w: i32 = pop_stack(state);
+            if w == -1 {
+                break;
+            }
+            graph.nodes[w as usize].on_stack = false;
+            component_size += 1;
+            
+            if w == node_id {
+                break;
+            }
+        }
+        
+        return component_size;
+    }
+    
+    return 0;
+}
+
+fn tarjan_scc_dfs(graph: &mut Graph, state: &mut TarjanState, node_id: i32) -> i32 {
+    114514
+}
+
+// Run Tarjan's algorithm on entire graph
+fn find_all_sccs(graph: &mut Graph) -> i32 {
+    let mut state: TarjanState = TarjanState {
+        index_counter: 0,
+        stack: [0; 10],
+        stack_size: 0,
+        scc_count: 0,
+    };
+    
+    let mut total_component_sizes: i32 = 0;
+    let mut node_id: i32 = 0;
+    
+    while node_id < graph.node_count {
+        if graph.nodes[node_id as usize].index == -1 {
+            let component_size: i32 = tarjan_scc_dfs(graph, &mut state, node_id);
+            total_component_sizes += component_size;
+        }
+        node_id += 1;
+    }
+    
+    return state.scc_count + total_component_sizes;
+}
+
+// Create test graph with complex SCC structure
+fn create_test_graph() -> Graph {
+    let mut graph: Graph = Graph {
+        nodes: [
+            init_node(0), init_node(1), init_node(2), init_node(3), init_node(4),
+            init_node(5), init_node(6), init_node(7), init_node(8), init_node(9)
+        ],
+        adjacency: [[false; 10]; 10],
+        node_count: 8,
+    };
+    
+    // Create a graph with multiple SCCs
+    add_edge(&mut graph, 0, 1);
+    add_edge(&mut graph, 1, 2);
+    add_edge(&mut graph, 2, 0);  // SCC: {0, 1, 2}
+    
+    add_edge(&mut graph, 2, 3);
+    add_edge(&mut graph, 3, 4);
+    add_edge(&mut graph, 4, 5);
+    add_edge(&mut graph, 5, 3);  // SCC: {3, 4, 5}
+    
+    add_edge(&mut graph, 5, 6);
+    add_edge(&mut graph, 6, 7);
+    add_edge(&mut graph, 7, 6);  // SCC: {6, 7}
+    
+    return graph;
+}
+
+// Additional verification using simple cycle detection
+fn verify_with_cycle_detection() -> i32 {
+    let mut verification_result: i32 = 0;
+    let mut test_node: i32 = 0;
+    
+    // Simple DFS-based cycle detection for comparison
+    while test_node < 5 {
+        let mut visited: [bool; 10] = [false; 10];
+        let mut rec_stack: [bool; 10] = [false; 10];
+        
+        let has_cycle: bool = dfs_cycle_check(test_node, &mut visited, &mut rec_stack);
+        if has_cycle {
+            verification_result += 1;
+        }
+        
+        test_node += 1;
+    }
+    
+    return verification_result;
+}
+
+// Helper function for cycle detection
+fn dfs_cycle_check(node: i32, visited: &mut [bool; 10], rec_stack: &mut [bool; 10]) -> bool {
+    visited[node as usize] = true;
+    rec_stack[node as usize] = true;
+    
+    // Check a simple graph structure for testing
+    if node == 0 && !visited[1] {
+        if dfs_cycle_check(1, visited, rec_stack) {
+            return true;
+        }
+    }
+    if node == 1 && !visited[2] {
+        if dfs_cycle_check(2, visited, rec_stack) {
+            return true;
+        }
+    }
+    if node == 2 && !visited[0] {
+        if rec_stack[0] {
+            return true;  // Back edge found
+        }
+        if dfs_cycle_check(0, visited, rec_stack) {
+            return true;
+        }
+    }
+    
+    rec_stack[node as usize] = false;
+    return false;
+}
+
+fn main() {
+    let mut test_graph: Graph = create_test_graph();
+    let scc_result: i32 = find_all_sccs(&mut test_graph);
+    let cycle_result: i32 = verify_with_cycle_detection();
+    let final_result: i32 = scc_result + cycle_result;
+    printInt(final_result);
+    exit(0);
+}

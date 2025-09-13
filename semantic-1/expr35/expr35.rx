@@ -1,0 +1,255 @@
+/*
+Test Package: Semantic-1
+Test Target: expr
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: Complex expression error: Variable `current_node` not found - AVL tree rebalancing simulation with height calculations, rotation detection, and tree complexity metrics
+*/
+
+struct AVLTreeNode {
+    value: i32,
+    height: i32,
+    balance_factor: i32,
+    left_exists: bool,
+    right_exists: bool,
+}
+
+impl AVLTreeNode {
+    fn new(val: i32) -> AVLTreeNode {
+        AVLTreeNode {
+            value: val,
+            height: 1,
+            balance_factor: 0,
+            left_exists: false,
+            right_exists: false,
+        }
+    }
+    
+    fn update_height(&mut self, left_height: i32, right_height: i32) {
+        let max_height: i32 = if (left_height > right_height) { left_height } else { right_height };
+        self.height = max_height + 1;
+        self.balance_factor = left_height - right_height;
+    }
+    
+    fn needs_rotation(&self) -> i32 {
+        if (self.balance_factor > 1) {
+            return 1;
+        } else if (self.balance_factor < -1) {
+            return -1;
+        } else {
+            return 0;
+        }
+    }
+}
+
+fn calculate_tree_height(nodes: &[AVLTreeNode; 15], node_index: i32, max_depth: i32) -> i32 {
+    if (node_index < 0 || node_index >= 15 || max_depth <= 0) {
+        return 0;
+    }
+    
+    let current_node: &AVLTreeNode = &nodes[node_index as usize];
+    let left_height: i32 = if (current_node.left_exists) {
+        calculate_tree_height(nodes, node_index * 2 + 1, max_depth - 1)
+    } else {
+        0
+    };
+    
+    let right_height: i32 = if (current_node.right_exists) {
+        calculate_tree_height(nodes, node_index * 2 + 2, max_depth - 1)
+    } else {
+        0
+    };
+    
+    let max_child_height: i32 = if (left_height > right_height) { left_height } else { right_height };
+    return max_child_height + 1;
+}
+
+fn perform_avl_rebalancing_simulation(nodes: &mut [AVLTreeNode; 15]) -> i32 {
+    let mut rebalance_count: i32 = 0;
+    let mut node_index: i32 = 0;
+    
+    loop {
+        if (node_index >= 15) { break; }
+        
+        let left_child_index: i32 = node_index * 2 + 1;
+        let right_child_index: i32 = node_index * 2 + 2;
+        
+        let left_height: i32 = if (left_child_index < 15 && current_node.left_exists) {
+            nodes[left_child_index as usize].height
+        } else {
+            0
+        };
+        
+        let right_height: i32 = if (right_child_index < 15 && current_node.right_exists) {
+            nodes[right_child_index as usize].height
+        } else {
+            0
+        };
+        
+        current_node.update_height(left_height, right_height);
+        
+        let rotation_needed: i32 = current_node.needs_rotation();
+        if (rotation_needed != 0) {
+            rebalance_count = rebalance_count + 1;
+            let rotation_type: i32 = {
+                if (rotation_needed > 0) {
+                    if (left_child_index < 15 && nodes[left_child_index as usize].balance_factor >= 0) { 1 } else { 2 }
+                } else {
+                    if (right_child_index < 15 && nodes[right_child_index as usize].balance_factor <= 0) { 3 } else { 4 }
+                }
+            };
+            
+            current_node.balance_factor = 0;
+            
+            if (rotation_type == 1) {
+                current_node.height = current_node.height - 1;
+            } else if (rotation_type == 2) {
+                current_node.height = current_node.height - 2;
+            } else if (rotation_type == 3) {
+                current_node.height = current_node.height - 1;
+            } else if (rotation_type == 4) {
+                current_node.height = current_node.height - 2;
+            }
+        }
+        node_index = node_index + 1;
+    }
+    
+    return rebalance_count;
+}
+
+fn compute_tree_complexity_metrics(nodes: &[AVLTreeNode; 15]) -> i32 {
+    let mut total_height: i32 = 0;
+    let mut balance_factor_sum: i32 = 0;
+    let mut leaf_count: i32 = 0;
+    let mut internal_node_count: i32 = 0;
+    
+    let mut index: i32 = 0;
+    loop {
+        if (index >= 15) {
+            break;
+        }
+        
+        let node: &AVLTreeNode = &nodes[index as usize];
+        total_height = total_height + node.height;
+        balance_factor_sum = balance_factor_sum + {
+            let bf: i32 = node.balance_factor;
+            if (bf < 0) { -bf } else { bf }
+        };
+        
+        if (!node.left_exists && !node.right_exists) {
+            leaf_count = leaf_count + 1;
+        } else {
+            internal_node_count = internal_node_count + 1;
+        }
+        
+        index = index + 1;
+    }
+    
+    let complexity_score: i32 = {
+        let height_factor: i32 = total_height * 3;
+        let balance_factor: i32 = balance_factor_sum * 5;
+        let structure_factor: i32 = (leaf_count * 2) + (internal_node_count * 4);
+        let raw_score: i32 = height_factor + balance_factor + structure_factor;
+        let normalized: i32 = raw_score % 1000;
+        if (normalized > 500) {
+            normalized - 200
+        } else {
+            normalized + 100
+        }
+    };
+    
+    return complexity_score;
+}
+
+fn main() {
+    let mut avl_tree: [AVLTreeNode; 15] = [
+        AVLTreeNode::new(50), AVLTreeNode::new(30), AVLTreeNode::new(70), AVLTreeNode::new(20), AVLTreeNode::new(40),
+        AVLTreeNode::new(60), AVLTreeNode::new(80), AVLTreeNode::new(10), AVLTreeNode::new(25), AVLTreeNode::new(35),
+        AVLTreeNode::new(45), AVLTreeNode::new(55), AVLTreeNode::new(65), AVLTreeNode::new(75), AVLTreeNode::new(85),
+    ];
+    
+    avl_tree[0].left_exists = true;
+    avl_tree[0].right_exists = true;
+    avl_tree[1].left_exists = true;
+    avl_tree[1].right_exists = true;
+    avl_tree[2].left_exists = true;
+    avl_tree[2].right_exists = true;
+    avl_tree[3].left_exists = true;
+    avl_tree[3].right_exists = true;
+    avl_tree[4].left_exists = true;
+    avl_tree[4].right_exists = true;
+    avl_tree[5].left_exists = true;
+    avl_tree[5].right_exists = true;
+    avl_tree[6].left_exists = true;
+    avl_tree[6].right_exists = true;
+    
+    let tree_height: i32 = calculate_tree_height(&avl_tree, 0, 10);
+    let rebalance_operations: i32 = perform_avl_rebalancing_simulation(&mut avl_tree);
+    let complexity_metrics: i32 = compute_tree_complexity_metrics(&avl_tree);
+    
+    let performance_analysis: i32 = {
+        let height_weight: i32 = tree_height * 7;
+        let rebalance_weight: i32 = rebalance_operations * 12;
+        let complexity_weight: i32 = complexity_metrics / 3;
+        let combined: i32 = height_weight + rebalance_weight + complexity_weight;
+        let optimized: i32 = {
+            let temp: i32 = combined % 2000;
+            if (temp > 1000) {
+                temp - 500
+            } else {
+                temp + 250
+            }
+        };
+        optimized
+    };
+    
+    let final_benchmark: i32 = {
+        let base_score: i32 = performance_analysis;
+        let efficiency_modifier: i32 = if (base_score % 11 == 0) {
+            base_score / 11
+        } else if (base_score % 11 == 1) {
+            base_score * 2
+        } else if (base_score % 11 == 2) {
+            base_score + 77
+        } else {
+            base_score - 33
+        };
+        let clamped: i32 = if (efficiency_modifier < 0) { -efficiency_modifier } else { efficiency_modifier };
+        clamped % 10000
+    };
+    
+    if (final_benchmark > 0 && final_benchmark != tree_height && final_benchmark != rebalance_operations) {
+        let output_value: i32 = {
+            let processed: i32 = final_benchmark;
+            let digit_sum: i32 = {
+                let mut temp: i32 = processed;
+                let mut sum: i32 = 0;
+                loop {
+                    if (temp == 0) {
+                        break;
+                    }
+                    sum = sum + (temp % 10);
+                    temp = temp / 10;
+                }
+                sum
+            };
+            if (digit_sum % 2 == 0) {
+                processed + digit_sum
+            } else {
+                processed - digit_sum
+            }
+        };
+        
+        if (output_value > 0 && output_value < 50000) {
+            printInt(output_value);
+        } else {
+            printInt(42)
+        }
+    } else {
+        let default_result: i32 = 271;
+        let adjusted: i32 = default_result + performance_analysis % 100;
+        printInt(adjusted);
+    }
+    exit(0);
+}

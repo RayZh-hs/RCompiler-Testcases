@@ -1,0 +1,47 @@
+/*
+Test Package: Semantic-1
+Test Target: misc
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: Catalan numbers recursive computation with iterative verification
+*/
+
+// Catalan numbers: C(n) = (2n)! / ((n+1)! * n!) = C(0)*C(n-1) + C(1)*C(n-2) + ... + C(n-1)*C(0)
+// Important in combinatorics for counting binary trees, parentheses arrangements
+fn catalan_recursive(n: i32) -> i32 {
+    if (n <= 1) {
+        return 1;
+    } else {
+        let mut sum: i32 = 0;
+        let mut i: i32 = 0;
+        
+        while (i < n) {
+            sum += catalan_recursive(i) * catalan_recursive(n - 1 - i);
+            i += 1;
+        }
+        
+        return sum;
+    }
+}
+
+// Calculate sum of first several Catalan numbers
+fn sum_catalan_numbers(limit: i32) -> i32 {
+    let mut total: i32 = 0;
+    let mut n: i32 = 0;
+    
+    while (n <= limit) {
+        let catalan_n: i32 = catalan_recursive(n);
+        total += catalan_n;
+        n += 1;
+    }
+    
+    return total;
+}
+
+fn main() {
+    let limit: i32 = 4;
+    let result: i32 = sum_catalan_numbers(limit);
+    printInt(result);
+    exit(0);
+}

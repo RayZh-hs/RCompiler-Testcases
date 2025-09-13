@@ -1,0 +1,23 @@
+/*
+Test Package: Semantic-1
+Test Target: return
+Author: Ruitian Wang
+Time: 2025-08-27
+Verdict: Pass
+Comment: Valid return in if expression - early return does not affect if expression type
+*/
+
+// Valid: return in if expression - early return does not affect if expression type
+fn test(b: bool) -> i32 {
+    let x: bool = if (b) {
+        return 0;
+    } else {
+        false
+    };
+    1
+}
+
+fn main() {
+    let result: i32 = test(true);
+    exit(0);
+}

@@ -1,0 +1,32 @@
+{
+    "active": 1,
+    "cmp": [
+        "compileexitcode"
+    ],
+    "compileexitcode": -1,
+    "compilememorylimit": 256,
+    "compiletimelimit": 15,
+    "exitcode": 0,
+    "id": 2032026,
+    "input_path": "src/expr24/expr24.in",
+    "input_visible": 1,
+    "metainfo": {
+        "caseauthor": "Wenxin Zheng",
+        "comment": "Expression error: Missing closing parenthesis in grouped expression - combines call, return, grouped, if, operator, and literal expressions",
+        "lastmodified": "2025-08-08"
+    },
+    "name": "expr24",
+    "name_visible": 1,
+    "output_path": "src/expr24/expr24.out",
+    "output_visible": 1,
+    "provide": [
+        "compilestderr",
+        "compileexitcode"
+    ],
+    "runtimelimit": -1,
+    "runtimememorylimit": 256,
+    "source_path": "src/expr24/expr24.rx",
+    "source_visible": 1,
+    "stage_id": 23891,
+    "stage_name": "semantic-1"
+}

@@ -1,0 +1,156 @@
+/*
+Test Package: Semantic-1
+Test Target: misc
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: Brent's cycle detection algorithm with integer literal overflow error
+*/
+
+// Brent's algorithm for cycle detection in pseudorandom sequences
+// More efficient than Floyd's tortoise-and-hare algorithm
+
+struct CycleInfo {
+    cycle_length: i32,
+    cycle_start: i32,
+}
+
+// Linear congruential generator for pseudorandom sequence
+fn lcg_next(seed: i32, a: i32, c: i32, m: i32) -> i32 {
+    let result: i32 = ((seed as i64 * a as i64 + c as i64) % m as i64) as i32;
+    if result < 0 {
+        return result + m;
+    }
+    return result;
+}
+
+// Brent's cycle detection algorithm implementation
+fn brent_cycle_detection(initial_seed: i32, lcg_a: i32, lcg_c: i32, lcg_m: i32) -> CycleInfo {
+    let mut power: i32 = 1;
+    let mut lambda: i32 = 1;  // Cycle length
+    let mut tortoise: i32 = initial_seed;
+    let mut hare: i32 = lcg_next(initial_seed, lcg_a, lcg_c, lcg_m);
+    
+    // Find cycle length using Brent's algorithm
+    while tortoise != hare {
+        if power == lambda {
+            tortoise = hare;
+            power *= 2;
+            lambda = 0;
+        }
+        hare = lcg_next(hare, lcg_a, lcg_c, lcg_m);
+        lambda += 1;
+        
+        // Safety check to prevent infinite loops
+        if lambda > 10000 {
+            break;
+        }
+    }
+    
+    // Find cycle start position (μ)
+    let mut mu: i32 = 0;
+    tortoise = initial_seed;
+    hare = initial_seed;
+    
+    // Move hare lambda steps ahead
+    let mut step: i32 = 0;
+    while step < lambda {
+        hare = lcg_next(hare, lcg_a, lcg_c, lcg_m);
+        step += 1;
+    }
+    
+    // Find start of cycle
+    while tortoise != hare {
+        tortoise = lcg_next(tortoise, lcg_a, lcg_c, lcg_m);
+        hare = lcg_next(hare, lcg_a, lcg_c, lcg_m);
+        mu += 1;
+        
+        if mu > 10000 {
+            break;
+        }
+    }
+    
+    let cycle_info: CycleInfo = CycleInfo {
+        cycle_length: lambda,
+        cycle_start: mu,
+    };
+    
+    return cycle_info;
+}
+
+// Analyze multiple LCG parameters for cycle characteristics
+fn analyze_lcg_cycles() -> i32 {
+    let mut total_analysis: i32 = 0;
+    let mut param: i32 = 1;
+    
+    while param <= 3 {
+        let a: i32 = 16807;  // Common LCG multiplier
+        let c: i32 = 0;      // Additive constant
+        let m: i32 = 2147483647; // 2^31 - 1, a Mersenne prime
+        
+        let param_set: i32 = 42 + param;  // This should cause compilation error
+        
+        let cycle_result: CycleInfo = brent_cycle_detection(param_set, a, c, m);
+        total_analysis += cycle_result.cycle_length + cycle_result.cycle_start;
+        
+        // Nested analysis with different parameters
+        let mut inner_seed: i32 = param_set * 3;
+        while inner_seed <= param_set * 3 + 2 {
+            let inner_a: i32 = 48271;  // Another common LCG multiplier
+            let inner_cycle: CycleInfo = brent_cycle_detection(inner_seed, inner_a, c, m);
+            
+            total_analysis += inner_cycle.cycle_length / 100;  // Scale down to avoid overflow
+            
+            // Additional recursive analysis
+            if inner_cycle.cycle_length > 0 {
+                let recursive_seed: i32 = inner_cycle.cycle_start;
+                let recursive_cycle: CycleInfo = brent_cycle_detection(recursive_seed, a, 1, 997);
+                total_analysis += recursive_cycle.cycle_start;
+            }
+            
+            inner_seed += 1;
+        }
+        
+        param += 1;
+    }
+    
+    return total_analysis % 1000000;  // Prevent overflow
+}
+
+// Additional verification using different cycle detection approach
+fn verify_cycles_with_different_method() -> i32 {
+    let mut verification_sum: i32 = 0;
+    let mut test_seed: i32 = 12345;
+    
+    // Use simple Floyd's algorithm for comparison
+    while test_seed <= 12347 {
+        let mut slow: i32 = test_seed;
+        let mut fast: i32 = test_seed;
+        let mut steps: i32 = 0;
+        
+        // Floyd's cycle detection
+        loop {
+            slow = lcg_next(slow, 1103515245, 12345, 2147483648);
+            fast = lcg_next(fast, 1103515245, 12345, 2147483648);
+            fast = lcg_next(fast, 1103515245, 12345, 2147483648);
+            steps += 1;
+            
+            if slow == fast || steps > 1000 {
+                break;
+            }
+        }
+        
+        verification_sum += steps;
+        test_seed += 1;
+    }
+    
+    return verification_sum;
+}
+
+fn main() {
+    let brent_result: i32 = analyze_lcg_cycles();
+    let floyd_result: i32 = verify_cycles_with_different_method();
+    let final_result: i32 = brent_result + floyd_result;
+    printInt(final_result);
+    exit(0);
+}

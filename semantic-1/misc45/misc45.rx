@@ -1,0 +1,169 @@
+/*
+Test Package: Semantic-1
+Test Target: misc
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: Solovay-Strassen primality test with Jacobi symbol computation
+*/
+
+// Solovay-Strassen primality test with Jacobi symbol computation
+// Probabilistic primality test using quadratic residues and Jacobi symbols
+fn jacobi_symbol(mut a: i32, mut n: i32) -> i32 {
+    if (n <= 0 || n % 2 == 0) {
+        return 0;
+    }
+    
+    let mut result: i32 = 1;
+    
+    while (a != 0) {
+        while (a % 2 == 0) {
+            a = a / 2;
+            if (n % 8 == 3 || n % 8 == 5) {
+                result = -result;
+            }
+        }
+        
+        let temp: i32 = a;
+        a = n;
+        n = temp;
+        
+        if (a % 4 == 3 && n % 4 == 3) {
+            result = -result;
+        }
+        
+        a = a % n;
+    }
+    
+    if (n == 1) {
+        return result;
+    } else {
+        return 0;
+    }
+}
+
+fn power_mod(mut base: i32, mut exp: i32, modulus: i32) -> i32 {
+    let mut result: i32 = 1;
+    base = base % modulus;
+    
+    while (exp > 0) {
+        if (exp % 2 == 1) {
+            result = (result * base) % modulus;
+        }
+        exp = exp / 2;
+        base = (base * base) % modulus;
+    }
+    
+    return result;
+}
+
+fn solovay_strassen_single_test(n: i32, a: i32) -> bool {
+    if (n <= 1) {
+        return false;
+    }
+    if (n == 2) {
+        return true;
+    }
+    if (n % 2 == 0) {
+        return false;
+    }
+    
+    let jacobi: i32 = jacobi_symbol(a, n);
+    if (jacobi == 0) {
+        return false;
+    }
+    
+    let fermat: i32 = power_mod(a, (n - 1) / 2, n);
+    let jacobi_mod: i32 = if (jacobi == -1) { n - 1 } else { jacobi };
+    
+    return fermat == jacobi_mod;
+}
+
+fn solovay_strassen_recursive(n: i32, witnesses: &[i32; 10], index: i32, 
+                            total_witnesses: i32, passed: i32) -> bool {
+    if (index >= total_witnesses) {
+        return passed == total_witnesses;
+    }
+    
+    let current_witness: i32 = witnesses[index as usize];
+    if (current_witness >= n) {
+        return solovay_strassen_recursive(n, witnesses, index + 1, total_witnesses, passed);
+    }
+    
+    if (solovay_strassen_single_test(n, current_witness)) {
+        return solovay_strassen_recursive(n, witnesses, index + 1, total_witnesses, passed + 1);
+    } else {
+        return false; // Failed one test, definitely composite
+    }
+}
+
+fn generate_witnesses(n: i32, witnesses: &mut [i32; 10]) -> i32 {
+    let mut count: usize = 0;
+    let mut current: i32 = 2;
+    
+    while (count < 10 && current < n) {
+        witnesses[count] = current;
+        count = count + 1;
+        current = current + 1;
+        
+        // Skip even numbers except 2
+        if (current > 2 && current % 2 == 0) {
+            current = current + 1;
+        }
+    }
+    
+    return count as i32;
+}
+
+fn primality_test_with_precheck(n: i32) -> bool {
+    // Handle small cases
+    if (n <= 1) {
+        return false;
+    }
+    if (n <= 3) {
+        return true;
+    }
+    if (n % 2 == 0 || n % 3 == 0) {
+        return false;
+    }
+    
+    // Check divisibility by small primes
+    let mut i: i32 = 5;
+    while (i * i <= n) {
+        if (n % i == 0 || n % (i + 2) == 0) {
+            return false;
+        }
+        i = i + 6;
+    }
+    
+    // Run Solovay-Strassen test
+    let mut witnesses: [i32; 10] = [0; 10];
+    let witness_count: i32 = generate_witnesses(n, &mut witnesses);
+    
+    return solovay_strassen_recursive(n, &witnesses, 0, witness_count, 0);
+}
+
+fn factorization_check_recursive(n: i32, divisor: i32) -> i32 {
+    if (divisor * divisor > n) {
+        return n; // n is prime or 1
+    }
+    
+    if (n % divisor == 0) {
+        return divisor;
+    }
+    
+    let next_divisor: i32 = if (divisor == 2) { 3 } else { divisor + 2 };
+    return factorization_check_recursive(n, next_divisor);
+}
+
+fn main() {
+    let n: i32 = getInt();
+    
+    if (primality_test_with_precheck(n)) {
+        printInt(1); // Probably prime
+    } else {
+        let factor: i32 = factorization_check_recursive(n, 2);
+        printInt(factor); // Show a factor
+    }
+    exit(0);
+}

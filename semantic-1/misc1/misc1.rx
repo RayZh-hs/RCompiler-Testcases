@@ -1,0 +1,27 @@
+/*
+Test Package: Semantic-1
+Test Target: misc
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: misc test, simple sum calculation with function
+*/
+
+// Simple sum calculation function
+// Calculate sum of numbers from 1 to n
+fn calculate_sum(n: i32) -> i32 {
+    let mut sum: i32 = 0;
+    let mut i: i32 = 1;
+    while (i <= n) {
+        sum += i;
+        i += 1;
+    }
+    return sum;
+}
+
+fn main() {
+    let n: i32 = getInt();
+    let result: i32 = calculate_sum(n);
+    printInt(result);
+    exit(0);
+}

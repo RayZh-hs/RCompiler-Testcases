@@ -1,0 +1,29 @@
+/*
+Test Package: Semantic-1
+Test Target: basic
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: basic test, incomplete main function - missing implementation
+*/
+
+fn encrypt(input: &[char; 16], output: &mut [i32; 16], shift: i32) {
+    let mut i: usize = 0usize;
+    while (i < 16) {
+        let c: char = input[i];
+        let base: char = if (c >= 'a' && c <= 'z') { 'a' } else if (c >= 'A' && c <= 'Z') { 'A' } else { '\0' };
+        if (base != '\0') {
+            let offset = c as i32 - base as i32;
+            let new_offset = (offset + shift) % 26;
+            output[i] = base as i32 + new_offset;
+        } else {
+            output[i] = c as i32;
+        }
+        i += 1;
+    }
+}
+fn main() {
+    let plaintext: [char; 16] = ['H', 'e', 'l', 'l', 'o', 'R', 'u', 's', 't', 'W', 'o', 'r', 'l', 'd', '!', '\0'];
+    let mut ciphertext: [i32; 16] = [0; 16];
+    encrypt(&plaintext, &mut ciphertext, 3);
+    exit(0);

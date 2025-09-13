@@ -1,0 +1,29 @@
+/*
+Test Package: Semantic-1
+Test Target: return
+Author: Ruitian Wang
+Time: 2025-08-27
+Verdict: Pass
+Comment: Valid nested return statements in different scopes
+*/
+
+// Valid: nested return statements in different scopes
+fn outer() -> i32 {
+    fn inner(x: i32) -> i32 {
+        if (x > 0) {
+            return x * 2;
+        }
+        return 0;
+    }
+    
+    let result: i32 = inner(5);
+    if (result > 5) {
+        return result;
+    }
+    return 1
+}
+
+fn main() {
+    let result: i32 = outer();
+    exit(0);
+}

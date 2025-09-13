@@ -1,0 +1,265 @@
+/*
+Test Package: Semantic-1
+Test Target: misc
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: Queue implementation using circular array
+*/
+
+// Queue implementation using circular array
+// FIFO (First In First Out) data structure
+struct Queue {
+    data: [i32; 1000],
+    front: i32,
+    rear: i32,
+    size: i32,
+    capacity: i32,
+}
+
+impl Queue {
+    fn new() -> Queue {
+        Queue {
+            data: [0; 1000],
+            front: 0,
+            rear: -1,
+            size: 0,
+            capacity: 1000,
+        }
+    }
+    
+    fn is_empty(&self) -> bool {
+        return (self.size == 0);
+    }
+    
+    fn is_full(&self) -> bool {
+        return (self.size == self.capacity);
+    }
+    
+    fn enqueue(&mut self, value: i32) -> bool {
+        if (self.is_full()) {
+            return false;
+        }
+        
+        self.rear = (self.rear + 1) % self.capacity;
+        self.data[self.rear as usize] = value;
+        self.size += 1;
+        return true;
+    }
+    
+    fn dequeue(&mut self) -> i32 {
+        if (self.is_empty()) {
+            return -1;
+        }
+        
+        let value: i32 = self.data[self.front as usize];
+        self.front = (self.front + 1) % self.capacity;
+        self.size -= 1;
+        return value;
+    }
+    
+    fn front_element(&self) -> i32 {
+        if (self.is_empty()) {
+            return -1;
+        }
+        return self.data[self.front as usize];
+    }
+    
+    fn rear_element(&self) -> i32 {
+        if (self.is_empty()) {
+            return -1;
+        }
+        return self.data[self.rear as usize];
+    }
+    
+    fn get_size(&self) -> i32 {
+        return self.size;
+    }
+    
+    fn clear(&mut self) {
+        self.front = 0;
+        self.rear = -1;
+        self.size = 0;
+    }
+    
+    fn print_queue(&self) {
+        if (self.is_empty()) {
+            return;
+        }
+        
+        let mut current: i32 = self.front;
+        let mut count: i32 = 0;
+        
+        while (count < self.size) {
+            printInt(self.data[current as usize]);
+            current = (current + 1) % self.capacity;
+            count += 1;
+        }
+    }
+    
+    // Priority queue simulation using simple insertion sort
+    fn priority_enqueue(&mut self, value: i32, priority: i32) -> bool {
+        if (self.is_full()) {
+            return false;
+        }
+        
+        if (self.is_empty()) {
+            self.enqueue(value);
+            return true;
+        }
+        
+        // Create temporary storage for reordering
+        let mut temp_data: [i32; 1000] = [0; 1000];
+        let mut temp_priorities: [i32; 1000] = [0; 1000];
+        let mut temp_size: i32 = 0;
+        
+        // Extract all elements
+        while (!self.is_empty()) {
+            temp_data[temp_size as usize] = self.dequeue();
+            temp_priorities[temp_size as usize] = temp_size; // Simulate priorities
+            temp_size += 1;
+        }
+        
+        // Insert new element in correct position
+        let mut inserted: bool = false;
+        let mut i: i32 = 0;
+        while (i < temp_size) {
+            if (!inserted && priority > temp_priorities[i as usize]) {
+                self.enqueue(value);
+                inserted = true;
+            }
+            self.enqueue(temp_data[i as usize]);
+            i += 1;
+        }
+        
+        if (!inserted) {
+            self.enqueue(value);
+        }
+        
+        return true;
+    }
+}
+
+// Deque (Double-ended queue) implementation
+struct Deque {
+    data: [i32; 1000],
+    front: i32,
+    rear: i32,
+    size: i32,
+    capacity: i32,
+}
+
+impl Deque {
+    fn new() -> Deque {
+        Deque {
+            data: [0; 1000],
+            front: 0,
+            rear: -1,
+            size: 0,
+            capacity: 1000,
+        }
+    }
+    
+    fn is_empty(&self) -> bool {
+        return (self.size == 0);
+    }
+    
+    fn is_full(&self) -> bool {
+        return (self.size == self.capacity);
+    }
+    
+    fn insert_front(&mut self, value: i32) -> bool {
+        if (self.is_full()) {
+            return false;
+        }
+        
+        if (self.is_empty()) {
+            self.front = 0;
+            self.rear = 0;
+        } else {
+            self.front = (self.front - 1 + self.capacity) % self.capacity;
+        }
+        
+        self.data[self.front as usize] = value;
+        self.size += 1;
+        return true;
+    }
+    
+    fn insert_rear(&mut self, value: i32) -> bool {
+        if (self.is_full()) {
+            return false;
+        }
+        
+        if (self.is_empty()) {
+            self.front = 0;
+            self.rear = 0;
+        } else {
+            self.rear = (self.rear + 1) % self.capacity;
+        }
+        
+        self.data[self.rear as usize] = value;
+        self.size += 1;
+        return true;
+    }
+    
+    fn delete_front(&mut self) -> i32 {
+        if (self.is_empty()) {
+            return -1;
+        }
+        
+        let value: i32 = self.data[self.front as usize];
+        if (self.size == 1) {
+            self.front = 0;
+            self.rear = -1;
+        } else {
+            self.front = (self.front + 1) % self.capacity;
+        }
+        self.size -= 1;
+        return value;
+    }
+    
+    fn delete_rear(&mut self) -> i32 {
+        if (self.is_empty()) {
+            return -1;
+        }
+        
+        let value: i32 = self.data[self.rear as usize];
+        if (self.size == 1) {
+            self.front = 0;
+            self.rear = -1;
+        } else {
+            self.rear = (self.rear - 1 + self.capacity) % self.capacity;
+        }
+        self.size -= 1;
+        return value;
+    }
+}
+
+fn main() {
+    let mut queue: Queue = Queue::new();
+    let n: i32 = getInt();
+    
+    let mut i: i32 = 0;
+    while (i < n) {
+        let operation: i32 = getInt();
+        
+        if (operation == 1) { // Enqueue
+            let value: i32 = getInt();
+            queue.enqueue(value);
+        } else if (operation == 2) { // Dequeue
+            let value: i32 = queue.dequeue();
+            printInt(value);
+        } else if (operation == 3) { // Front
+            let value: i32 = queue.front_element();
+            printInt(value);
+        } else if (operation == 4) { // Size
+            let size: i32 = queue.get_size();
+            printInt(size);
+        } else if (operation == 5) { // Print queue
+            queue.print_queue();
+        }
+        
+        i += 1;
+    }
+    exit(0);
+}

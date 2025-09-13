@@ -1,0 +1,29 @@
+/*
+Test Package: Semantic-1
+Test Target: loop
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: loop test, sieve of Eratosthenes algorithm with while loops and array operations
+*/
+
+fn main() {
+    const N: usize = 30;
+    let mut is_prime: [bool; N] = [true; N];
+    is_prime[0] = false;
+    is_prime[1] = false;
+ 
+    let mut p: usize = 2usize;
+    while (p < N) {
+        if (is_prime[p]) {
+            let mut multiple: usize = p * p;
+            while (multiple < N) {
+                is_prime[multiple] = false;
+                multiple += p;
+            }
+        }
+        p += 1;
+    }
+    let _: [bool; N] = is_prime;
+    exit(0);
+}

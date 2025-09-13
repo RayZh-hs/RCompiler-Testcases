@@ -1,0 +1,387 @@
+/*
+Test Package: Semantic-2
+Test Target: comprehensive
+Author: Wenxin Zheng
+Time: 2025-08-17
+Verdict: Success
+Test Name: Custom Memory Allocator Simulation
+Summary: This test comprehensively evaluates compiler optimizations for:
+Details:
+Simulation of dynamic memory management with a static buffer.
+Complex array manipulation and integer-based pointer arithmetic.
+Management of data structures representing memory blocks (e.g., free lists).
+Loop-heavy searches for memory allocation (e.g., first-fit algorithm).
+Optimization of frequent function calls for alloc/free operations.
+Handling of memory fragmentation and coalescing scenarios.
+Scope and lifetime challenges with memory state variables.
+*/
+
+// comprehensive36.rx - Custom Memory Allocator Simulation
+// This test comprehensively evaluates compiler optimizations for:
+// - Simulation of dynamic memory management with a static buffer.
+// - Complex array manipulation and integer-based pointer arithmetic.
+// - Management of data structures representing memory blocks (e.g., free lists).
+// - Loop-heavy searches for memory allocation (e.g., first-fit algorithm).
+// - Optimization of frequent function calls for alloc/free operations.
+// - Handling of memory fragmentation and coalescing scenarios.
+// - Scope and lifetime challenges with memory state variables.
+
+let HEAP_SIZE: i32 = 2048;
+let BLOCK_HEADER_SIZE: i32 = 2;
+let BLOCK_STATUS_FREE: i32 = 0;
+let BLOCK_STATUS_USED: i32 = 1;
+
+let heap: [i32; 2048] = [0; 2048];
+let is_initialized: bool = false;
+
+fn init_allocator() {
+    if (is_initialized) {
+        return;
+    }
+    heap[0] = HEAP_SIZE - BLOCK_HEADER_SIZE;
+    heap[1] = BLOCK_STATUS_FREE;
+    heap[2] = -1;
+    is_initialized = true;
+}
+
+fn custom_alloc(size: i32) -> i32 {
+    let required_size: i32 = size;
+    if (required_size <= 0) {
+        return -1;
+    }
+
+    let mut current_block_ptr: i32 = 0;
+    let mut best_fit_ptr: i32 = -1;
+    let mut best_fit_size: i32 = HEAP_SIZE + 1;
+
+    while (current_block_ptr < HEAP_SIZE) {
+        let block_size: i32 = heap[current_block_ptr];
+        let block_status: i32 = heap[current_block_ptr + 1];
+
+        if (block_status == BLOCK_STATUS_FREE) {
+            if (block_size >= required_size) {
+                if (block_size < best_fit_size) {
+                    best_fit_ptr = current_block_ptr;
+                    best_fit_size = block_size;
+                }
+            }
+        }
+
+        if (block_size <= 0) {
+            break;
+        }
+        current_block_ptr = current_block_ptr + block_size + BLOCK_HEADER_SIZE;
+    }
+
+    if (best_fit_ptr != -1) {
+        let original_size: i32 = heap[best_fit_ptr];
+        let remaining_size: i32 = original_size - required_size - BLOCK_HEADER_SIZE;
+
+        if (remaining_size > BLOCK_HEADER_SIZE) {
+            heap[best_fit_ptr] = required_size;
+            heap[best_fit_ptr + 1] = BLOCK_STATUS_USED;
+
+            let new_block_ptr: i32 = best_fit_ptr + required_size + BLOCK_HEADER_SIZE;
+            heap[new_block_ptr] = remaining_size;
+            heap[new_block_ptr + 1] = BLOCK_STATUS_FREE;
+        } else {
+            heap[best_fit_ptr + 1] = BLOCK_STATUS_USED;
+        }
+        return best_fit_ptr + BLOCK_HEADER_SIZE;
+    }
+
+    return -1;
+}
+
+fn custom_free(ptr: i32) {
+    if (ptr <= BLOCK_HEADER_SIZE) {
+        return;
+    }
+    let block_ptr: i32 = ptr - BLOCK_HEADER_SIZE;
+    heap[block_ptr + 1] = BLOCK_STATUS_FREE;
+
+    let mut current_ptr: i32 = 0;
+    while (current_ptr < HEAP_SIZE) {
+        let current_size: i32 = heap[current_ptr];
+        if (current_size <= 0) {
+            break;
+        }
+        let next_ptr: i32 = current_ptr + current_size + BLOCK_HEADER_SIZE;
+        if (next_ptr < HEAP_SIZE) {
+            if (heap[current_ptr + 1] == BLOCK_STATUS_FREE) {
+                if (heap[next_ptr + 1] == BLOCK_STATUS_FREE) {
+                    let next_size: i32 = heap[next_ptr];
+                    heap[current_ptr] = current_size + next_size + BLOCK_HEADER_SIZE;
+                    continue;
+                }
+            }
+        }
+        current_ptr = next_ptr;
+    }
+}
+
+fn main() {
+    init_allocator();
+    let mut total_allocations: i32 = 0;
+    let mut failed_allocations: i32 = 0;
+    let mut i: i32 = 0;
+    let mut allocations: [i32; 100] = [0; 100];
+    let mut allocation_count: i32 = 0;
+
+    while (i < 200) {
+        let size_selector: i32 = i % 10;
+        let mut alloc_size: i32 = 0;
+        if (size_selector == 0) {
+            alloc_size = 10;
+        } else if (size_selector == 1) {
+            alloc_size = 50;
+        } else if (size_selector == 2) {
+            alloc_size = 25;
+        } else if (size_selector == 3) {
+            alloc_size = 120;
+        } else if (size_selector == 4) {
+            alloc_size = 5;
+        } else if (size_selector == 5) {
+            alloc_size = 80;
+        } else if (size_selector == 6) {
+            alloc_size = 200;
+        } else if (size_selector == 7) {
+            alloc_size = 15;
+        } else if (size_selector == 8) {
+            alloc_size = 30;
+        } else {
+            alloc_size = 60;
+        }
+
+        let ptr: i32 = custom_alloc(alloc_size);
+        if (ptr != -1) {
+            if (allocation_count < 100) {
+                allocations[allocation_count] = ptr;
+                allocation_count = allocation_count + 1;
+            }
+            total_allocations = total_allocations + 1;
+            let mut j: i32 = 0;
+            while (j < alloc_size) {
+                heap[ptr + j] = (ptr + j) % 128;
+                j = j + 1;
+            }
+        } else {
+            failed_allocations = failed_allocations + 1;
+        }
+
+        if (i % 5 == 4) {
+            let mut free_idx: i32 = 0;
+            if (allocation_count > 0) {
+                free_idx = (i * 17) % allocation_count;
+                let free_ptr: i32 = allocations[free_idx];
+                if (free_ptr != 0) {
+                    custom_free(free_ptr);
+                    allocations[free_idx] = 0;
+                }
+            }
+        }
+        i = i + 1;
+    }
+
+    let mut final_sum: i32 = 0;
+    let mut k: i32 = 0;
+    while (k < allocation_count) {
+        let ptr: i32 = allocations[k];
+        if (ptr != 0) {
+            let block_ptr: i32 = ptr - BLOCK_HEADER_SIZE;
+            let size: i32 = heap[block_ptr];
+            let mut l: i32 = 0;
+            while (l < size) {
+                final_sum = final_sum + heap[ptr + l];
+                l = l + 1;
+            }
+        }
+        k = k + 1;
+    }
+
+    let mut total_free_space: i32 = 0;
+    let mut current_block_ptr: i32 = 0;
+    while (current_block_ptr < HEAP_SIZE) {
+        let block_size: i32 = heap[current_block_ptr];
+        let block_status: i32 = heap[current_block_ptr + 1];
+        if (block_status == BLOCK_STATUS_FREE) {
+            total_free_space = total_free_space + block_size;
+        }
+        if (block_size <= 0) {
+            break;
+        }
+        current_block_ptr = current_block_ptr + block_size + BLOCK_HEADER_SIZE;
+    }
+
+    if (true) {
+        let mut debug_info: i32 = 1;
+        while (debug_info < 5) {
+            let mut inner_counter: i32 = 0;
+            while (inner_counter < debug_info) {
+                inner_counter = inner_counter + 1;
+            }
+            debug_info = debug_info + 1;
+        }
+    }
+
+    printInt(total_allocations);
+    printInt(failed_allocations);
+    printInt(final_sum);
+    printInt(total_free_space);
+
+    let mut m: i32 = 0;
+    while (m < 100) {
+        if (allocations[m] != 0) {
+            custom_free(allocations[m]);
+        }
+        m = m + 1;
+    }
+
+    let final_ptr: i32 = custom_alloc(1024);
+    if (final_ptr != -1) {
+        printInt(1);
+    } else {
+        printInt(0);
+    }
+
+    let another_ptr: i32 = custom_alloc(1024);
+    if (another_ptr != -1) {
+        printInt(1);
+    } else {
+        printInt(0);
+    }
+
+    custom_free(final_ptr);
+    let last_ptr: i32 = custom_alloc(2000);
+    if (last_ptr != -1) {
+        printInt(1);
+    } else {
+        printInt(0);
+    }
+
+    let mut final_check_sum: i32 = 0;
+    let mut p: i32 = 0;
+    while (p < HEAP_SIZE) {
+        final_check_sum = final_check_sum + heap[p];
+        p = p + 1;
+    }
+    printInt(final_check_sum % 1000);
+
+    if (false) {
+        let mut dead_code_val: i32 = 0;
+        let mut q: i32 = 0;
+        while (q < 1000) {
+            dead_code_val = dead_code_val + q;
+            q = q + 1;
+        }
+        printInt(dead_code_val);
+    }
+
+    let mut r: i32 = 0;
+    let mut complex_calc: i32 = 0;
+    while (r < 50) {
+        let mut s: i32 = 0;
+        while (s < 50) {
+            if (r * s) % 3 == 0 {
+                complex_calc = complex_calc + r - s;
+            } else {
+                complex_calc = complex_calc + s - r;
+            }
+            s = s + 1;
+        }
+        r = r + 1;
+    }
+    printInt(complex_calc);
+
+    let mut a: i32 = 10;
+    let b: i32 = 20;
+    if (a < b) {
+        let c: i32 = 30;
+        a = a + c;
+    } else {
+        let d: i32 = 40;
+        a = a + d;
+    }
+
+    if (true) {
+        let a: bool = false;
+        if (a) {
+            printInt(100);
+        } else {
+            printInt(200);
+        }
+    }
+    printInt(a);
+
+    let mut outer_var: i32 = 1;
+    while (outer_var < 3) {
+        let mut inner_var: i32 = 10;
+        if (outer_var == 1) {
+            let mut temp_var: i32 = 100;
+            inner_var = inner_var + temp_var;
+        }
+        printInt(inner_var);
+        outer_var = outer_var + 1;
+    }
+
+    let mut x: i32 = 5;
+    let y: i32 = x;
+    x = 10;
+    printInt(y);
+
+    let mut z: i32 = 0;
+    while (z < 1) {
+        let mut loop_scoped: i32 = 123;
+        if (true) {
+            loop_scoped = 456;
+        }
+        printInt(loop_scoped);
+        z = z + 1;
+    }
+
+    if (true) {
+        let mut shadow_var: i32 = 111;
+        printInt(shadow_var);
+    }
+    let mut shadow_var: i32 = 222;
+    printInt(shadow_var);
+
+    let mut check: i32 = 0;
+    if (check == 0) {
+        let mut val: i32 = 10;
+        val = val + 1;
+    }
+
+    let mut final_val: i32 = 0;
+    if (true) {
+        let mut temp_final: i32 = 1000;
+        final_val = temp_final;
+    }
+
+    let mut another_check: i32 = 0;
+    if (another_check == 0) {
+        let mut val2: i32 = 20;
+        val2 = val2 + 1;
+    } else {
+        let mut val2: i32 = 30;
+        val2 = val2 + 1;
+    }
+
+    let mut mut_outer: i32 = 50;
+    if (true) {
+        let mut_outer: i32 = 60;
+        if (true) {
+            let mut_outer: i32 = 70;
+            printInt(mut_outer);
+        }
+        printInt(mut_outer);
+    }
+    printInt(mut_outer);
+
+    let mut error_var: i32 = 0;
+    if (true) {
+        let mut inner_error_var: i32 = 1;
+        error_var = inner_error_var;
+    }
+    inner_error_var = 2;
+}

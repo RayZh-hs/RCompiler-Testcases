@@ -1,0 +1,19 @@
+/*
+Test Package: Semantic-1
+Test Target: type
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: Type error: struct field type mismatch
+*/
+
+// Type error: struct field type mismatch
+struct Person {
+    age: i32,
+    name: &str,
+}
+
+fn main() {
+    let p = Person { age: "twenty", name: "John" };
+    exit(0);
+}

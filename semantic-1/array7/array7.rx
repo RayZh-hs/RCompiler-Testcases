@@ -1,0 +1,13 @@
+/*
+Test Package: Semantic-1
+Test Target: array
+Author: Wenxin Zheng
+Time: 2025-08-07
+Verdict: Fail
+Comment: array test, multi-dimensional array initialization with error row count
+*/
+
+fn main() {
+    let mat: [[u32; 4]; 2] = [[0; 4]; 3];
+    exit(0);
+}

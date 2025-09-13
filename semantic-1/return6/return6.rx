@@ -1,0 +1,25 @@
+/*
+Test Package: Semantic-1
+Test Target: return
+Author: Ruitian Wang
+Time: 2025-08-26
+Verdict: Fail
+Comment: exit function test, exit() cannot be used in methods even if named 'main'
+*/
+
+struct TestStruct {
+    value: i32,
+}
+
+impl TestStruct {
+    fn main(&self) {
+        println("This is a method named 'main' in a struct");
+        exit(0);  // This should fail - exit() not allowed in methods, even if named 'main'
+    }
+}
+
+fn main() {
+    let test: TestStruct = TestStruct { value: 39 };
+    test.main();
+    exit(0);
+}

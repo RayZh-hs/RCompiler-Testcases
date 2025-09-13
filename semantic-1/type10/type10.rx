@@ -1,0 +1,16 @@
+/*
+Test Package: Semantic-1
+Test Target: type
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: Type error: incompatible numeric types
+*/
+
+// Type error: incompatible numeric types
+fn main() {
+    let x: i32 = 10;
+    let y: usize = 3;
+    let result: i32 = x + y;
+    exit(0);
+}

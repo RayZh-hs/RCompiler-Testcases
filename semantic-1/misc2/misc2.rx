@@ -1,0 +1,35 @@
+/*
+Test Package: Semantic-1
+Test Target: misc
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: misc test, array operations with maximum finding
+*/
+
+// Find maximum element in array
+// Read n numbers and find the maximum value
+fn main() {
+    let n: i32 = getInt();
+    let mut arr: [i32; 100] = [0; 100];
+    let mut i: usize = 0;
+    
+    // Read array elements
+    while (i < n as usize) {
+        arr[i] = getInt();
+        i += 1;
+    }
+    
+    // Find maximum
+    let mut max_val: i32 = arr[0];
+    i = 1;
+    while (i < n as usize) {
+        if (arr[i] > max_val) {
+            max_val = arr[i];
+        }
+        i += 1;
+    }
+    
+    printInt(max_val);
+    exit(0);
+}

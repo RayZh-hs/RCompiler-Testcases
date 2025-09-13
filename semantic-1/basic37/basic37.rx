@@ -1,0 +1,82 @@
+/*
+Test Package: Semantic-1
+Test Target: basic
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: basic test, binary search and array statistical operations
+*/
+
+fn binary_search(arr: &[i32; 20], target: i32) -> i32 {
+    let mut low: usize = 0usize;
+    let mut high: usize = 19usize;
+    let mut comparisons: i32 = 0;
+    let mut result: i32 = -1;
+    while (low <= high) {
+        comparisons += 1;
+        let mid: usize = (low + high) / 2;
+        if (arr[mid] == target) {
+            result = mid as i32;
+            break;
+        } else if (arr[mid] < target) {
+            low = mid + 1;
+        } else {
+            if (mid == 0) {
+                break;
+            }
+            high = mid - 1;
+        }
+    }
+    result
+}
+
+fn count_occurrences(arr: &[i32; 20], target: i32) -> i32 {
+    let mut cnt: i32 = 0;
+    let mut i: usize = 0usize;
+    while (i < 20) {
+        if (arr[i] == target) {
+            cnt += 1;
+        }
+        i += 1;
+    }
+    cnt
+}
+
+fn accumulate_array(arr: &[i32; 20]) -> i32 {
+    let mut sum: i32 = 0;
+    let mut i: usize = 0usize;
+    while (i < 20) {
+        sum += arr[i];
+        i += 1;
+    }
+    sum
+}
+
+fn difference_sum(arr: &[i32; 20], avg: i32) -> i32 {
+    let mut diff_sum: i32 = 0;
+    let mut i: usize = 0usize;
+    while (i < 20) {
+        let diff: i32 = if (arr[i] > avg) { arr[i] - avg } else { avg - arr[i] };
+        diff_sum += diff;
+        i += 1;
+    }
+    diff_sum
+}
+
+fn main() {
+    let sorted: [i32; 20] = [1, 2, 3, 4, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19];
+    let res: i32 = binary_search(&sorted, 4);
+    let count: i32 = count_occurrences(&sorted, 4);
+    let sum: i32 = accumulate_array(&sorted);
+    let avg: i32 = sum / 20;
+    let diff: i32 = difference_sum(&sorted, avg);
+    let dummy: i32 = res + count + avg + diff;
+    let mut extra: i32 = 0;
+    let mut j: usize = 0;
+    while (j < 20) {
+        extra += sorted[j] % 3;
+        j += 1;
+    }
+    let final_result: i32 = extra;
+    exit(0);
+}

@@ -1,0 +1,308 @@
+/*
+Test Package: Semantic-2
+Test Target: comprehensive
+Author: Wenxin Zheng
+Time: 2025-08-17
+Verdict: Success
+Test Name: Advanced Control Flow and Logic Simulation
+Summary: This test comprehensively evaluates compiler optimizations for:
+Details:
+Deeply nested and complex conditional (if    let mut p: i32 = 0;
+    while (p < 10) {
+        let mut temp: i32 = p * p;
+        if (p % 2 == 0) {
+            let mut temp: i32 = p * 2;
+            final_val = final_val + temp;
+        }
+        final_val = final_val + temp;
+        p = p + 1;
+    } loop (while) structures.
+State machine implementation with intricate transition logic.
+Boolean logic optimization and short-circuiting behavior.
+Loop unrolling and fusion in the context of state updates.
+Efficient handling of multi-dimensional arrays for storing state tables.
+Branch prediction accuracy for irregular, data-driven control flow.
+Correct handling of variable shadowing and mutability in nested scopes.
+*/
+
+// comprehensive39.rx - Advanced Control Flow and Logic Simulation
+// This test comprehensively evaluates compiler optimizations for:
+// - Deeply nested and complex conditional (if/else) and loop (while) structures.
+// - State machine implementation with intricate transition logic.
+// - Boolean logic optimization and short-circuiting behavior.
+// - Loop unrolling and fusion in the context of state updates.
+// - Efficient handling of multi-dimensional arrays for storing state tables.
+// - Branch prediction accuracy for irregular, data-driven control flow.
+// - Correct handling of variable shadowing and mutability in nested scopes.
+
+let STATE_A: i32 = 0;
+let STATE_B: i32 = 1;
+let STATE_C: i32 = 2;
+let STATE_D: i32 = 3;
+let STATE_E: i32 = 4;
+let STATE_F: i32 = 5;
+let STATE_G: i32 = 6;
+let STATE_H: i32 = 7;
+let NUM_STATES: i32 = 8;
+
+let INPUT_X: i32 = 0;
+let INPUT_Y: i32 = 1;
+let INPUT_Z: i32 = 2;
+let NUM_INPUTS: i32 = 3;
+
+let mut transition_table: [[i32; 3]; 8] = [[0; 3]; 8];
+let mut output_table: [[i32; 3]; 8] = [[0; 3]; 8];
+
+fn setup_fsm() {
+    transition_table[STATE_A][INPUT_X] = STATE_B;
+    transition_table[STATE_A][INPUT_Y] = STATE_C;
+    transition_table[STATE_A][INPUT_Z] = STATE_A;
+    output_table[STATE_A][INPUT_X] = 1;
+    output_table[STATE_A][INPUT_Y] = 0;
+    output_table[STATE_A][INPUT_Z] = -1;
+
+    transition_table[STATE_B][INPUT_X] = STATE_D;
+    transition_table[STATE_B][INPUT_Y] = STATE_E;
+    transition_table[STATE_B][INPUT_Z] = STATE_A;
+    output_table[STATE_B][INPUT_X] = 2;
+    output_table[STATE_B][INPUT_Y] = 3;
+    output_table[STATE_B][INPUT_Z] = 0;
+
+    transition_table[STATE_C][INPUT_X] = STATE_F;
+    transition_table[STATE_C][INPUT_Y] = STATE_G;
+    transition_table[STATE_C][INPUT_Z] = STATE_B;
+    output_table[STATE_C][INPUT_X] = 5;
+    output_table[STATE_C][INPUT_Y] = 8;
+    output_table[STATE_C][INPUT_Z] = 13;
+
+    transition_table[STATE_D][INPUT_X] = STATE_H;
+    transition_table[STATE_D][INPUT_Y] = STATE_A;
+    transition_table[STATE_D][INPUT_Z] = STATE_B;
+    output_table[STATE_D][INPUT_X] = 21;
+    output_table[STATE_D][INPUT_Y] = 34;
+    output_table[STATE_D][INPUT_Z] = 55;
+
+    transition_table[STATE_E][INPUT_X] = STATE_C;
+    transition_table[STATE_E][INPUT_Y] = STATE_F;
+    transition_table[STATE_E][INPUT_Z] = STATE_E;
+    output_table[STATE_E][INPUT_X] = -1;
+    output_table[STATE_E][INPUT_Y] = -2;
+    output_table[STATE_E][INPUT_Z] = -3;
+
+    transition_table[STATE_F][INPUT_X] = STATE_G;
+    transition_table[STATE_F][INPUT_Y] = STATE_H;
+    transition_table[STATE_F][INPUT_Z] = STATE_D;
+    output_table[STATE_F][INPUT_X] = 10;
+    output_table[STATE_F][INPUT_Y] = 20;
+    output_table[STATE_F][INPUT_Z] = 30;
+
+    transition_table[STATE_G][INPUT_X] = STATE_A;
+    transition_table[STATE_G][INPUT_Y] = STATE_B;
+    transition_table[STATE_G][INPUT_Z] = STATE_C;
+    output_table[STATE_G][INPUT_X] = 40;
+    output_table[STATE_G][INPUT_Y] = 50;
+    output_table[STATE_G][INPUT_Z] = 60;
+
+    transition_table[STATE_H][INPUT_X] = STATE_E;
+    transition_table[STATE_H][INPUT_Y] = STATE_D;
+    transition_table[STATE_H][INPUT_Z] = STATE_F;
+    output_table[STATE_H][INPUT_X] = 70;
+    output_table[STATE_H][INPUT_Y] = 80;
+    output_table[STATE_H][INPUT_Z] = 90;
+}
+
+fn run_fsm(inputs: [i32; 100], len: i32) -> i32 {
+    let mut current_state: i32 = STATE_A;
+    let mut accumulated_output: i32 = 0;
+    let mut i: i32 = 0;
+
+    while (i < len) {
+        let input: i32 = inputs[i];
+        if (input >= 0) {
+            if (input < NUM_INPUTS) {
+                let output: i32 = output_table[current_state][input];
+                let next_state: i32 = transition_table[current_state][input];
+
+                if (output > 0) {
+                    if (current_state % 2 == 0) {
+                        accumulated_output = accumulated_output + output * 2;
+                    } else {
+                        accumulated_output = accumulated_output + output;
+                    }
+                } else {
+                    if (accumulated_output > 100) {
+                        accumulated_output = accumulated_output + output;
+                    } else {
+                        accumulated_output = accumulated_output - output;
+                    }
+                }
+
+                let mut j: i32 = 0;
+                let mut temp_calc: i32 = 0;
+                while (j < output % 10) {
+                    if (j % 2 == 0) {
+                        temp_calc = temp_calc + j;
+                    } else {
+                        temp_calc = temp_calc - j;
+                    }
+                    j = j + 1;
+                }
+                accumulated_output = accumulated_output + temp_calc;
+
+                current_state = next_state;
+            }
+        }
+        i = i + 1;
+    }
+    return accumulated_output;
+}
+
+fn generate_inputs(seed: i32, len: i32) -> [i32; 100] {
+    let mut inputs: [i32; 100] = [0; 100];
+    let mut current_val: i32 = seed;
+    let mut i: i32 = 0;
+    while (i < len) {
+        current_val = (current_val * 1103515245 + 12345) / 65536;
+        inputs[i] = current_val % NUM_INPUTS;
+        i = i + 1;
+    }
+    return inputs;
+}
+
+fn main() {
+    setup_fsm();
+
+    let inputs1: [i32; 100] = generate_inputs(42, 100);
+    let result1: i32 = run_fsm(inputs1, 100);
+    printInt(result1);
+
+    let inputs2: [i32; 100] = generate_inputs(1337, 80);
+    let result2: i32 = run_fsm(inputs2, 80);
+    printInt(result2);
+
+    let mut custom_inputs: [i32; 100] = [0; 100];
+    let mut i: i32 = 0;
+    while (i < 50) {
+        custom_inputs[i] = (i * i) % NUM_INPUTS;
+        i = i + 1;
+    }
+    let result3: i32 = run_fsm(custom_inputs, 50);
+    printInt(result3);
+
+    let mut counter: i32 = 0;
+    let mut outer_loop: i32 = 0;
+    while (outer_loop < 10) {
+        let mut inner_loop: i32 = 0;
+        while (inner_loop < 10) {
+            if (outer_loop % 2 == 0) {
+                if (inner_loop % 3 == 0) {
+                    counter = counter + 1;
+                } else {
+                    counter = counter - 1;
+                }
+            } else {
+                if (inner_loop % 2 == 0) {
+                    counter = counter + 2;
+                } else {
+                    counter = counter - 2;
+                }
+            }
+            inner_loop = inner_loop + 1;
+        }
+        outer_loop = outer_loop + 1;
+    }
+    printInt(counter);
+
+    let mut a: i32 = 10;
+    let mut b: i32 = 20;
+    let mut c: i32 = 30;
+
+    if (a > b) {
+        if (b > c) {
+            printInt(1);
+        } else {
+            printInt(2);
+        }
+    } else {
+        if (b < c) {
+            if (a < c) {
+                printInt(3);
+            } else {
+                printInt(4);
+            }
+        } else {
+            printInt(5);
+        }
+    }
+
+    let mut x: i32 = 0;
+    let mut y: i32 = 0;
+    let mut z: i32 = 0;
+    let mut i: i32 = 0;
+    while (i < 100) {
+        let sel: i32 = i % 6;
+        if (sel == 0) {
+            x = x + 1;
+        } else if (sel == 1) {
+            x = x - 1;
+        } else if (sel == 2) {
+            y = y + x;
+        } else if (sel == 3) {
+            y = y - x;
+        } else if (sel == 4) {
+            z = z + y;
+        } else {
+            z = z - y;
+        }
+        i = i + 1;
+    }
+    printInt(x);
+    printInt(y);
+    printInt(z);
+
+    let mut shadow: i32 = 100;
+    if (shadow > 50) {
+        let mut shadow: i32 = 200;
+        if (shadow > 150) {
+            let mut shadow: i32 = 300;
+            shadow = shadow + 1;
+            printInt(shadow);
+        }
+        shadow = shadow + 1;
+        printInt(shadow);
+    }
+    shadow = shadow + 1;
+    printInt(shadow);
+
+    let mut k: i32 = 0;
+    while (k < 1) {
+        let mut loop_var: i32 = 123;
+        loop_var = loop_var + 1;
+        k = k + 1;
+    }
+
+    let mut m: i32 = 0;
+    while (m < 2) {
+        let mut another_loop_var: i32 = 456;
+        if (m == 0) {
+            let mut another_loop_var: i32 = 789;
+            another_loop_var = another_loop_var + 1;
+            printInt(another_loop_var);
+        }
+        printInt(another_loop_var);
+        m = m + 1;
+    }
+
+    let mut final_val: i32 = 0;
+    let mut p: i32 = 0;
+    while (p < 10) {
+        let mut temp: i32 = p * p;
+        if (p % 2 == 0) {
+            let mut temp: i32 = p * 2;
+            final_val = final_val + temp;
+        }
+        final_val = final_val + temp;
+        p = p + 1;
+    }
+    printInt(final_val);
+}

@@ -1,0 +1,15 @@
+/*
+Test Package: Semantic-1
+Test Target: expr
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: Expression error: Invalid array index expression - missing closing bracket
+*/
+
+// Error: Invalid array index expression - missing closing bracket
+fn main() {
+    let arr: [i32; 3] = [1, 2, 3];
+    let val: i32 = arr[0;  // Missing closing bracket ]
+    exit(0);
+}

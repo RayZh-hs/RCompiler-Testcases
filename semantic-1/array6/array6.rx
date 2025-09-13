@@ -1,0 +1,17 @@
+/*
+Test Package: Semantic-1
+Test Target: array
+Author: Wenxin Zheng
+Time: 2025-08-07
+Verdict: Fail
+Comment: array test, array element count mismatch in multi-dimensional array
+*/
+
+fn main() {
+    let grid: [[i32; 2]; 3] = [
+        [1, 2],
+        [3, 4],
+        [5, 6, 7],
+    ];
+    exit(0);
+}

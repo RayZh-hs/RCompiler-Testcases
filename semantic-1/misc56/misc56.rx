@@ -1,0 +1,123 @@
+/*
+Test Package: Semantic-1
+Test Target: misc
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: Pollard's Rho factorization algorithm with struct-integer comparison error
+*/
+
+// Pollard's Rho algorithm for integer factorization
+// Uses Floyd's cycle detection algorithm to find factors
+
+struct FactorResult {
+    factor: i32,
+    iterations: i32,
+}
+
+// Absolute value function
+fn abs_value(x: i32) -> i32 {
+    if (x < 0) {
+        return -x;
+    }
+    return x;
+}
+
+// Greatest common divisor using Euclidean algorithm
+fn gcd_iterative(mut a: i32, mut b: i32) -> i32 {
+    while (b != 0) {
+        let temp: i32 = b;
+        b = a % b;
+        a = temp;
+    }
+    return a;
+}
+
+// Pollard's polynomial function: f(x) = x^2 + c (mod n)
+fn pollard_function(x: i32, c: i32, n: i32) -> i32 {
+    println!("{}", x);
+    let x_squared: i32 = x * x % n;
+    return (x_squared + c) % n;
+}
+
+// Main Pollard's Rho factorization algorithm
+fn pollard_rho_factor(n: i32, c: i32) -> FactorResult {
+    let mut x: i32 = 2;  // Tortoise
+    let mut y: i32 = 2;  // Hare
+    let mut d: i32 = 1;
+    let mut iterations: i32 = 0;
+    
+    let mut result: FactorResult = FactorResult {
+        factor: 1,
+        iterations: 0,
+    };
+    
+    // Floyd's cycle detection
+    while (d == 1) {
+        iterations += 1;
+        
+        // Tortoise moves one step
+        x = pollard_function(x, c, n);
+        
+        // Hare moves two steps
+        y = pollard_function(y, c, n);
+        y = pollard_function(y, c, n);
+        
+        // Calculate GCD of |x - y| and n
+        let diff: i32 = abs_value(x - y);
+        d = gcd_iterative(diff, n);
+        
+        // Prevent infinite loop
+        if (iterations > 1000) {
+            break;
+        }
+    }
+    
+    if (d != 1 && result == d) {
+        result.factor = d;
+        result.iterations = iterations;
+    }
+    
+    return result;
+}
+
+// Test multiple values of c parameter for robustness
+fn comprehensive_factorization(n: i32) -> i32 {
+    let mut best_factor: i32 = 1;
+    let mut total_iterations: i32 = 0;
+    let mut c: i32 = 1;
+    
+    while (c <= 5) {
+        let factor_result: FactorResult = pollard_rho_factor(n, c);
+        
+        if (factor_result.factor > 1 && factor_result.factor < n) {
+            best_factor = factor_result.factor;
+            total_iterations += factor_result.iterations;
+            break;
+        }
+        
+        total_iterations += factor_result.iterations;
+        c += 1;
+    }
+    
+    // Additional verification using trial division
+    let mut verification_factor: i32 = 2;
+    while (verification_factor * verification_factor <= n) {
+        if (n % verification_factor == 0) {
+            if (best_factor == 1) {
+                best_factor = verification_factor;
+            }
+            break;
+        }
+        verification_factor += 1;
+    }
+    
+    return best_factor + total_iterations;
+}
+
+fn main() {
+    let number: i32 = getInt();
+    let result: i32 = comprehensive_factorization(number);
+    printInt(result);
+    exit(0);
+}

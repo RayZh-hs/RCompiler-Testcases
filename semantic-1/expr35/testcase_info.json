@@ -1,0 +1,32 @@
+{
+    "active": 1,
+    "cmp": [
+        "compileexitcode"
+    ],
+    "compileexitcode": -1,
+    "compilememorylimit": 256,
+    "compiletimelimit": 15,
+    "exitcode": 0,
+    "id": 2032037,
+    "input_path": "src/expr35/expr35.in",
+    "input_visible": 1,
+    "metainfo": {
+        "caseauthor": "Wenxin Zheng",
+        "comment": "Complex expression error: Variable `current_node` not found - AVL tree rebalancing simulation with height calculations, rotation detection, and tree complexity metrics",
+        "lastmodified": "2025-08-08"
+    },
+    "name": "expr35",
+    "name_visible": 1,
+    "output_path": "src/expr35/expr35.out",
+    "output_visible": 1,
+    "provide": [
+        "compilestderr",
+        "compileexitcode"
+    ],
+    "runtimelimit": -1,
+    "runtimememorylimit": 256,
+    "source_path": "src/expr35/expr35.rx",
+    "source_visible": 1,
+    "stage_id": 23891,
+    "stage_name": "semantic-1"
+}

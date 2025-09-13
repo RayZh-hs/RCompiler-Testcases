@@ -1,0 +1,320 @@
+/*
+Test Package: Semantic-1
+Test Target: expr
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: Disjoint set with path compression, union by rank, and Kruskal's algorithm simulation
+*/
+
+struct DisjointSetNode {
+    parent: i32,
+    rank: i32,
+    size: i32,
+    group_id: i32,
+}
+
+impl DisjointSetNode {
+    fn new(id: i32) -> DisjointSetNode {
+        DisjointSetNode {
+            parent: id,
+            rank: 0,
+            size: 1,
+            group_id: id,
+        }
+    }
+    
+    fn is_root(&self) -> bool {
+        return self.parent == self.group_id;
+    }
+}
+
+fn find_with_path_compression(nodes: &mut [DisjointSetNode; 20], node_id: i32) -> i32 {
+    if (node_id < 0 || node_id >= 20) {
+        return -1;
+    }
+    
+    if (nodes[node_id as usize].is_root()) {
+        return node_id;
+    }
+    
+    let parent: i32 = nodes[node_id as usize].parent;
+    let root: i32 = find_with_path_compression(nodes, parent);
+    nodes[node_id as usize].parent = root;
+    return root;
+}
+
+fn union_by_rank_and_size(nodes: &mut [DisjointSetNode; 20], node_a: i32, node_b: i32) -> bool {
+    let root_a: i32 = find_with_path_compression(nodes, node_a);
+    let root_b: i32 = find_with_path_compression(nodes, node_b);
+    
+    if (root_a == root_b) {
+        return false;
+    }
+    
+    let rank_a: i32 = nodes[root_a as usize].rank;
+    let rank_b: i32 = nodes[root_b as usize].rank;
+    let size_a: i32 = nodes[root_a as usize].size;
+    let size_b: i32 = nodes[root_b as usize].size;
+    
+    let new_root : i32 = if (rank_a > rank_b) {
+        root_a
+    } else if (rank_a < rank_b) {
+        root_b
+    } else {
+        if (size_a >= size_b) {
+            root_a
+        } else {
+            root_b
+        }
+    };
+
+    let old_root: i32 = if (rank_a > rank_b) {
+        root_b
+    } else if (rank_a < rank_b) {
+        root_a
+    } else {
+        if (size_a >= size_b) {
+            root_b
+        } else {
+            root_a
+        }
+    };
+    
+    nodes[old_root as usize].parent = new_root;
+    nodes[new_root as usize].size = nodes[new_root as usize].size + nodes[old_root as usize].size;
+    
+    if (rank_a == rank_b) {
+        nodes[new_root as usize].rank = nodes[new_root as usize].rank + 1;
+    }
+    
+    return true;
+}
+
+fn count_connected_components(nodes: &mut [DisjointSetNode; 20]) -> i32 {
+    let mut component_count: i32 = 0;
+    let mut unique_roots: [i32; 20] = [-1; 20];
+    let mut unique_count: usize = 0;
+    
+    let mut node_index: usize = 0;
+    loop {
+        if (node_index >= 20) {
+            break;
+        }
+        
+        let root: i32 = find_with_path_compression(nodes, node_index as i32);
+        let mut is_new_root: bool = true;
+        let mut root_check_index: usize = 0;
+        
+        loop {
+            if (root_check_index >= unique_count) {
+                break;
+            }
+            if (unique_roots[root_check_index] == root) {
+                is_new_root = false;
+                break;
+            }
+            root_check_index = root_check_index + 1;
+        }
+        
+        if (is_new_root) {
+            unique_roots[unique_count] = root;
+            unique_count = unique_count + 1;
+            component_count = component_count + 1;
+        }
+        
+        node_index = node_index + 1;
+    }
+    
+    return component_count;
+}
+
+fn calculate_union_find_efficiency(nodes: &[DisjointSetNode; 20]) -> i32 {
+    let mut total_path_length: i32 = 0;
+    let mut max_rank: i32 = 0;
+    let mut total_size_variance: i32 = 0;
+    
+    let mut index: usize = 0;
+    loop {
+        if (index >= 20) {
+            break;
+        }
+        
+        let node: &DisjointSetNode = &nodes[index];
+        
+        let mut path_length: i32 = 0;
+        let mut current: usize = index;
+        loop {
+            if (nodes[current].parent == current as i32) {
+                break;
+            }
+            path_length = path_length + 1;
+            current = nodes[current].parent as usize;
+            if (path_length > 20) {
+                break;
+            }
+        }
+        
+        total_path_length = total_path_length + path_length;
+        
+        if (node.rank > max_rank) {
+            max_rank = node.rank;
+        }
+        
+        let size_diff: i32 = {
+            let expected_size: i32 = 1;
+            let actual_size: i32 = node.size;
+            if (actual_size > expected_size) {
+                actual_size - expected_size
+            } else {
+                expected_size - actual_size
+            }
+        };
+        total_size_variance = total_size_variance + size_diff;
+        
+        index = index + 1;
+    }
+    
+    let efficiency_score: i32 = {
+        let path_penalty: i32 = total_path_length * 10;
+        let rank_bonus: i32 = max_rank * 5;
+        let variance_penalty: i32 = total_size_variance * 3;
+        let raw_score: i32 = 1000 - path_penalty - variance_penalty + rank_bonus;
+        if (raw_score < 0) {
+            100
+        } else {
+            raw_score % 500 + 100
+        }
+    };
+    
+    return efficiency_score;
+}
+
+fn simulate_kruskal_algorithm(nodes: &mut [DisjointSetNode; 20], edges: [[i32; 3]; 30]) -> i32 {
+    let mut mst_weight: i32 = 0;
+    let mut edges_added: i32 = 0;
+    
+    let mut edge_index: usize = 0;
+    loop {
+        if (edge_index >= 30 || edges_added >= 19) {
+            break;
+        }
+        
+        let edge: [i32; 3] = edges[edge_index];
+        let node_u: i32 = edge[0];
+        let node_v: i32 = edge[1];
+        let weight: i32 = edge[2];
+        
+        if (node_u >= 0 && node_u < 20 && node_v >= 0 && node_v < 20) {
+            let root_u: i32 = find_with_path_compression(nodes, node_u);
+            let root_v: i32 = find_with_path_compression(nodes, node_v);
+            
+            if (root_u != root_v) {
+                let union_success: bool = union_by_rank_and_size(nodes, node_u, node_v);
+                if (union_success) {
+                    mst_weight = mst_weight + weight;
+                    edges_added = edges_added + 1;
+                }
+            }
+        }
+        
+        edge_index = edge_index + 1;
+    }
+    
+    let final_components: i32 = count_connected_components(nodes);
+    let penalty: i32 = if (final_components > 1) { final_components * 50 } else { 0 };
+    
+    return mst_weight - penalty;
+}
+
+fn main() {
+    let mut disjoint_set: [DisjointSetNode; 20] = [
+        DisjointSetNode::new(0), DisjointSetNode::new(1), DisjointSetNode::new(2), DisjointSetNode::new(3),
+        DisjointSetNode::new(4), DisjointSetNode::new(5), DisjointSetNode::new(6), DisjointSetNode::new(7),
+        DisjointSetNode::new(8), DisjointSetNode::new(9), DisjointSetNode::new(10), DisjointSetNode::new(11),
+        DisjointSetNode::new(12), DisjointSetNode::new(13), DisjointSetNode::new(14), DisjointSetNode::new(15),
+        DisjointSetNode::new(16), DisjointSetNode::new(17), DisjointSetNode::new(18), DisjointSetNode::new(19),
+    ];
+    
+    let test_edges: [[i32; 3]; 30] = [
+        [0, 1, 4], [0, 2, 3], [1, 2, 1], [1, 3, 2], [2, 3, 5],
+        [3, 4, 7], [4, 5, 2], [5, 6, 6], [6, 7, 1], [7, 8, 4],
+        [8, 9, 3], [9, 10, 8], [10, 11, 2], [11, 12, 9], [12, 13, 1],
+        [13, 14, 5], [14, 15, 3], [15, 16, 7], [16, 17, 2], [17, 18, 4],
+        [18, 19, 6], [0, 19, 10], [1, 18, 8], [2, 17, 7], [3, 16, 9],
+        [4, 15, 5], [5, 14, 4], [6, 13, 8], [7, 12, 3], [8, 11, 6],
+    ];
+    
+    union_by_rank_and_size(&mut disjoint_set, 0, 1);
+    union_by_rank_and_size(&mut disjoint_set, 2, 3);
+    union_by_rank_and_size(&mut disjoint_set, 4, 5);
+    union_by_rank_and_size(&mut disjoint_set, 6, 7);
+    union_by_rank_and_size(&mut disjoint_set, 8, 9);
+    union_by_rank_and_size(&mut disjoint_set, 0, 2);
+    union_by_rank_and_size(&mut disjoint_set, 4, 6);
+    union_by_rank_and_size(&mut disjoint_set, 8, 10);
+    
+    let initial_components: i32 = count_connected_components(&mut disjoint_set);
+    let efficiency_before: i32 = calculate_union_find_efficiency(&disjoint_set);
+    let mst_result: i32 = simulate_kruskal_algorithm(&mut disjoint_set, test_edges);
+    let efficiency_after: i32 = calculate_union_find_efficiency(&disjoint_set);
+    let final_components: i32 = count_connected_components(&mut disjoint_set);
+    
+    let performance_metrics: i32 = {
+        let component_improvement: i32 = initial_components - final_components;
+        let efficiency_delta: i32 = efficiency_after - efficiency_before;
+        let mst_quality: i32 = if (mst_result > 0) { mst_result / 2 } else { 0 };
+        let combined_score: i32 = (component_improvement * 20) + efficiency_delta + mst_quality;
+        let normalized: i32 = {
+            let temp: i32 = combined_score % 3000;
+            if (temp < 0) {
+                -temp + 500
+            } else if (temp > 1500) {
+                temp - 750
+            } else {
+                temp + 300
+            }
+        };
+        normalized
+    };
+    
+    let output_calculation: i32 = {
+        let base: i32 = performance_metrics;
+        let hash_like_transform: i32 = {
+            let step1: i32 = (base * 31) % 10007;
+            let step2: i32 = (step1 + 1299827) % 20011;
+            let step3: i32 = step2 % 1000;
+            step3
+        };
+        
+        let final_adjustment: i32 = if (hash_like_transform % 13 == 0) {
+            hash_like_transform / 13
+        } else if (hash_like_transform % 13 == 1) {
+            hash_like_transform * 3
+        } else {
+            hash_like_transform + 127
+        };
+        
+        final_adjustment % 50000
+    };
+    
+    if (output_calculation > 0 && output_calculation != initial_components) {
+        let verified_output: i32 = {
+            let check1: bool = output_calculation != final_components;
+            let check2: bool = output_calculation != mst_result;
+            let check3: bool = output_calculation < 100000;
+            
+            if (check1 && check2 && check3) {
+                output_calculation
+            } else {
+                (output_calculation / 7) + 314
+            }
+        };
+        printInt(verified_output);
+    } else {
+        let emergency_value: i32 = 2718;
+        let backup: i32 = emergency_value + (performance_metrics % 1000);
+        printInt(backup);
+    }
+    exit(0);
+}

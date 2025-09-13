@@ -1,0 +1,75 @@
+/*
+Test Package: Semantic-1
+Test Target: misc
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: Miller-Rabin primality test with recursive witness checking
+*/
+
+// Miller-Rabin primality test with recursive witness checking
+// Probabilistic algorithm to test if a number is prime
+fn power_mod(mut base: i32, mut exp: i32, modulus: i32) -> i32 {
+    let mut result: i32 = 1;
+    base = base % modulus;
+    
+    while (exp > 0) {
+        if (exp % 2 == 1) {
+            result = (result * base) % modulus;
+        }
+        exp = exp / 2;
+        base = (base * base) % modulus;
+    }
+    
+    return result;
+}
+
+fn witness_check_recursive(a: i32, d: i32, n: i32, r: i32, round: i32) -> bool {
+    if (round >= r) {
+        return false;
+    }
+    
+    let x: i32 = power_mod(a, d * power_mod(2, round, n), n);
+    
+    if (x == 1 || x == n - 1) {
+        return true;
+    }
+    
+    return witness_check_recursive(a, d, n, r, round + 1);
+}
+
+fn miller_rabin_test(n: i32, witness: i32) -> bool {
+    if (n <= 1 || n == 4) {
+        return false;
+    }
+    if (n <= 3) {
+        return true;
+    }
+    
+    let mut d: i32 = n - 1;
+    let mut r: i32 = 0;
+    
+    while (d % 2 == 0) {
+        d = d / 2;
+        r = r + 1;
+    }
+    
+    let x: i32 = power_mod(witness, d, n);
+    if (x == 1 || x == n - 1) {
+        return true;
+    }
+    
+    return witness_check_recursive(witness, d, n, r, 1);
+}
+
+fn main() {
+    let n: i32 = getInt();
+    let witness: i32 = getInt();
+    
+    if (miller_rabin_test(n, witness)) {
+        printInt(1);
+    } else {
+        printInt(0);
+    }
+    exit(0);
+}

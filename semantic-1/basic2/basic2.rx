@@ -1,0 +1,69 @@
+/*
+Test Package: Semantic-1
+Test Target: basic
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: basic test, type mismatch in if expression - string vs i32
+*/
+
+fn main() {
+    let a: i32 = 10;
+    let b: i32 = 20;
+    let operator: Op = pick_operator(a);
+    let result: i32 = if (operator == Op::Add) {
+        compute(a, b, Op::Add)
+    } else {
+        compute(a, b, Op::Sub)
+    };
+    let doubled: i32 = result * 2;
+    let mut acc: i32 = 0;
+    let mut i: i32 = 0;
+    while (i < doubled) {
+        acc += i;
+        i += 1;
+    }
+    let final_score: i32 = acc / 3;
+    exit(0);
+}
+
+enum Op {
+    Add,
+    Sub,
+}
+
+fn pick_operator(value: i32) -> Op {
+    if (value > 5) {
+        Op::Add
+    } else {
+        Op::Sub
+    }
+}
+
+fn compute(x: i32, y: i32, op: Op) -> i32 {
+    let mut accumulator: i32 = 0;
+    let mut i: i32 = 0;
+    while (i < y) {
+        accumulator = accumulator + x + i;
+        i += 1;
+    }
+    if (op == Op::Add) {
+        accumulator + y
+    } else {
+        "invalid"
+    }
+}
+
+struct Dummy {
+    field_one: i32,
+    field_two: bool,
+}
+
+impl Dummy {
+    fn new() -> Self {
+        Dummy {
+            field_one: 0,
+            field_two: false,
+        }
+    }
+}

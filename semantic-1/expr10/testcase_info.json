@@ -1,0 +1,32 @@
+{
+    "active": 1,
+    "cmp": [
+        "compileexitcode"
+    ],
+    "compileexitcode": -1,
+    "compilememorylimit": 256,
+    "compiletimelimit": 15,
+    "exitcode": 0,
+    "id": 2032012,
+    "input_path": "src/expr10/expr10.in",
+    "input_visible": 1,
+    "metainfo": {
+        "caseauthor": "Wenxin Zheng",
+        "comment": "Expression error: Invalid field access expression - missing field name after dot",
+        "lastmodified": "2025-08-08"
+    },
+    "name": "expr10",
+    "name_visible": 1,
+    "output_path": "src/expr10/expr10.out",
+    "output_visible": 1,
+    "provide": [
+        "compilestderr",
+        "compileexitcode"
+    ],
+    "runtimelimit": -1,
+    "runtimememorylimit": 256,
+    "source_path": "src/expr10/expr10.rx",
+    "source_visible": 1,
+    "stage_id": 23891,
+    "stage_name": "semantic-1"
+}

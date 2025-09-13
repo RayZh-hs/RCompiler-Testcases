@@ -1,0 +1,32 @@
+{
+    "active": 1,
+    "cmp": [
+        "compileexitcode"
+    ],
+    "compileexitcode": 0,
+    "compilememorylimit": 256,
+    "compiletimelimit": 15,
+    "exitcode": 0,
+    "id": 2031958,
+    "input_path": "src/misc36/misc36.in",
+    "input_visible": 1,
+    "metainfo": {
+        "caseauthor": "Wenxin Zheng",
+        "comment": "Pollard's rho algorithm for integer factorization with recursive optimization",
+        "lastmodified": "2025-08-08"
+    },
+    "name": "misc36",
+    "name_visible": 1,
+    "output_path": "src/misc36/misc36.out",
+    "output_visible": 1,
+    "provide": [
+        "compilestderr",
+        "compileexitcode"
+    ],
+    "runtimelimit": -1,
+    "runtimememorylimit": 256,
+    "source_path": "src/misc36/misc36.rx",
+    "source_visible": 1,
+    "stage_id": 23891,
+    "stage_name": "semantic-1"
+}

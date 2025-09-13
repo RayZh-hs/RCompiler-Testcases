@@ -1,0 +1,245 @@
+/*
+Test Package: Semantic-2
+Test Target: comprehensive
+Author: Wenxin Zheng
+Time: 2025-08-17
+Verdict: Success
+Test Name: Large-Scale Array and Matrix Computations
+Summary: This test comprehensively evaluates compiler optimizations for:
+Details:
+Multi-dimensional array access patterns and address calculation.
+Loop interchange, fusion, and tiling for improved cache performance.
+Strength reduction and induction variable analysis in nested loops.
+Vectorization of arithmetic operations on array elements (if applicable).
+Complex data dependencies and their impact on loop parallelization.
+Branch prediction within loop bodies for data-dependent operations.
+Correct handling of array bounds and memory access.
+*/
+
+// comprehensive40.rx - Large-Scale Array and Matrix Computations
+// This test comprehensively evaluates compiler optimizations for:
+// - Multi-dimensional array access patterns and address calculation.
+// - Loop interchange, fusion, and tiling for improved cache performance.
+// - Strength reduction and induction variable analysis in nested loops.
+// - Vectorization of arithmetic operations on array elements (if applicable).
+// - Complex data dependencies and their impact on loop parallelization.
+// - Branch prediction within loop bodies for data-dependent operations.
+// - Correct handling of array bounds and memory access.
+
+let SIZE: i32 = 40;
+let HALF_SIZE: i32 = 20;
+
+fn init_matrix(mat: [[i32; 40]; 40], seed: i32) -> [[i32; 40]; 40] {
+    let mut i: i32 = 0;
+    let mut new_mat: [[i32; 40]; 40] = mat;
+    while (i < SIZE) {
+        let mut j: i32 = 0;
+        while (j < SIZE) {
+            new_mat[i][j] = (i * SIZE + j + seed) % 100;
+            j = j + 1;
+        }
+        i = i + 1;
+    }
+    return new_mat;
+}
+
+fn matrix_multiply(a: [[i32; 40]; 40], b: [[i32; 40]; 40]) -> [[i32; 40]; 40] {
+    let mut result: [[i32; 40]; 40] = [[0; 40]; 40];
+    let mut i: i32 = 0;
+    while (i < SIZE) {
+        let mut j: i32 = 0;
+        while (j < SIZE) {
+            let mut sum: i32 = 0;
+            let mut k: i32 = 0;
+            while (k < SIZE) {
+                sum = sum + a[i][k] * b[k][j];
+                k = k + 1;
+            }
+            result[i][j] = sum;
+            j = j + 1;
+        }
+        i = i + 1;
+    }
+    return result;
+}
+
+fn apply_stencil(mat: [[i32; 40]; 40]) -> [[i32; 40]; 40] {
+    let mut result: [[i32; 40]; 40] = [[0; 40]; 40];
+    let mut i: i32 = 1;
+    while (i < SIZE - 1) {
+        let mut j: i32 = 1;
+        while (j < SIZE - 1) {
+            let mut sum: i32 = 0;
+            sum = sum + mat[i-1][j-1];
+            sum = sum + mat[i-1][j];
+            sum = sum + mat[i-1][j+1];
+            sum = sum + mat[i][j-1];
+            sum = sum + mat[i][j] * -8;
+            sum = sum + mat[i][j+1];
+            sum = sum + mat[i+1][j-1];
+            sum = sum + mat[i+1][j];
+            sum = sum + mat[i+1][j+1];
+            result[i][j] = sum / 3;
+            j = j + 1;
+        }
+        i = i + 1;
+    }
+    return result;
+}
+
+fn transpose_and_add(mat: [[i32; 40]; 40]) -> [[i32; 40]; 40] {
+    let mut result: [[i32; 40]; 40] = mat;
+    let mut i: i32 = 0;
+    while (i < SIZE) {
+        let mut j: i32 = i;
+        while (j < SIZE) {
+            let temp: i32 = result[i][j];
+            result[i][j] = result[j][i] + temp;
+            result[j][i] = temp + result[j][i];
+            j = j + 1;
+        }
+        i = i + 1;
+    }
+    return result;
+}
+
+fn sub_matrix_sum(mat: [[i32; 40]; 40]) -> i32 {
+    let mut total_sum: i32 = 0;
+    let mut i: i32 = 0;
+    while (i < HALF_SIZE) {
+        let mut j: i32 = 0;
+        while (j < HALF_SIZE) {
+            total_sum = total_sum + mat[i][j];
+            j = j + 1;
+        }
+        i = i + 1;
+    }
+    i = HALF_SIZE;
+    while (i < SIZE) {
+        let mut j: i32 = HALF_SIZE;
+        while (j < SIZE) {
+            total_sum = total_sum + mat[i][j];
+            j = j + 1;
+        }
+        i = i + 1;
+    }
+    return total_sum;
+}
+
+fn diagonal_processing(mat: [[i32; 40]; 40]) -> i32 {
+    let mut result: i32 = 0;
+    let mut i: i32 = 0;
+    while (i < SIZE) {
+        if (mat[i][i] > 50) {
+            result = result + mat[i][SIZE - 1 - i];
+        } else {
+            result = result - mat[i][i];
+        }
+        i = i + 1;
+    }
+    return result;
+}
+
+fn main() {
+    let mut matrix_a: [[i32; 40]; 40] = [[0; 40]; 40];
+    let mut matrix_b: [[i32; 40]; 40] = [[0; 40]; 40];
+
+    matrix_a = init_matrix(matrix_a, 123);
+    matrix_b = init_matrix(matrix_b, 456);
+
+    let mut matrix_c: [[i32; 40]; 40] = matrix_multiply(matrix_a, matrix_b);
+
+    let mut i: i32 = 0;
+    while (i < 5) {
+        matrix_c = apply_stencil(matrix_c);
+        i = i + 1;
+    }
+
+    let sum1: i32 = sub_matrix_sum(matrix_c);
+    printInt(sum1);
+
+    let diag_res1: i32 = diagonal_processing(matrix_c);
+    printInt(diag_res1);
+
+    let mut matrix_d: [[i32; 40]; 40] = transpose_and_add(matrix_c);
+
+    let sum2: i32 = sub_matrix_sum(matrix_d);
+    printInt(sum2);
+
+    let diag_res2: i32 = diagonal_processing(matrix_d);
+    printInt(diag_res2);
+
+    let mut matrix_e: [[i32; 40]; 40] = matrix_multiply(matrix_d, matrix_a);
+
+    let sum3: i32 = sub_matrix_sum(matrix_e);
+    printInt(sum3);
+
+    let mut checksum: i32 = 0;
+    let mut j: i32 = 0;
+    while (j < SIZE) {
+        let mut k: i32 = 0;
+        while (k < SIZE) {
+            if ((j + k) % 2 == 0) {
+                checksum = checksum + matrix_e[j][k];
+            } else {
+                checksum = checksum - matrix_e[j][k];
+            }
+            k = k + 1;
+        }
+        j = j + 1;
+    }
+    printInt(checksum);
+
+    let mut m: i32 = 0;
+    while (m < SIZE) {
+        let mut row_max: i32 = -999999;
+        let mut n: i32 = 0;
+        while (n < SIZE) {
+            if (matrix_e[m][n] > row_max) {
+                row_max = matrix_e[m][n];
+            }
+            n = n + 1;
+        }
+        printInt(row_max);
+        m = m + 1;
+    }
+
+    let mut p: i32 = 0;
+    while (p < SIZE) {
+        let mut col_min: i32 = 999999;
+        let mut q: i32 = 0;
+        while (q < SIZE) {
+            if (matrix_e[q][p] < col_min) {
+                col_min = matrix_e[q][p];
+            }
+            q = q + 1;
+        }
+        printInt(col_min);
+        p = p + 1;
+    }
+
+    let mut temp_mat: [[i32; 40]; 40] = matrix_a;
+    let mut r: i32 = 0;
+    while (r < SIZE) {
+        let mut s: i32 = 0;
+        while (s < SIZE) {
+            let temp_val: i32 = temp_mat[r][s];
+            temp_mat[r][s] = temp_mat[s][r];
+            temp_mat[s][r] = temp_val;
+            s = s + 1;
+        }
+        r = r + 1;
+    }
+
+    let mut final_sum: i32 = 0;
+    let mut t: i32 = 0;
+    while (t < SIZE) {
+        let mut u: i32 = 0;
+        while (u < SIZE) {
+            final_sum = final_sum + temp_mat[t][u];
+            u = u + 1;
+        }
+        t = t + 1;
+    }
+    printInt(final_sum);
+}

@@ -1,0 +1,44 @@
+/*
+Test Package: Semantic-1
+Test Target: type
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: Type error: string used as array index in matrix operations
+*/
+
+// Complete program with type error: array indexing with wrong type
+struct Matrix {
+    data: [i32; 9],  // 3x3 matrix
+    rows: i32,
+    cols: i32,
+}
+
+fn get_element(matrix: Matrix, row: i32, col: i32) -> i32 {
+    let index: i32 = row * matrix.cols + col;
+    return matrix.data[index as usize];
+}
+
+fn set_matrix_diagonal(matrix: &mut Matrix, value: i32) {
+    let mut i: i32 = 0;
+    while (i < 3) {
+        let index: i32 = i * matrix.cols + i;
+        matrix.data[index as usize] = value;
+        i = i + 1;
+    }
+}
+
+fn main() {
+    let mut mat: Matrix = Matrix { 
+        data: [1, 2, 3, 4, 5, 6, 7, 8, 9], 
+        rows: 3, 
+        cols: 3 
+    };
+    
+    set_matrix_diagonal(&mut mat, 10);
+    
+    // Type error: using string as array index
+    let element: i32 = mat.data["invalid_index"];
+    printInt(element);
+    exit(0);
+}

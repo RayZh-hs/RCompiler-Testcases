@@ -1,0 +1,278 @@
+/*
+Test Package: Semantic-2
+Test Target: comprehensive
+Author: Wenxin Zheng
+Time: 2025-08-17
+Verdict: Success
+Test Name: Multi-Agent Simulation on a 2D Grid
+Summary: This test comprehensively evaluates compiler optimizations for:
+Details:
+Multi-dimensional array access and manipulation.
+Complex object-oriented-style programming with structs.
+Simulation loops with many state updates per tick.
+Decision-making logic with deep conditional branches.
+Interaction between multiple complex data structures.
+*/
+
+// comprehensive33.rx - Multi-Agent Simulation on a 2D Grid
+// This test comprehensively evaluates compiler optimizations for:
+// - Multi-dimensional array access and manipulation.
+// - Complex object-oriented-style programming with structs.
+// - Simulation loops with many state updates per tick.
+// - Decision-making logic with deep conditional branches.
+// - Interaction between multiple complex data structures.
+
+fn printInt(n: i32) {}
+
+const GRID_WIDTH: i32 = 50;
+const GRID_HEIGHT: i32 = 50;
+const NUM_AGENTS: i32 = 20;
+const SIMULATION_TICKS: i32 = 100;
+
+struct Agent {
+    id: i32,
+    x: i32,
+    y: i32,
+    energy: i32,
+    target_x: i32,
+    target_y: i32,
+    active: bool,
+}
+
+struct World {
+    grid: [[i32; GRID_WIDTH]; GRID_HEIGHT],
+    agents: [Agent; NUM_AGENTS],
+}
+
+fn main() {
+    let mut world: World = World {
+        grid: [[0; GRID_WIDTH]; GRID_HEIGHT],
+        agents: [Agent { id: 0, x: 0, y: 0, energy: 0, target_x: 0, target_y: 0, active: false }; NUM_AGENTS],
+    };
+
+    initialize_world(&mut world, 98765);
+
+    let mut tick: i32 = 0;
+    while (tick < SIMULATION_TICKS) {
+        update_world(&mut world);
+        process_interactions(&mut world);
+        if (tick % 10 == 0) {
+            run_diagnostics(&world);
+        }
+        tick = tick + 1;
+    }
+
+    final_report(&world);
+    printInt(9999);
+}
+
+fn initialize_world(world: &mut World, seed: i32) {
+    let mut current_seed: i32 = seed;
+    let mut i: i32 = 0;
+    while (i < NUM_AGENTS) {
+        current_seed = (current_seed * 1103515245 + 12345) / 65536 % 32768;
+        let x: i32 = current_seed % GRID_WIDTH;
+        current_seed = (current_seed * 1103515245 + 12345) / 65536 % 32768;
+        let y: i32 = current_seed % GRID_HEIGHT;
+        current_seed = (current_seed * 1103515245 + 12345) / 65536 % 32768;
+        let energy: i32 = 100 + (current_seed % 100);
+
+        world.agents[i].id = i;
+        world.agents[i].x = x;
+        world.agents[i].y = y;
+        world.agents[i].energy = energy;
+        world.agents[i].active = true;
+        world.grid[y][x] = i + 1;
+        update_agent_target(&mut world.agents[i], current_seed);
+        i = i + 1;
+    }
+
+    i = 0;
+    while (i < GRID_HEIGHT) {
+        let mut j: i32 = 0;
+        while (j < GRID_WIDTH) {
+            if (world.grid[i][j] == 0) {
+                current_seed = (current_seed * 1103515245 + 12345) / 65536 % 32768;
+                if (current_seed % 10 == 0) {
+                    world.grid[i][j] = -1 * (current_seed % 5 + 1);
+                }
+            }
+            j = j + 1;
+        }
+        i = i + 1;
+    }
+}
+
+fn update_agent_target(agent: &mut Agent, seed: i32) {
+    let mut new_seed: i32 = seed;
+    new_seed = (new_seed * 1103515245 + 12345) / 65536 % 32768;
+    agent.target_x = new_seed % GRID_WIDTH;
+    new_seed = (new_seed * 1103515245 + 12345) / 65536 % 32768;
+    agent.target_y = new_seed % GRID_HEIGHT;
+}
+
+fn update_world(world: &mut World) {
+    let mut i: i32 = 0;
+    while (i < NUM_AGENTS) {
+        if (world.agents[i].active) {
+            let agent: &mut Agent = &mut world.agents[i];
+            let old_x: i32 = agent.x;
+            let old_y: i32 = agent.y;
+
+            if (agent.x < agent.target_x) { agent.x = agent.x + 1; }
+            else if (agent.x > agent.target_x) { agent.x = agent.x - 1; }
+
+            if (agent.y < agent.target_y) { agent.y = agent.y + 1; }
+            else if (agent.y > agent.target_y) { agent.y = agent.y - 1; }
+
+            agent.x = clamp(agent.x, 0, GRID_WIDTH - 1);
+            agent.y = clamp(agent.y, 0, GRID_HEIGHT - 1);
+
+            agent.energy = agent.energy - 1;
+
+            if (world.grid[agent.y][agent.x] == 0) {
+                world.grid[old_y][old_x] = 0;
+                world.grid[agent.y][agent.x] = agent.id + 1;
+            } else {
+                agent.x = old_x;
+                agent.y = old_y;
+                agent.energy = agent.energy - 5;
+            }
+
+            if (agent.x == agent.target_x && agent.y == agent.target_y) {
+                update_agent_target(agent, agent.id + agent.energy);
+            }
+
+            if (agent.energy <= 0) {
+                agent.active = false;
+                world.grid[agent.y][agent.x] = 0;
+            }
+        }
+        i = i + 1;
+    }
+}
+
+fn process_interactions(world: &mut World) {
+    let mut i: i32 = 0;
+    while (i < NUM_AGENTS) {
+        if (!world.agents[i].active) {
+            continue;
+        }
+        let mut j: i32 = i + 1;
+        while (j < NUM_AGENTS) {
+            if (!world.agents[j].active) {
+                continue;
+            }
+
+            let agent1: &Agent = &world.agents[i];
+            let agent2: &Agent = &world.agents[j];
+
+            let dist_x: i32 = agent1.x - agent2.x;
+            let dist_y: i32 = agent1.y - agent2.y;
+
+            if (dist_x * dist_x + dist_y * dist_y < 4) {
+                if (agent1.energy > agent2.energy) {
+                    world.agents[i].energy = world.agents[i].energy + 10;
+                    world.agents[j].energy = world.agents[j].energy - 10;
+                } else {
+                    world.agents[i].energy = world.agents[i].energy - 10;
+                    world.agents[j].energy = world.agents[j].energy + 10;
+                }
+            }
+            j = j + 1;
+        }
+
+        let x: i32 = world.agents[i].x;
+        let y: i32 = world.agents[i].y;
+        if (world.grid[y][x] < 0) {
+            world.agents[i].energy = world.agents[i].energy + world.grid[y][x] * -10;
+            world.grid[y][x] = world.agents[i].id + 1;
+        }
+        i = i + 1;
+    }
+}
+
+fn run_diagnostics(world: &World) {
+    let mut total_energy: i32 = 0;
+    let mut active_agents: i32 = 0;
+    let mut i: i32 = 0;
+    while (i < NUM_AGENTS) {
+        if (world.agents[i].active) {
+            total_energy = total_energy + world.agents[i].energy;
+            active_agents = active_agents + 1;
+        }
+        i = i + 1;
+    }
+    printInt(100000 + active_agents);
+    printInt(200000 + total_energy);
+    provoke_error(world);
+}
+
+fn final_report(world: &World) {
+    let mut i: i32 = 0;
+    while (i < NUM_AGENTS) {
+        if (world.agents[i].active) {
+            printInt(world.agents[i].id * 10000 + world.agents[i].energy);
+        } else {
+            printInt(world.agents[i].id * 10000 + -1);
+        }
+        i = i + 1;
+    }
+}
+
+fn clamp(val: i32, min: i32, max: i32) -> i32 {
+    if (val < min) { return min; }
+    if (val > max) { return max; }
+    return val;
+}
+
+fn provoke_error(world: &World) {
+    let mut agent_copy: Agent = world.agents[0];
+    agent_copy.energy = -100;
+
+    let mut i: i32 = 0;
+    while (i < NUM_AGENTS) {
+        if (world.agents[i].active) {
+            if (world.agents[i].energy > 150) {
+                let mut temp_agent: Agent = world.agents[i];
+                temp_agent.energy = temp_agent.energy / 2;
+                if (temp_agent.energy > 100) {
+                    printInt(temp_agent.id + 5000);
+                }
+            }
+        }
+        i = i + 1;
+    }
+
+    let mut strongest_agent_id: i32 = -1;
+    let mut max_energy: i32 = -1;
+    i = 0;
+    while (i < NUM_AGENTS) {
+        if (world.agents[i].active) {
+            if (world.agents[i].energy > max_energy) {
+                max_energy = world.agents[i].energy;
+                strongest_agent_id = world.agents[i].id;
+            }
+        }
+        i = i + 1;
+    }
+
+    if (strongest_agent_id != -1) {
+        world.agents[strongest_agent_id].energy = 0;
+    }
+}
+
+fn another_simulation_scenario() {
+    let mut world: World = World {
+        grid: [[0; GRID_WIDTH]; GRID_HEIGHT],
+        agents: [Agent { id: 0, x: 0, y: 0, energy: 0, target_x: 0, target_y: 0, active: false }; NUM_AGENTS],
+    };
+    initialize_world(&mut world, 11223);
+    let mut i: i32 = 0;
+    while (i < 50) {
+        update_world(&mut world);
+        i = i + 1;
+    }
+    process_interactions(&mut world);
+    final_report(&world);
+}

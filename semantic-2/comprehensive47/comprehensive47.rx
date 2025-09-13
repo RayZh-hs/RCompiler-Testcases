@@ -1,0 +1,155 @@
+/*
+Test Package: Semantic-2
+Test Target: comprehensive
+Author: Wenxin Zheng
+Time: 2025-08-17
+Verdict: Success
+Test Name: Genetic Algorithm for Optimization
+Summary: This test comprehensively evaluates compiler optimizations for:
+Details:
+Simulation of evolutionary processes with selection, crossover, and mutation.
+Complex fitness function calculations involving non-linear operations.
+Management of a population of candidate solutions (large array of structs).
+Random number generation and its impact on control flow.
+Loop-heavy operations for evaluating and evolving the population.
+Re-use of variables with different meanings in different scopes.
+*/
+
+// comprehensive47.rx - Genetic Algorithm for Optimization
+// This test comprehensively evaluates compiler optimizations for:
+// - Simulation of evolutionary processes with selection, crossover, and mutation.
+// - Complex fitness function calculations involving non-linear operations.
+// - Management of a population of candidate solutions (large array of structs).
+// - Random number generation and its impact on control flow.
+// - Loop-heavy operations for evaluating and evolving the population.
+// - Re-use of variables with different meanings in different scopes.
+
+fn main() {
+    struct Chromosome {
+        genes: [i32; 16],
+        fitness: i32,
+    }
+
+    let mut population: [Chromosome; 64] = [Chromosome { genes: [0; 16], fitness: 0 }; 64];
+    let mut rng_seed: i32 = 12345;
+
+    fn pseudo_rand(mut seed: &mut i32) -> i32 {
+        *seed = (*seed * 1103515245 + 12345) & 2147483647;
+        return *seed;
+    }
+
+    fn init_population(mut pop: &mut [Chromosome; 64], mut seed: &mut i32) {
+        let mut i: i32 = 0;
+        while (i < 64) {
+            let mut j: i32 = 0;
+            while (j < 16) {
+                pop[i].genes[j] = pseudo_rand(&mut *seed) % 200 - 100;
+                j = j + 1;
+            }
+            i = i + 1;
+        }
+    }
+
+    // Fitness function: try to make genes sum to a target, with penalties
+    fn calculate_fitness(mut chrom: &mut Chromosome) {
+        let target_sum: i32 = 500;
+        let mut sum: i32 = 0;
+        let mut penalty: i32 = 0;
+        let mut i: i32 = 0;
+        while (i < 16) {
+            sum = sum + chrom.genes[i];
+            if (chrom.genes[i] > 90 || chrom.genes[i] < -90) {
+                penalty = penalty + (chrom.genes[i] * chrom.genes[i]);
+            }
+            i = i + 1;
+        }
+        let diff: i32 = target_sum - sum;
+        chrom.fitness = -(diff * diff) - penalty; // Maximize fitness (closer to 0 is better)
+    }
+
+    fn evaluate_population(mut pop: &mut [Chromosome; 64]) {
+        let mut i: i32 = 0;
+        while (i < 64) {
+            calculate_fitness(&mut pop[i]);
+            i = i + 1;
+        }
+    }
+
+    fn selection(pop: &[Chromosome; 64], mut seed: &mut i32) -> i32 {
+        let tournament_size: i32 = 5;
+        let mut best_index: i32 = -1;
+        let mut best_fitness: i32 = -99999999;
+        let mut i: i32 = 0;
+        while (i < tournament_size) {
+            let idx: i32 = pseudo_rand(&mut *seed) % 64;
+            if (pop[idx].fitness > best_fitness) {
+                best_fitness = pop[idx].fitness;
+                best_index = idx;
+            }
+            i = i + 1;
+        }
+        return best_index;
+    }
+
+    fn crossover(parent1: &Chromosome, parent2: &Chromosome, mut child: &mut Chromosome, mut seed: &mut i32) {
+        let crossover_point: i32 = pseudo_rand(&mut *seed) % 16;
+        let mut i: i32 = 0;
+        while (i < 16) {
+            if (i < crossover_point) {
+                child.genes[i] = parent1.genes[i];
+            } else {
+                child.genes[i] = parent2.genes[i];
+            }
+            i = i + 1;
+        }
+    }
+
+    fn mutate(mut chrom: &mut Chromosome, mut seed: &mut i32) {
+        let mutation_rate: i32 = 10; // out of 100
+        let mut i: i32 = 0;
+        while (i < 16) {
+            if (pseudo_rand(&mut *seed) % 100 < mutation_rate) {
+                chrom.genes[i] = chrom.genes[i] + (pseudo_rand(&mut *seed) % 20 - 10);
+            }
+            i = i + 1;
+        }
+    }
+
+    init_population(&mut population, &mut rng_seed);
+
+    let mut generation: i32 = 0;
+    while (generation < 50) {
+        evaluate_population(&mut population);
+        let mut new_population: [Chromosome; 64] = [Chromosome { genes: [0; 16], fitness: 0 }; 64];
+
+        let mut i: i32 = 0;
+        while (i < 64) {
+            let p1_idx: i32 = selection(&population, &mut rng_seed);
+            let p2_idx: i32 = selection(&population, &mut rng_seed);
+            crossover(&population[p1_idx], &population[p2_idx], &mut new_population[i], &mut rng_seed);
+            mutate(&mut new_population[i], &mut rng_seed);
+            i = i + 1;
+        }
+        
+        // Hidden Error: The variable `i` is re-declared in this inner scope,
+        // shadowing the outer `i`. A compiler should catch this re-declaration
+        // in the same function block.
+        let mut i: i32 = 0;
+        while (i < 64) {
+            population[i] = new_population[i];
+            i = i + 1;
+        }
+        generation = generation + 1;
+    }
+
+    evaluate_population(&mut population);
+    let mut best_fitness: i32 = -99999999;
+    let mut i: i32 = 0;
+    while (i < 64) {
+        if (population[i].fitness > best_fitness) {
+            best_fitness = population[i].fitness;
+        }
+        i = i + 1;
+    }
+    printInt(best_fitness);
+}

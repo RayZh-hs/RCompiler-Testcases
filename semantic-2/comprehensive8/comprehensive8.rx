@@ -1,0 +1,1128 @@
+/*
+Test Package: Semantic-2
+Test Target: comprehensive
+Author: Wenxin Zheng
+Time: 2025-08-17
+Verdict: Success
+Test Name: Comprehensive Test 8: Dynamic Programming and Optimization Problems
+Summary: This test focuses on compiler optimization of:
+Details:
+Dynamic programming table access patterns
+Memoization and caching optimizations
+Multi-dimensional array optimization
+Nested loop optimization in DP algorithms
+Memory access pattern optimization in DP
+Optimization problem solving algorithms
+*/
+
+// comprehensive8.rx - Comprehensive Test 8: Dynamic Programming and Optimization Problems
+// This test focuses on compiler optimization of:
+// - Dynamic programming table access patterns
+// - Memoization and caching optimizations
+// - Multi-dimensional array optimization
+// - Nested loop optimization in DP algorithms
+// - Memory access pattern optimization in DP
+// - Optimization problem solving algorithms
+
+fn main() {
+    // Performance test marker - start
+    printInt(1800);
+    
+    // Test 1: Classic dynamic programming problems
+    // Tests optimization of DP table access and computation patterns
+    testClassicDynamicProgramming();
+    
+    // Test 2: Sequence alignment and string DP
+    // Tests optimization of 2D DP tables and string operations
+    testSequenceAlignmentDP();
+    
+    // Test 3: Optimization problems (knapsack, scheduling)
+    // Tests optimization of combinatorial optimization algorithms
+    testOptimizationProblems();
+    
+    // Test 4: Game theory and minimax DP
+    // Tests optimization of recursive DP with game tree structures
+    testGameTheoryDP();
+    
+    // Test 5: Advanced DP patterns (digit DP, bitmask DP)
+    // Tests optimization of complex DP state representations
+    testAdvancedDPPatterns();
+    
+    // Performance test marker - end
+    printInt(1899);
+}
+
+// Test 1: Classic Dynamic Programming Problems
+fn testClassicDynamicProgramming() {
+    printInt(1801); // Start classic DP test
+    
+    // Test Fibonacci with memoization
+    let fib_result: i32 = fibonacciDP(45);
+    printInt(fib_result);
+    
+    // Test longest increasing subsequence
+    let mut sequence: [i32; 100] = [0; 100];
+    initializeSequence(sequence, 100);
+    let lis_result: i32 = longestIncreasingSubsequence(sequence, 100);
+    printInt(lis_result);
+    
+    // Test coin change problem
+    let coin_change_result: i32 = coinChangeDP(247);
+    printInt(coin_change_result);
+    
+    // Test maximum subarray sum (Kadane's algorithm)
+    let mut array: [i32; 150] = [0; 150];
+    initializeArray(array, 150);
+    let max_sum_result: i32 = maximumSubarraySum(array, 150);
+    printInt(max_sum_result);
+    
+    // Test house robber problem
+    let robber_result: i32 = houseRobberDP(array, 150);
+    printInt(robber_result);
+    
+    printInt(1802); // End classic DP test
+}
+
+// Fibonacci with dynamic programming
+fn fibonacciDP(n: i32) -> i32 {
+    if (n <= 1) {
+        return n;
+    }
+    
+    let mut dp: [i32; 46] = [0; 46];
+    dp[0] = 0;
+    dp[1] = 1;
+    
+    let mut i: i32 = 2;
+    while (i <= n) {
+        dp[i] = dp[i - 1] + dp[i - 2];
+        i = i + 1;
+    }
+    
+    return dp[n];
+}
+
+// Initialize sequence for testing
+fn initializeSequence(mut sequence: [i32; 100], size: i32) {
+    let mut seed: i32 = 12345;
+    let mut i: i32 = 0;
+    
+    while (i < size) {
+        seed = (seed * 1664525 + 1013904223) % 2147483647;
+        if (seed < 0) {
+            seed = -seed;
+        }
+        sequence[i] = seed % 1000;
+        i = i + 1;
+    }
+}
+
+// Longest Increasing Subsequence using DP
+fn longestIncreasingSubsequence(sequence: [i32; 100], size: i32) -> i32 {
+    let mut dp: [i32; 100] = [1; 100];
+    let mut max_length: i32 = 1;
+    
+    let mut i: i32 = 1;
+    while (i < size) {
+        let mut j: i32 = 0;
+        while (j < i) {
+            if (sequence[j] < sequence[i] && dp[j] + 1 > dp[i]) {
+                dp[i] = dp[j] + 1;
+            }
+            j = j + 1;
+        }
+        
+        if (dp[i] > max_length) {
+            max_length = dp[i];
+        }
+        
+        i = i + 1;
+    }
+    
+    return max_length;
+}
+
+// Coin Change DP (minimum coins needed)
+fn coinChangeDP(amount: i32) -> i32 {
+    let coins: [i32; 5] = [1, 5, 10, 25, 50];
+    let mut dp: [i32; 248] = [9999; 248];
+    dp[0] = 0;
+    
+    let mut i: i32 = 1;
+    while (i <= amount) {
+        let mut coin_idx: i32 = 0;
+        while (coin_idx < 5) {
+            let coin: i32 = coins[coin_idx];
+            if (coin <= i && dp[i - coin] + 1 < dp[i]) {
+                dp[i] = dp[i - coin] + 1;
+            }
+            coin_idx = coin_idx + 1;
+        }
+        i = i + 1;
+    }
+    
+    return dp[amount];
+}
+
+// Initialize array with mixed positive and negative values
+fn initializeArray(mut array: [i32; 150], size: i32) {
+    let mut seed: i32 = 54321;
+    let mut i: i32 = 0;
+    
+    while (i < size) {
+        seed = (seed * 1664525 + 1013904223) % 2147483647;
+        if (seed < 0) {
+            seed = -seed;
+        }
+        
+        // Mix of positive and negative values
+        if (seed % 3 == 0) {
+            array[i] = -(seed % 100);
+        } else {
+            array[i] = seed % 100;
+        }
+        i = i + 1;
+    }
+}
+
+// Maximum Subarray Sum (Kadane's Algorithm)
+fn maximumSubarraySum(array: [i32; 150], size: i32) -> i32 {
+    let mut max_so_far: i32 = array[0];
+    let mut max_ending_here: i32 = array[0];
+    
+    let mut i: i32 = 1;
+    while (i < size) {
+        if (max_ending_here + array[i] > array[i]) {
+            max_ending_here = max_ending_here + array[i];
+        } else {
+            max_ending_here = array[i];
+        }
+        
+        if (max_ending_here > max_so_far) {
+            max_so_far = max_ending_here;
+        }
+        
+        i = i + 1;
+    }
+    
+    return max_so_far;
+}
+
+// House Robber DP
+fn houseRobberDP(houses: [i32; 150], size: i32) -> i32 {
+    if (size == 0) {
+        return 0;
+    }
+    if (size == 1) {
+        return houses[0];
+    }
+    
+    let mut dp: [i32; 150] = [0; 150];
+    dp[0] = houses[0];
+    
+    if (houses[1] > houses[0]) {
+        dp[1] = houses[1];
+    } else {
+        dp[1] = houses[0];
+    }
+    
+    let mut i: i32 = 2;
+    while (i < size) {
+        let rob_current: i32 = dp[i - 2] + houses[i];
+        let skip_current: i32 = dp[i - 1];
+        
+        if (rob_current > skip_current) {
+            dp[i] = rob_current;
+        } else {
+            dp[i] = skip_current;
+        }
+        
+        i = i + 1;
+    }
+    
+    return dp[size - 1];
+}
+
+// Test 2: Sequence Alignment and String DP
+fn testSequenceAlignmentDP() {
+    printInt(1803); // Start sequence alignment test
+    
+    // Test edit distance (Levenshtein distance)
+    let mut string1: [i32; 50] = [0; 50];
+    let mut string2: [i32; 50] = [0; 50];
+    initializeStrings(string1, string2, 30, 35);
+    let edit_distance: i32 = editDistanceDP(string1, string2, 30, 35);
+    printInt(edit_distance);
+    
+    // Test longest common subsequence
+    let lcs_result: i32 = longestCommonSubsequenceDP(string1, string2, 30, 35);
+    printInt(lcs_result);
+    
+    // Test palindrome partitioning
+    let palindrome_result: i32 = palindromePartitioningDP(string1, 30);
+    printInt(palindrome_result);
+    
+    // Test string reconstruction problems
+    let reconstruction_result: i32 = stringReconstructionDP(string1, 30);
+    printInt(reconstruction_result);
+    
+    printInt(1804); // End sequence alignment test
+}
+
+// Initialize strings for DP testing
+fn initializeStrings(mut string1: [i32; 50], mut string2: [i32; 50], len1: i32, len2: i32) {
+    let mut seed: i32 = 98765;
+    let mut i: i32 = 0;
+    
+    // Initialize string1
+    while (i < len1) {
+        seed = (seed * 1664525 + 1013904223) % 2147483647;
+        if (seed < 0) {
+            seed = -seed;
+        }
+        string1[i] = 65 + (seed % 26); // A-Z
+        i = i + 1;
+    }
+    
+    // Initialize string2 (with some similarity to string1)
+    i = 0;
+    while (i < len2) {
+        seed = (seed * 1664525 + 1013904223) % 2147483647;
+        if (seed < 0) {
+            seed = -seed;
+        }
+        
+        if (i < len1 && seed % 3 == 0) {
+            string2[i] = string1[i]; // Some matching characters
+        } else {
+            string2[i] = 65 + (seed % 26); // A-Z
+        }
+        i = i + 1;
+    }
+}
+
+// Edit Distance using DP
+fn editDistanceDP(string1: [i32; 50], string2: [i32; 50], len1: i32, len2: i32) -> i32 {
+    let mut dp: [i32; 1800] = [0; 1800]; // 36x50 table
+    
+    // Initialize base cases
+    let mut i: i32 = 0;
+    while (i <= len1) {
+        dp[i * (len2 + 1) + 0] = i; // First column
+        i = i + 1;
+    }
+    
+    let mut j: i32 = 0;
+    while (j <= len2) {
+        dp[0 * (len2 + 1) + j] = j; // First row
+        j = j + 1;
+    }
+    
+    // Fill DP table
+    i = 1;
+    while (i <= len1) {
+        j = 1;
+        while (j <= len2) {
+            if (string1[i - 1] == string2[j - 1]) {
+                dp[i * (len2 + 1) + j] = dp[(i - 1) * (len2 + 1) + (j - 1)];
+            } else {
+                let insert: i32 = dp[i * (len2 + 1) + (j - 1)] + 1;
+                let delete: i32 = dp[(i - 1) * (len2 + 1) + j] + 1;
+                let replace: i32 = dp[(i - 1) * (len2 + 1) + (j - 1)] + 1;
+                
+                let min_val: i32;
+                if (insert < delete) {
+                    min_val = insert;
+                } else {
+                    min_val = delete;
+                }
+                
+                if (replace < min_val) {
+                    dp[i * (len2 + 1) + j] = replace;
+                } else {
+                    dp[i * (len2 + 1) + j] = min_val;
+                }
+            }
+            j = j + 1;
+        }
+        i = i + 1;
+    }
+    
+    return dp[len1 * (len2 + 1) + len2];
+}
+
+// Longest Common Subsequence using DP
+fn longestCommonSubsequenceDP(string1: [i32; 50], string2: [i32; 50], len1: i32, len2: i32) -> i32 {
+    let mut dp: [i32; 1800] = [0; 1800]; // 36x50 table
+    
+    let mut i: i32 = 1;
+    while (i <= len1) {
+        let mut j: i32 = 1;
+        while (j <= len2) {
+            if (string1[i - 1] == string2[j - 1]) {
+                dp[i * (len2 + 1) + j] = dp[(i - 1) * (len2 + 1) + (j - 1)] + 1;
+            } else {
+                let from_left: i32 = dp[i * (len2 + 1) + (j - 1)];
+                let from_top: i32 = dp[(i - 1) * (len2 + 1) + j];
+                
+                if (from_left > from_top) {
+                    dp[i * (len2 + 1) + j] = from_left;
+                } else {
+                    dp[i * (len2 + 1) + j] = from_top;
+                }
+            }
+            j = j + 1;
+        }
+        i = i + 1;
+    }
+    
+    return dp[len1 * (len2 + 1) + len2];
+}
+
+// Palindrome Partitioning DP
+fn palindromePartitioningDP(string: [i32; 50], length: i32) -> i32 {
+    let mut dp: [i32; 50] = [0; 50];
+    let mut is_palindrome: [bool; 2500] = [false; 2500]; // 50x50 table
+    
+    // Precompute palindrome table
+    let mut i: i32 = 0;
+    while (i < length) {
+        let mut j: i32 = 0;
+        while (j < length) {
+            if i == j {
+                is_palindrome[i * length + j] = true;
+            } else if i + 1 == j {
+                is_palindrome[i * length + j] = (string[i] == string[j]);
+            } else if i < j {
+                is_palindrome[i * length + j] = (string[i] == string[j]) && 
+                    is_palindrome[(i + 1) * length + (j - 1)];
+            }
+            j = j + 1;
+        }
+        i = i + 1;
+    }
+    
+    // DP for minimum cuts
+    i = 0;
+    while (i < length) {
+        dp[i] = i; // Maximum cuts needed
+        let mut j: i32 = 0;
+        while (j <= i) {
+            if is_palindrome[j * length + i] {
+                if j == 0 {
+                    dp[i] = 0;
+                } else if dp[j - 1] + 1 < dp[i] {
+                    dp[i] = dp[j - 1] + 1;
+                }
+            }
+            j = j + 1;
+        }
+        i = i + 1;
+    }
+    
+    return dp[length - 1];
+}
+
+// String Reconstruction DP
+fn stringReconstructionDP(string: [i32; 50], length: i32) -> i32 {
+    // Count number of ways to reconstruct string with specific patterns
+    let mut dp: [i32; 50] = [0; 50];
+    dp[0] = 1;
+    
+    let mut i: i32 = 1;
+    while (i <= length) {
+        // Single character
+        if i >= 1 && string[i - 1] >= 65 && string[i - 1] <= 90 {
+            dp[i] = dp[i] + dp[i - 1];
+        }
+        
+        // Two character combination
+        if i >= 2 && string[i - 2] >= 65 && string[i - 2] <= 90 &&
+           string[i - 1] >= 65 && string[i - 1] <= 90 {
+            dp[i] = dp[i] + dp[i - 2];
+        }
+        
+        // Three character combination (less common)
+        if i >= 3 && string[i - 3] >= 65 && string[i - 3] <= 90 &&
+           string[i - 2] >= 65 && string[i - 2] <= 90 &&
+           string[i - 1] >= 65 && string[i - 1] <= 90 {
+            dp[i] = dp[i] + dp[i - 3] / 2; // Reduced weight
+        }
+        
+        i = i + 1;
+    }
+    
+    return dp[length];
+}
+
+// Test 3: Optimization Problems
+fn testOptimizationProblems() {
+    printInt(1805); // Start optimization problems test
+    
+    // Test 0/1 Knapsack problem
+    let knapsack_result: i32 = knapsackDP(50, 100);
+    printInt(knapsack_result);
+    
+    // Test unbounded knapsack
+    let unbounded_knapsack_result: i32 = unboundedKnapsackDP(50, 100);
+    printInt(unbounded_knapsack_result);
+    
+    // Test job scheduling with deadlines
+    let scheduling_result: i32 = jobSchedulingDP(30);
+    printInt(scheduling_result);
+    
+    // Test partition problem
+    let partition_result: i32 = partitionProblemDP(40);
+    printInt(partition_result);
+    
+    // Test matrix chain multiplication
+    let matrix_chain_result: i32 = matrixChainMultiplicationDP(20);
+    printInt(matrix_chain_result);
+    
+    printInt(1806); // End optimization problems test
+}
+
+// 0/1 Knapsack DP
+fn knapsackDP(num_items: i32, capacity: i32) -> i32 {
+    let mut weights: [i32; 50] = [0; 50];
+    let mut values: [i32; 50] = [0; 50];
+    
+    // Initialize items
+    let mut i: i32 = 0;
+    let mut seed: i32 = 11111;
+    while (i < num_items) {
+        seed = (seed * 1664525 + 1013904223) % 2147483647;
+        if seed < 0 {
+            seed = -seed;
+        }
+        weights[i] = 1 + (seed % 20);
+        values[i] = 10 + (seed % 50);
+        i = i + 1;
+    }
+    
+    // DP table
+    let mut dp: [i32; 5050] = [0; 5050]; // (num_items+1) x (capacity+1)
+    
+    i = 1;
+    while (i <= num_items) {
+        let mut w: i32 = 1;
+        while (w <= capacity) {
+            // Don't take item i-1
+            dp[i * (capacity + 1) + w] = dp[(i - 1) * (capacity + 1) + w];
+            
+            // Take item i-1 if possible
+            if weights[i - 1] <= w {
+                let take_value: i32 = values[i - 1] + dp[(i - 1) * (capacity + 1) + (w - weights[i - 1])];
+                if take_value > dp[i * (capacity + 1) + w] {
+                    dp[i * (capacity + 1) + w] = take_value;
+                }
+            }
+            
+            w = w + 1;
+        }
+        i = i + 1;
+    }
+    
+    return dp[num_items * (capacity + 1) + capacity];
+}
+
+// Unbounded Knapsack DP
+fn unboundedKnapsackDP(num_items: i32, capacity: i32) -> i32 {
+    let mut weights: [i32; 50] = [0; 50];
+    let mut values: [i32; 50] = [0; 50];
+    
+    // Initialize items
+    let mut i: i32 = 0;
+    let mut seed: i32 = 22222;
+    while (i < num_items) {
+        seed = (seed * 1664525 + 1013904223) % 2147483647;
+        if seed < 0 {
+            seed = -seed;
+        }
+        weights[i] = 1 + (seed % 15);
+        values[i] = 5 + (seed % 40);
+        i = i + 1;
+    }
+    
+    // DP array
+    let mut dp: [i32; 101] = [0; 101];
+    
+    let mut w: i32 = 1;
+    while (w <= capacity) {
+        i = 0;
+        while (i < num_items) {
+            if weights[i] <= w {
+                let new_value: i32 = values[i] + dp[w - weights[i]];
+                if new_value > dp[w] {
+                    dp[w] = new_value;
+                }
+            }
+            i = i + 1;
+        }
+        w = w + 1;
+    }
+    
+    return dp[capacity];
+}
+
+// Job Scheduling with Deadlines DP
+fn jobSchedulingDP(num_jobs: i32) -> i32 {
+    let mut profits: [i32; 30] = [0; 30];
+    let mut deadlines: [i32; 30] = [0; 30];
+    
+    // Initialize jobs
+    let mut i: i32 = 0;
+    let mut seed: i32 = 33333;
+    while (i < num_jobs) {
+        seed = (seed * 1664525 + 1013904223) % 2147483647;
+        if seed < 0 {
+            seed = -seed;
+        }
+        profits[i] = 10 + (seed % 100);
+        deadlines[i] = 1 + (seed % 20);
+        i = i + 1;
+    }
+    
+    // Sort jobs by profit (simple bubble sort)
+    i = 0;
+    while (i < num_jobs - 1) {
+        let mut j: i32 = 0;
+        while (j < num_jobs - i - 1) {
+            if profits[j] < profits[j + 1] {
+                // Swap profits
+                let temp_profit: i32 = profits[j];
+                profits[j] = profits[j + 1];
+                profits[j + 1] = temp_profit;
+                
+                // Swap deadlines
+                let temp_deadline: i32 = deadlines[j];
+                deadlines[j] = deadlines[j + 1];
+                deadlines[j + 1] = temp_deadline;
+            }
+            j = j + 1;
+        }
+        i = i + 1;
+    }
+    
+    // Schedule jobs greedily
+    let mut schedule: [bool; 20] = [false; 20];
+    let mut total_profit: i32 = 0;
+    
+    i = 0;
+    while (i < num_jobs) {
+        let mut slot: i32 = deadlines[i] - 1;
+        
+        // Find available slot
+        while (slot >= 0) {
+            if slot < 20 && !schedule[slot] {
+                schedule[slot] = true;
+                total_profit = total_profit + profits[i];
+                break;
+            }
+            slot = slot - 1;
+        }
+        
+        i = i + 1;
+    }
+    
+    return total_profit;
+}
+
+// Partition Problem DP
+fn partitionProblemDP(num_elements: i32) -> i32 {
+    let mut elements: [i32; 40] = [0; 40];
+    let mut total_sum: i32 = 0;
+    
+    // Initialize elements
+    let mut i: i32 = 0;
+    let mut seed: i32 = 44444;
+    while (i < num_elements) {
+        seed = (seed * 1664525 + 1013904223) % 2147483647;
+        if seed < 0 {
+            seed = -seed;
+        }
+        elements[i] = 1 + (seed % 50);
+        total_sum = total_sum + elements[i];
+        i = i + 1;
+    }
+    
+    // Check if partition is possible
+    if total_sum % 2 != 0 {
+        return 0; // Cannot partition odd sum into two equal parts
+    }
+    
+    let target: i32 = total_sum / 2;
+    let mut dp: [bool; 1001] = [false; 1001]; // Subset sum DP
+    dp[0] = true;
+    
+    i = 0;
+    while (i < num_elements) {
+        let mut j: i32 = target;
+        while (j >= elements[i]) {
+            dp[j] = dp[j] || dp[j - elements[i]];
+            j = j - 1;
+        }
+        i = i + 1;
+    }
+    
+    if dp[target] {
+        return 1; // Partition possible
+    } else {
+        return 0; // Partition not possible
+    }
+}
+
+// Matrix Chain Multiplication DP
+fn matrixChainMultiplicationDP(num_matrices: i32) -> i32 {
+    let mut dimensions: [i32; 21] = [0; 21];
+    
+    // Initialize matrix dimensions
+    let mut seed: i32 = 55555;
+    let mut i: i32 = 0;
+    while (i <= num_matrices) {
+        seed = (seed * 1664525 + 1013904223) % 2147483647;
+        if seed < 0 {
+            seed = -seed;
+        }
+        dimensions[i] = 10 + (seed % 50);
+        i = i + 1;
+    }
+    
+    // DP table for minimum multiplications
+    let mut dp: [i32; 400] = [0; 400]; // 20x20 table
+    
+    let mut length: i32 = 2; // Chain length
+    while (length <= num_matrices) {
+        i = 1;
+        while (i <= num_matrices - length + 1) {
+            let j: i32 = i + length - 1;
+            dp[i * 20 + j] = 999999; // Initialize to large value
+            
+            let mut k: i32 = i;
+            while (k < j) {
+                let cost: i32 = dp[i * 20 + k] + dp[(k + 1) * 20 + j] + 
+                               dimensions[i - 1] * dimensions[k] * dimensions[j];
+                
+                if cost < dp[i * 20 + j] {
+                    dp[i * 20 + j] = cost;
+                }
+                
+                k = k + 1;
+            }
+            
+            i = i + 1;
+        }
+        length = length + 1;
+    }
+    
+    return dp[1 * 20 + num_matrices];
+}
+
+// Test 4: Game Theory DP
+fn testGameTheoryDP() {
+    printInt(1807); // Start game theory test
+    
+    // Test optimal game strategy
+    let game_result: i32 = optimalGameStrategyDP(20);
+    printInt(game_result);
+    
+    // Test coin game
+    let coin_game_result: i32 = coinGameDP(30);
+    printInt(coin_game_result);
+    
+    // Test nim game variations
+    let nim_result: i32 = nimGameDP(25);
+    printInt(nim_result);
+    
+    printInt(1808); // End game theory test
+}
+
+// Optimal Game Strategy DP
+fn optimalGameStrategyDP(num_coins: i32) -> i32 {
+    let mut coins: [i32; 20] = [0; 20];
+    
+    // Initialize coin values
+    let mut i: i32 = 0;
+    let mut seed: i32 = 66666;
+    while (i < num_coins) {
+        seed = (seed * 1664525 + 1013904223) % 2147483647;
+        if seed < 0 {
+            seed = -seed;
+        }
+        coins[i] = 1 + (seed % 100);
+        i = i + 1;
+    }
+    
+    // DP table for maximum difference player 1 can achieve
+    let mut dp: [i32; 400] = [0; 400]; // 20x20 table
+    
+    // Base case: single coin
+    i = 0;
+    while (i < num_coins) {
+        dp[i * 20 + i] = coins[i];
+        i = i + 1;
+    }
+    
+    // Fill DP table
+    let mut length: i32 = 2;
+    while (length <= num_coins) {
+        i = 0;
+        while (i <= num_coins - length) {
+            let j: i32 = i + length - 1;
+            
+            // Player chooses coin i, opponent plays optimally on [i+1, j]
+            let choose_i: i32 = coins[i] - dp[(i + 1) * 20 + j];
+            
+            // Player chooses coin j, opponent plays optimally on [i, j-1]
+            let choose_j: i32 = coins[j] - dp[i * 20 + (j - 1)];
+            
+            if choose_i > choose_j {
+                dp[i * 20 + j] = choose_i;
+            } else {
+                dp[i * 20 + j] = choose_j;
+            }
+            
+            i = i + 1;
+        }
+        length = length + 1;
+    }
+    
+    return dp[0 * 20 + (num_coins - 1)];
+}
+
+// Coin Game DP
+fn coinGameDP(num_coins: i32) -> i32 {
+    let mut coins: [i32; 30] = [0; 30];
+    
+    // Initialize coins
+    let mut i: i32 = 0;
+    let mut seed: i32 = 77777;
+    while (i < num_coins) {
+        seed = (seed * 1664525 + 1013904223) % 2147483647;
+        if seed < 0 {
+            seed = -seed;
+        }
+        coins[i] = 1 + (seed % 50);
+        i = i + 1;
+    }
+    
+    // DP for maximum coins player 1 can collect
+    let mut dp: [i32; 900] = [0; 900]; // 30x30 table
+    
+    // Base cases
+    i = 0;
+    while (i < num_coins) {
+        dp[i * 30 + i] = coins[i];
+        if i + 1 < num_coins {
+            if coins[i] > coins[i + 1] {
+                dp[i * 30 + (i + 1)] = coins[i];
+            } else {
+                dp[i * 30 + (i + 1)] = coins[i + 1];
+            }
+        }
+        i = i + 1;
+    }
+    
+    // Fill DP table
+    let mut length: i32 = 3;
+    while (length <= num_coins) {
+        i = 0;
+        while (i <= num_coins - length) {
+            let j: i32 = i + length - 1;
+            
+            // Take from left
+            let take_left: i32 = coins[i] + 
+                if dp[(i + 2) * 30 + j] < dp[(i + 1) * 30 + (j - 1)] {
+                    dp[(i + 2) * 30 + j]
+                } else {
+                    dp[(i + 1) * 30 + (j - 1)]
+                };
+            
+            // Take from right
+            let take_right: i32 = coins[j] + 
+                if dp[i * 30 + (j - 2)] < dp[(i + 1) * 30 + (j - 1)] {
+                    dp[i * 30 + (j - 2)]
+                } else {
+                    dp[(i + 1) * 30 + (j - 1)]
+                };
+            
+            if take_left > take_right {
+                dp[i * 30 + j] = take_left;
+            } else {
+                dp[i * 30 + j] = take_right;
+            }
+            
+            i = i + 1;
+        }
+        length = length + 1;
+    }
+    
+    return dp[0 * 30 + (num_coins - 1)];
+}
+
+// Nim Game DP
+fn nimGameDP(num_piles: i32) -> i32 {
+    let mut piles: [i32; 25] = [0; 25];
+    
+    // Initialize pile sizes
+    let mut i: i32 = 0;
+    let mut seed: i32 = 88888;
+    while i < num_piles {
+        seed = (seed * 1664525 + 1013904223) % 2147483647;
+        if seed < 0 {
+            seed = -seed;
+        }
+        piles[i] = 1 + (seed % 20);
+        i = i + 1;
+    }
+    
+    // Calculate Nim-sum (XOR of all pile sizes)
+    let mut nim_sum: i32 = 0;
+    i = 0;
+    while i < num_piles {
+        nim_sum = nim_sum ^ piles[i]; // XOR operation
+        i = i + 1;
+    }
+    
+    // Count winning moves
+    let mut winning_moves: i32 = 0;
+    i = 0;
+    while i < num_piles {
+        let target: i32 = nim_sum ^ piles[i];
+        if target < piles[i] {
+            winning_moves = winning_moves + (piles[i] - target);
+        }
+        i = i + 1;
+    }
+    
+    return winning_moves;
+}
+
+// Test 5: Advanced DP Patterns
+fn testAdvancedDPPatterns() {
+    printInt(1809); // Start advanced DP test
+    
+    // Test digit DP
+    let digit_dp_result: i32 = digitDP(12345);
+    printInt(digit_dp_result);
+    
+    // Test bitmask DP
+    let bitmask_dp_result: i32 = bitmaskDP(15);
+    printInt(bitmask_dp_result);
+    
+    // Test tree DP
+    let tree_dp_result: i32 = treeDP(20);
+    printInt(tree_dp_result);
+    
+    printInt(1810); // End advanced DP test
+}
+
+// Digit DP - count numbers with specific properties
+fn digitDP(number: i32) -> i32 {
+    let mut digits: [i32; 10] = [0; 10];
+    let mut digit_count: i32 = 0;
+    let mut temp: i32 = number;
+    
+    // Extract digits
+    while temp > 0 {
+        digits[digit_count] = temp % 10;
+        temp = temp / 10;
+        digit_count = digit_count + 1;
+    }
+    
+    // Reverse digits array
+    let mut i: i32 = 0;
+    while i < digit_count / 2 {
+        let swap_temp: i32 = digits[i];
+        digits[i] = digits[digit_count - 1 - i];
+        digits[digit_count - 1 - i] = swap_temp;
+        i = i + 1;
+    }
+    
+    // Count numbers with sum of digits divisible by 3
+    let mut dp: [i32; 100] = [0; 100]; // [position][sum_mod_3][tight]
+    return digitDPRecursive(digits, digit_count, 0, 0, true, dp);
+}
+
+fn digitDPRecursive(digits: [i32; 10], digit_count: i32, pos: i32, 
+                   sum_mod: i32, tight: bool, mut dp: [i32; 100]) -> i32 {
+    if pos == digit_count {
+        if sum_mod == 0 {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+    
+    let state: i32 = pos * 10 + sum_mod * 2 + if tight { 1 } else { 0 };
+    if state < 100 && dp[state] != 0 {
+        return dp[state];
+    }
+    
+    let limit: i32;
+    if tight {
+        limit = digits[pos];
+    } else {
+        limit = 9;
+    }
+    
+    let mut result: i32 = 0;
+    let mut digit: i32 = 0;
+    while digit <= limit {
+        let new_sum_mod: i32 = (sum_mod + digit) % 3;
+        let new_tight: bool = tight && (digit == limit);
+        result = result + digitDPRecursive(digits, digit_count, pos + 1, 
+                                         new_sum_mod, new_tight, dp);
+        digit = digit + 1;
+    }
+    
+    if state < 100 {
+        dp[state] = result;
+    }
+    return result;
+}
+
+// Bitmask DP - Traveling Salesman Problem
+fn bitmaskDP(num_cities: i32) -> i32 {
+    let mut distances: [i32; 225] = [0; 225]; // 15x15 distance matrix
+    
+    // Initialize distances
+    let mut i: i32 = 0;
+    let mut seed: i32 = 99999;
+    while i < num_cities {
+        let mut j: i32 = 0;
+        while j < num_cities {
+            if i == j {
+                distances[i * num_cities + j] = 0;
+            } else {
+                seed = (seed * 1664525 + 1013904223) % 2147483647;
+                if seed < 0 {
+                    seed = -seed;
+                }
+                distances[i * num_cities + j] = 1 + (seed % 100);
+            }
+            j = j + 1;
+        }
+        i = i + 1;
+    }
+    
+    // DP with bitmask
+    let total_states: i32 = 1;
+    let mut shift: i32 = 0;
+    while shift < num_cities {
+        // total_states *= 2; // This would be total_states << 1
+        shift = shift + 1;
+    }
+    
+    // Simplified TSP for small number of cities
+    let mut min_cost: i32 = 999999;
+    let mut mask: i32 = 1;
+    while mask < 32768 && mask < total_states { // Limit to prevent overflow
+        let visited_count: i32 = countSetBits(mask);
+        if visited_count == num_cities && (mask & 1) != 0 {
+            let cost: i32 = calculateTourCost(mask, distances, num_cities);
+            if cost < min_cost {
+                min_cost = cost;
+            }
+        }
+        mask = mask + 1;
+    }
+    
+    return min_cost;
+}
+
+// Count set bits in a number
+fn countSetBits(n: i32) -> i32 {
+    let mut count: i32 = 0;
+    let mut temp: i32 = n;
+    
+    while temp > 0 {
+        count = count + (temp & 1);
+        temp = temp / 2;
+    }
+    
+    return count;
+}
+
+// Calculate tour cost for given bitmask
+fn calculateTourCost(mask: i32, distances: [i32; 225], num_cities: i32) -> i32 {
+    let mut cost: i32 = 0;
+    let mut prev_city: i32 = 0;
+    let mut city: i32 = 1;
+    
+    while city < num_cities {
+        if (mask & (1 << city)) != 0 {
+            cost = cost + distances[prev_city * num_cities + city];
+            prev_city = city;
+        }
+        city = city + 1;
+    }
+    
+    // Return to start
+    cost = cost + distances[prev_city * num_cities + 0];
+    
+    return cost;
+}
+
+// Tree DP - Maximum independent set in tree
+fn treeDP(num_nodes: i32) -> i32 {
+    // Create tree structure using adjacency list simulation
+    let mut tree: [i32; 400] = [-1; 400]; // 20x20 adjacency matrix
+    let mut node_values: [i32; 20] = [0; 20];
+    
+    // Initialize tree and node values
+    let mut seed: i32 = 111111;
+    let mut i: i32 = 0;
+    while i < num_nodes {
+        seed = (seed * 1664525 + 1013904223) % 2147483647;
+        if seed < 0 {
+            seed = -seed;
+        }
+        node_values[i] = 1 + (seed % 50);
+        i = i + 1;
+    }
+    
+    // Create simple tree structure
+    i = 1;
+    while i < num_nodes {
+        let parent: i32 = (i - 1) / 2;
+        tree[parent * num_nodes + i] = 1;
+        tree[i * num_nodes + parent] = 1;
+        i = i + 1;
+    }
+    
+    // Calculate maximum independent set
+    let mut include_dp: [i32; 20] = [0; 20];
+    let mut exclude_dp: [i32; 20] = [0; 20];
+    
+    return treeDPRecursive(tree, node_values, num_nodes, 0, -1, include_dp, exclude_dp);
+}
+
+fn treeDPRecursive(tree: [i32; 400], node_values: [i32; 20], num_nodes: i32, 
+                  node: i32, parent: i32, mut include_dp: [i32; 20], mut exclude_dp: [i32; 20]) -> i32 {
+    include_dp[node] = node_values[node];
+    exclude_dp[node] = 0;
+    
+    let mut child: i32 = 0;
+    while child < num_nodes {
+        if tree[node * num_nodes + child] == 1 && child != parent {
+            let child_result: i32 = treeDPRecursive(tree, node_values, num_nodes, 
+                                                   child, node, include_dp, exclude_dp);
+            
+            include_dp[node] = include_dp[node] + exclude_dp[child];
+            exclude_dp[node] = exclude_dp[node] + 
+                if include_dp[child] > exclude_dp[child] {
+                    include_dp[child]
+                } else {
+                    exclude_dp[child]
+                };
+        }
+        child = child + 1;
+    }
+    
+    if include_dp[node] > exclude_dp[node] {
+        return include_dp[node];
+    } else {
+        return exclude_dp[node];
+    }
+}

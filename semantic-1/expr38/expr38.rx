@@ -1,0 +1,427 @@
+/*
+Test Package: Semantic-1
+Test Target: expr
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: Fenwick tree with coordinate compression, range frequency queries, and statistical analysis
+*/
+
+struct FenwickTreeNode {
+    value: i32,
+    frequency: i32,
+    prefix_sum: i32,
+    range_contribution: i32,
+}
+
+impl FenwickTreeNode {
+    fn new() -> FenwickTreeNode {
+        FenwickTreeNode {
+            value: 0,
+            frequency: 0,
+            prefix_sum: 0,
+            range_contribution: 0,
+        }
+    }
+    
+    fn update(&mut self, new_value: i32, delta_freq: i32) {
+        self.value = self.value + new_value;
+        self.frequency = self.frequency + delta_freq;
+        self.prefix_sum = self.prefix_sum + (new_value * delta_freq);
+        self.range_contribution = self.prefix_sum;
+    }
+    
+    fn reset(&mut self) {
+        self.value = 0;
+        self.frequency = 0;
+        self.prefix_sum = 0;
+        self.range_contribution = 0;
+    }
+}
+
+fn fenwick_tree_update(tree: &mut [FenwickTreeNode; 64], index: i32, delta_value: i32, delta_freq: i32) {
+    let mut current_index: i32 = index;
+    
+    loop {
+        if (current_index >= 64) {
+            break;
+        }
+        
+        tree[current_index as usize].update(delta_value, delta_freq);
+        
+        let lowbit: i32 = current_index & (-current_index);
+        current_index = current_index + lowbit;
+    }
+}
+
+fn fenwick_tree_query(tree: &[FenwickTreeNode; 64], index: i32, query_type: i32) -> i32 {
+    let mut result: i32 = 0;
+    let mut current_index: i32 = index;
+    
+    loop {
+        if (current_index <= 0) {
+            break;
+        }
+        
+        let node: &FenwickTreeNode = &tree[current_index as usize];
+        
+        if (query_type == 0){
+            result = result + node.prefix_sum;
+        } else if (query_type == 1) {
+            result = result + node.frequency;
+        } else if (query_type == 2) {
+            result = result + node.value;
+        } else {
+            result = result + node.range_contribution;
+        }
+        
+        let lowbit: i32 = current_index & (-current_index);
+        current_index = current_index - lowbit;
+    }
+    
+    return result;
+}
+
+fn fenwick_tree_range_query(tree: &[FenwickTreeNode; 64], left: i32, right: i32, query_type: i32) -> i32 {
+    if (left > right || left < 0 || right >= 64) {
+        return 0;
+    }
+    
+    let right_result: i32 = fenwick_tree_query(tree, right, query_type);
+    let left_result: i32 = if (left > 0) { fenwick_tree_query(tree, left - 1, query_type) } else { 0 };
+    
+    return right_result - left_result;
+}
+
+fn perform_coordinate_compression(values: [i32; 32]) -> [i32; 32] {
+    let mut compressed: [i32; 32] = [0; 32];
+    let mut unique_values: [i32; 32] = [0; 32];
+    let mut unique_count: i32 = 0;
+    
+    let mut value_index: i32 = 0;
+    loop {
+        if (value_index >= 32) {
+            break;
+        }
+        
+        let current_value: i32 = values[value_index as usize];
+        let mut is_unique: bool = true;
+        let mut unique_index: i32 = 0;
+        
+        loop {
+            if (unique_index >= unique_count) {
+                break;
+            }
+            if (unique_values[unique_index as usize] == current_value) {
+                is_unique = false;
+                break;
+            }
+            unique_index = unique_index + 1;
+        }
+        
+        if (is_unique) {
+            unique_values[unique_count as usize] = current_value;
+            unique_count = unique_count + 1;
+        }
+        
+        value_index = value_index + 1;
+    }
+    
+    let mut sort_index: i32 = 0;
+    loop {
+        if (sort_index >= unique_count - 1) {
+            break;
+        }
+        
+        let mut min_index: i32 = sort_index;
+        let mut compare_index: i32 = sort_index + 1;
+        
+        loop {
+            if (compare_index >= unique_count) {
+                break;
+            }
+            if (unique_values[compare_index as usize] < unique_values[min_index as usize]) {
+                min_index = compare_index;
+            }
+            compare_index = compare_index + 1;
+        }
+        
+        if (min_index != sort_index) {
+            let temp: i32 = unique_values[sort_index as usize];
+            unique_values[sort_index as usize] = unique_values[min_index as usize];
+            unique_values[min_index as usize] = temp;
+        }
+        
+        sort_index = sort_index + 1;
+    }
+    
+    let mut compress_index: i32 = 0;
+    loop {
+        if (compress_index >= 32) {
+            break;
+        }
+        
+        let target_value: i32 = values[compress_index as usize];
+        let mut find_index: i32 = 0;
+        
+        loop {
+            if (find_index >= unique_count) {
+                break;
+            }
+            if (unique_values[find_index as usize] == target_value) {
+                compressed[compress_index as usize] = find_index;
+                break;
+            }
+            find_index = find_index + 1;
+        }
+        
+        compress_index = compress_index + 1;
+    }
+    
+    return compressed;
+}
+
+fn simulate_range_frequency_queries(tree: &mut [FenwickTreeNode; 64], 
+                                   compressed_values: [i32; 32], 
+                                   query_ranges: [[i32; 2]; 16]) -> i32 {
+    let mut total_operations: i32 = 0;
+    let mut cumulative_result: i32 = 0;
+    
+    let mut insert_index: i32 = 0;
+    loop {
+        if (insert_index >= 32) {
+            break;
+        }
+        
+        let compressed_val: i32 = compressed_values[insert_index as usize];
+        if (compressed_val >= 0 && compressed_val < 64) {
+            fenwick_tree_update(tree, compressed_val + 1, compressed_val, 1);
+            total_operations = total_operations + 1;
+        }
+        
+        insert_index = insert_index + 1;
+    }
+    
+    let mut query_index: i32 = 0;
+    loop {
+        if (query_index >= 16) {
+            break;
+        }
+        
+        let query_range: [i32; 2] = query_ranges[query_index as usize];
+        let left_bound: i32 = query_range[0];
+        let right_bound: i32 = query_range[1];
+        
+        if (left_bound >= 0 && right_bound < 64 && left_bound <= right_bound) {
+            let frequency_sum: i32 = fenwick_tree_range_query(tree, left_bound + 1, right_bound + 1, 1);
+            let value_sum: i32 = fenwick_tree_range_query(tree, left_bound + 1, right_bound + 1, 0);
+            let contribution_sum: i32 = fenwick_tree_range_query(tree, left_bound + 1, right_bound + 1, 3);
+            
+            let weighted_result: i32 = {
+                let freq_weight: i32 = frequency_sum * 5;
+                let value_weight: i32 = value_sum / 3;
+                let contrib_weight: i32 = contribution_sum * 2;
+                freq_weight + value_weight + contrib_weight
+            };
+            
+            cumulative_result = cumulative_result + weighted_result;
+            total_operations = total_operations + 1;
+        }
+        
+        query_index = query_index + 1;
+    }
+    
+    let simulation_score: i32 = {
+        let operation_factor: i32 = total_operations * 23;
+        let result_factor: i32 = cumulative_result / 7;
+        let combined: i32 = operation_factor + result_factor;
+        let normalized: i32 = {
+            let temp: i32 = combined % 8000;
+            if (temp > 4000) {
+                temp - 2000
+            } else {
+                temp + 1500
+            }
+        };
+        normalized
+    };
+    
+    return simulation_score;
+}
+
+fn calculate_fenwick_tree_statistics(tree: &[FenwickTreeNode; 64]) -> i32 {
+    let mut non_zero_nodes: i32 = 0;
+    let mut total_value_sum: i32 = 0;
+    let mut total_frequency_sum: i32 = 0;
+    let mut max_contribution: i32 = 0;
+    let mut min_contribution: i32 = 1000000;
+    
+    let mut stats_index: i32 = 0;
+    loop {
+        if (stats_index >= 64) {
+            break;
+        }
+        
+        let node: &FenwickTreeNode = &tree[stats_index as usize];
+        
+        if (node.frequency > 0) {
+            non_zero_nodes = non_zero_nodes + 1;
+            total_value_sum = total_value_sum + node.value;
+            total_frequency_sum = total_frequency_sum + node.frequency;
+            
+            let contribution: i32 = node.range_contribution;
+            if (contribution > max_contribution) {
+                max_contribution = contribution;
+            }
+            if (contribution < min_contribution) {
+                min_contribution = contribution;
+            }
+        }
+        
+        stats_index = stats_index + 1;
+    }
+    
+    let statistical_complexity: i32 = {
+        let density_factor: i32 = non_zero_nodes * 50;
+        let value_factor: i32 = total_value_sum / 4;
+        let frequency_factor: i32 = total_frequency_sum * 3;
+        let range_factor: i32 = max_contribution - min_contribution;
+        
+        let raw_complexity: i32 = density_factor + value_factor + frequency_factor + range_factor;
+        let adjusted: i32 = {
+            let temp: i32 = raw_complexity % 15000;
+            if (temp < 5000) {
+                temp + 3000
+            } else if (temp > 10000) {
+                temp - 4000
+            } else {
+                temp
+            }
+        };
+        adjusted
+    };
+    
+    return statistical_complexity;
+}
+
+fn main() {
+    let input_values: [i32; 32] = [
+        100, 50, 200, 75, 150, 25, 300, 125, 175, 225, 275, 325,
+        60, 110, 160, 210, 260, 310, 40, 90, 140, 190, 240, 290,
+        80, 130, 180, 230, 280, 330, 70, 120,
+    ];
+    
+    let query_ranges: [[i32; 2]; 16] = [
+        [0, 10], [5, 15], [10, 20], [15, 25], [20, 30], [0, 5], [25, 31], [8, 18],
+        [3, 13], [18, 28], [1, 11], [11, 21], [21, 31], [6, 16], [16, 26], [2, 12],
+    ];
+    
+    let mut fenwick_tree: [FenwickTreeNode; 64] = [
+        FenwickTreeNode::new(), FenwickTreeNode::new(), FenwickTreeNode::new(), FenwickTreeNode::new(),
+        FenwickTreeNode::new(), FenwickTreeNode::new(), FenwickTreeNode::new(), FenwickTreeNode::new(),
+        FenwickTreeNode::new(), FenwickTreeNode::new(), FenwickTreeNode::new(), FenwickTreeNode::new(),
+        FenwickTreeNode::new(), FenwickTreeNode::new(), FenwickTreeNode::new(), FenwickTreeNode::new(),
+        FenwickTreeNode::new(), FenwickTreeNode::new(), FenwickTreeNode::new(), FenwickTreeNode::new(),
+        FenwickTreeNode::new(), FenwickTreeNode::new(), FenwickTreeNode::new(), FenwickTreeNode::new(),
+        FenwickTreeNode::new(), FenwickTreeNode::new(), FenwickTreeNode::new(), FenwickTreeNode::new(),
+        FenwickTreeNode::new(), FenwickTreeNode::new(), FenwickTreeNode::new(), FenwickTreeNode::new(),
+        FenwickTreeNode::new(), FenwickTreeNode::new(), FenwickTreeNode::new(), FenwickTreeNode::new(),
+        FenwickTreeNode::new(), FenwickTreeNode::new(), FenwickTreeNode::new(), FenwickTreeNode::new(),
+        FenwickTreeNode::new(), FenwickTreeNode::new(), FenwickTreeNode::new(), FenwickTreeNode::new(),
+        FenwickTreeNode::new(), FenwickTreeNode::new(), FenwickTreeNode::new(), FenwickTreeNode::new(),
+        FenwickTreeNode::new(), FenwickTreeNode::new(), FenwickTreeNode::new(), FenwickTreeNode::new(),
+        FenwickTreeNode::new(), FenwickTreeNode::new(), FenwickTreeNode::new(), FenwickTreeNode::new(),
+        FenwickTreeNode::new(), FenwickTreeNode::new(), FenwickTreeNode::new(), FenwickTreeNode::new(),
+        FenwickTreeNode::new(), FenwickTreeNode::new(), FenwickTreeNode::new(), FenwickTreeNode::new(),
+    ];
+    
+    let compressed_coordinates: [i32; 32] = perform_coordinate_compression(input_values);
+    
+    let pre_simulation_stats: i32 = calculate_fenwick_tree_statistics(&fenwick_tree);
+    
+    let simulation_result: i32 = simulate_range_frequency_queries(&mut fenwick_tree, compressed_coordinates, query_ranges);
+    
+    let post_simulation_stats: i32 = calculate_fenwick_tree_statistics(&fenwick_tree);
+    
+    let comprehensive_analysis: i32 = {
+        let pre_stats_weight: i32 = pre_simulation_stats * 2;
+        let simulation_weight: i32 = simulation_result / 5;
+        let post_stats_weight: i32 = post_simulation_stats * 3;
+        let stats_delta: i32 = post_simulation_stats - pre_simulation_stats;
+        let delta_weight: i32 = stats_delta * 4;
+        
+        let combined_score: i32 = pre_stats_weight + simulation_weight + post_stats_weight + delta_weight;
+        let processed: i32 = {
+            let temp: i32 = combined_score % 25000;
+            if (temp < 10000) {
+                temp + 5000
+            } else if (temp > 20000) {
+                temp - 7500
+            } else {
+                temp
+            }
+        };
+        processed
+    };
+    
+    let verification_and_output: i32 = {
+        let base_score: i32 = comprehensive_analysis;
+        let validation_1: bool = base_score > 0 && base_score != pre_simulation_stats;
+        let validation_2: bool = base_score != post_simulation_stats && base_score != simulation_result;
+        let validation_3: bool = base_score < 1000000;
+        
+        if (validation_1 && validation_2 && validation_3) {
+            let cryptographic_transform: i32 = {
+                let step1: i32 = (base_score * 73) % 1000003;
+                let step2: i32 = (step1 + 982451653) % 2000003;
+                let step3: i32 = (step2 * 17) % 100000;
+                step3
+            };
+            
+            let final_adjustment: i32 = {
+                let modulus_check: i32 = cryptographic_transform % 19;
+                if (modulus_check == 0) {
+                    cryptographic_transform / 19
+                } else if (modulus_check <= 5) {
+                    cryptographic_transform * 2
+                } else if (modulus_check <= 10) {
+                    cryptographic_transform + 4567
+                } else {
+                    cryptographic_transform - 1234
+                }
+            };
+            
+            if (final_adjustment > 0 && final_adjustment < 500000) {
+                final_adjustment
+            } else {
+                (final_adjustment % 10000) + 50000
+            }
+        } else {
+            let fallback_calculation: i32 = 161803;
+            let emergency_mod: i32 = base_score % 10000;
+            fallback_calculation + emergency_mod
+        }
+    };
+    
+    if (verification_and_output > 0) {
+        let ultimate_verification: i32 = {
+            let check_1: bool = verification_and_output != comprehensive_analysis;
+            let check_2: bool = verification_and_output != simulation_result;
+            let check_3: bool = verification_and_output > 100;
+            
+            if (check_1 && check_2 && check_3) {
+                verification_and_output
+            } else {
+                let backup: i32 = 271828;
+                backup + (verification_and_output % 1000)
+            }
+        };
+        
+        printInt(ultimate_verification);
+    } else {
+        let absolute_fallback: i32 = 314159;
+        let rescue_calc: i32 = absolute_fallback + (comprehensive_analysis % 100);
+        printInt(rescue_calc)
+    }
+    exit(0);
+}

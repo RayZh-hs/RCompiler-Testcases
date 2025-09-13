@@ -1,0 +1,19 @@
+/*
+Test Package: Semantic-1
+Test Target: expr
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: Expression error: Invalid struct expression - missing comma between fields
+*/
+
+// Error: Invalid struct expression - missing comma between fields
+struct Point {
+    x: i32,
+    y: i32,
+}
+
+fn main() {
+    let p: Point = Point { x: 10 y: 20 };  // Missing comma between fields
+    exit(0);
+}

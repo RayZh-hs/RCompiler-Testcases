@@ -1,0 +1,227 @@
+/*
+Test Package: Semantic-1
+Test Target: misc
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: Lenstra elliptic curve factorization method for composite numbers
+*/
+
+// Lenstra elliptic curve factorization method
+// Uses elliptic curves to find factors of composite numbers
+struct ECPoint {
+    x: i32,
+    y: i32,
+    is_infinity: bool,
+}
+
+impl ECPoint {
+    fn copy(&self) -> ECPoint {
+        ECPoint {
+            x: self.x,
+            y: self.y,
+            is_infinity: self.is_infinity,
+        }
+    }
+}
+
+struct Result {
+    point: ECPoint,
+    factor: i32,
+}
+
+fn gcd(mut a: i32, mut b: i32) -> i32 {
+    while (b != 0) {
+        let temp: i32 = b;
+        b = a % b;
+        a = temp;
+    }
+    return a;
+}
+
+fn extended_gcd(a: i32, b: i32, x: &mut i32, y: &mut i32) -> i32 {
+    if (a == 0) {
+        *x = 0;
+        *y = 1;
+        return b;
+    }
+
+    let mut x1: i32 = 0;
+    let mut y1: i32 = 0;
+    let gcd_val: i32 = extended_gcd(b % a, a, &mut x1, &mut y1);
+
+    *x = y1 - (b / a) * x1;
+    *y = x1;
+
+    return gcd_val;
+}
+
+fn mod_inverse_safe(a: i32, m: i32) -> i32 {
+    let mut x: i32 = 0;
+    let mut y: i32 = 0;
+    let g: i32 = extended_gcd(a, m, &mut x, &mut y);
+
+    if (g != 1) {
+        return -1; // No modular inverse exists
+    }
+
+    return if (x < 0) { x + m } else { x };
+}
+
+fn ec_point_add_lenstra(p1: &ECPoint, p2: &ECPoint, a: i32, n: i32) -> Result {
+    if (p1.is_infinity) {
+        return Result { point: p2.copy(), factor: 1 };
+    }
+    if (p2.is_infinity) {
+        return Result { point: p1.copy(), factor: 1 };
+    }
+
+    if (p1.x == p2.x) {
+        if (p1.y == p2.y) {
+            // Point doubling
+            let numerator: i32 = (3 * p1.x * p1.x + a) % n;
+            let denominator: i32 = (2 * p1.y) % n;
+            let inv: i32 = mod_inverse_safe(denominator, n);
+
+            if (inv == -1) {
+                return Result {
+                    point: ECPoint {
+                        x: 0,
+                        y: 0,
+                        is_infinity: true,
+                    },
+                    factor: gcd(denominator, n),
+                };
+            }
+
+            let slope: i32 = (numerator * inv) % n;
+            let x3: i32 = (slope * slope - 2 * p1.x) % n;
+            let y3: i32 = (slope * (p1.x - x3) - p1.y) % n;
+
+            return Result {
+                point: ECPoint {
+                    x: if (x3 < 0) { x3 + n } else { x3 },
+                    y: if (y3 < 0) { y3 + n } else { y3 },
+                    is_infinity: false,
+                },
+                factor:1,
+            };
+        } else {
+            return Result {
+                point: ECPoint {
+                    x: 0,
+                    y: 0,
+                    is_infinity: true,
+                },
+                factor: 1,
+            };
+        }
+    }
+
+    let numerator: i32 = (p2.y - p1.y) % n;
+    let denominator: i32 = (p2.x - p1.x) % n;
+    let inv: i32 = mod_inverse_safe(denominator, n);
+
+    if (inv == -1) {
+        return Result {
+            point: ECPoint {
+                x: 0,
+                y: 0,
+                is_infinity: true,
+            },
+            factor: gcd(denominator, n),
+        };
+    }
+
+    let slope: i32 = (numerator * inv) % n;
+    let x3: i32 = (slope * slope - p1.x - p2.x) % n;
+    let y3: i32 = (slope * (p1.x - x3) - p1.y) % n;
+
+    return Result {
+        point: ECPoint {
+            x: if (x3 < 0) { x3 + n } else { x3 },
+            y: if (y3 < 0) { y3 + n } else { y3 },
+            is_infinity: false,
+        },
+        factor: 1,
+    };
+}
+
+fn ec_scalar_multiply(mut k: i32, point: &ECPoint, a: i32, n: i32) -> Result {
+    let mut result: ECPoint = ECPoint {
+        x: 0,
+        y: 0,
+        is_infinity: true,
+    };
+    let mut addend: ECPoint = point.copy();
+
+    while (k > 0) {
+        if (k % 2 == 1) {
+            let new_result: Result= ec_point_add_lenstra(&result, &addend, a, n);
+            result = new_result.point;
+            if (new_result.factor > 1 && new_result.factor < n) {
+                return Result { point: result, factor: new_result.factor };
+            }
+        }
+
+        let doubled: Result = ec_point_add_lenstra(&addend, &addend, a, n);
+        addend = doubled.point;
+        if (doubled.factor > 1 && doubled.factor < n) {
+            return Result { point: addend, factor: doubled.factor };
+        }
+
+        k = k / 2;
+    }
+
+    return Result { point: result, factor: 1 };
+}
+
+fn lenstra_factorization_recursive(n: i32, attempts: i32, max_attempts: i32) -> i32 {
+    if (attempts >= max_attempts) {
+        return n;
+    }
+
+    let a: i32 = (attempts * 7 + 1) % n;
+    let x: i32 = (attempts * 11 + 2) % n;
+    let y_squared: i32 = (x * x * x + a * x + attempts) % n;
+
+    // Simple check if y_squared is a perfect square
+    let mut y: i32 = 1;
+    while (y * y <= y_squared) {
+        if (y * y == y_squared) {
+            break;
+        }
+        y = y + 1;
+    }
+
+    if (y * y != y_squared) {
+        return lenstra_factorization_recursive(n, attempts + 1, max_attempts);
+    }
+
+    let point: ECPoint = ECPoint {
+        x: x,
+        y: y,
+        is_infinity: false,
+    };
+
+    // Try small factorial multiplications
+    let mut k: i32 = 2;
+    while (k <= 20) {
+        let unused_point: Result = ec_scalar_multiply(k, &point, a, n);
+
+        if (unused_point.factor > 1 && unused_point.factor < n) {
+            return unused_point.factor;
+        }
+
+        k = k + 1;
+    }
+
+    return lenstra_factorization_recursive(n, attempts + 1, max_attempts);
+}
+
+fn main() {
+    let n: i32 = getInt();
+    let factor: i32 = lenstra_factorization_recursive(n, 1, 10);
+    printInt(factor);
+    exit(0);
+}

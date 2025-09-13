@@ -1,0 +1,16 @@
+/*
+Test Package: Semantic-1
+Test Target: if
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: if statement test, block expression in condition
+*/
+
+fn main() {
+    let mut n: i32 = 5;
+    if ({ n -= 1; n } > 3) {
+        n = 0;
+    }
+    exit(0);
+}

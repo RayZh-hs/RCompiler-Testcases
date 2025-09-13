@@ -1,0 +1,27 @@
+/*
+Test Package: Semantic-1
+Test Target: expr
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: Expression error: Missing operator between operands - combines struct, block, field access, if, operator, and literal expressions
+*/
+
+struct Data {
+    value: i32,
+    multiplier: i32,
+}
+
+fn main() {
+    let data: Data = Data { value: 10, multiplier: 3 };
+    let computed: i32 = {
+        let temp: i32 = data.value * data.multiplier;
+        temp + 5
+    };
+    let condition: bool = computed > 30;
+    if (condition) {
+        printInt(computed);
+    }
+    let final_val: i32 = computed data.value;
+    exit(0);
+}

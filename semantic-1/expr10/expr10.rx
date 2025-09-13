@@ -1,0 +1,20 @@
+/*
+Test Package: Semantic-1
+Test Target: expr
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: Expression error: Invalid field access expression - missing field name after dot
+*/
+
+// Error: Invalid field access expression - missing field name after dot
+struct Person {
+    name: String,
+    age: i32,
+}
+
+fn main() {
+    let p: Person = Person { name: "Alice", age: 30 };
+    let x: i32 = p.;  // Missing field name after dot
+    exit(0);
+}

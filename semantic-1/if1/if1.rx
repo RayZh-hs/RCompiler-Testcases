@@ -1,0 +1,16 @@
+/*
+Test Package: Semantic-1
+Test Target: if
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: if statement test, basic conditional execution
+*/
+
+fn main() {
+    let x: i32 = 10;
+    if (x > 5) {
+        let y: i32 = x - 5;
+    }
+    exit(0);
+}

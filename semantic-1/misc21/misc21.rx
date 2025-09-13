@@ -1,0 +1,194 @@
+/*
+Test Package: Semantic-1
+Test Target: misc
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: Linked List implementation using arrays
+*/
+
+// Linked List implementation using arrays
+// Simulates pointer-based linked list with array indices
+
+struct ListNode {
+    value: i32,
+    next: i32, // Index to next node, -1 for null
+}
+
+struct LinkedList {
+    nodes: [ListNode; 1000],
+    head: i32,
+    free_list: i32,
+    node_count: i32,
+    size: i32,
+}
+
+impl ListNode {
+    fn new(value: i32) -> ListNode {
+        ListNode {
+            value: value,
+            next: -1,
+        }
+    }
+}
+
+impl LinkedList {
+    fn new() -> LinkedList {
+        let mut list: LinkedList = LinkedList {
+            nodes: [ListNode::new(0); 1000],
+            head: -1,
+            free_list: 0,
+            node_count: 0,
+            size: 0,
+        };
+        
+        // Initialize free list
+        let mut i: i32 = 0;
+        while (i < 999) {
+            list.nodes[i as usize].next = i + 1;
+            i += 1;
+        }
+        list.nodes[999].next = -1;
+        
+        return list;
+    }
+    
+    fn allocate_node(&mut self) -> i32 {
+        if (self.free_list == -1) {
+            return -1; // No free nodes
+        }
+        
+        let node_index: i32 = self.free_list;
+        self.free_list = self.nodes[self.free_list as usize].next;
+        self.node_count += 1;
+        return node_index;
+    }
+    
+    fn deallocate_node(&mut self, index: i32) {
+        self.nodes[index as usize].next = self.free_list;
+        self.free_list = index;
+        self.node_count -= 1;
+    }
+    
+    fn insert_front(&mut self, value: i32) -> bool {
+        let new_node_index: i32 = self.allocate_node();
+        if (new_node_index == -1) {
+            return false;
+        }
+        
+        self.nodes[new_node_index as usize].value = value;
+        self.nodes[new_node_index as usize].next = self.head;
+        self.head = new_node_index;
+        self.size += 1;
+        return true;
+    }
+    
+    fn insert_back(&mut self, value: i32) -> bool {
+        let new_node_index: i32 = self.allocate_node();
+    if (new_node_index == -1) {
+            return false;
+        }
+        
+        self.nodes[new_node_index as usize].value = value;
+        self.nodes[new_node_index as usize].next = -1;
+        
+        if (self.head == -1) {
+            self.head = new_node_index;
+        } else {
+            let mut current: i32 = self.head;
+            while (self.nodes[current as usize].next != -1) {
+                current = self.nodes[current as usize].next;
+            }
+            self.nodes[current as usize].next = new_node_index;
+        }
+        
+        self.size += 1;
+        return true;
+    }
+    
+    fn delete_value(&mut self, value: i32) -> bool {
+        if (self.head == -1) {
+            return false;
+        }
+        
+        // Delete from head
+        if (self.nodes[self.head as usize].value == value) {
+            let old_head: i32 = self.head;
+            self.head = self.nodes[self.head as usize].next;
+            self.deallocate_node(old_head);
+            self.size -= 1;
+            return true;
+        }
+        
+        // Search and delete
+        let mut current: i32 = self.head;
+        while (self.nodes[current as usize].next != -1) {
+            let next_node: i32 = self.nodes[current as usize].next;
+            if (self.nodes[next_node as usize].value == value) {
+                self.nodes[current as usize].next = self.nodes[next_node as usize].next;
+                self.deallocate_node(next_node);
+                self.size -= 1;
+                return true;
+            }
+            current = next_node;
+        }
+        
+        return false;
+    }
+    
+    fn search(&self, value: i32) -> bool {
+        let mut current: i32 = self.head;
+        while (current != -1) {
+            if (self.nodes[current as usize].value == value) {
+                return true;
+            }
+            current = self.nodes[current as usize].next;
+        }
+        return false;
+    }
+    
+    fn print_list(&self) {
+        let mut current: i32 = self.head;
+        while (current != -1) {
+            printInt(self.nodes[current as usize].value);
+            current = self.nodes[current as usize].next;
+        }
+    }
+    
+    fn get_size(&self) -> i32 {
+        return self.size;
+    }
+}
+
+fn main() {
+    let mut list: LinkedList = LinkedList::new();
+    let n: i32 = getInt();
+    
+    let mut i: i32 = 0;
+    while (i < n) {
+        let operation: i32 = getInt();
+        
+        if (operation == 1) { // Insert front
+            let value: i32 = getInt();
+            list.insert_front(value);
+        } else if (operation == 2) { // Insert back
+            let value: i32 = getInt();
+            list.insert_back(value);
+        } else if (operation == 3) { // Delete value
+            let value: i32 = getInt();
+            list.delete_value(value);
+        } else if (operation == 4) { // Search
+            let value: i32 = getInt();
+            if (list.search(value)) {
+                printInt(1);
+            } else {
+                printInt(0);
+            }
+        } else if (operation == 5) { // Print list
+            list.print_list();
+        }
+        
+        i += 1;
+    }
+    exit(0);
+}

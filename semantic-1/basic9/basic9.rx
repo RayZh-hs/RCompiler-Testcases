@@ -1,0 +1,76 @@
+/*
+Test Package: Semantic-1
+Test Target: basic
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: basic test, type mismatch in trait implementation - i32 vs bool
+*/
+
+fn main() {
+    let mut board: Board = Board::new();
+    let mut turn: usize = 0;
+    while (turn < 9) {
+        let row: usize = turn / 3;
+        let col: usize = turn % 3;
+        board.place(row, col, if (turn % 2 == 0) { Cell::X } else { Cell::O });
+        turn += 1;
+    }
+    let outcome: Cell = board.winner();
+    let holder: Cell = outcome;
+    exit(0);
+}
+
+enum Cell { Empty, X, O }
+
+struct Board {
+    cells: [[Cell; 3]; 3],
+}
+
+impl Board {
+    fn new() -> Self {
+        Board { cells: [
+            [Cell::Empty, Cell::Empty, Cell::Empty],
+            [Cell::Empty, Cell::Empty, Cell::Empty],
+            [Cell::Empty, Cell::Empty, Cell::Empty],
+        ]}
+    }
+
+    fn place(&mut self, r: usize, c: usize, value: Cell) {
+        self.cells[r][c] = value;
+    }
+
+    fn winner(&self) -> Cell {
+        for i in 0..3 {
+            if (self.line_equal(self.cells[i][0], self.cells[i][1], self.cells[i][2])) {
+                return self.cells[i][0];
+            }
+            if (self.line_equal(self.cells[0][i], self.cells[1][i], self.cells[2][i])) {
+                return self.cells[0][i];
+            }
+        }
+        if (self.line_equal(self.cells[0][0], self.cells[1][1], self.cells[2][2])) {
+            return self.cells[0][0];
+        }
+        if (self.line_equal(self.cells[0][2], self.cells[1][1], self.cells[2][0])) {
+            return self.cells[0][2];
+        }
+        Cell::Empty
+    }
+
+    fn line_equal(&self, a: Cell, b: Cell, c: Cell) -> bool {
+        if (a == Cell::X && b == Cell::X && c == Cell::X) {
+            return true;
+        } 
+        if (a == Cell::O && b == Cell::O && c == Cell::O) {
+            return true;
+        }
+        false
+    }
+}
+
+impl PartialEq for Cell {
+    fn eq(&self, other: &Self) -> bool {
+        0
+    }
+}

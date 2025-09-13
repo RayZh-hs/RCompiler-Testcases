@@ -1,0 +1,23 @@
+/*
+Test Package: Semantic-1
+Test Target: loop
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: loop test, basic while loop with continue statement
+*/
+
+fn main() {
+    let mut total: u32 = 0u32;
+    let mut n: u32 = 0u32;
+    while (n < 20) {
+        if (n % 2 == 0) {
+            n += 1;
+            continue;
+        }
+        total += n;
+        n += 1;
+    }
+    let _ = total;
+    exit(0);
+}

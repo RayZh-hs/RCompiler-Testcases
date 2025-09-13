@@ -1,0 +1,17 @@
+/*
+Test Package: Semantic-1
+Test Target: loop
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: loop test, syntax error - malformed while condition
+*/
+
+fn main() {
+    let mut total: i32 = 0;
+    let i: i32 = 0;
+    while i 0..10 {
+        total += i;
+    }
+    exit(0);
+}

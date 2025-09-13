@@ -1,0 +1,31 @@
+/*
+Test Package: Semantic-1
+Test Target: type
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: Type error: array element type mismatch with enum and boolean
+*/
+
+// Complete program with type error: array assignment with wrong element types
+enum Status {
+    Active,
+    Inactive,
+    Pending,
+}
+
+fn process_statuses(statuses: [Status; 3]) {
+    let mut i: i32 = 0;
+    while (i < 3) {
+        // Process each status
+        i = i + 1;
+        let s: &Status = &statuses[i as usize];
+    }
+}
+
+fn main() {
+    // Type error: mixing Status enum with boolean in array
+    let status_array: [Status; 3] = [Status::Active, true, Status::Pending];
+    process_statuses(status_array);
+    exit(0);
+}

@@ -1,0 +1,230 @@
+/*
+Test Package: Semantic-1
+Test Target: misc
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: Miller-Rabin primality test with variable `miller_result` not found
+*/
+
+// Miller-Rabin probabilistic primality test algorithm
+// Uses repeated squaring and modular arithmetic
+
+trait NumberOperations {
+    fn power_mod(base: Self, exp: Self, modulus: Self) -> Self;
+    fn is_even(n: Self) -> bool;
+    fn copy(&self) -> Self;
+}
+
+struct Int {
+    i: i32,
+}
+
+impl NumberOperations for Int {
+    fn power_mod(base: Self, exp: Self, modulus: Self) -> Self {
+        if (modulus.i == 1) {
+            return Int { i: 0 };
+        }
+        
+        let mut result: i32 = 1;
+        let mut base_mod: i32 = base.i % modulus.i;
+        let mut exponent: i32 = exp.i;
+        
+        while (exponent > 0) {
+            if (exponent % 2 == 1) {
+                result = ((result as i64 * base_mod as i64) % modulus.i as i64) as i32;
+            }
+            exponent = exponent / 2;
+            base_mod = ((base_mod as i64 * base_mod as i64) % modulus.i as i64) as i32;
+        }
+        
+        return Int { i: result };
+    }
+    
+    fn is_even(n: Self) -> bool {
+        return n.i % 2 == 0;
+    }
+
+    fn copy(&self) -> Self {
+        Int { i: self.i }
+    }
+}
+
+struct MillerRabinTest {
+    witness_count: i32,
+    accuracy_threshold: i32,
+}
+
+// Decompose n-1 as d * 2^r where d is odd
+fn decompose_number(n: i32) -> (i32, i32) {
+    let mut d: i32 = n - 1;
+    let mut r: i32 = 0;
+    
+    while (d % 2 == 0) {
+        d = d / 2;
+        r += 1;
+    }
+    
+    return (d, r);
+}
+
+// Single Miller-Rabin test with witness a
+fn miller_rabin_witness_test(n: Int, a: Int, d: Int, r: i32) -> bool {
+    // Compute a^d mod n
+    let mut x: Int = Int::power_mod(a, d, n.copy());
+    
+    if (x.i == 1 || x.i == n.i - 1) {
+        return true;  // Probably prime
+    }
+    
+    // Repeat r-1 times
+    let mut i: i32 = 0;
+    while (i < r - 1) {
+        x = Int::power_mod(x, Int { i: 2 }, n.copy());
+        
+        if (x.i == n.i - 1) {
+            return true;  // Probably prime
+        }
+        
+        i += 1;
+    }
+    
+    return false;  // Composite
+}
+
+// Main Miller-Rabin primality test
+fn miller_rabin_test(n: Int, witnesses: [i32; 8]) -> bool {  
+
+    if (n.i <= 1) {
+        return false;
+    }
+    if (n.i <= 3) {
+        return true;
+    }
+    if (Int::is_even(n.copy())) {
+        return false;
+    }
+    
+    let n_i32: i32 = n.i;
+    let (d, r): (i32, i32) = decompose_number(n_i32);
+    
+    let mut witness_index: i32 = 0;
+    while (witness_index < 8) {
+        let a: i32 = witnesses[witness_index as usize];
+        
+        if (a >= n_i32) {
+            witness_index += 1;
+            continue;
+        }
+        
+        if (!miller_rabin_witness_test(n.copy(), Int { i: a }, Int { i: d }, r)) {
+            return false;  // Definitely composite
+        }
+        
+        witness_index += 1;
+    }
+    
+    return true;  // Probably prime
+}
+
+// Test multiple numbers for primality
+fn comprehensive_primality_test() -> i32 {
+    let common_witnesses: [i32; 8] = [2, 3, 5, 7, 11, 13, 17, 19];
+    let mut prime_count: i32 = 0;
+    let mut composite_sum: i32 = 0;
+    
+    let mut test_number: i32 = 100;
+    while (test_number <= 200) {
+        // Error occurs here: calling generic function with i32 but expecting different type
+        let is_probably_prime: bool = miller_rabin_test(Int { i: test_number }, common_witnesses);
+        
+        if (is_probably_prime) {
+            prime_count += 1;
+        } else {
+            composite_sum += test_number % 100;  // Keep sum manageable
+        }
+        
+        // Additional verification using trial division for small numbers
+        if (test_number < 150) {
+            let mut trial_divisor: i32 = 2;
+            let mut is_trial_prime: bool = true;
+            
+            while ((trial_divisor * trial_divisor) <= test_number) {
+                if (test_number % trial_divisor == 0) {
+                    is_trial_prime = false;
+                    break;
+                }
+                trial_divisor += 1;
+            }
+            
+            // Cross-validation between methods
+            if ((is_probably_prime != is_trial_prime) && test_number > 2) {
+                composite_sum += 1;  // Discrepancy penalty
+            }
+        }
+        
+        test_number += 1;
+    }
+    
+    return prime_count * 10 + composite_sum;
+}
+
+// Fermat primality test for comparison (simple version)
+fn fermat_primality_test(n: i32, iterations: i32) -> bool {
+    if (n <= 1) {
+        return false;
+    }
+    if (n <= 3) {
+        return true;
+    }
+    if (n % 2 == 0) {
+        return false;
+    }
+    
+    let mut iter: i32 = 0;
+    while (iter < iterations) {
+        let a: i32 = 2 + (iter % 10);  // Simple witness selection
+        
+        if (a >= n) {
+            iter += 1;
+            continue;
+        }
+        
+        let result: i32 = Int::power_mod(Int { i: a }, Int { i: n - 1 }, Int { i: n }).i;
+        if (result != 1) {
+            return false;  // Composite
+        }
+        
+        iter += 1;
+    }
+    
+    return true;  // Probably prime
+}
+
+// Compare Miller-Rabin with Fermat test
+fn compare_primality_tests() -> i32 {
+    let mut comparison_score: i32 = 0;
+    let mut test_num: i32 = 50;
+    
+    while (test_num < 100) {
+        let miller_result: i32 = comprehensive_primality_test();
+        let fermat_result: bool = fermat_primality_test(test_num, 5);
+        
+        // Scoring based on agreement between methods
+        if (fermat_result) {
+            comparison_score += test_num % 10;
+        }
+        
+        test_num += 7;  // Skip some numbers for efficiency
+    }
+    
+    return comparison_score + miller_result;
+}
+
+fn main() {
+    let primality_result: i32 = comprehensive_primality_test();
+    let comparison_result: i32 = compare_primality_tests();
+    let final_score: i32 = primality_result + comparison_result;
+    printInt(final_score);
+    exit(0);
+}

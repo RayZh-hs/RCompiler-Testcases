@@ -1,0 +1,17 @@
+/*
+Test Package: Semantic-1
+Test Target: type
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: Type error: unit type cannot be used in comparison
+*/
+
+// Type error: unit type cannot be used in comparison
+fn main() {
+    let unit_val: () = ();
+    if (unit_val == 5) {
+        printInt(1);
+    }
+    exit(0);
+}

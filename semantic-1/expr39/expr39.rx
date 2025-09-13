@@ -1,0 +1,470 @@
+/*
+Test Package: Semantic-1
+Test Target: expr
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: Complex expression error: Missing closing parenthesis in expression - suffix array construction with doubling algorithm, LCP array computation, and string analysis
+*/
+
+struct SuffixArrayNode {
+    original_index: i32,
+    rank: i32,
+    next_rank: i32,
+    suffix_length: i32,
+    lcp_value: i32,
+}
+
+impl SuffixArrayNode {
+    fn new(index: i32, initial_rank: i32) -> SuffixArrayNode {
+        SuffixArrayNode {
+            original_index: index,
+            rank: initial_rank,
+            next_rank: 0,
+            suffix_length: 0,
+            lcp_value: 0,
+        }
+    }
+    
+    fn update_ranks(&mut self, new_rank: i32, new_next_rank: i32) {
+        self.rank = new_rank;
+        self.next_rank = new_next_rank;
+    }
+    
+    fn calculate_combined_rank(&self) -> i64 {
+        let combined: i64 = (self.rank as i64) * 1000000 + (self.next_rank as i64);
+        return combined;
+    }
+}
+
+fn radix_sort_suffix_nodes(nodes: &mut [SuffixArrayNode; 32], sort_by_next_rank: bool) {
+    let mut counting_array: [i32; 256] = [0; 256];
+    let mut output_array: [SuffixArrayNode; 32] = [
+        SuffixArrayNode::new(0, 0), SuffixArrayNode::new(0, 0), SuffixArrayNode::new(0, 0), SuffixArrayNode::new(0, 0),
+        SuffixArrayNode::new(0, 0), SuffixArrayNode::new(0, 0), SuffixArrayNode::new(0, 0), SuffixArrayNode::new(0, 0),
+        SuffixArrayNode::new(0, 0), SuffixArrayNode::new(0, 0), SuffixArrayNode::new(0, 0), SuffixArrayNode::new(0, 0),
+        SuffixArrayNode::new(0, 0), SuffixArrayNode::new(0, 0), SuffixArrayNode::new(0, 0), SuffixArrayNode::new(0, 0),
+        SuffixArrayNode::new(0, 0), SuffixArrayNode::new(0, 0), SuffixArrayNode::new(0, 0), SuffixArrayNode::new(0, 0),
+        SuffixArrayNode::new(0, 0), SuffixArrayNode::new(0, 0), SuffixArrayNode::new(0, 0), SuffixArrayNode::new(0, 0),
+        SuffixArrayNode::new(0, 0), SuffixArrayNode::new(0, 0), SuffixArrayNode::new(0, 0), SuffixArrayNode::new(0, 0),
+        SuffixArrayNode::new(0, 0), SuffixArrayNode::new(0, 0), SuffixArrayNode::new(0, 0), SuffixArrayNode::new(0, 0),
+    ];
+    
+    let mut count_index: usize = 0;
+    loop {
+        if (count_index >= 32) {
+            break;
+        }
+        
+        let sort_key: i32 = if (sort_by_next_rank) {
+            nodes[count_index].next_rank + 128
+        } else {
+            nodes[count_index].rank + 128
+        };
+        
+        if (sort_key >= 0 && sort_key < 256) {
+            counting_array[sort_key as usize] = counting_array[sort_key as usize] + 1;
+        }
+        
+        count_index = count_index + 1;
+    }
+    
+    let mut cumulative_index: usize = 1;
+    loop {
+        if (cumulative_index >= 256) {
+            break;
+        }
+        counting_array[cumulative_index] = counting_array[cumulative_index] + counting_array[cumulative_index - 1];
+        cumulative_index = cumulative_index + 1;
+    }
+    
+    let mut sort_index: i32 = 31;
+    loop {
+        if (sort_index < 0) {
+            break;
+        }
+        
+        let sort_key: i32 = if (sort_by_next_rank) {
+            nodes[sort_index as usize].next_rank + 128
+        } else {
+            nodes[sort_index as usize].rank + 128
+        };
+        
+        if (sort_key >= 0 && sort_key < 256) {
+            counting_array[sort_key as usize] = counting_array[sort_key as usize] - 1;
+            let output_pos: i32 = counting_array[sort_key as usize];
+            if (output_pos >= 0 && output_pos < 32) {
+                output_array[output_pos as usize] = SuffixArrayNode {
+                    original_index: nodes[sort_index as usize].original_index,
+                    rank: nodes[sort_index as usize].rank,
+                    next_rank: nodes[sort_index as usize].next_rank,
+                    suffix_length: nodes[sort_index as usize].suffix_length,
+                    lcp_value: nodes[sort_index as usize].lcp_value,
+                };
+            }
+        }
+        
+        sort_index = sort_index - 1;
+    }
+    
+    let mut copy_index: usize = 0;
+    loop {
+        if (copy_index >= 32) {
+            break;
+        }
+        nodes[copy_index] = SuffixArrayNode {
+            original_index: output_array[copy_index].original_index,
+            rank: output_array[copy_index].rank,
+            next_rank: output_array[copy_index].next_rank,
+            suffix_length: output_array[copy_index].suffix_length,
+            lcp_value: output_array[copy_index].lcp_value,
+        };
+        copy_index = copy_index + 1;
+    }
+}
+
+fn build_suffix_array_with_doubling(text: [i32; 32]) -> [SuffixArrayNode; 32] {
+    let mut suffix_nodes: [SuffixArrayNode; 32] = [
+        SuffixArrayNode::new(0, text[0]), SuffixArrayNode::new(1, text[1]), SuffixArrayNode::new(2, text[2]), SuffixArrayNode::new(3, text[3]),
+        SuffixArrayNode::new(4, text[4]), SuffixArrayNode::new(5, text[5]), SuffixArrayNode::new(6, text[6]), SuffixArrayNode::new(7, text[7]),
+        SuffixArrayNode::new(8, text[8]), SuffixArrayNode::new(9, text[9]), SuffixArrayNode::new(10, text[10]), SuffixArrayNode::new(11, text[11]),
+        SuffixArrayNode::new(12, text[12]), SuffixArrayNode::new(13, text[13]), SuffixArrayNode::new(14, text[14]), SuffixArrayNode::new(15, text[15]),
+        SuffixArrayNode::new(16, text[16]), SuffixArrayNode::new(17, text[17]), SuffixArrayNode::new(18, text[18]), SuffixArrayNode::new(19, text[19]),
+        SuffixArrayNode::new(20, text[20]), SuffixArrayNode::new(21, text[21]), SuffixArrayNode::new(22, text[22]), SuffixArrayNode::new(23, text[23]),
+        SuffixArrayNode::new(24, text[24]), SuffixArrayNode::new(25, text[25]), SuffixArrayNode::new(26, text[26]), SuffixArrayNode::new(27, text[27]),
+        SuffixArrayNode::new(28, text[28]), SuffixArrayNode::new(29, text[29]), SuffixArrayNode::new(30, text[30]), SuffixArrayNode::new(31, text[31]),
+    ];
+    
+    let mut gap: i32 = 1;
+    loop {
+        if (gap >= 32) {
+            break;
+        }
+        
+        let mut next_rank_index: usize = 0;
+        loop {
+            if (next_rank_index >= 32) {
+                break;
+            }
+            
+            let next_index: i32 = suffix_nodes[next_rank_index].original_index + gap;
+            let next_rank: i32 = if (next_index < 32) {
+                text[next_index as usize]
+            } else {
+                -1
+            };
+            
+            suffix_nodes[next_rank_index].next_rank = next_rank;
+            next_rank_index = next_rank_index + 1;
+        }
+        
+        radix_sort_suffix_nodes(&mut suffix_nodes, true);
+        radix_sort_suffix_nodes(&mut suffix_nodes, false);
+        
+        let mut temp_ranks: [i32; 32] = [0; 32];
+        temp_ranks[suffix_nodes[0].original_index as usize] = 0;
+        
+        let mut rank_assign_index: usize = 1;
+        loop {
+            if (rank_assign_index >= 32) {
+                break;
+            }
+            
+            let current_node: &SuffixArrayNode = &suffix_nodes[rank_assign_index];
+            let previous_node: &SuffixArrayNode = &suffix_nodes[rank_assign_index - 1];
+            
+            let rank_increment: i32 = if (current_node.rank == previous_node.rank && 
+                                    current_node.next_rank == previous_node.next_rank) {
+                0
+            } else {
+                1
+            };
+            
+            temp_ranks[current_node.original_index as usize] = temp_ranks[previous_node.original_index as usize] + rank_increment;
+            rank_assign_index = rank_assign_index + 1;
+        }
+        
+        let mut update_index: usize = 0;
+        loop {
+            if (update_index >= 32) {
+                break;
+            }
+            suffix_nodes[update_index].rank = temp_ranks[suffix_nodes[update_index].original_index as usize];
+            update_index = update_index + 1;
+        }
+        
+        gap = gap * 2;
+    }
+    
+    return suffix_nodes;
+}
+
+fn compute_lcp_array(suffix_array: &mut [SuffixArrayNode; 32], text: [i32; 32]) -> [i32; 32] {
+    let mut lcp_array: [i32; 32] = [0; 32];
+    let mut rank_to_index: [i32; 32] = [0; 32];
+    
+    let mut mapping_index: usize = 0;
+    loop {
+        if (mapping_index >= 32) {
+            break;
+        }
+        rank_to_index[suffix_array[mapping_index].rank as usize] = mapping_index as i32;
+        mapping_index = mapping_index + 1;
+    }
+    
+    let mut current_lcp: i32 = 0;
+    let mut lcp_index: usize = 0;
+    
+    loop {
+        if (lcp_index >= 32) {
+            break;
+        }
+        
+        let current_suffix_rank: i32 = suffix_array[lcp_index].rank;
+        
+        if (current_suffix_rank == 31) {
+            current_lcp = 0;
+            lcp_index = lcp_index + 1;
+            continue;
+        }
+        
+        let next_suffix_index: i32 = rank_to_index[(current_suffix_rank + 1) as usize];
+        let current_suffix_start: i32 = suffix_array[lcp_index].original_index;
+        let next_suffix_start: i32 = suffix_array[next_suffix_index as usize].original_index;
+        
+        loop {
+            if (current_suffix_start + current_lcp >= 32 || next_suffix_start + current_lcp >= 32) {
+                break;
+            }
+            
+            if (text[(current_suffix_start + current_lcp) as usize] != text[(next_suffix_start + current_lcp) as usize]) {
+                break;
+            }
+            
+            current_lcp = current_lcp + 1;
+        }
+        
+        lcp_array[current_suffix_rank as usize] = current_lcp;
+        suffix_array[lcp_index].lcp_value = current_lcp;
+        
+        if (current_lcp > 0) {
+            current_lcp = current_lcp - 1;
+        }
+        
+        lcp_index = lcp_index + 1;
+    }
+    
+    return lcp_array;
+}
+
+fn analyze_suffix_array_properties(suffix_array: &[SuffixArrayNode; 32], lcp_array: [i32; 32]) -> i32 {
+    let mut max_lcp: i32 = 0;
+    let mut total_lcp_sum: i32 = 0;
+    let mut lcp_variance_sum: i32 = 0;
+    let mut unique_suffix_count: i32 = 0;
+    
+    let mut analysis_index: usize = 0;
+    loop {
+        if (analysis_index >= 32) {
+            break;
+        }
+        
+        let current_lcp: i32 = lcp_array[analysis_index];
+        total_lcp_sum = total_lcp_sum + current_lcp;
+        
+        if (current_lcp > max_lcp) {
+            max_lcp = current_lcp;
+        }
+        
+        if (current_lcp == 0) {
+            unique_suffix_count = unique_suffix_count + 1;
+        }
+        
+        analysis_index = analysis_index + 1;
+    }
+    
+    let average_lcp: i32 = total_lcp_sum / 32;
+    
+    let mut variance_index: usize = 0;
+    loop {
+        if (variance_index >= 32) {
+            break;
+        }
+        
+        let lcp_diff: i32 = lcp_array[variance_index] - average_lcp;
+        let squared_diff: i32 = lcp_diff * lcp_diff;
+        lcp_variance_sum = lcp_variance_sum + squared_diff;
+        
+        variance_index = variance_index + 1;
+    }
+    
+    let mut rank_inversion_count: i32 = 0;
+    let mut inversion_check_i: usize = 0;
+    
+    loop {
+        if (inversion_check_i >= 31) {
+            break;
+        }
+        
+        let mut inversion_check_j: usize = inversion_check_i + 1;
+        loop {
+            if (inversion_check_j >= 32) {
+                break;
+            }
+            
+            if (suffix_array[inversion_check_i].original_index > suffix_array[inversion_check_j].original_index) {
+                rank_inversion_count = rank_inversion_count + 1;
+            }
+            
+            inversion_check_j = inversion_check_j + 1;
+        }
+        
+        inversion_check_i = inversion_check_i + 1;
+    }
+    
+    let complexity_metric: i32 = {
+        let lcp_complexity: i32 = max_lcp * 15 + (total_lcp_sum / 2);
+        let variance_complexity: i32 = lcp_variance_sum / 10;
+        let uniqueness_factor: i32 = unique_suffix_count * 25;
+        let inversion_penalty: i32 = rank_inversion_count * 5;
+        
+        let raw_metric: i32 = lcp_complexity + variance_complexity + uniqueness_factor - inversion_penalty;
+        let normalized: i32 = {
+            let temp: i32 = raw_metric % 12000;
+            if (temp < 4000) {
+                temp + 2000
+            } else if (temp > 8000) {
+                temp - 3000
+            } else {
+                temp
+            }
+        };
+        normalized
+    };
+    
+    return complexity_metric;
+}
+
+fn main() {
+    let input_text: [i32; 32] = [
+        65, 66, 65, 67, 65, 66, 65, 68, 65, 66, 65, 67, 65, 66, 65, 69,
+        65, 66, 65, 67, 65, 66, 65, 68, 65, 66, 65, 67, 65, 66, 65, 70,
+    ];
+    
+    let mut constructed_suffix_array: [SuffixArrayNode; 32] = build_suffix_array_with_doubling(input_text);
+    
+    let computed_lcp_array: [i32; 32] = compute_lcp_array(&mut constructed_suffix_array, input_text);
+    
+    let pre_analysis_complexity: i32 = analyze_suffix_array_properties(&constructed_suffix_array, computed_lcp_array);
+    
+    let mut suffix_length_sum: i32 = 0;
+    let mut rank_sum: i32 = 0;
+    let mut original_index_sum: i32 = 0;
+    
+    let mut statistics_index: usize = 0;
+    loop {
+        if (statistics_index >= 32) {
+            break;
+        }
+        
+        let node: &mut SuffixArrayNode = &mut constructed_suffix_array[statistics_index];
+        node.suffix_length = 32 - node.original_index;
+        suffix_length_sum = suffix_length_sum + node.suffix_length;
+        rank_sum = rank_sum + node.rank;
+        original_index_sum = original_index_sum + node.original_index;
+        
+        statistics_index = statistics_index + 1;
+    }
+    
+    let post_analysis_complexity: i32 = analyze_suffix_array_properties(&constructed_suffix_array, computed_lcp_array);
+    
+    let comprehensive_evaluation: i32 = {
+        let pre_complexity_weight: i32 = pre_analysis_complexity * 3;
+        let post_complexity_weight: i32 = post_analysis_complexity * 4;
+        let suffix_length_factor: i32 = suffix_length_sum / 8;
+        let rank_distribution_factor: i32 = rank_sum / 16;
+        let index_distribution_factor: i32 = original_index_sum / 12;
+        let complexity_delta: i32 = post_analysis_complexity - pre_analysis_complexity;
+        let delta_weight: i32 = complexity_delta * 2;
+        
+        let combined_evaluation: i32 = pre_complexity_weight + post_complexity_weight + 
+                                suffix_length_factor + rank_distribution_factor + 
+                                index_distribution_factor + delta_weight;
+        
+        let processed_evaluation: i32 = {
+            let temp: i32 = combined_evaluation % 30000;
+            if (temp < 10000) {
+                temp + 8000
+            } else if (temp > 25000) {
+                temp - 12000
+            } else {
+                temp
+            }
+        };
+        processed_evaluation
+    };
+    
+    let cryptographic_hash_simulation: i32 = {
+        let base_value: i32 = comprehensive_evaluation;
+        let hash_step_1: i32 = (base_value * 1299827) % 1000000007;
+    let hash_step_2: i32 = (hash_step_1 + 982451653) % 2000000011;
+    let hash_step_3: i32 = (hash_step_2 * 73 % 100000000; // existing missing parenthesis preserved
+        let final_hash: i32 = hash_step_3 % 1000000;
+        final_hash
+    };
+    
+    let output_determination: i32 = {
+        let hash_base: i32 = cryptographic_hash_simulation;
+        let modular_analysis: i32 = hash_base % 23;
+        
+        let final_output: i32 = if (modular_analysis == 0) {
+            hash_base / 23
+        } else if (modular_analysis <= 7) {
+            hash_base * 2 + 12345
+        } else if (modular_analysis <= 15) {
+            hash_base + 67890
+        } else {
+            hash_base - 54321
+        };
+        
+        let clamped_output: i32 = if (final_output < 0) {
+            -final_output
+        } else {
+            final_output
+        };
+        
+        clamped_output % 2000000
+    };
+    
+    let verification_and_final_output: i32 = {
+        let candidate: i32 = output_determination;
+        let verification_1: bool = (candidate > 0 && candidate != pre_analysis_complexity);
+        let verification_2: bool = (candidate != post_analysis_complexity && candidate != comprehensive_evaluation);
+        let verification_3: bool = (candidate != cryptographic_hash_simulation && candidate < 10000000);
+        
+        if (verification_1 && verification_2 && verification_3) {
+            let enhanced_output: i32 = {
+                let enhancement_factor: i32 = 37;
+                let enhanced: i32 = candidate * enhancement_factor;
+                let modded: i32 = enhanced % 5000000;
+                let final_enhanced: i32 = modded + 100000;
+                final_enhanced
+            };
+            enhanced_output
+        } else {
+            let emergency_base: i32 = 1618033;
+            let emergency_modifier: i32 = candidate % 100000;
+            let emergency_result: i32 = emergency_base + emergency_modifier;
+            emergency_result
+        }
+    };
+    
+    if (verification_and_final_output > 0 && verification_and_final_output != output_determination) {
+        printInt(verification_and_final_output);
+    } else {
+        let absolute_fallback: i32 = 2718281;
+        let rescue_value: i32 = absolute_fallback + (comprehensive_evaluation % 10000);
+        printInt(rescue_value);
+    }
+    exit(0);
+}

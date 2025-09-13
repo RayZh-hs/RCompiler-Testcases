@@ -1,0 +1,67 @@
+/*
+Test Package: Semantic-1
+Test Target: misc
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: misc test, power calculation with iterative and recursive methods
+*/
+
+// Power calculation using iterative method
+// Calculate base^exponent efficiently
+fn power_iterative(base: i32, mut exp: i32) -> i32 {
+    if (exp == 0) {
+        return 1;
+    }
+    
+    let mut result: i32 = 1;
+    let mut current_base: i32 = base;
+    
+    while (exp > 0) {
+        if (exp % 2 == 1) {
+            result *= current_base;
+        }
+        current_base *= current_base;
+        exp /= 2;
+    }
+    
+    return result;
+}
+
+fn power_recursive(base: i32, exp: i32) -> i32 {
+    if (exp == 0) {
+        return 1;
+    }
+    if (exp == 1) {
+        return base;
+    }
+    
+    let half_power: i32 = power_recursive(base, exp / 2);
+    
+    if (exp % 2 == 0) {
+        return half_power * half_power;
+    } else {
+        return base * half_power * half_power;
+    }
+}
+
+fn main() {
+    let base: i32 = getInt();
+    let exponent: i32 = getInt();
+    let method: i32 = getInt(); // 1 for iterative, 2 for recursive
+    
+    if (exponent < 0) {
+        printInt(0); // Invalid exponent
+        return;
+    }
+    
+    let result: i32;
+    if (method == 1) {
+        result = power_iterative(base, exponent);
+    } else {
+        result = power_recursive(base, exponent);
+    }
+    
+    printInt(result);
+    exit(0);
+}

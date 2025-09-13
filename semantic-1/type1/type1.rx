@@ -1,0 +1,14 @@
+/*
+Test Package: Semantic-1
+Test Target: type
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: Type error: boolean cannot be assigned to integer
+*/
+
+// Type error: boolean cannot be assigned to integer
+fn main() {
+    let x: i32 = true;
+    exit(0);
+}

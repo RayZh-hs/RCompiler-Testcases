@@ -1,0 +1,18 @@
+/*
+Test Package: Semantic-1
+Test Target: expr
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: Expression error: Invalid call expression - missing closing parenthesis
+*/
+
+// Error: Invalid call expression - missing closing parenthesis
+fn add(a: i32, b: i32) -> i32 {
+    a + b
+}
+
+fn main() {
+    let result: i32 = add(5, 10;  // Missing closing parenthesis
+    exit(0);
+}

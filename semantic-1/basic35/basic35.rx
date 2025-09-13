@@ -1,0 +1,57 @@
+/*
+Test Package: Semantic-1
+Test Target: basic
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: basic test, interpolation search with array size mismatch error
+*/
+
+const ARR: usize = 20;
+
+fn interpolation_search(a: [i32; ARR], key: i32) -> i32 {
+    let mut low: usize = 0;
+    let mut high: usize = ARR - 1;
+    while (low <= high && key >= a[low] && key <= a[high]) {
+        let pos: usize = low + (((key - a[low]) as usize) * (high - low))
+                     / ((a[high] - a[low]) as usize);
+        if (a[pos] == key) {
+            return pos as i32;
+        }
+        if (a[pos] < key) {
+            low = pos + 1;
+        } else {
+            high = pos - 1;
+        }
+    }
+    -1
+}
+
+fn build_array() -> [i32; ARR] {
+    let mut out: [i32; ARR] = [0; ARR];
+    let mut i: usize = 0;
+    while (i < ARR) {
+        out[i] = (i * 3) as i32 + 2;
+        i += 1;
+    }
+    out
+}
+
+fn segment_sum(data: [i32; ARR], start: usize, len: usize) -> i32 {
+    let mut s: i32 = 0;
+    let mut c: usize = 0;
+    while (c < len) {
+        s = s + data[start + c];
+        c += 1;
+    }
+    s
+}
+
+fn main() {
+    let dataset: [i32; ARR] = build_array();
+    let loc: i32 = interpolation_search(dataset, 23);
+    let seg: i32 = segment_sum(dataset, 5, 7);
+    let token: i32 = loc * seg;
+    let wrong: [i32; ARR - 1] = dataset;
+    exit(0);
+}

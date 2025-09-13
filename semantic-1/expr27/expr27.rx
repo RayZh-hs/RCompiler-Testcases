@@ -1,0 +1,25 @@
+/*
+Test Package: Semantic-1
+Test Target: expr
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: Expression error: Missing semicolon after if expression - combines call, array, if, operator, and literal expressions
+*/
+
+fn process_array(arr: [i32; 3]) -> i32 {
+    arr[0] + arr[1] + arr[2]
+}
+
+fn main() {
+    let numbers: [i32; 3] = [5, 10, 15];
+    let sum: i32 = process_array(numbers);
+    let doubled: i32 = sum * 2;
+    let result: i32 = if (doubled > 50) { doubled } else { 0 }
+    printInt(result);
+    let final_check: bool = result != 0;
+    if (final_check) {
+        printInt(1);
+    }
+    exit(0);
+}

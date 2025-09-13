@@ -1,0 +1,24 @@
+/*
+Test Package: Semantic-1
+Test Target: return
+Author: Ruitian Wang
+Time: 2025-08-27
+Verdict: Fail
+Comment: Return type mismatch - returning different types in if-else branches
+*/
+
+// Error: Return type mismatch - returning different types in if-else branches
+fn test_branches(x: i32) -> i32 {
+    if (x == 1) {
+        return 42;
+    } else if (x == 2) {
+        return "hello";  // Type mismatch: expected i32, found &str
+    } else {
+        return 0;
+    }
+}
+
+fn main() {
+    let result: i32 = test_branches(1);
+    exit(0);
+}

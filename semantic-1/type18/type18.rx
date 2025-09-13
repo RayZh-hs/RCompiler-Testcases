@@ -1,0 +1,42 @@
+/*
+Test Package: Semantic-1
+Test Target: type
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: Type error: comparing struct with numeric value in vector operations
+*/
+
+// Complete program with type error: binary operation between incompatible types
+struct Vector2D {
+    x: i32,
+    y: i32,
+}
+
+fn add_vectors(v1: &Vector2D, v2: &Vector2D) -> Vector2D {
+    return Vector2D { 
+        x: v1.x + v2.x, 
+        y: v1.y + v2.y 
+    };
+}
+
+fn dot_product(v1: &Vector2D, v2: &Vector2D) -> i32 {
+    return v1.x * v2.x + v1.y * v2.y;
+}
+
+fn main() {
+    let vec1: Vector2D = Vector2D { x: 3, y: 4 };
+    let vec2: Vector2D = Vector2D { x: 1, y: 2 };
+    let scalar: i32 = 2;
+    
+    let sum: Vector2D = add_vectors(&vec1, &vec2);
+    let dot: i32 = dot_product(&vec1, &vec2);
+    
+    // Type error: comparing Vector2D struct with numeric value
+    if (sum > scalar) {
+        printInt(1);
+    } else {
+        printInt(0);
+    }
+    exit(0);
+}

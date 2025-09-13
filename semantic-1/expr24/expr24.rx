@@ -1,0 +1,24 @@
+/*
+Test Package: Semantic-1
+Test Target: expr
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: Expression error: Missing closing parenthesis in grouped expression - combines call, return, grouped, if, operator, and literal expressions
+*/
+
+fn calculate(x: i32) -> i32 {
+    return x * 2 + 1;
+}
+
+fn main() {
+    let input: i32 = getInt();
+    let processed: i32 = calculate(input);
+    let grouped: i32 = (processed + 5;
+    if (grouped > 0) {
+        printInt(grouped);
+    }
+    let final_result: i32 = grouped % 10;
+    printInt(final_result);
+    exit(0);
+}

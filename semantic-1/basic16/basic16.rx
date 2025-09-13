@@ -1,0 +1,27 @@
+/*
+Test Package: Semantic-1
+Test Target: basic
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: basic test, undefined variables and functions, function return type error
+*/
+
+fn main() {
+    let mut index: usize = 0;
+    let mut total: usize = 0;
+    while (index < data.len()) {
+        total = add(total, data[index]);
+        index += 1
+    }
+    let avg: usize = total / data.len();
+    let answer: () = report(avg);
+    let keep: () = answer
+    exit(0);
+}
+
+fn report(v: i32) -> () { v }
+
+fn helper() {
+    missing();
+}

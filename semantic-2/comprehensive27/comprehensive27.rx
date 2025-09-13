@@ -1,0 +1,1196 @@
+/*
+Test Package: Semantic-2
+Test Target: comprehensive
+Author: Wenxin Zheng
+Time: 2025-08-17
+Verdict: Success
+Test Name: Advanced Multi-Layer Cache System with Memory Management Simulation
+Summary: This test comprehensively evaluates compiler optimizations for:
+Details:
+Complex multi-level data structure management with cache hierarchies
+Advanced memory allocation simulation and garbage collection patterns
+Complex arithmetic operations and bit manipulation for hash computations
+Deep recursive function calls with tail-call optimization opportunities
+Multi-dimensional array access patterns with cache locality considerations
+Branch prediction for complex conditional logic in cache hit/miss scenarios
+Loop optimization in memory management and cache replacement algorithms
+Function call overhead optimization for frequently called utility functions
+*/
+
+// comprehensive27.rx - Advanced Multi-Layer Cache System with Memory Management Simulation
+// This test comprehensively evaluates compiler optimizations for:
+// - Complex multi-level data structure management with cache hierarchies
+// - Advanced memory allocation simulation and garbage collection patterns
+// - Complex arithmetic operations and bit manipulation for hash computations
+// - Deep recursive function calls with tail-call optimization opportunities
+// - Multi-dimensional array access patterns with cache locality considerations
+// - Branch prediction for complex conditional logic in cache hit/miss scenarios
+// - Loop optimization in memory management and cache replacement algorithms
+// - Function call overhead optimization for frequently called utility functions
+
+fn main() {
+    // Initialize a comprehensive cache system simulation
+    // This simulates a 3-level cache hierarchy with LRU replacement policy
+    printInt(42); // Expected output marker
+    
+    // Test the cache system with various access patterns
+    let cache_performance: i32 = run_cache_simulation();
+    printInt(cache_performance);
+    
+    // Test memory management algorithms
+    let memory_efficiency: i32 = run_memory_manager();
+    printInt(memory_efficiency);
+    
+    // Test hash table operations with collision resolution
+    let hash_operations: i32 = run_hash_table_tests();
+    printInt(hash_operations);
+    
+    // Test priority queue operations for cache replacement
+    let priority_queue_ops: i32 = run_priority_queue_tests();
+    printInt(priority_queue_ops);
+    
+    // Run comprehensive system integration test
+    let integration_result: i32 = run_integrated_system_test();
+    printInt(integration_result);
+    
+    printInt(99); // End marker
+}
+
+// Cache system constants
+fn get_l1_cache_size() -> i32 { 64 }
+fn get_l2_cache_size() -> i32 { 512 }
+fn get_l3_cache_size() -> i32 { 2048 }
+fn get_cache_line_size() -> i32 { 64 }
+fn get_associativity() -> i32 { 4 }
+
+// Memory management constants
+fn get_page_size() -> i32 { 4096 }
+fn get_heap_size() -> i32 { 65536 }
+fn get_gc_threshold() -> i32 { 80 }
+
+// Hash table configuration
+fn get_hash_table_size() -> i32 { 1024 }
+fn get_max_probe_distance() -> i32 { 16 }
+
+// Advanced cache simulation with LRU replacement policy
+fn run_cache_simulation() -> i32 {
+    let total_accesses: i32 = 10000;
+    let cache_hits: i32 = 0;
+    let cache_misses: i32 = 0;
+    
+    // Simulate L1 cache (64 entries, 4-way associative)
+    let l1_cache: [i32; 256] = [0; 256]; // tag, valid, lru_counter, data
+    let l1_lru_counter: i32 = 0;
+    
+    // Simulate L2 cache (512 entries, 8-way associative) 
+    let l2_cache: [i32; 4096] = [0; 4096];
+    let l2_lru_counter: i32 = 0;
+    
+    // Simulate memory access patterns
+    let access_pattern: i32 = 0;
+    while (access_pattern < total_accesses) {
+        let address: i32 = generate_memory_address(access_pattern);
+        let cache_result: i32 = simulate_cache_access(address, l1_cache, l2_cache);
+        
+        if (cache_result > 0) {
+            cache_hits = cache_hits + 1;
+        } else {
+            cache_misses = cache_misses + 1;
+            // Simulate cache line fill
+            let fill_result: i32 = simulate_cache_fill(address, l1_cache, l2_cache);
+        }
+        
+        // Update LRU counters
+        l1_lru_counter = update_lru_counters_l1(l1_cache, l1_lru_counter);
+        l2_lru_counter = update_lru_counters_l2(l2_cache, l2_lru_counter);
+        
+        access_pattern = access_pattern + 1;
+    }
+    
+    // Calculate cache hit ratio (scaled by 1000 for integer precision)
+    let hit_ratio: i32 = (cache_hits * 1000) / total_accesses;
+    return hit_ratio;
+}
+
+// Generate complex memory access patterns for testing
+fn generate_memory_address(pattern_index: i32) -> i32 {
+    let base_address: i32 = 0x10000000;
+    let pattern_type: i32 = pattern_index % 7;
+    
+    if (pattern_type == 0) {
+        // Sequential access pattern
+        return base_address + (pattern_index * 4);
+    } else if (pattern_type == 1) {
+        // Strided access pattern  
+        return base_address + ((pattern_index * 64) % 8192);
+    } else if (pattern_type == 2) {
+        // Random access pattern
+        return base_address + (hash_function(pattern_index) % 16384);
+    } else if (pattern_type == 3) {
+        // Temporal locality pattern
+        let hot_set_size: i32 = 128;
+        return base_address + ((pattern_index % hot_set_size) * 4);
+    } else if (pattern_type == 4) {
+        // Spatial locality pattern
+        let block_size: i32 = 64;
+        let block_id: i32 = pattern_index / block_size;
+        let offset: i32 = pattern_index % block_size;
+        return base_address + (block_id * 1024) + (offset * 4);
+    } else if (pattern_type == 5) {
+        // Power-of-2 stride pattern
+        let stride: i32 = 1;
+        let temp: i32 = pattern_index;
+        while (temp > 0) {
+            stride = stride * 2;
+            temp = temp / 2;
+        }
+        return base_address + ((pattern_index * stride) % 32768);
+    } else {
+        // Mixed pattern with aliasing
+        return base_address + ((pattern_index * 17 + pattern_index * pattern_index) % 65536);
+    }
+}
+
+// Complex hash function for address generation
+fn hash_function(key: i32) -> i32 {
+    let hash: i32 = key;
+    hash = hash ^ (hash >> 16);
+    hash = hash * 0x45d9f3b;
+    hash = hash ^ (hash >> 16);
+    hash = hash * 0x45d9f3b;
+    hash = hash ^ (hash >> 16);
+    return hash;
+}
+
+// Simulate cache access with complex associative lookup
+fn simulate_cache_access(address: i32, l1_cache: [i32; 256], l2_cache: [i32; 4096]) -> i32 {
+    // L1 Cache lookup (4-way associative)
+    let l1_index: i32 = (address / get_cache_line_size()) % 16;
+    let l1_tag: i32 = address / (get_cache_line_size() * 16);
+    
+    let way: i32 = 0;
+    while (way < get_associativity()) {
+        let cache_entry_base: i32 = (l1_index * get_associativity() + way) * 4;
+        let stored_tag: i32 = l1_cache[cache_entry_base];
+        let valid_bit: i32 = l1_cache[cache_entry_base + 1];
+        
+        if valid_bit == 1 && stored_tag == l1_tag {
+            // L1 cache hit
+            l1_cache[cache_entry_base + 2] = get_current_timestamp(); // Update LRU
+            return 1; // L1 hit
+        }
+        way = way + 1;
+    }
+    
+    // L2 Cache lookup (8-way associative)
+    let l2_index: i32 = (address / get_cache_line_size()) % 64;
+    let l2_tag: i32 = address / (get_cache_line_size() * 64);
+    
+    way = 0;
+    while (way < 8) {
+        let cache_entry_base: i32 = (l2_index * 8 + way) * 4;
+        let stored_tag: i32 = l2_cache[cache_entry_base];
+        let valid_bit: i32 = l2_cache[cache_entry_base + 1];
+        
+        if valid_bit == 1 && stored_tag == l2_tag {
+            // L2 cache hit
+            l2_cache[cache_entry_base + 2] = get_current_timestamp(); // Update LRU
+            return 2; // L2 hit
+        }
+        way = way + 1;
+    }
+    
+    return 0; // Cache miss
+}
+
+// Simulate cache line fill with LRU replacement
+fn simulate_cache_fill(address: i32, l1_cache: [i32; 256], l2_cache: [i32; 4096]) -> i32 {
+    // Fill L1 cache
+    let l1_index: i32 = (address / get_cache_line_size()) % 16;
+    let l1_tag: i32 = address / (get_cache_line_size() * 16);
+    
+    // Find LRU way in L1
+    let lru_way: i32 = find_lru_way_l1(l1_cache, l1_index);
+    let cache_entry_base: i32 = (l1_index * get_associativity() + lru_way) * 4;
+    
+    l1_cache[cache_entry_base] = l1_tag;
+    l1_cache[cache_entry_base + 1] = 1; // Set valid
+    l1_cache[cache_entry_base + 2] = get_current_timestamp(); // Set LRU timestamp
+    l1_cache[cache_entry_base + 3] = simulate_memory_read(address); // Load data
+    
+    // Fill L2 cache
+    let l2_index: i32 = (address / get_cache_line_size()) % 64;
+    let l2_tag: i32 = address / (get_cache_line_size() * 64);
+    
+    let l2_lru_way: i32 = find_lru_way_l2(l2_cache, l2_index);
+    let l2_entry_base: i32 = (l2_index * 8 + l2_lru_way) * 4;
+    
+    l2_cache[l2_entry_base] = l2_tag;
+    l2_cache[l2_entry_base + 1] = 1; // Set valid
+    l2_cache[l2_entry_base + 2] = get_current_timestamp(); // Set LRU timestamp
+    l2_cache[l2_entry_base + 3] = simulate_memory_read(address); // Load data
+    
+    return 1;
+}
+
+// Find LRU way in L1 cache set
+fn find_lru_way_l1(l1_cache: [i32; 256], set_index: i32) -> i32 {
+    let oldest_timestamp: i32 = 2147483647; // Max int
+    let lru_way: i32 = 0;
+    
+    let way: i32 = 0;
+    while (way < get_associativity()) {
+        let cache_entry_base: i32 = (set_index * get_associativity() + way) * 4;
+        let timestamp: i32 = l1_cache[cache_entry_base + 2];
+        let valid: i32 = l1_cache[cache_entry_base + 1];
+        
+        if valid == 0 {
+            return way; // Found invalid entry
+        }
+        
+        if timestamp < oldest_timestamp {
+            oldest_timestamp = timestamp;
+            lru_way = way;
+        }
+        way = way + 1;
+    }
+    
+    return lru_way;
+}
+
+// Find LRU way in L2 cache set
+fn find_lru_way_l2(l2_cache: [i32; 4096], set_index: i32) -> i32 {
+    let oldest_timestamp: i32 = 2147483647; // Max int
+    let lru_way: i32 = 0;
+    
+    let way: i32 = 0;
+    while (way < 8) {
+        let cache_entry_base: i32 = (set_index * 8 + way) * 4;
+        let timestamp: i32 = l2_cache[cache_entry_base + 2];
+        let valid: i32 = l2_cache[cache_entry_base + 1];
+        
+        if valid == 0 {
+            return way; // Found invalid entry
+        }
+        
+        if timestamp < oldest_timestamp {
+            oldest_timestamp = timestamp;
+            lru_way = way;
+        }
+        way = way + 1;
+    }
+    
+    return lru_way;
+}
+
+// Update LRU counters for L1 cache
+fn update_lru_counters_l1(l1_cache: [i32; 256], current_counter: i32) -> i32 {
+    return current_counter + 1;
+}
+
+// Update LRU counters for L2 cache  
+fn update_lru_counters_l2(l2_cache: [i32; 4096], current_counter: i32) -> i32 {
+    return current_counter + 1;
+}
+
+// Get current timestamp for LRU tracking
+fn get_current_timestamp() -> i32 {
+    // Simplified timestamp - in real system this would be cycle counter
+    return hash_function(42) % 1000000;
+}
+
+// Simulate memory read operation
+fn simulate_memory_read(address: i32) -> i32 {
+    // Simulate memory latency and return data
+    let data: i32 = address % 65536;
+    return hash_function(data);
+}
+
+// Advanced memory management simulation
+fn run_memory_manager() -> i32 {
+    let total_allocations: i32 = 5000;
+    let allocation_sizes: [i32; 16] = [8, 16, 32, 64, 128, 256, 512, 1024, 
+                                      2048, 4096, 8192, 16384, 32768, 65536, 131072, 262144];
+    
+    // Simulate heap with free block management
+    let heap: [i32; 16384] = [0; 16384]; // Simplified heap representation
+    let free_blocks: [i32; 1024] = [0; 1024]; // Free block list
+    let allocated_blocks: [i32; 1024] = [0; 1024]; // Allocated block list
+    let free_count: i32 = 0;
+    let allocated_count: i32 = 0;
+    
+    // Initialize free block list with entire heap
+    free_blocks[0] = 0; // Start address
+    free_blocks[1] = 16384 * 4; // Size in bytes
+    free_count = 1;
+    
+    let allocation_index: i32 = 0;
+    let successful_allocations: i32 = 0;
+    let failed_allocations: i32 = 0;
+    let garbage_collections: i32 = 0;
+    
+    while (allocation_index < total_allocations) {
+        let size_index: i32 = allocation_index % 16;
+        let allocation_size: i32 = allocation_sizes[size_index];
+        
+        // Try to allocate memory
+        let allocated_address: i32 = allocate_memory(heap, free_blocks, allocated_blocks, 
+                                                   free_count, allocated_count, allocation_size);
+        
+        if allocated_address >= 0 {
+            successful_allocations = successful_allocations + 1;
+            allocated_count = allocated_count + 1;
+            
+            // Simulate memory usage
+            let usage_pattern: i32 = simulate_memory_usage(allocated_address, allocation_size);
+        } else {
+            // Try garbage collection
+            let gc_result: i32 = run_garbage_collection(heap, free_blocks, allocated_blocks, 
+                                                      free_count, allocated_count);
+            garbage_collections = garbage_collections + 1;
+            
+            if gc_result > 0 {
+                // Retry allocation after GC
+                allocated_address = allocate_memory(heap, free_blocks, allocated_blocks, 
+                                                  free_count, allocated_count, allocation_size);
+                if allocated_address >= 0 {
+                    successful_allocations = successful_allocations + 1;
+                    allocated_count = allocated_count + 1;
+                } else {
+                    failed_allocations = failed_allocations + 1;
+                }
+            } else {
+                failed_allocations = failed_allocations + 1;
+            }
+        }
+        
+        // Randomly free some allocated blocks
+        if allocation_index % 10 == 7 && allocated_count > 0 {
+            let free_result: i32 = free_random_block(heap, free_blocks, allocated_blocks, 
+                                                   free_count, allocated_count);
+            if free_result > 0 {
+                allocated_count = allocated_count - 1;
+                free_count = free_count + 1;
+            }
+        }
+        
+        allocation_index = allocation_index + 1;
+    }
+    
+    // Calculate memory management efficiency
+    let efficiency: i32 = (successful_allocations * 1000) / (successful_allocations + failed_allocations);
+    return efficiency + garbage_collections; // Include GC overhead
+}
+
+// Allocate memory using first-fit algorithm
+fn allocate_memory(heap: [i32; 16384], free_blocks: [i32; 1024], allocated_blocks: [i32; 1024], 
+                  free_count: i32, allocated_count: i32, size: i32) -> i32 {
+    let block_index: i32 = 0;
+    
+    while (block_index < free_count) {
+        let block_start: i32 = free_blocks[block_index * 2];
+        let block_size: i32 = free_blocks[block_index * 2 + 1];
+        
+        if block_size >= size {
+            // Allocate from this block
+            allocated_blocks[allocated_count * 2] = block_start;
+            allocated_blocks[allocated_count * 2 + 1] = size;
+            
+            // Update free block
+            if block_size == size {
+                // Remove entire block
+                let move_index: i32 = block_index;
+                while (move_index < free_count - 1) {
+                    free_blocks[move_index * 2] = free_blocks[(move_index + 1) * 2];
+                    free_blocks[move_index * 2 + 1] = free_blocks[(move_index + 1) * 2 + 1];
+                    move_index = move_index + 1;
+                }
+            } else {
+                // Split block
+                free_blocks[block_index * 2] = block_start + size;
+                free_blocks[block_index * 2 + 1] = block_size - size;
+            }
+            
+            return block_start;
+        }
+        
+        block_index = block_index + 1;
+    }
+    
+    return -1; // Allocation failed
+}
+
+// Simulate memory usage patterns
+fn simulate_memory_usage(address: i32, size: i32) -> i32 {
+    let usage_type: i32 = (address + size) % 5;
+    let operations: i32 = 0;
+    
+    if usage_type == 0 {
+        // Sequential write pattern
+        let offset: i32 = 0;
+        while (offset < size) {
+            operations = operations + 1;
+            offset = offset + 4;
+        }
+    } else if usage_type == 1 {
+        // Random access pattern
+        let accesses: i32 = size / 8;
+        let access_count: i32 = 0;
+        while (access_count < accesses) {
+            let random_offset: i32 = hash_function(access_count + address) % size;
+            operations = operations + 1;
+            access_count = access_count + 1;
+        }
+    } else if usage_type == 2 {
+        // Stride pattern
+        let stride: i32 = 16;
+        let offset: i32 = 0;
+        while (offset < size) {
+            operations = operations + 1;
+            offset = offset + stride;
+        }
+    } else if usage_type == 3 {
+        // Hot/cold pattern
+        let hot_region: i32 = size / 4;
+        let access_count: i32 = 0;
+        while (access_count < hot_region) {
+            operations = operations + 1;
+            access_count = access_count + 1;
+        }
+    } else {
+        // Mixed pattern
+        operations = simulate_complex_memory_pattern(address, size);
+    }
+    
+    return operations;
+}
+
+// Complex memory access pattern simulation
+fn simulate_complex_memory_pattern(base_address: i32, size: i32) -> i32 {
+    let operations: i32 = 0;
+    let pattern_phases: i32 = 4;
+    let phase: i32 = 0;
+    
+    while (phase < pattern_phases) {
+        let phase_size: i32 = size / pattern_phases;
+        let phase_start: i32 = base_address + (phase * phase_size);
+        
+        if phase % 2 == 0 {
+            // Forward traversal
+            let offset: i32 = 0;
+            while (offset < phase_size) {
+                operations = operations + 1;
+                // Simulate cache-friendly access
+                if offset % 64 == 0 {
+                    operations = operations + compute_checksum(phase_start + offset);
+                }
+                offset = offset + 4;
+            }
+        } else {
+            // Backward traversal
+            let offset: i32 = phase_size - 4;
+            while (offset >= 0) {
+                operations = operations + 1;
+                // Simulate cache-unfriendly access
+                if offset % 128 == 0 {
+                    operations = operations + compute_complex_function(phase_start + offset);
+                }
+                offset = offset - 4;
+            }
+        }
+        
+        phase = phase + 1;
+    }
+    
+    return operations;
+}
+
+// Compute checksum for memory validation
+fn compute_checksum(address: i32) -> i32 {
+    let checksum: i32 = address;
+    checksum = checksum ^ (checksum << 13);
+    checksum = checksum ^ (checksum >> 17);
+    checksum = checksum ^ (checksum << 5);
+    return checksum % 1000;
+}
+
+// Complex mathematical function for testing
+fn compute_complex_function(input: i32) -> i32 {
+    let result: i32 = input;
+    let iteration: i32 = 0;
+    
+    while (iteration < 10) {
+        result = (result * 17 + 31) % 65537;
+        result = result ^ (result >> 8);
+        iteration = iteration + 1;
+    }
+    
+    return result % 100;
+}
+
+// Garbage collection simulation
+fn run_garbage_collection(heap: [i32; 16384], free_blocks: [i32; 1024], allocated_blocks: [i32; 1024], 
+                         free_count: i32, allocated_count: i32) -> i32 {
+    let reclaimed_memory: i32 = 0;
+    let blocks_freed: i32 = 0;
+    
+    // Mark and sweep algorithm simulation
+    let reachable_blocks: [bool; 512] = [false; 512];
+    let reachable_count: i32 = mark_reachable_blocks(allocated_blocks, allocated_count, reachable_blocks);
+    
+    // Sweep unreachable blocks
+    let block_index: i32 = 0;
+    while (block_index < allocated_count) {
+        if !reachable_blocks[block_index] {
+            let block_start: i32 = allocated_blocks[block_index * 2];
+            let block_size: i32 = allocated_blocks[block_index * 2 + 1];
+            
+            // Add to free list
+            free_blocks[free_count * 2] = block_start;
+            free_blocks[free_count * 2 + 1] = block_size;
+            
+            reclaimed_memory = reclaimed_memory + block_size;
+            blocks_freed = blocks_freed + 1;
+        }
+        block_index = block_index + 1;
+    }
+    
+    // Coalesce adjacent free blocks
+    let coalesced_blocks: i32 = coalesce_free_blocks(free_blocks, free_count + blocks_freed);
+    
+    return reclaimed_memory + coalesced_blocks;
+}
+
+// Mark reachable blocks (simplified reachability analysis)
+fn mark_reachable_blocks(allocated_blocks: [i32; 1024], allocated_count: i32, reachable: [bool; 512]) -> i32 {
+    let reachable_count: i32 = 0;
+    let block_index: i32 = 0;
+    
+    while (block_index < allocated_count) {
+        let block_start: i32 = allocated_blocks[block_index * 2];
+        let block_size: i32 = allocated_blocks[block_index * 2 + 1];
+        
+        // Simplified reachability test based on block characteristics
+        let reachability_score: i32 = compute_reachability_score(block_start, block_size, block_index);
+        
+        if reachability_score > 50 {
+            reachable[block_index] = true;
+            reachable_count = reachable_count + 1;
+        }
+        
+        block_index = block_index + 1;
+    }
+    
+    return reachable_count;
+}
+
+// Compute reachability score for garbage collection
+fn compute_reachability_score(address: i32, size: i32, age: i32) -> i32 {
+    let score: i32 = 0;
+    
+    // Age factor (newer blocks more likely to be reachable)
+    score = score + (100 - age);
+    
+    // Size factor (medium-sized blocks more likely to be reachable)
+    if size >= 64 && size <= 4096 {
+        score = score + 30;
+    }
+    
+    // Address pattern factor
+    if address % 4096 == 0 {
+        score = score + 20; // Aligned blocks
+    }
+    
+    // Hash-based pseudo-randomness for realistic behavior
+    let hash_score: i32 = hash_function(address + size) % 40;
+    score = score + hash_score;
+    
+    return score;
+}
+
+// Coalesce adjacent free blocks
+fn coalesce_free_blocks(free_blocks: [i32; 1024], block_count: i32) -> i32 {
+    let coalesced_count: i32 = 0;
+    
+    // Sort free blocks by address (simplified bubble sort)
+    let i: i32 = 0;
+    while (i < block_count - 1) {
+        let j: i32 = 0;
+        while (j < block_count - 1 - i) {
+            let addr1: i32 = free_blocks[j * 2];
+            let addr2: i32 = free_blocks[(j + 1) * 2];
+            
+            if addr1 > addr2 {
+                // Swap blocks
+                let temp_addr: i32 = free_blocks[j * 2];
+                let temp_size: i32 = free_blocks[j * 2 + 1];
+                
+                free_blocks[j * 2] = free_blocks[(j + 1) * 2];
+                free_blocks[j * 2 + 1] = free_blocks[(j + 1) * 2 + 1];
+                
+                free_blocks[(j + 1) * 2] = temp_addr;
+                free_blocks[(j + 1) * 2 + 1] = temp_size;
+            }
+            j = j + 1;
+        }
+        i = i + 1;
+    }
+    
+    // Coalesce adjacent blocks
+    i = 0;
+    while i < block_count - 1 {
+        let curr_addr: i32 = free_blocks[i * 2];
+        let curr_size: i32 = free_blocks[i * 2 + 1];
+        let next_addr: i32 = free_blocks[(i + 1) * 2];
+        
+        if curr_addr + curr_size == next_addr {
+            // Coalesce blocks
+            free_blocks[i * 2 + 1] = curr_size + free_blocks[(i + 1) * 2 + 1];
+            
+            // Remove next block
+            let move_index: i32 = i + 1;
+            while move_index < block_count - 1 {
+                free_blocks[move_index * 2] = free_blocks[(move_index + 1) * 2];
+                free_blocks[move_index * 2 + 1] = free_blocks[(move_index + 1) * 2 + 1];
+                move_index = move_index + 1;
+            }
+            
+            coalesced_count = coalesced_count + 1;
+        } else {
+            i = i + 1;
+        }
+    }
+    
+    return coalesced_count;
+}
+
+// Free a random allocated block
+fn free_random_block(heap: [i32; 16384], free_blocks: [i32; 1024], allocated_blocks: [i32; 1024], 
+                    free_count: i32, allocated_count: i32) -> i32 {
+    if allocated_count == 0 {
+        return 0;
+    }
+    
+    let random_index: i32 = hash_function(allocated_count) % allocated_count;
+    let block_start: i32 = allocated_blocks[random_index * 2];
+    let block_size: i32 = allocated_blocks[random_index * 2 + 1];
+    
+    // Add to free list
+    free_blocks[free_count * 2] = block_start;
+    free_blocks[free_count * 2 + 1] = block_size;
+    
+    // Remove from allocated list
+    let move_index: i32 = random_index;
+    while move_index < allocated_count - 1 {
+        allocated_blocks[move_index * 2] = allocated_blocks[(move_index + 1) * 2];
+        allocated_blocks[move_index * 2 + 1] = allocated_blocks[(move_index + 1) * 2 + 1];
+        move_index = move_index + 1;
+    }
+    
+    return 1;
+}
+
+// Advanced hash table implementation with open addressing
+fn run_hash_table_tests() -> i32 {
+    let table_size: i32 = get_hash_table_size();
+    let hash_table: [i32; 2048] = [0; 2048]; // key, value pairs
+    let occupied: [bool; 1024] = [false; 1024];
+    let deleted: [bool; 1024] = [false; 1024];
+    
+    let total_operations: i32 = 8000;
+    let successful_inserts: i32 = 0;
+    let successful_lookups: i32 = 0;
+    let successful_deletes: i32 = 0;
+    let collisions: i32 = 0;
+    
+    let operation_index: i32 = 0;
+    while operation_index < total_operations {
+        let operation_type: i32 = operation_index % 4;
+        let key: i32 = generate_hash_key(operation_index);
+        let value: i32 = generate_hash_value(operation_index);
+        
+        if operation_type == 0 || operation_type == 1 {
+            // Insert operation (50% of operations)
+            let insert_result: i32 = hash_table_insert(hash_table, occupied, deleted, 
+                                                     table_size, key, value);
+            if insert_result >= 0 {
+                successful_inserts = successful_inserts + 1;
+                if insert_result > 0 {
+                    collisions = collisions + insert_result; // Number of probes
+                }
+            }
+        } else if operation_type == 2 {
+            // Lookup operation (25% of operations)
+            let lookup_result: i32 = hash_table_lookup(hash_table, occupied, deleted, 
+                                                     table_size, key);
+            if lookup_result >= 0 {
+                successful_lookups = successful_lookups + 1;
+            }
+        } else {
+            // Delete operation (25% of operations)
+            let delete_result: i32 = hash_table_delete(hash_table, occupied, deleted, 
+                                                     table_size, key);
+            if delete_result > 0 {
+                successful_deletes = successful_deletes + 1;
+            }
+        }
+        
+        operation_index = operation_index + 1;
+    }
+    
+    // Calculate hash table performance metric
+    let performance: i32 = successful_inserts + successful_lookups + successful_deletes;
+    return performance - (collisions / 10); // Subtract collision penalty
+}
+
+// Generate hash table keys with various patterns
+fn generate_hash_key(index: i32) -> i32 {
+    let pattern: i32 = index % 6;
+    
+    if pattern == 0 {
+        return index; // Sequential keys
+    } else if pattern == 1 {
+        return index * 17 + 31; // Linear transformation
+    } else if pattern == 2 {
+        return hash_function(index); // Pseudo-random keys
+    } else if pattern == 3 {
+        return (index * index) % 65536; // Quadratic keys
+    } else if pattern == 4 {
+        return fibonacci_number(index % 20); // Fibonacci sequence
+    } else {
+        return generate_clustered_key(index); // Clustered keys
+    }
+}
+
+// Generate hash table values
+fn generate_hash_value(index: i32) -> i32 {
+    return (index * 13 + 7) % 1000000;
+}
+
+// Generate clustered keys for testing hash distribution
+fn generate_clustered_key(index: i32) -> i32 {
+    let cluster_size: i32 = 100;
+    let cluster_id: i32 = index / cluster_size;
+    let within_cluster: i32 = index % cluster_size;
+    
+    return cluster_id * 10000 + within_cluster;
+}
+
+// Compute Fibonacci number for key generation
+fn fibonacci_number(n: i32) -> i32 {
+    if n <= 1 {
+        return n;
+    }
+    
+    let prev: i32 = 0;
+    let curr: i32 = 1;
+    let i: i32 = 2;
+    
+    while i <= n {
+        let next: i32 = prev + curr;
+        prev = curr;
+        curr = next;
+        i = i + 1;
+    }
+    
+    return curr;
+}
+
+// Hash table insert with quadratic probing
+fn hash_table_insert(table: [i32; 2048], occupied: [bool; 1024], deleted: [bool; 1024], 
+                    size: i32, key: i32, value: i32) -> i32 {
+    let hash: i32 = hash_function(key) % size;
+    let probe_count: i32 = 0;
+    let original_hash: i32 = hash;
+    
+    while probe_count < get_max_probe_distance() {
+        let index: i32 = (original_hash + probe_count * probe_count) % size;
+        
+        if !occupied[index] || deleted[index] {
+            // Found empty or deleted slot
+            table[index * 2] = key;
+            table[index * 2 + 1] = value;
+            occupied[index] = true;
+            deleted[index] = false;
+            return probe_count; // Return number of probes
+        }
+        
+        if table[index * 2] == key {
+            // Key already exists, update value
+            table[index * 2 + 1] = value;
+            return 0; // No probing needed
+        }
+        
+        probe_count = probe_count + 1;
+    }
+    
+    return -1; // Insert failed
+}
+
+// Hash table lookup
+fn hash_table_lookup(table: [i32; 2048], occupied: [bool; 1024], deleted: [bool; 1024], 
+                    size: i32, key: i32) -> i32 {
+    let hash: i32 = hash_function(key) % size;
+    let probe_count: i32 = 0;
+    let original_hash: i32 = hash;
+    
+    while probe_count < get_max_probe_distance() {
+        let index: i32 = (original_hash + probe_count * probe_count) % size;
+        
+        if !occupied[index] && !deleted[index] {
+            return -1; // Key not found
+        }
+        
+        if occupied[index] && !deleted[index] && table[index * 2] == key {
+            return table[index * 2 + 1]; // Found key, return value
+        }
+        
+        probe_count = probe_count + 1;
+    }
+    
+    return -1; // Key not found after max probes
+}
+
+// Hash table delete
+fn hash_table_delete(table: [i32; 2048], occupied: [bool; 1024], deleted: [bool; 1024], 
+                    size: i32, key: i32) -> i32 {
+    let hash: i32 = hash_function(key) % size;
+    let probe_count: i32 = 0;
+    let original_hash: i32 = hash;
+    
+    while probe_count < get_max_probe_distance() {
+        let index: i32 = (original_hash + probe_count * probe_count) % size;
+        
+        if !occupied[index] && !deleted[index] {
+            return 0; // Key not found
+        }
+        
+        if occupied[index] && !deleted[index] && table[index * 2] == key {
+            deleted[index] = true; // Mark as deleted
+            return 1; // Successfully deleted
+        }
+        
+        probe_count = probe_count + 1;
+    }
+    
+    return 0; // Key not found after max probes
+}
+
+// Priority queue implementation for cache replacement
+fn run_priority_queue_tests() -> i32 {
+    let max_size: i32 = 256;
+    let heap: [i32; 512] = [0; 512]; // priority, data pairs
+    let heap_size: i32 = 0;
+    
+    let total_operations: i32 = 6000;
+    let successful_operations: i32 = 0;
+    let heap_violations: i32 = 0;
+    
+    let operation_index: i32 = 0;
+    while operation_index < total_operations {
+        let operation_type: i32 = operation_index % 5;
+        
+        if operation_type == 0 || operation_type == 1 || operation_type == 2 {
+            // Insert operation (60% of operations)
+            if heap_size < max_size {
+                let priority: i32 = generate_priority(operation_index);
+                let data: i32 = operation_index;
+                
+                let insert_result: i32 = priority_queue_insert(heap, heap_size, priority, data);
+                if insert_result > 0 {
+                    heap_size = heap_size + 1;
+                    successful_operations = successful_operations + 1;
+                    
+                    // Validate heap property
+                    let validation_result: i32 = validate_heap_property(heap, heap_size);
+                    if validation_result == 0 {
+                        heap_violations = heap_violations + 1;
+                    }
+                }
+            }
+        } else if operation_type == 3 {
+            // Extract max operation (20% of operations)
+            if heap_size > 0 {
+                let max_priority: i32 = priority_queue_extract_max(heap, heap_size);
+                if max_priority >= 0 {
+                    heap_size = heap_size - 1;
+                    successful_operations = successful_operations + 1;
+                    
+                    // Validate heap property after extraction
+                    let validation_result: i32 = validate_heap_property(heap, heap_size);
+                    if validation_result == 0 {
+                        heap_violations = heap_violations + 1;
+                    }
+                }
+            }
+        } else {
+            // Peek operation (20% of operations)
+            if heap_size > 0 {
+                let max_priority: i32 = priority_queue_peek(heap);
+                if max_priority >= 0 {
+                    successful_operations = successful_operations + 1;
+                }
+            }
+        }
+        
+        operation_index = operation_index + 1;
+    }
+    
+    return successful_operations - heap_violations; // Subtract violation penalty
+}
+
+// Generate priority values for testing
+fn generate_priority(index: i32) -> i32 {
+    let pattern: i32 = index % 4;
+    
+    if pattern == 0 {
+        return index % 1000; // Sequential priorities
+    } else if pattern == 1 {
+        return hash_function(index) % 10000; // Random priorities
+    } else if pattern == 2 {
+        return (index * index) % 5000; // Quadratic priorities
+    } else {
+        return fibonacci_number(index % 15) * 10; // Fibonacci-based priorities
+    }
+}
+
+// Insert element into max heap
+fn priority_queue_insert(heap: [i32; 512], size: i32, priority: i32, data: i32) -> i32 {
+    let index: i32 = size;
+    
+    // Insert at the end
+    heap[index * 2] = priority;
+    heap[index * 2 + 1] = data;
+    
+    // Bubble up to maintain heap property
+    while index > 0 {
+        let parent_index: i32 = (index - 1) / 2;
+        let parent_priority: i32 = heap[parent_index * 2];
+        
+        if heap[index * 2] <= parent_priority {
+            break; // Heap property satisfied
+        }
+        
+        // Swap with parent
+        let temp_priority: i32 = heap[index * 2];
+        let temp_data: i32 = heap[index * 2 + 1];
+        
+        heap[index * 2] = heap[parent_index * 2];
+        heap[index * 2 + 1] = heap[parent_index * 2 + 1];
+        
+        heap[parent_index * 2] = temp_priority;
+        heap[parent_index * 2 + 1] = temp_data;
+        
+        index = parent_index;
+    }
+    
+    return 1; // Success
+}
+
+// Extract maximum element from heap
+fn priority_queue_extract_max(heap: [i32; 512], size: i32) -> i32 {
+    if size == 0 {
+        return -1; // Empty heap
+    }
+    
+    let max_priority: i32 = heap[0];
+    
+    // Move last element to root
+    heap[0] = heap[(size - 1) * 2];
+    heap[1] = heap[(size - 1) * 2 + 1];
+    
+    // Bubble down to maintain heap property
+    let index: i32 = 0;
+    let new_size: i32 = size - 1;
+    
+    while true {
+        let left_child: i32 = 2 * index + 1;
+        let right_child: i32 = 2 * index + 2;
+        let largest: i32 = index;
+        
+        // Find largest among node and its children
+        if left_child < new_size && heap[left_child * 2] > heap[largest * 2] {
+            largest = left_child;
+        }
+        
+        if right_child < new_size && heap[right_child * 2] > heap[largest * 2] {
+            largest = right_child;
+        }
+        
+        if largest == index {
+            break; // Heap property satisfied
+        }
+        
+        // Swap with largest child
+        let temp_priority: i32 = heap[index * 2];
+        let temp_data: i32 = heap[index * 2 + 1];
+        
+        heap[index * 2] = heap[largest * 2];
+        heap[index * 2 + 1] = heap[largest * 2 + 1];
+        
+        heap[largest * 2] = temp_priority;
+        heap[largest * 2 + 1] = temp_data;
+        
+        index = largest;
+    }
+    
+    return max_priority;
+}
+
+// Peek at maximum element without removing it
+fn priority_queue_peek(heap: [i32; 512]) -> i32 {
+    return heap[0]; // Return priority of root element
+}
+
+// Validate heap property
+fn validate_heap_property(heap: [i32; 512], size: i32) -> i32 {
+    let index: i32 = 0;
+    
+    while index < size {
+        let left_child: i32 = 2 * index + 1;
+        let right_child: i32 = 2 * index + 2;
+        
+        if left_child < size && heap[index * 2] < heap[left_child * 2] {
+            return 0; // Heap property violated
+        }
+        
+        if right_child < size && heap[index * 2] < heap[right_child * 2] {
+            return 0; // Heap property violated
+        }
+        
+        index = index + 1;
+    }
+    
+    return 1; // Heap property satisfied
+}
+
+// Integrated system test combining all components
+fn run_integrated_system_test() -> i32 {
+    let system_cycles: i32 = 1000;
+    let total_score: i32 = 0;
+    
+    let cycle: i32 = 0;
+    while cycle < system_cycles {
+        // Simulate system workload
+        let memory_pressure: i32 = simulate_memory_pressure(cycle);
+        let cache_efficiency: i32 = simulate_cache_workload(cycle);
+        let hash_performance: i32 = simulate_hash_workload(cycle);
+        let queue_throughput: i32 = simulate_queue_workload(cycle);
+        
+        // Calculate system performance for this cycle
+        let cycle_score: i32 = compute_integrated_score(memory_pressure, cache_efficiency, 
+                                                       hash_performance, queue_throughput);
+        total_score = total_score + cycle_score;
+        
+        // Simulate system adaptation
+        if cycle % 100 == 99 {
+            let adaptation_bonus: i32 = simulate_system_adaptation(cycle);
+            total_score = total_score + adaptation_bonus;
+        }
+        
+        cycle = cycle + 1;
+    }
+    
+    return total_score / system_cycles; // Average performance
+}
+
+// Simulate memory pressure for integrated testing
+fn simulate_memory_pressure(cycle: i32) -> i32 {
+    let pressure_type: i32 = cycle % 3;
+    let base_pressure: i32 = 50;
+    
+    if pressure_type == 0 {
+        // Low pressure - mostly cache hits
+        return base_pressure + (cycle % 20);
+    } else if pressure_type == 1 {
+        // Medium pressure - mixed workload
+        return base_pressure + 30 + ((cycle * 17) % 40);
+    } else {
+        // High pressure - cache thrashing
+        return base_pressure + 60 + (hash_function(cycle) % 30);
+    }
+}
+
+// Simulate cache workload patterns
+fn simulate_cache_workload(cycle: i32) -> i32 {
+    let workload_type: i32 = (cycle / 10) % 4;
+    let base_efficiency: i32 = 70;
+    
+    if workload_type == 0 {
+        // Sequential access pattern
+        return base_efficiency + 20;
+    } else if workload_type == 1 {
+        // Strided access pattern
+        return base_efficiency + 10;
+    } else if workload_type == 2 {
+        // Random access pattern
+        return base_efficiency - 10;
+    } else {
+        // Mixed access pattern
+        return base_efficiency + ((cycle * 23) % 30) - 15;
+    }
+}
+
+// Simulate hash table workload
+fn simulate_hash_workload(cycle: i32) -> i32 {
+    let collision_rate: i32 = (cycle % 50) + 10;
+    let base_performance: i32 = 80;
+    
+    // Higher collision rate reduces performance
+    return base_performance - (collision_rate / 5);
+}
+
+// Simulate priority queue workload
+fn simulate_queue_workload(cycle: i32) -> i32 {
+    let queue_size: i32 = (cycle % 200) + 50;
+    let operation_mix: i32 = cycle % 5;
+    
+    let base_throughput: i32 = 85;
+    
+    if operation_mix == 0 {
+        // Insert-heavy workload
+        return base_throughput - (queue_size / 20);
+    } else if operation_mix == 1 {
+        // Extract-heavy workload
+        return base_throughput - (queue_size / 15);
+    } else {
+        // Balanced workload
+        return base_throughput - (queue_size / 25);
+    }
+}
+
+// Compute integrated performance score
+fn compute_integrated_score(memory: i32, cache: i32, hash: i32, queue: i32) -> i32 {
+    let weighted_score: i32 = (memory * 3 + cache * 4 + hash * 2 + queue * 1) / 10;
+    
+    // Apply non-linear scaling for realistic system behavior
+    if weighted_score > 90 {
+        return weighted_score + 10; // Bonus for high performance
+    } else if weighted_score < 40 {
+        return weighted_score - 10; // Penalty for low performance
+    } else {
+        return weighted_score;
+    }
+}
+
+// Simulate system adaptation mechanisms
+fn simulate_system_adaptation(cycle: i32) -> i32 {
+    let adaptation_factor: i32 = 0;
+    
+    // Cache prefetching adaptation
+    if cycle % 300 == 299 {
+        adaptation_factor = adaptation_factor + 5;
+    }
+    
+    // Memory management adaptation
+    if cycle % 500 == 499 {
+        adaptation_factor = adaptation_factor + 8;
+    }
+    
+    // Hash table resizing simulation
+    if cycle % 700 == 699 {
+        adaptation_factor = adaptation_factor + 3;
+    }
+    
+    return adaptation_factor;
+}

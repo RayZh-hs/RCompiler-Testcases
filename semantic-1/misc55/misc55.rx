@@ -1,0 +1,69 @@
+/*
+Test Package: Semantic-1
+Test Target: misc
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: Stern-Brocot tree generation with recursive sequence analysis
+*/
+
+// Stern-Brocot tree: binary tree containing all positive rational numbers
+// Each node represents a fraction, generated recursively using mediants
+fn gcd_recursive(a: i32, b: i32) -> i32 {
+    if (b == 0) {
+        return a;
+    } else {
+        return gcd_recursive(b, a % b);
+    }
+}
+
+// Generate nth level of Stern-Brocot sequence (Stern's diatomic sequence)
+fn stern_diatomic_recursive(n: i32) -> i32 {
+    if (n == 0) {
+        return 0;
+    } else if (n == 1) {
+        return 1;
+    } else if (n % 2 == 0) {
+        return stern_diatomic_recursive(n / 2);
+    } else {
+        let half: i32 = n / 2;
+        return stern_diatomic_recursive(half) + stern_diatomic_recursive(half + 1);
+    }
+}
+
+// Calculate properties of Stern-Brocot sequence
+fn analyze_stern_sequence() -> i32 {
+    let mut analysis_result: i32 = 0;
+    let mut n: i32 = 1;
+    
+    while (n <= 15) {
+        let stern_val: i32 = stern_diatomic_recursive(n);
+        analysis_result += stern_val;
+        
+        // Find GCD patterns in the sequence
+        if (n > 1) {
+            let prev_stern: i32 = stern_diatomic_recursive(n - 1);
+            let common_divisor: i32 = gcd_recursive(stern_val, prev_stern);
+            analysis_result += common_divisor;
+        }
+        
+        // Nested loop for additional mathematical properties
+        let mut factor: i32 = 1;
+        while (factor <= stern_val && factor <= 5) {
+            if (stern_val % factor == 0) {
+                analysis_result += factor;
+            }
+            factor += 1;
+        }
+        
+        n += 1;
+    }
+    
+    return analysis_result;
+}
+
+fn main() {
+    let result: i32 = analyze_stern_sequence();
+    printInt(result);
+    exit(0);
+}

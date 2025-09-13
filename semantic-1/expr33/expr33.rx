@@ -1,0 +1,188 @@
+/*
+Test Package: Semantic-1
+Test Target: expr
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: Depth-first search algorithm with graph traversal, complex control flow, and nested data structures; printInt returns `()`
+*/
+
+struct GraphNode {
+    id: i32,
+    visited: bool,
+    neighbors: [i32; 5],
+    neighbor_count: i32,
+}
+
+impl GraphNode {
+    fn new(node_id: i32) -> GraphNode {
+        GraphNode {
+            id: node_id,
+            visited: false,
+            neighbors: [0; 5],
+            neighbor_count: 0,
+        }
+    }
+    
+    fn add_neighbor(&mut self, neighbor_id: i32) {
+        if (self.neighbor_count < 5) {
+            self.neighbors[self.neighbor_count as usize] = neighbor_id;
+            self.neighbor_count = self.neighbor_count + 1;
+        }
+    }
+    
+    fn has_neighbor(&self, target_id: i32) -> bool {
+        let mut i: i32 = 0;
+        loop {
+            if (i >= self.neighbor_count) {
+                break;
+            }
+            if (self.neighbors[i as usize] == target_id) {
+                return true;
+            }
+            i = i + 1;
+        }
+        return false;
+    }
+}
+
+fn depth_first_search(graph: &mut [GraphNode; 10], start_node: i32, target_node: i32) -> i32 {
+    let mut visited_count: i32 = 0;
+    let mut stack: [i32; 10] = [0; 10];
+    let mut stack_size: i32 = 0;
+    
+    stack[stack_size as usize] = start_node;
+    stack_size = stack_size + 1;
+    
+    loop {
+        if (stack_size == 0) {
+            break;
+        }
+        
+        stack_size = stack_size - 1;
+        let current_node: i32 = stack[stack_size as usize];
+        
+        if (graph[current_node as usize].visited) {
+            continue;
+        }
+        
+        visited_count = visited_count + 1;
+        
+        if (current_node == target_node) {
+            return visited_count;
+        }
+        
+        let mut neighbor_index: i32 = 0;
+        loop {
+            if (neighbor_index >= graph[current_node as usize].neighbor_count) {
+                break;
+            }
+            
+            let neighbor: i32 = graph[current_node as usize].neighbors[neighbor_index as usize];
+            if (!graph[neighbor as usize].visited) {
+                stack[stack_size as usize] = neighbor;
+                stack_size = stack_size + 1;
+            }
+            
+            neighbor_index = neighbor_index + 1;
+        }
+    }
+    
+    return -1;
+}
+
+fn calculate_graph_metrics(nodes: [GraphNode; 10]) -> i32 {
+    let mut total_edges: i32 = 0;
+    let mut max_degree: i32 = 0;
+    let mut connected_components: i32 = 0;
+    
+    let mut node_index: i32 = 0;
+    loop {
+        if (node_index >= 10) {
+            break;
+        }
+        
+        let current_node: &GraphNode = &nodes[node_index as usize];
+        let degree: i32 = current_node.neighbor_count;
+        total_edges = total_edges + degree;
+        
+        if (degree > max_degree) {
+            max_degree = degree;
+        }
+        
+        if (degree > 0) {
+            connected_components = connected_components + 1;
+        }
+        
+        node_index = node_index + 1;
+    }
+    
+    let metric: i32 = {
+        let edge_factor: i32 = total_edges * 2;
+        let degree_factor: i32 = max_degree * max_degree;
+        let component_factor: i32 = connected_components * 3;
+        let combined: i32 = edge_factor + degree_factor + component_factor;
+        if (combined > 50) {
+            combined % 30
+        } else {
+            combined + 10
+        }
+    };
+    
+    return metric;
+}
+
+fn main() {
+    let mut graph_nodes: [GraphNode; 10] = [
+        GraphNode::new(0), GraphNode::new(1), GraphNode::new(2), GraphNode::new(3), GraphNode::new(4),
+        GraphNode::new(5), GraphNode::new(6), GraphNode::new(7), GraphNode::new(8), GraphNode::new(9),
+    ];
+    
+    graph_nodes[0].add_neighbor(1);
+    graph_nodes[0].add_neighbor(2);
+    graph_nodes[1].add_neighbor(3);
+    graph_nodes[1].add_neighbor(4);
+    graph_nodes[2].add_neighbor(5);
+    graph_nodes[3].add_neighbor(6);
+    graph_nodes[4].add_neighbor(7);
+    graph_nodes[5].add_neighbor(8);
+    graph_nodes[6].add_neighbor(9);
+    graph_nodes[7].add_neighbor(0);
+    
+    let dfs_result: i32 = depth_first_search(&mut graph_nodes, 0, 9);
+    let metrics_result: i32 = calculate_graph_metrics(graph_nodes);
+    
+    let final_calculation: i32 = {
+        let dfs_weighted: i32 = if (dfs_result > 0) { dfs_result * 5 } else { 10 };
+        let metrics_weighted: i32 = metrics_result * 2;
+        let sum: i32 = dfs_weighted + metrics_weighted;
+        let processed: i32 = {
+            let temp: i32 = sum % 100;
+            if (temp > 50) {
+                temp - 20
+            } else {
+                temp + 15
+            }
+        };
+        processed
+    };
+    
+    if (final_calculation > 0 && final_calculation < 1000) {
+        let output: i32 = {
+            let base: i32 = final_calculation;
+            let modified: i32 = if (base % 3 == 0) {
+                base / 3
+            } else if (base % 3 == 1) {
+                base * 2
+            } else {
+                base + 7
+            };
+            modified
+        };
+        printInt(output);
+    } else {
+        let default_value: i32 = 42;
+        printInt(default_value)
+    }
+    exit(0);
+}

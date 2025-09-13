@@ -1,0 +1,64 @@
+/*
+Test Package: Semantic-1
+Test Target: basic
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: basic test, quicksort function missing return statement
+*/
+
+const N: usize = 16;
+
+fn quicksort(data: &mut [i32; N], l: i32, r: i32) -> i32 {
+    let mut i: i32 = l;
+    let mut j: i32 = r;
+    let mid: usize = ((l + r) / 2) as usize;
+    let p: i32 = data[mid];
+    while (i <= j) {
+        while (data[i as usize] < p) {
+            i += 1;
+        }
+        while (data[j as usize] > p) {
+            j -= 1;
+        }
+        if (i <= j) {
+            let tmp: i32 = data[i as usize];
+            data[i as usize] = data[j as usize];
+            data[j as usize] = tmp;
+            i += 1;
+            j -= 1;
+        }
+    }
+    if (l < j) {
+        quicksort(data, l, j);
+    }
+    if (i < r) {
+        quicksort(data, i, r);
+    }
+}
+
+fn is_sorted(a: [i32; N]) -> bool {
+    let mut k: usize = 1;
+    while (k < N) {
+        if (a[k] < a[k - 1]) {
+            return false;
+        }
+        k += 1;
+    }
+    true
+}
+
+fn main() {
+    let mut nums: [i32; N] = [
+        23, 12, 45, 3, 9, 18, 5, 41,
+        7, 29, 11, 2, 30, 16, 4, 8,
+    ];
+    quicksort(&mut nums, 0, (N as i32) - 1);
+    let ok: bool = is_sorted(nums);
+    if (ok) {
+        let f: i32 = 1;
+    } else {
+        let f: i32 = 0;
+    }
+    exit(0);
+}

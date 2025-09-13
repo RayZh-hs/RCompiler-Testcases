@@ -1,0 +1,14 @@
+/*
+Test Package: Semantic-1
+Test Target: array
+Author: Wenxin Zheng
+Time: 2025-08-07
+Verdict: Fail
+Comment: array test, array element modification without mutability
+*/
+
+fn main() {
+    let arr: [i32; 3] = [1, 2, 3];
+    arr[1] = 4;     // arr 未声明为 mut
+    exit(0);
+}

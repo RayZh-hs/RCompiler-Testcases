@@ -1,0 +1,60 @@
+/*
+Test Package: Semantic-1
+Test Target: misc
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: Digital root recursive calculation with iterative pattern search
+*/
+
+// Digital root calculation: repeatedly sum digits until single digit
+// Used in recreational mathematics and numerology
+fn digital_root_recursive(n: i32) -> i32 {
+    if (n < 10) {
+        return n;
+    } else {
+        let mut sum: i32 = 0;
+        let mut temp: i32 = n;
+        
+        while (temp > 0) {
+            sum += temp % 10;
+            temp = temp / 10;
+        }
+        
+        return digital_root_recursive(sum);
+    }
+}
+
+// Find numbers with specific digital root properties
+fn find_special_digital_roots() -> i32 {
+    let mut count: i32 = 0;
+    let mut num: i32 = 10;
+    
+    while (num <= 100) {
+        let root: i32 = digital_root_recursive(num);
+        
+        // Count numbers where digital root equals specific patterns
+        if (root == 3 || root == 6 || root == 9) {
+            count += root;
+            
+            // Nested loop for additional complexity
+            let mut factor: i32 = 1;
+            while (factor <= root) {
+                if (num % factor == 0) {
+                    count += 1;
+                }
+                factor += 1;
+            }
+        }
+        
+        num += 7; // Skip by 7 for interesting pattern
+    }
+    
+    return count;
+}
+
+fn main() {
+    let result: i32 = find_special_digital_roots();
+    printInt(result);
+    exit(0);
+}

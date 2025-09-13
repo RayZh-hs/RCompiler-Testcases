@@ -1,0 +1,51 @@
+/*
+Test Package: Semantic-1
+Test Target: basic
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: basic test, undefined type Ordering in function return
+*/
+
+fn main() {
+    let mut cache: Memo = Memo::new();
+    let res: i32 = cache.compute(10);
+    let echo: i32 = res;
+    exit(0);
+}
+
+struct Memo {
+    data: [i32; 32],
+    filled: bool,
+}
+
+impl Memo {
+    fn new() -> Self {
+        Memo { data: [0; 32], filled: false }
+    }
+
+    fn compute(&mut self, n: i32) -> i32 {
+        if (self.filled && n < 32) {
+            return self.data[n as usize];
+        }
+        let mut i: i32 = 0;
+        let mut sum: i32 = 0;
+        while (i <= n) {
+            sum += i;
+            i += 1;
+        }
+        self.data[n as usize] = sum;
+        self.filled = true;
+        sum
+    }
+}
+
+impl Default for Memo {
+    fn default() -> Self {
+        Memo { data: [0; 32], filled: false }
+    }
+}
+
+fn cmp(a: i32, b: i32) -> Ordering { 
+    if (a < b) { Ordering::Less } else { Ordering::Greater }
+}

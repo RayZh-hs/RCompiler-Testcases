@@ -1,0 +1,44 @@
+/*
+Test Package: Semantic-1
+Test Target: misc
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: Collatz conjecture recursive implementation with iterative analysis
+*/
+
+// Collatz conjecture (3n+1 problem) recursive implementation
+// Famous unsolved problem in mathematics combining recursion and iterative tracking
+fn collatz_recursive(n: i32, depth: i32) -> i32 {
+    if (n == 1) {
+        return depth;
+    } else if (n % 2 == 0) {
+        return collatz_recursive(n / 2, depth + 1);
+    } else {
+        return collatz_recursive(3 * n + 1, depth + 1);
+    }
+}
+
+// Find maximum collatz sequence length in a range
+fn find_max_collatz_length(start: i32, end: i32) -> i32 {
+    let mut max_length: i32 = 0;
+    let mut current: i32 = start;
+    
+    while (current <= end) {
+        let length: i32 = collatz_recursive(current, 0);
+        if (length > max_length) {
+            max_length = length;
+        }
+        current += 1;
+    }
+    
+    return max_length;
+}
+
+fn main() {
+    let start: i32 = 1;
+    let end: i32 = 10;
+    let result: i32 = find_max_collatz_length(start, end);
+    printInt(result);
+    exit(0);
+}

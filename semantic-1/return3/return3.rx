@@ -1,0 +1,16 @@
+/*
+Test Package: Semantic-1
+Test Target: return
+Author: Bohan Zhang
+Time: 2025-08-24
+Verdict: Fail
+Comment: exit function test, the main function must have an exit function call as a final statement
+*/
+
+fn main() {
+    println(r#"Why is there no exit in main?
+Look in my eyes!
+Tell me!
+WHY!"#
+    );
+}

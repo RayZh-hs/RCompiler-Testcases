@@ -1,0 +1,18 @@
+/*
+Test Package: Semantic-1
+Test Target: loop
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: loop test, variable scope error - using loop variable outside scope
+*/
+
+fn main() {
+    let mut i: u32 = 0u32;
+    while (i < 5) {
+        let tmp: u32 = i * 2;
+        i += 1;
+    }
+    let result: u32 = tmp + 1;
+    exit(0);
+}

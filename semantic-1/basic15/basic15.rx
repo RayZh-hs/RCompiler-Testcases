@@ -1,0 +1,65 @@
+/*
+Test Package: Semantic-1
+Test Target: basic
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: basic test, incomplete trait implementation and array bounds error
+*/
+
+fn main() {
+    let mut game: Board = Board::fresh();
+    let mut step: usize = 0;
+    while (step < 9) {
+        game.place(step / 3, step % 3, step as i32);
+        step += 1;
+    }
+    let winner: i32 = game.evaluate();
+    let outcome: i32 = winner;
+    exit(0);
+}
+
+struct Board {
+    grid: [[i32; 3]; 3],
+    moves: usize,
+}
+
+impl Board {
+    fn fresh() -> Self {
+        Board { grid: [
+            [0,0,0],
+            [0,0,0],
+            [0,0,0]
+        ], moves: 0 }
+    }
+
+    fn place(&mut self, r: usize, c: usize, v: i32) {
+        self.grid[r][c] = v;
+        self.moves += 1
+    }
+
+    fn evaluate(&self) -> i32 {
+        let mut i: usize = 0;
+        while (i < 3) {
+            if (self.grid[i][0] == self.grid[i][1] && self.grid[i][1] == self.grid[i][2]) {
+                return self.grid[i][0]
+            }
+            i += 1;
+        }
+        -1
+    }
+}
+
+trait Render {
+    fn draw(&self) -> String;
+    fn clear(&mut self);
+}
+
+impl Render for Board {
+    fn draw(&self) -> String { String::from("Board drawn") }
+}
+
+fn analysis(b: &Board) {
+    let x: i32 = b.grid[3][3];
+    let _: i32 = x;
+}

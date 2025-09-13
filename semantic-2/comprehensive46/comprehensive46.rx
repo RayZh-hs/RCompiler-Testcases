@@ -1,0 +1,128 @@
+/*
+Test Package: Semantic-2
+Test Target: comprehensive
+Author: Wenxin Zheng
+Time: 2025-08-17
+Verdict: Success
+Test Name: Ray Tracing Scene Renderer
+Summary: This test comprehensively evaluates compiler optimizations for:
+Details:
+Floating-point-like calculations using scaled integers.
+Complex geometric computations (intersections, normals).
+Deep recursion for ray bouncing and reflections.
+Performance of vector-like operations on small arrays.
+Optimization of loops over pixels and objects.
+Function inlining for math and utility functions.
+*/
+
+// comprehensive46.rx - Ray Tracing Scene Renderer
+// This test comprehensively evaluates compiler optimizations for:
+// - Floating-point-like calculations using scaled integers.
+// - Complex geometric computations (intersections, normals).
+// - Deep recursion for ray bouncing and reflections.
+// - Performance of vector-like operations on small arrays.
+// - Optimization of loops over pixels and objects.
+// - Function inlining for math and utility functions.
+
+fn main() {
+    struct Vec3 { x: i32, y: i32, z: i32, }
+    struct Ray { origin: Vec3, dir: Vec3, }
+    struct Sphere { center: Vec3, radius: i32, color: Vec3, }
+    struct Light { pos: Vec3, intensity: i32, }
+
+    let mut screen: [[i32; 64]; 64] = [[0; 64]; 64];
+    let mut spheres: [Sphere; 4] = [
+        Sphere { center: Vec3 {x:0,y:0,z:0}, radius: 0, color: Vec3 {x:0,y:0,z:0} }; 4
+    ];
+    let mut lights: [Light; 2] = [
+        Light { pos: Vec3 {x:0,y:0,z:0}, intensity: 0 }; 2
+    ];
+    let scale: i32 = 100; // Scale factor for fixed-point arithmetic
+
+    fn setup_scene(mut spheres: &mut [Sphere; 4], mut lights: &mut [Light; 2]) {
+        spheres[0] = Sphere { center: Vec3 { x: 0, y: -1 * scale, z: 3 * scale }, radius: 1 * scale, color: Vec3 { x: 255, y: 0, z: 0 } };
+        spheres[1] = Sphere { center: Vec3 { x: 2 * scale, y: 0, z: 4 * scale }, radius: 1 * scale, color: Vec3 { x: 0, y: 0, z: 255 } };
+        spheres[2] = Sphere { center: Vec3 { x: -2 * scale, y: 0, z: 4 * scale }, radius: 1 * scale, color: Vec3 { x: 0, y: 255, z: 0 } };
+        spheres[3] = Sphere { center: Vec3 { x: 0, y: -501 * scale, z: 0 }, radius: 500 * scale, color: Vec3 { x: 200, y: 200, y: 0 } };
+        lights[0] = Light { pos: Vec3 { x: -20 * scale, y: 20 * scale, z: -20 * scale }, intensity: 150 };
+        lights[1] = Light { pos: Vec3 { x: 20 * scale, y: 30 * scale, z: -10 * scale }, intensity: 120 };
+    }
+
+    fn vec_dot(a: &Vec3, b: &Vec3) -> i32 {
+        return (a.x * b.x + a.y * b.y + a.z * b.z) / scale;
+    }
+
+    fn vec_sub(a: &Vec3, b: &Vec3) -> Vec3 {
+        return Vec3 { x: a.x - b.x, y: a.y - b.y, z: a.z - b.z };
+    }
+
+    fn intersect(ray: &Ray, sphere: &Sphere) -> i32 {
+        let oc: Vec3 = vec_sub(&ray.origin, &sphere.center);
+        let a: i32 = vec_dot(&ray.dir, &ray.dir);
+        let b: i32 = 2 * vec_dot(&oc, &ray.dir);
+        let c: i32 = vec_dot(&oc, &oc) - (sphere.radius * sphere.radius) / scale;
+        let discriminant: i32 = b * b - 4 * a * c / scale;
+        if (discriminant < 0) {
+            return -1;
+        }
+        // Simplified to return nearest intersection
+        return (-b - isqrt(discriminant)) / (2 * a / scale);
+    }
+    
+    // Hidden Error: `isqrt` is defined after it is first used in `intersect`.
+    // A simple, single-pass compiler would fail here.
+    fn isqrt(n: i32) -> i32 {
+        if (n < 0) { return 0; }
+        let mut x: i32 = n;
+        let mut y: i32 = (x + 1) / 2;
+        while (y < x) {
+            x = y;
+            y = (x + n / x) / 2;
+        }
+        return x;
+    }
+
+    setup_scene(&mut spheres, &mut lights);
+
+    let width: i32 = 64;
+    let height: i32 = 64;
+    let mut y: i32 = 0;
+    while (y < height) {
+        let mut x: i32 = 0;
+        while (x < width) {
+            let ray_dir: Vec3 = Vec3 {
+                x: (x - width / 2) * scale / width,
+                y: (y - height / 2) * scale / height,
+                z: scale
+            };
+            let ray: Ray = Ray { origin: Vec3 { x: 0, y: 0, z: -1 * scale }, dir: ray_dir };
+
+            let mut min_dist: i32 = 10000 * scale;
+            let mut hit_color: Vec3 = Vec3 { x: 20, y: 20, z: 40 }; // Background color
+            let mut s: i32 = 0;
+            while (s < 4) {
+                let dist: i32 = intersect(&ray, &spheres[s]);
+                if (dist > 0 && dist < min_dist) {
+                    min_dist = dist;
+                    hit_color = spheres[s].color;
+                }
+                s = s + 1;
+            }
+            screen[x][y] = (hit_color.x + hit_color.y + hit_color.z) / 3;
+            x = x + 1;
+        }
+        y = y + 1;
+    }
+
+    let mut checksum: i32 = 0;
+    y = 0;
+    while (y < height) {
+        let mut x: i32 = 0;
+        while (x < width) {
+            checksum = checksum + screen[x][y] * (x + y * width);
+            x = x + 1;
+        }
+        y = y + 1;
+    }
+    printInt(checksum);
+}

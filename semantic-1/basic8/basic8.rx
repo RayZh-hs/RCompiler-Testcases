@@ -1,0 +1,29 @@
+/*
+Test Package: Semantic-1
+Test Target: basic
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: basic test, dynamic array size in function parameter
+*/
+
+fn main() {
+    let size: usize = 5;
+    let table: [[i32; 5]; 5] = make_table(size);
+    let unused: [[i32; 5]; 5] = table;
+    exit(0);
+}
+
+fn make_table(n: usize) -> [[i32; n]; n] {
+    let mut arr: [[i32; n]; n] = [[0; n]; n];
+    let mut row: usize = 0usize;
+    while (row < n) {
+        let mut col: usize = 0usize;
+        while (col < n) {
+            arr[row][col] = (row * col) as i32;
+            col += 1;
+        }
+        row += 1;
+    }
+    arr
+}

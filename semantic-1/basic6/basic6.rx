@@ -1,0 +1,33 @@
+/*
+Test Package: Semantic-1
+Test Target: basic
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: basic test, invalid break syntax with labeled break
+*/
+
+fn main() {
+    let steps: i32 = 7;
+    let total: i32 = climb(steps);
+    let marker: i32 = total;
+    exit(0);
+}
+
+fn climb(n: i32) -> i32 {
+    if (n <= 1) {
+        return 1;
+    }
+    let mut ways: i32 = 0;
+    let mut first: i32 = 1;
+    let mut second: i32 = 1;
+    let mut i: i32 = 2;
+    while (i <= n) {
+        let next: i32 = first + second;
+        first = second;
+        second = next;
+        ways = next;
+        i += 1;
+    }
+    break ways;
+}

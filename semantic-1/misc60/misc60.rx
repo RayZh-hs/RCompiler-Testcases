@@ -1,0 +1,250 @@
+/*
+Test Package: Semantic-1
+Test Target: misc
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: Aho-Corasick string matching algorithm with uninitialized struct field error
+*/
+
+// Aho-Corasick algorithm for multiple string pattern matching
+// Builds trie with failure links for efficient pattern searching
+
+struct TrieNode {
+    children: [i32; 26],  // Indices to child nodes (-1 for no child)
+    failure_link: i32,    // Failure link for Aho-Corasick
+    output_link: i32,     // Output link for pattern matching
+    is_end_of_word: bool,
+    pattern_id: i32,      // ID of pattern ending at this node
+    depth: i32,           // Depth in trie for debugging
+}
+
+struct AhoCorasickTrie {
+    nodes: [TrieNode; 100],
+    node_count: i32,
+    patterns: [[i32; 20]; 10],  // Store patterns as character codes
+    pattern_lengths: [i32; 10],
+    pattern_count: i32,
+}
+
+// Initialize a trie node
+fn init_trie_node() -> TrieNode {
+    let mut i: i32 = 0;
+    let mut children: [i32; 26] = [-1; 26];
+    
+    // Initialize all children to -1
+    while (i < 26) {
+        children[i as usize] = -1;
+        i += 1;
+    }
+    
+    TrieNode {
+        children: children,
+        failure_link: -1,
+        output_link: -1,
+        is_end_of_word: false,
+        pattern_id: -1,
+        // depth: 0,  // Intentionally missing this field
+    }
+}
+
+// Convert character to array index (a=0, b=1, ..., z=25)
+fn char_to_index(ch: i32) -> i32 {
+    if (ch >= 97 && ch <= 122) {  // 'a' to 'z'
+        return ch - 97;
+    }
+    return -1;  // Invalid character
+}
+
+// Add pattern to trie
+fn add_pattern_to_trie(trie: &mut AhoCorasickTrie, pattern: [i32; 20], length: i32, pattern_id: i32) {
+    let mut current_node: i32 = 0;  // Start from root
+    let mut pos: i32 = 0;
+    
+    while (pos < length) {
+        let ch_index: i32 = char_to_index(pattern[pos as usize]);
+        if (ch_index == -1) {
+            pos += 1;
+            continue;
+        }
+        
+        let mut current_children: [i32; 26] = trie.nodes[current_node as usize].children;
+        if (current_children[ch_index as usize] == -1) {
+            // Create new node
+            if (trie.node_count >= 100) {
+                break;  // Trie full
+            }
+            
+            current_children[ch_index as usize] = trie.node_count;
+            trie.nodes[trie.node_count as usize] = init_trie_node();  // This will fail due to missing field
+            trie.node_count += 1;
+        }
+        
+        current_node = current_children[ch_index as usize];
+        pos += 1;
+    }
+    
+    trie.nodes[current_node as usize].is_end_of_word = true;
+    trie.nodes[current_node as usize].pattern_id = pattern_id;
+}
+
+// Build failure links using BFS approach
+fn build_failure_links(trie: &mut AhoCorasickTrie) {
+    let mut queue: [i32; 100] = [0; 100];
+    let mut queue_front: i32 = 0;
+    let mut queue_back: i32 = 0;
+    
+    // Initialize failure links for first level (children of root)
+    let mut i: i32 = 0;
+    while (i < 26) {
+        let child: i32 = trie.nodes[0].children[i as usize];
+        if (child != -1) {
+            trie.nodes[child as usize].failure_link = 0;  // Point to root
+            queue[queue_back as usize] = child;
+            queue_back += 1;
+        }
+        i += 1;
+    }
+    
+    // Process remaining levels
+    while (queue_front < queue_back) {
+        let current: i32 = queue[queue_front as usize];
+        queue_front += 1;
+        
+        let mut ch: i32 = 0;
+        while (ch < 26) {
+            let child: i32 = trie.nodes[current as usize].children[ch as usize];
+            if (child != -1) {
+                // Find failure link for this child
+                let mut failure: i32 = trie.nodes[current as usize].failure_link;
+                
+                while (failure != -1) {
+                    let failure_child: i32 = trie.nodes[failure as usize].children[ch as usize];
+                    if (failure_child != -1) {
+                        trie.nodes[child as usize].failure_link = failure_child;
+                        break;
+                    }
+                    failure = trie.nodes[failure as usize].failure_link;
+                }
+                
+                if (failure == -1) {
+                    trie.nodes[child as usize].failure_link = 0;  // Point to root
+                }
+                
+                // Set output link
+                let fail_node: i32 = trie.nodes[child as usize].failure_link;
+                if (trie.nodes[fail_node as usize].is_end_of_word) {
+                    trie.nodes[child as usize].output_link = fail_node;
+                } else {
+                    trie.nodes[child as usize].output_link = trie.nodes[fail_node as usize].output_link;
+                }
+                
+                queue[queue_back as usize] = child;
+                queue_back += 1;
+            }
+            ch += 1;
+        }
+    }
+}
+
+// Search for patterns in text using Aho-Corasick
+fn search_patterns(trie: &AhoCorasickTrie, text: [i32; 50], text_length: i32) -> i32 {
+    let mut current_state: i32 = 0;
+    let mut matches_found: i32 = 0;
+    let mut pos: i32 = 0;
+    
+    while (pos < text_length) {
+        let ch_index: i32 = char_to_index(text[pos as usize]);
+        if (ch_index == -1) {
+            pos += 1;
+            continue;
+        }
+        
+        // Try to follow edge in trie
+        while (current_state != -1 && trie.nodes[current_state as usize].children[ch_index as usize] == -1) {
+            current_state = trie.nodes[current_state as usize].failure_link;
+        }
+        
+        if (current_state == -1) {
+            current_state = 0;
+        } else {
+            current_state = trie.nodes[current_state as usize].children[ch_index as usize];
+        }
+        
+        // Check for pattern matches at current position
+        let mut output_state: i32 = current_state;
+        while (output_state != -1) {
+            if (trie.nodes[output_state as usize].is_end_of_word) {
+                matches_found += 1;
+                // Could record which pattern was found here
+            }
+            output_state = trie.nodes[output_state as usize].output_link;
+        }
+        
+        pos += 1;
+    }
+    
+    return matches_found;
+}
+
+// Initialize Aho-Corasick automaton with test patterns
+fn create_test_automaton() -> AhoCorasickTrie {
+    let mut trie: AhoCorasickTrie = AhoCorasickTrie {
+        nodes: [init_trie_node(); 100],  // This will fail due to uninitialized field
+        node_count: 1,  // Start with root node
+        patterns: [[0; 20]; 10],
+        pattern_lengths: [0; 10],
+        pattern_count: 0,
+    };
+    
+    // Initialize root node properly
+    trie.nodes[0] = init_trie_node();
+    
+    // Add test patterns: "abc", "bc", "ab"
+    let pattern1: [i32; 20] = [97, 98, 99, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];  // "abc"
+    let pattern2: [i32; 20] = [98, 99, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];     // "bc"
+    let pattern3: [i32; 20] = [97, 98, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];     // "ab"
+    
+    add_pattern_to_trie(&mut trie, pattern1, 3, 0);
+    add_pattern_to_trie(&mut trie, pattern2, 2, 1);
+    add_pattern_to_trie(&mut trie, pattern3, 2, 2);
+    
+    trie.pattern_count = 3;
+    build_failure_links(&mut trie);
+    
+    return trie;
+}
+
+// Comprehensive pattern matching test
+fn comprehensive_pattern_search() -> i32 {
+    let automaton: AhoCorasickTrie = create_test_automaton();  // This will fail during compilation
+    
+    // Test text: "abcabcabc"
+    let test_text: [i32; 50] = [97, 98, 99, 97, 98, 99, 97, 98, 99, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 
+                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    
+    let matches: i32 = search_patterns(&automaton, test_text, 9);
+    
+    // Additional verification with simple string matching
+    let mut simple_matches: i32 = 0;
+    let mut i: i32 = 0;
+    
+    while (i < 7) {  // Can check for "abc" at positions 0, 3, 6
+        if (test_text[i as usize] == 97 && test_text[(i+1) as usize] == 98 && test_text[(i+2) as usize] == 99) {
+            simple_matches += 1;
+        }
+        if (test_text[i as usize] == 98 && test_text[(i+1) as usize] == 99) {
+            simple_matches += 1;
+        }
+        i += 1;
+    }
+    
+    return matches + simple_matches;
+}
+
+fn main() {
+    let search_result: i32 = comprehensive_pattern_search();
+    printInt(search_result);
+    exit(0);
+}

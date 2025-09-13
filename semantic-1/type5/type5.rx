@@ -1,0 +1,18 @@
+/*
+Test Package: Semantic-1
+Test Target: type
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: Type error: function return type mismatch
+*/
+
+// Type error: function return type mismatch
+fn get_number() -> i32 {
+    return "not a number";
+}
+
+fn main() {
+    let x: i32 = get_number();
+    exit(0);
+}

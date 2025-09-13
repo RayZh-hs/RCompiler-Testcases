@@ -1,0 +1,19 @@
+/*
+Test Package: Semantic-1
+Test Target: loop
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: loop test, Fibonacci sequence calculation with while loop and array indexing
+*/
+
+fn main() {
+    let mut fib: [u32; 10] = [0u32; 10];
+    fib[1] = 1;
+    let mut i: usize = 2usize;
+    while (i < 10) {
+        fib[i] = fib[i - 1] + fib[i - 2];
+        i += 1;
+    }
+    exit(0);
+}

@@ -1,0 +1,32 @@
+{
+    "active": 1,
+    "cmp": [
+        "compileexitcode"
+    ],
+    "compileexitcode": 0,
+    "compilememorylimit": 256,
+    "compiletimelimit": 15,
+    "exitcode": 0,
+    "id": 2031842,
+    "input_path": "src/return8/return8.in",
+    "input_visible": 1,
+    "metainfo": {
+        "caseauthor": "Ruitian Wang",
+        "comment": "Valid return with complex expression",
+        "lastmodified": "2025-08-27"
+    },
+    "name": "return8",
+    "name_visible": 1,
+    "output_path": "src/return8/return8.out",
+    "output_visible": 1,
+    "provide": [
+        "compilestderr",
+        "compileexitcode"
+    ],
+    "runtimelimit": -1,
+    "runtimememorylimit": 256,
+    "source_path": "src/return8/return8.rx",
+    "source_visible": 1,
+    "stage_id": 23891,
+    "stage_name": "semantic-1"
+}

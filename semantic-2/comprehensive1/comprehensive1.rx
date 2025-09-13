@@ -1,0 +1,291 @@
+/*
+Test Package: Semantic-2
+Test Target: comprehensive
+Author: venillalemon
+Time: 2025-09-04
+Verdict: Success
+Comment: Comprehensive test of segment tree merging
+*/
+
+const MAXN: usize = 200;
+const LOG_MAXN: usize = 10;
+const MAXSEG: usize = 2000;
+
+struct Food {
+    cnt: i32,
+    ty: i32,
+}
+impl Food {
+    fn better(self, other: Food) -> Food {
+        if (self.cnt == other.cnt) {
+            if (self.ty < other.ty) { self } else { other }
+        } else if (self.cnt > other.cnt) {
+            self
+        } else {
+            other
+        }
+    }
+}
+
+struct SegT {
+    l: i32,
+    r: i32,
+    lc: usize,
+    rc: usize,
+    val: Food,
+}
+
+fn new_segt(
+    seg_pool: &mut [SegT; MAXSEG],
+    seg_cnt: &mut usize,
+    l: i32,
+    r: i32,
+    val: Food,
+) -> usize {
+    *seg_cnt += 1;
+    seg_pool[*seg_cnt] = SegT {
+        l: l,
+        r: r,
+        lc: 0,
+        rc: 0,
+        val: val,
+    };
+    *seg_cnt
+}
+
+fn build(seg_pool: &mut [SegT; MAXSEG], seg_cnt: &mut usize, l: i32, r: i32) -> usize {
+    if (l > r) {
+        return 0;
+    }
+    if (l == r) {
+        return new_segt(seg_pool, seg_cnt, l, r, Food { cnt: 0, ty: l });
+    }
+    new_segt(seg_pool, seg_cnt, l, r, Food { cnt: 0, ty: 0 })
+}
+
+fn update(seg_pool: &mut [SegT; MAXSEG], seg_cnt: &mut usize, idx: usize, pos: i32, delta: i32) {
+    if (idx == 0) {
+        return;
+    }
+    let (l, r): (i32, i32) = (seg_pool[idx].l, seg_pool[idx].r);
+    if (pos < l || pos > r) {
+        return;
+    }
+    if (l == r) {
+        seg_pool[idx].val.cnt += delta;
+        return;
+    }
+    let mid: i32 = (l + r) / 2;
+    if (pos <= mid) {
+        if (seg_pool[idx].lc == 0) {
+            seg_pool[idx].lc = build(seg_pool, seg_cnt, l, mid);
+        }
+        update(seg_pool, seg_cnt, seg_pool[idx].lc, pos, delta);
+    } else {
+        if (seg_pool[idx].rc == 0) {
+            seg_pool[idx].rc = build(seg_pool, seg_cnt, mid + 1, r);
+        }
+        update(seg_pool, seg_cnt, seg_pool[idx].rc, pos, delta);
+    }
+    let mut res: Food = Food { cnt: 0, ty: 0 };
+    if (seg_pool[idx].lc != 0) {
+        res = seg_pool[idx].lc_val(seg_pool).better(res);
+    }
+    if (seg_pool[idx].rc != 0) {
+        res = seg_pool[idx].rc_val(seg_pool).better(res);
+    }
+    seg_pool[idx].val = res;
+}
+
+impl SegT {
+    fn lc_val(&self, seg_pool: &[SegT; MAXSEG]) -> Food {
+        seg_pool[self.lc].val
+    }
+    fn rc_val(&self, seg_pool: &[SegT; MAXSEG]) -> Food {
+        seg_pool[self.rc].val
+    }
+}
+
+fn merge(seg_pool: &mut [SegT; MAXSEG], seg_cnt: &mut usize, u: usize, v: usize) -> usize {
+    if (u == 0) {
+        return v;
+    }
+    if (v == 0) {
+        return u;
+    }
+    if (seg_pool[u].l == seg_pool[u].r) {
+        seg_pool[u].val.cnt += seg_pool[v].val.cnt;
+        return u;
+    }
+    seg_pool[u].lc = merge(seg_pool, seg_cnt, seg_pool[u].lc, seg_pool[v].lc);
+    seg_pool[u].rc = merge(seg_pool, seg_cnt, seg_pool[u].rc, seg_pool[v].rc);
+    let mut res: Food = Food { cnt: 0, ty: 0 };
+    if (seg_pool[u].lc != 0) {
+        res = seg_pool[u].lc_val(seg_pool).better(res);
+    }
+    if (seg_pool[u].rc != 0) {
+        res = seg_pool[u].rc_val(seg_pool).better(res);
+    }
+    seg_pool[u].val = res;
+    u
+}
+
+struct Node {
+    edges: [usize; MAXN + 1],
+    edges_len: usize,
+    d: i32,
+    fa: [usize; LOG_MAXN + 1],
+    segment: usize,
+    ans: i32,
+}
+
+impl Node {
+    fn push(&mut self, to: usize) {
+        self.edges[self.edges_len] = to;
+        self.edges_len += 1;
+    }
+    fn clear(&mut self) {
+        self.edges_len = 0;
+    }
+}
+
+fn prepare(node_pool: &mut [Node; MAXN + 1], v: usize, f: usize) {
+    node_pool[v].fa[0] = f;
+    node_pool[v].d = if (f == 0) { 1 } else { node_pool[f].d + 1 };
+    let mut i = 1;
+    while (i <= LOG_MAXN) {
+        let ff: usize = node_pool[v].fa[i - 1];
+        if (ff != 0) {
+            node_pool[v].fa[i] = node_pool[ff].fa[i - 1];
+        }
+        i += 1;
+    }
+    i = 0;
+    while (i < node_pool[v].edges_len) {
+        let to: usize = node_pool[v].edges[i];
+        i += 1;
+        if (to == f) {
+            continue;
+        }
+        prepare(node_pool, to, v);
+    }
+}
+
+fn lca(node_pool: &[Node; MAXN + 1], mut u: usize, mut v: usize) -> usize {
+    if (node_pool[u].d < node_pool[v].d) {
+        let tmp = u;
+        u = v;
+        v = tmp;
+    }
+    let mut i = LOG_MAXN as i32;
+    while (i >= 0) {
+        let ff: usize = node_pool[u].fa[i as usize];
+        if (ff != 0 && node_pool[ff].d >= node_pool[v].d) {
+            u = ff;
+        }
+        i -= 1;
+    }
+    if (u == v) {
+        return u;
+    }
+    i = LOG_MAXN as i32;
+    while (i >= 0) {
+        if (node_pool[u].fa[i as usize] != node_pool[v].fa[i as usize]) {
+            u = node_pool[u].fa[i as usize];
+            v = node_pool[v].fa[i as usize];
+        }
+        i -= 1;
+    }
+    node_pool[u].fa[0]
+}
+
+fn dfs(
+    node_pool: &mut [Node; MAXN + 1],
+    seg_pool: &mut [SegT; MAXSEG],
+    seg_cnt: &mut usize,
+    v: usize,
+    f: usize,
+) {
+    let mut i: usize = 0;
+    while (i < node_pool[v].edges_len) {
+        let to: usize = node_pool[v].edges[i];
+        i += 1;
+        if (to == f) {
+            continue;
+        }
+        dfs(node_pool, seg_pool, seg_cnt, to, v);
+    }
+    node_pool[v].ans = seg_pool[node_pool[v].segment].val.ty;
+    if (f != 0) {
+        node_pool[f].segment = merge(
+            seg_pool,
+            seg_cnt,
+            node_pool[f].segment,
+            node_pool[v].segment,
+        );
+    }
+}
+
+fn main() {
+    let mut node_pool: [Node; MAXN + 1] = [Node {
+        edges: [0; MAXN + 1],
+        edges_len: 0,
+        d: 0,
+        fa: [0; LOG_MAXN + 1],
+        segment: 0,
+        ans: 0,
+    }; MAXN + 1];
+
+    let mut seg_pool: [SegT; MAXSEG] = [SegT {
+        l: 0,
+        r: 0,
+        lc: 0,
+        rc: 0,
+        val: Food { cnt: 0, ty: 0 },
+    }; MAXSEG];
+    let mut seg_cnt: usize = 0;
+
+    let n: usize = getInt() as usize;
+    let m: usize = getInt() as usize;
+    let mut i: usize = 1;
+    while (i <= n) {
+        node_pool[i].clear();
+        node_pool[i].segment = build(&mut seg_pool, &mut seg_cnt, 1, MAXN as i32);
+        i += 1;
+    }
+    i = 0;
+    while (i < n - 1) {
+        let a: usize = getInt() as usize;
+        let b: usize = getInt() as usize;
+        node_pool[a].push(b);
+        node_pool[b].push(a);
+        i += 1;
+    }
+    prepare(&mut node_pool, 1, 0);
+    i = 0;
+    while (i < m) {
+        let x: usize = getInt() as usize;
+        let y: usize = getInt() as usize;
+        let z: i32 = getInt();
+        let f: usize = lca(&node_pool, x, y);
+        update(&mut seg_pool, &mut seg_cnt, node_pool[x].segment, z, 1);
+        update(&mut seg_pool, &mut seg_cnt, node_pool[y].segment, z, 1);
+        update(&mut seg_pool, &mut seg_cnt, node_pool[f].segment, z, -1);
+        if (node_pool[f].fa[0] != 0) {
+            update(
+                &mut seg_pool,
+                &mut seg_cnt,
+                node_pool[node_pool[f].fa[0]].segment,
+                z,
+                -1,
+            );
+        }
+        i += 1;
+    }
+    dfs(&mut node_pool, &mut seg_pool, &mut seg_cnt, 1, 0);
+    i = 1;
+    while (i <= n) {
+        printlnInt(node_pool[i].ans);
+        i += 1;
+    }
+}

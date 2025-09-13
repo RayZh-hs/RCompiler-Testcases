@@ -1,0 +1,732 @@
+/*
+Test Package: Semantic-2
+Test Target: comprehensive
+Author: Wenxin Zheng
+Time: 2025-08-17
+Verdict: Success
+Test Name: Comprehensive Test 13: Advanced Mathematical Computing and Numerical Analysis
+Summary: This test implements sophisticated mathematical algorithms and numerical computations:
+Details:
+1. Matrix operations and linear algebra computations
+2. Polynomial evaluation and root finding using Newton's method
+3. Numerical integration using multiple methods (Trapezoidal, Simpson's)
+4. Fast Fourier Transform (simplified integer version)
+5. Prime number algorithms and number theory operations
+6. Statistical analysis and probability computations
+*/
+
+// Comprehensive Test 13: Advanced Mathematical Computing and Numerical Analysis
+// This test implements sophisticated mathematical algorithms and numerical computations:
+// 1. Matrix operations and linear algebra computations
+// 2. Polynomial evaluation and root finding using Newton's method
+// 3. Numerical integration using multiple methods (Trapezoidal, Simpson's)
+// 4. Fast Fourier Transform (simplified integer version)
+// 5. Prime number algorithms and number theory operations
+// 6. Statistical analysis and probability computations
+
+// Structure for advanced mathematical operations
+struct MathEngine {
+    // Matrix operations
+    matrix_a: [[i32; 100]; 100],
+    matrix_b: [[i32; 100]; 100],
+    matrix_result: [[i32; 100]; 100],
+    matrix_size: i32,
+    
+    // Polynomial operations
+    polynomial_coeffs: [i32; 200],
+    poly_degree: i32,
+    roots: [i32; 50],
+    root_count: i32,
+    
+    // Numerical integration
+    function_values: [i32; 1000],
+    integration_points: i32,
+    integration_results: [i32; 10],
+    
+    // FFT operations
+    real_part: [i32; 512],
+    imag_part: [i32; 512],
+    fft_size: i32,
+    
+    // Prime and number theory
+    primes: [i32; 1000],
+    prime_count: i32,
+    factorizations: [[i32; 20]; 100],
+    
+    // Statistical computations
+    data_series: [i32; 2000],
+    series_length: i32,
+    moments: [i32; 10],
+    correlations: [i32; 100],
+    
+    // Computation results
+    computation_log: [i32; 50],
+    log_size: i32,
+}
+
+impl MathEngine {
+    fn new() -> MathEngine {
+        MathEngine {
+            matrix_a: [[0; 100]; 100],
+            matrix_b: [[0; 100]; 100],
+            matrix_result: [[0; 100]; 100],
+            matrix_size: 0,
+            polynomial_coeffs: [0; 200],
+            poly_degree: 0,
+            roots: [0; 50],
+            root_count: 0,
+            function_values: [0; 1000],
+            integration_points: 0,
+            integration_results: [0; 10],
+            real_part: [0; 512],
+            imag_part: [0; 512],
+            fft_size: 0,
+            primes: [0; 1000],
+            prime_count: 0,
+            factorizations: [[0; 20]; 100],
+            data_series: [0; 2000],
+            series_length: 0,
+            moments: [0; 10],
+            correlations: [0; 100],
+            computation_log: [0; 50],
+            log_size: 0,
+        }
+    }
+    
+    // Initialize matrices with input data
+    fn initialize_matrices(&mut self, size: i32) {
+        self.matrix_size = size;
+        
+        // Read matrix A
+        let mut i = 0;
+        while (i < size) {
+            let mut j = 0;
+            while (j < size) {
+                self.matrix_a[i as usize][j as usize] = readInt();
+                j += 1;
+            }
+            i += 1;
+        }
+        
+        // Read matrix B
+        i = 0;
+        while (i < size) {
+            let mut j = 0;
+            while (j < size) {
+                self.matrix_b[i as usize][j as usize] = readInt();
+                j += 1;
+            }
+            i += 1;
+        }
+    }
+    
+    // Advanced matrix multiplication with optimization
+    fn matrix_multiply(&mut self) {
+        let mut i = 0;
+        while (i < self.matrix_size) {
+            let mut j = 0;
+            while (j < self.matrix_size) {
+                self.matrix_result[i as usize][j as usize] = 0;
+                let mut k = 0;
+                while (k < self.matrix_size) {
+                    self.matrix_result[i as usize][j as usize] += 
+                        self.matrix_a[i as usize][k as usize] * self.matrix_b[k as usize][j as usize];
+                    k += 1;
+                }
+                j += 1;
+            }
+            i += 1;
+        }
+    }
+    
+    // Matrix determinant calculation using LU decomposition
+    fn calculate_determinant(&mut self) -> i32 {
+        // Create a copy of matrix A for decomposition
+        let mut lu_matrix = [[0; 100]; 100];
+        let mut i = 0;
+        while (i < self.matrix_size) {
+            let mut j = 0;
+            while (j < self.matrix_size) {
+                lu_matrix[i as usize][j as usize] = self.matrix_a[i as usize][j as usize];
+                j += 1;
+            }
+            i += 1;
+        }
+        
+        let mut det = 1;
+        let mut sign = 1;
+        
+        // Perform LU decomposition
+        i = 0;
+        while (i < self.matrix_size - 1) {
+            // Find pivot
+            let mut max_row = i;
+            let mut max_val = if lu_matrix[i as usize][i as usize] < 0 { 
+                -lu_matrix[i as usize][i as usize] 
+            } else { 
+                lu_matrix[i as usize][i as usize] 
+            };
+            
+            let mut k = i + 1;
+            while k < self.matrix_size {
+                let abs_val = if lu_matrix[k as usize][i as usize] < 0 { 
+                    -lu_matrix[k as usize][i as usize] 
+                } else { 
+                    lu_matrix[k as usize][i as usize] 
+                };
+                if (abs_val > max_val) {
+                    max_val = abs_val;
+                    max_row = k;
+                }
+                k += 1;
+            }
+            
+            // Swap rows if necessary
+            if (max_row != i) {
+                let mut j = 0;
+                while j < self.matrix_size {
+                    let temp = lu_matrix[i as usize][j as usize];
+                    lu_matrix[i as usize][j as usize] = lu_matrix[max_row as usize][j as usize];
+                    lu_matrix[max_row as usize][j as usize] = temp;
+                    j += 1;
+                }
+                sign = -sign;
+            }
+            
+            // Check for zero pivot
+            if (lu_matrix[i as usize][i as usize] == 0) {
+                return 0;
+            }
+            
+            // Eliminate column
+            k = i + 1;
+            while k < self.matrix_size {
+                let factor = lu_matrix[k as usize][i as usize] / lu_matrix[i as usize][i as usize];
+                let mut j = i;
+                while j < self.matrix_size {
+                    lu_matrix[k as usize][j as usize] -= factor * lu_matrix[i as usize][j as usize];
+                    j += 1;
+                }
+                k += 1;
+            }
+            
+            i += 1;
+        }
+        
+        // Calculate determinant from diagonal elements
+        i = 0;
+        while i < self.matrix_size {
+            det *= lu_matrix[i as usize][i as usize];
+            i += 1;
+        }
+        
+        return det * sign;
+    }
+    
+    // Matrix transpose and additional operations
+    fn matrix_operations_suite(&mut self) {
+        // Calculate trace
+        let mut trace = 0;
+        let mut i = 0;
+        while i < self.matrix_size {
+            trace += self.matrix_a[i as usize][i as usize];
+            i += 1;
+        }
+        self.computation_log[self.log_size as usize] = trace;
+        self.log_size += 1;
+        
+        // Calculate Frobenius norm
+        let mut frobenius_norm = 0;
+        i = 0;
+        while i < self.matrix_size {
+            let mut j = 0;
+            while j < self.matrix_size {
+                let val = self.matrix_a[i as usize][j as usize];
+                frobenius_norm += val * val;
+                j += 1;
+            }
+            i += 1;
+        }
+        self.computation_log[self.log_size as usize] = frobenius_norm;
+        self.log_size += 1;
+        
+        // Matrix addition and subtraction
+        i = 0;
+        while i < self.matrix_size {
+            let mut j = 0;
+            while j < self.matrix_size {
+                // Store sum in result matrix temporarily
+                self.matrix_result[i as usize][j as usize] = 
+                    self.matrix_a[i as usize][j as usize] + self.matrix_b[i as usize][j as usize];
+                j += 1;
+            }
+            i += 1;
+        }
+    }
+    
+    // Polynomial operations and root finding
+    fn initialize_polynomial(&mut self, degree: i32) {
+        self.poly_degree = degree;
+        let mut i = 0;
+        while (i <= degree) {
+            self.polynomial_coeffs[i as usize] = readInt();
+            i += 1;
+        }
+    }
+    
+    // Evaluate polynomial at given point
+    fn evaluate_polynomial(&self, x: i32) -> i32 {
+        let mut result = 0;
+        let mut power = 1;
+        let mut i = 0;
+        while (i <= self.poly_degree) {
+            result += self.polynomial_coeffs[i as usize] * power;
+            power *= x;
+            i += 1;
+        }
+        return result;
+    }
+    
+    // Newton's method for finding polynomial roots
+    fn find_polynomial_roots(&mut self) {
+        self.root_count = 0;
+        
+        // Try different starting points
+        let mut start = -100;
+        while (start <= 100 && self.root_count < 50) {
+            let mut x = start;
+            let mut iterations = 0;
+            
+            while (iterations < 50) {
+                let f_x = self.evaluate_polynomial(x);
+                let f_prime_x = self.evaluate_polynomial_derivative(x);
+                
+                if (f_prime_x == 0) {
+                    break; // Avoid division by zero
+                }
+                
+                let next_x = x - f_x / f_prime_x;
+                
+                // Check for convergence
+                let diff = if next_x > x { next_x - x } else { x - next_x };
+                if (diff <= 1) {
+                    // Check if this is actually a root
+                    if (self.evaluate_polynomial(next_x) == 0 || 
+                       (if self.evaluate_polynomial(next_x) < 0 { -self.evaluate_polynomial(next_x) } 
+                        else { self.evaluate_polynomial(next_x) }) <= 5) {
+                        // Check if we already found this root
+                        let mut is_new_root = true;
+                        let mut j = 0;
+                        while (j < self.root_count) {
+                            let root_diff = if self.roots[j as usize] > next_x { 
+                                self.roots[j as usize] - next_x 
+                            } else { 
+                                next_x - self.roots[j as usize] 
+                            };
+                            if (root_diff <= 2) {
+                                is_new_root = false;
+                                break;
+                            }
+                            j += 1;
+                        }
+                        
+                        if (is_new_root) {
+                            self.roots[self.root_count as usize] = next_x;
+                            self.root_count += 1;
+                        }
+                    }
+                    break;
+                }
+                
+                x = next_x;
+                iterations += 1;
+            }
+            
+            start += 7; // Use step size to avoid duplicates
+        }
+    }
+    
+    // Evaluate polynomial derivative
+    fn evaluate_polynomial_derivative(&self, x: i32) -> i32 {
+        let mut result = 0;
+        let mut power = 1;
+        let mut i = 1;
+        while (i <= self.poly_degree) {
+            result += i * self.polynomial_coeffs[i as usize] * power;
+            power *= x;
+            i += 1;
+        }
+        return result;
+    }
+    
+    // Numerical integration using multiple methods
+    fn initialize_function_data(&mut self, points: i32) {
+        self.integration_points = points;
+        let mut i = 0;
+        while (i < points) {
+            self.function_values[i as usize] = readInt();
+            i += 1;
+        }
+    }
+    
+    // Trapezoidal rule integration
+    fn trapezoidal_integration(&mut self, step_size: i32) -> i32 {
+        let mut result = 0;
+        let mut i = 0;
+        while (i < self.integration_points - 1) {
+            result += (self.function_values[i as usize] + self.function_values[(i + 1) as usize]) * step_size / 2;
+            i += 1;
+        }
+        return result;
+    }
+    
+    // Simpson's rule integration
+    fn simpson_integration(&mut self, step_size: i32) -> i32 {
+        let mut result = 0;
+        let mut i = 0;
+        while (i < self.integration_points - 2) {
+            result += step_size * (self.function_values[i as usize] + 
+                                  4 * self.function_values[(i + 1) as usize] + 
+                                  self.function_values[(i + 2) as usize]) / 3;
+            i += 2;
+        }
+        return result;
+    }
+    
+    // Simplified Fast Fourier Transform for integers
+    fn initialize_fft_data(&mut self, size: i32) {
+        self.fft_size = size;
+        let mut i = 0;
+        while (i < size) {
+            self.real_part[i as usize] = readInt();
+            self.imag_part[i as usize] = 0; // Initialize imaginary parts to 0
+            i += 1;
+        }
+    }
+    
+    // Simplified FFT implementation (Cooley-Tukey algorithm)
+    fn compute_fft(&mut self) {
+        let n = self.fft_size;
+        
+        // Bit-reversal permutation
+        let mut j = 0;
+        let mut i = 1;
+        while (i < n) {
+            let mut bit = n / 2;
+            while (j >= bit) {
+                j -= bit;
+                bit /= 2;
+            }
+            j += bit;
+            
+            if (i < j) {
+                // Swap real parts
+                let temp_real = self.real_part[i as usize];
+                self.real_part[i as usize] = self.real_part[j as usize];
+                self.real_part[j as usize] = temp_real;
+                
+                // Swap imaginary parts
+                let temp_imag = self.imag_part[i as usize];
+                self.imag_part[i as usize] = self.imag_part[j as usize];
+                self.imag_part[j as usize] = temp_imag;
+            }
+            i += 1;
+        }
+        
+        // Cooley-Tukey FFT
+        let mut length = 2;
+        while (length <= n) {
+            let half_length = length / 2;
+            
+            // Simplified twiddle factor calculation (using approximation)
+            let angle_step = 6283 / length; // Approximation of 2*pi scaled
+            
+            i = 0;
+            while (i < n) {
+                let mut k = 0;
+                while (k < half_length) {
+                    let angle = k * angle_step;
+                    // Simplified cos and sin using Taylor series approximation
+                    let cos_val = 1000 - (angle * angle) / 2000; // Scaled cos approximation
+                    let sin_val = angle - (angle * angle * angle) / 6000; // Scaled sin approximation
+                    
+                    let even_idx = (i + k) as usize;
+                    let odd_idx = (i + k + half_length) as usize;
+                    
+                    let even_real = self.real_part[even_idx];
+                    let even_imag = self.imag_part[even_idx];
+                    let odd_real = self.real_part[odd_idx];
+                    let odd_imag = self.imag_part[odd_idx];
+                    
+                    // Complex multiplication: (odd_real + i*odd_imag) * (cos_val + i*sin_val)
+                    let twiddle_real = (odd_real * cos_val - odd_imag * sin_val) / 1000;
+                    let twiddle_imag = (odd_real * sin_val + odd_imag * cos_val) / 1000;
+                    
+                    self.real_part[even_idx] = even_real + twiddle_real;
+                    self.imag_part[even_idx] = even_imag + twiddle_imag;
+                    self.real_part[odd_idx] = even_real - twiddle_real;
+                    self.imag_part[odd_idx] = even_imag - twiddle_imag;
+                    
+                    k += 1;
+                }
+                i += length;
+            }
+            
+            length *= 2;
+        }
+    }
+    
+    // Prime number generation using Sieve of Eratosthenes
+    fn generate_primes(&mut self, limit: i32) {
+        let mut is_prime = [true; 10000];
+        is_prime[0] = false;
+        is_prime[1] = false;
+        
+        let mut i = 2;
+        while (i * i <= limit) {
+            if (is_prime[i as usize]) {
+                let mut j = i * i;
+                while (j <= limit) {
+                    is_prime[j as usize] = false;
+                    j += i;
+                }
+            }
+            i += 1;
+        }
+        
+        self.prime_count = 0;
+        i = 2;
+        while (i <= limit && self.prime_count < 1000) {
+            if (is_prime[i as usize]) {
+                self.primes[self.prime_count as usize] = i;
+                self.prime_count += 1;
+            }
+            i += 1;
+        }
+    }
+    
+    // Prime factorization using trial division
+    fn prime_factorize(&mut self, number: i32) -> i32 {
+        let mut n = number;
+        let mut factor_count = 0;
+        let mut i = 0;
+        
+        while (i < self.prime_count && self.primes[i as usize] * self.primes[i as usize] <= n) {
+            while (n % self.primes[i as usize] == 0) {
+                self.factorizations[0][factor_count as usize] = self.primes[i as usize];
+                factor_count += 1;
+                n /= self.primes[i as usize];
+            }
+            i += 1;
+        }
+        
+        if (n > 1) {
+            self.factorizations[0][factor_count as usize] = n;
+            factor_count += 1;
+        }
+        
+        return factor_count;
+    }
+    
+    // Statistical analysis functions
+    fn initialize_data_series(&mut self, length: i32) {
+        self.series_length = length;
+        let mut i = 0;
+        while (i < length) {
+            self.data_series[i as usize] = readInt();
+            i += 1;
+        }
+    }
+    
+    // Calculate statistical moments
+    fn calculate_moments(&mut self) {
+        // Calculate mean
+        let mut sum = 0;
+        let mut i = 0;
+        while (i < self.series_length) {
+            sum += self.data_series[i as usize];
+            i += 1;
+        }
+        let mean = sum / self.series_length;
+        self.moments[0] = mean;
+        
+        // Calculate variance and higher moments
+        let mut sum2 = 0;
+        let mut sum3 = 0;
+        let mut sum4 = 0;
+        
+        i = 0;
+        while (i < self.series_length) {
+            let diff = self.data_series[i as usize] - mean;
+            let diff2 = diff * diff;
+            let diff3 = diff2 * diff;
+            let diff4 = diff3 * diff;
+            
+            sum2 += diff2;
+            sum3 += diff3;
+            sum4 += diff4;
+            i += 1;
+        }
+        
+        self.moments[1] = sum2 / self.series_length; // Variance
+        self.moments[2] = sum3 / self.series_length; // Skewness numerator
+        self.moments[3] = sum4 / self.series_length; // Kurtosis numerator
+        
+        // Calculate additional statistics
+        let mut min_val = self.data_series[0];
+        let mut max_val = self.data_series[0];
+        
+        i = 1;
+        while (i < self.series_length) {
+            if (self.data_series[i as usize] < min_val) {
+                min_val = self.data_series[i as usize];
+            }
+            if (self.data_series[i as usize] > max_val) {
+                max_val = self.data_series[i as usize];
+            }
+            i += 1;
+        }
+        
+        self.moments[4] = min_val;
+        self.moments[5] = max_val;
+        self.moments[6] = max_val - min_val; // Range
+    }
+    
+    // Comprehensive mathematical analysis
+    fn perform_comprehensive_analysis(&mut self) {
+        // Matrix operations
+        self.matrix_multiply();
+        let det = self.calculate_determinant();
+        self.computation_log[self.log_size as usize] = det;
+        self.log_size += 1;
+        
+        self.matrix_operations_suite();
+        
+        // Polynomial analysis
+        self.find_polynomial_roots();
+        self.computation_log[self.log_size as usize] = self.root_count;
+        self.log_size += 1;
+        
+        // Numerical integration
+        let trapezoidal_result = self.trapezoidal_integration(1);
+        let simpson_result = self.simpson_integration(1);
+        self.integration_results[0] = trapezoidal_result;
+        self.integration_results[1] = simpson_result;
+        
+        // FFT analysis
+        self.compute_fft();
+        let mut fft_magnitude = 0;
+        let mut i = 0;
+        while (i < self.fft_size) {
+            let real = self.real_part[i as usize];
+            let imag = self.imag_part[i as usize];
+            fft_magnitude += real * real + imag * imag;
+            i += 1;
+        }
+        self.computation_log[self.log_size as usize] = fft_magnitude;
+        self.log_size += 1;
+        
+        // Prime analysis
+        let factors = self.prime_factorize(12345);
+        self.computation_log[self.log_size as usize] = factors;
+        self.log_size += 1;
+        
+        // Statistical analysis
+        self.calculate_moments();
+        
+        // Output all results
+        self.output_comprehensive_results();
+    }
+    
+    fn output_comprehensive_results(&self) {
+        // Output computation log
+        let mut i = 0;
+        while (i < self.log_size) {
+            printInt(self.computation_log[i as usize]);
+            i += 1;
+        }
+        
+        // Output statistical moments
+        i = 0;
+        while (i < 7) {
+            printInt(self.moments[i as usize]);
+            i += 1;
+        }
+        
+        // Output integration results
+        printInt(self.integration_results[0]);
+        printInt(self.integration_results[1]);
+        
+        // Output polynomial roots
+        i = 0;
+        while (i < self.root_count && i < 5) {
+            printInt(self.roots[i as usize]);
+            i += 1;
+        }
+        
+        // Output prime information
+        printInt(self.prime_count);
+        
+        // Final comprehensive metric
+        let complexity_score = (self.computation_log[0] + self.moments[0] + self.integration_results[0]) / 3;
+        printInt(complexity_score);
+    }
+}
+
+fn main() {
+    let mut math_engine = MathEngine::new();
+    
+    // Initialize matrices
+    let matrix_size = readInt();
+    math_engine.initialize_matrices(matrix_size);
+    
+    // Initialize polynomial
+    let poly_degree = readInt();
+    math_engine.initialize_polynomial(poly_degree);
+    
+    // Initialize function data for integration
+    let integration_points = readInt();
+    math_engine.initialize_function_data(integration_points);
+    
+    // Initialize FFT data
+    let fft_size = readInt();
+    math_engine.initialize_fft_data(fft_size);
+    
+    // Initialize statistical data
+    let series_length = readInt();
+    math_engine.initialize_data_series(series_length);
+    
+    // Generate primes up to a limit
+    let prime_limit = readInt();
+    math_engine.generate_primes(prime_limit);
+    
+    // Perform comprehensive mathematical analysis
+    math_engine.perform_comprehensive_analysis();
+    
+    // Additional computational stress testing
+    let iterations = readInt();
+    let mut total_computational_work = 0;
+    
+    let mut iter = 0;
+    while (iter < iterations) {
+        // Modify data and recompute
+        let modifier = (iter * 13 + 7) % 100;
+        
+        let mut i = 0;
+        while (i < math_engine.series_length) {
+            math_engine.data_series[i as usize] = (math_engine.data_series[i as usize] + modifier) % 10000;
+            i += 1;
+        }
+        
+        math_engine.calculate_moments();
+        total_computational_work += math_engine.moments[0] + math_engine.moments[1];
+        
+        iter += 1;
+    }
+    
+    printInt(total_computational_work);
+    
+    // Final mathematical complexity analysis
+    let final_complexity = (total_computational_work * math_engine.prime_count) / (iterations + 1);
+    printInt(final_complexity);
+}

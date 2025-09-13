@@ -1,0 +1,16 @@
+/*
+Test Package: Semantic-1
+Test Target: array
+Author: Wenxin Zheng
+Time: 2025-08-07
+Verdict: Success
+Comment: array test, multiple dimensions and array length
+*/
+
+fn main() {
+    const MATRIX: [[u32; 3]; 2] = [
+        [1, 2, 3],
+        [4, 5, 6],
+    ];
+    exit(0);
+}

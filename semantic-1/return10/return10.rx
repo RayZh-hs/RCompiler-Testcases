@@ -1,0 +1,22 @@
+/*
+Test Package: Semantic-1
+Test Target: return
+Author: Ruitian Wang
+Time: 2025-08-27
+Verdict: Fail
+Comment: Missing return value for non-unit return type
+*/
+
+// Error: Missing return value for non-unit return type
+fn missing_return() -> i32 {
+    let x: i32 = 42;
+    if (x > 0) {
+        return x;
+    }
+    // Missing return for else case
+}
+
+fn main() {
+    let result: i32 = missing_return();
+    exit(0);
+}

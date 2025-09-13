@@ -1,0 +1,64 @@
+/*
+Test Package: Semantic-1
+Test Target: misc
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: Pollard's rho algorithm for integer factorization with recursive optimization
+*/
+
+// Pollard's rho algorithm for integer factorization
+// Uses Floyd's cycle detection to find non-trivial factors
+fn gcd(mut a: i32, mut b: i32) -> i32 {
+    while (b != 0) {
+        let temp: i32 = b;
+        b = a % b;
+        a = temp;
+    }
+    return a;
+}
+
+fn f(x: i32, n: i32) -> i32 {
+    return (x * x + 1) % n;
+}
+
+fn pollard_rho(n: i32) -> i32 {
+    if (n % 2 == 0) {
+        return 2;
+    }
+    
+    let mut x: i32 = 2;
+    let mut y: i32 = 2;
+    let mut d: i32 = 1;
+    
+    while (d == 1) {
+        x = f(x, n);
+        y = f(f(y, n), n);
+        
+    let diff: i32 = if (x > y) { x - y } else { y - x };
+        d = gcd(diff, n);
+    }
+    
+    return d;
+}
+
+fn find_factor_recursive(n: i32, depth: i32) -> i32 {
+    if (depth > 10) {
+        return n;
+    }
+    
+    let factor: i32 = pollard_rho(n);
+    if (factor == n) {
+        return n;
+    }
+    
+    let remaining: i32 = n / factor;
+    return find_factor_recursive(remaining, depth + 1);
+}
+
+fn main() {
+    let n: i32 = getInt();
+    let factor: i32 = find_factor_recursive(n, 0);
+    printInt(factor);
+    exit(0);
+}

@@ -1,0 +1,24 @@
+/*
+Test Package: Semantic-1
+Test Target: expr
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: Expression error: Missing value in struct field initialization - combines struct, field access, operator, if, and literal expressions
+*/
+
+struct Point {
+    x: i32,
+    y: i32,
+}
+
+fn main() {
+    let p = Point { x: 1, y: };
+    let sum: i32 = p.x + p.y;
+    if sum > 0 {
+        printInt(sum);
+    } else {
+        printInt(0);
+    }
+    exit(0);
+}

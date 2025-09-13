@@ -1,0 +1,25 @@
+/*
+Test Package: Semantic-1
+Test Target: expr
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: Expression error: Invalid method call expression - missing dot before method name
+*/
+
+// Error: Invalid method call expression - missing dot before method name
+struct Calculator {
+    value: i32,
+}
+
+impl Calculator {
+    fn add(&mut self, n: i32) {
+        self.value += n;
+    }
+}
+
+fn main() {
+    let mut calc: Calculator = Calculator { value: 0 };
+    calc add(5);  // Missing dot before method name
+    exit(0);
+}

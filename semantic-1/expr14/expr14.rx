@@ -1,0 +1,14 @@
+/*
+Test Package: Semantic-1
+Test Target: expr
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: Expression error: Invalid underscore expression - underscore used in invalid context
+*/
+
+fn main() {
+    let x: i32 = _;
+    printInt(x);
+    exit(0);
+}

@@ -1,0 +1,64 @@
+/*
+Test Package: Semantic-1
+Test Target: basic
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: basic test, graph breadth-first search with connectivity check; bfs return type mismatch ([usize; V] vs [i32; V])
+*/
+
+const V: usize = 6;
+
+fn bfs(adj: [[i32; V]; V], s: usize) -> [i32; V] {
+    let mut vis: [i32; V] = [0; V];
+    let mut q: [usize; V] = [0; V];
+    let mut h: usize = 0;
+    let mut t: usize = 0;
+    q[t] = s;
+    t += 1;
+    vis[s] = 1;
+    while (h < t) {
+        let n: usize = q[h];
+        h += 1;
+        let mut nb: usize = 0;
+        while (nb < V) {
+            if (adj[n][nb] == 1 && vis[nb] == 0) {
+                q[t] = nb;
+                t += 1;
+                vis[nb] = 1;
+            }
+            nb += 1;
+        }
+    }
+    q
+}
+
+fn connected(v: [i32; V]) -> bool {
+    let mut k: usize = 0;
+    while (k < V) {
+        if (v[k] == 0) {
+            return false;
+        }
+        k += 1;
+    }
+    true
+}
+
+fn main() {
+    let g: [[i32; V]; V] = [
+        [0, 1, 0, 0, 0, 0],
+        [1, 0, 1, 0, 0, 0],
+        [0, 1, 0, 1, 0, 0],
+        [0, 0, 1, 0, 1, 0],
+        [0, 0, 0, 1, 0, 1],
+        [0, 0, 0, 0, 1, 0],
+    ];
+    let vmark: [i32; V] = bfs(g, 0);
+    let full: bool = connected(vmark);
+    if (full) {
+        let s: i32 = 1;
+    } else {
+        let s: i32 = 0;
+    }
+    exit(0);
+}

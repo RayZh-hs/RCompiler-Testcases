@@ -1,0 +1,17 @@
+/*
+Test Package: Semantic-1
+Test Target: loop
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: loop test, syntax error - missing opening brace for while loop body
+*/
+
+fn main() {
+    let mut i: u32 = 0u32;
+    while (i < 3)
+        let val: u32 = i * 2;
+        i += 1;
+    }
+    exit(0);
+}

@@ -1,0 +1,16 @@
+/*
+Test Package: Semantic-1
+Test Target: if
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: if statement test, undefined variable in condition
+*/
+
+
+fn main() {
+    if (some_condition) {
+        let _: i32 = 0; // Wildcard Pattern
+    }
+    exit(0);
+}

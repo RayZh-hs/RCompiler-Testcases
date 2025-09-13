@@ -1,0 +1,106 @@
+/*
+Test Package: Semantic-1
+Test Target: expr
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: Complex expression error: Missing comma in method call - matrix multiplication with nested loops, struct operations, method calls, array access, and complex arithmetic expressions
+*/
+
+struct Matrix {
+    rows: i32,
+    cols: i32,
+    data: [i32; 9],
+}
+
+impl Matrix {
+    fn new(rows: i32, cols: i32) -> Matrix {
+        Matrix {
+            rows: rows,
+            cols: cols,
+            data: [0; 9],
+        }
+    }
+    
+    fn get(&self, row: i32, col: i32) -> i32 {
+        let index: i32 = row * self.cols + col;
+        if (index >= 0 && index < 9) {
+            return self.data[index as usize];
+        } else {
+            return -1;
+        }
+    }
+    
+    fn set(&mut self, row: i32, col: i32, value: i32) {
+        let index: i32 = row * self.cols + col;
+        if (index >= 0 && index < 9) {
+            self.data[index as usize] = value;
+        }
+    }
+}
+
+fn matrix_multiply(a: &Matrix, b: &Matrix) -> Matrix {
+    let mut result: Matrix = Matrix::new(a.rows, b.cols);
+    let mut i: i32 = 0;
+    loop {
+        if i >= a.rows {
+            break;
+        }
+        let mut j: i32 = 0;
+        loop {
+            if j >= b.cols {
+                break;
+            }
+            let mut sum: i32 = 0;
+            let mut k: i32 = 0;
+            loop {
+                if k >= a.cols {
+                    break;
+                }
+                let a_val: i32 = a.get(i, k);
+                let b_val: i32 = b.get(k, j);
+                sum = sum + (a_val * b_val);
+                k = k + 1;
+            }
+            result.set(i, j, sum);
+            j = j + 1;
+        }
+        i = i + 1;
+    }
+    return result;
+}
+
+fn main() {
+    let mut matrix_a: Matrix = Matrix::new(3, 3);
+    let mut matrix_b: Matrix = Matrix::new(3, 3);
+    
+    matrix_a.set(0, 0, 1);
+    matrix_a.set(0, 1, 2);
+    matrix_a.set(0, 2, 3);
+    matrix_a.set(1, 0, 4);
+    matrix_a.set(1, 1, 5);
+    matrix_a.set(1, 2, 6);
+    matrix_a.set(2, 0, 7);
+    matrix_a.set(2, 1, 8);
+    matrix_a.set(2, 2 9);
+    
+    matrix_b.set(0, 0, 1);
+    matrix_b.set(0, 1, 0);
+    matrix_b.set(0, 2, 0);
+    matrix_b.set(1, 0, 0);
+    matrix_b.set(1, 1, 1);
+    matrix_b.set(1, 2, 0);
+    matrix_b.set(2, 0, 0);
+    matrix_b.set(2, 1, 0);
+    matrix_b.set(2, 2, 1);
+    
+    let result: Matrix = matrix_multiply(&matrix_a, &matrix_b);
+    let final_value: i32 = result.get(0, 0) + result.get(1, 1) + result.get(2, 2);
+    
+    if (final_value > 0) {
+        printInt(final_value);
+    } else {
+        printInt(0);
+    }
+    exit(0);
+}

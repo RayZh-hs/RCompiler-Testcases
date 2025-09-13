@@ -1,0 +1,13 @@
+/*
+Test Package: Semantic-1
+Test Target: return
+Author: Wenxin Zheng
+Time: 2025-08-07
+Verdict: Fail
+Comment: exit function test, string cannot be returned
+*/
+
+fn main() {
+    let a: String = 3.to_string();
+    exit(a);
+}

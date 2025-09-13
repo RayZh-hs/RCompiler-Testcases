@@ -1,0 +1,31 @@
+/*
+Test Package: Semantic-1
+Test Target: expr
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: Expression error: Missing closing parenthesis in grouped expression - combines struct, method call, array, index, grouped, if, and operator expressions
+*/
+
+struct Point {
+    x: i32,
+    y: i32,
+}
+
+impl Point {
+    fn distance_from_origin(&self) -> i32 {
+        self.x * self.x + self.y * self.y
+    }
+}
+
+fn main() {
+    let p: Point = Point { x: 3, y: 4 };
+    let distance: i32 = p.distance_from_origin();
+    let arr: [i32; 3] = [distance, distance + 1, distance + 2];
+    let index: i32 = (distance % 3;
+    printInt(arr[index as usize]);
+    if (distance > 20) {
+        printInt(distance);
+    }
+    exit(0);
+}

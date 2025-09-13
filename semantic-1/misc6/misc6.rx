@@ -1,0 +1,42 @@
+/*
+Test Package: Semantic-1
+Test Target: misc
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: misc test, prime number checker
+*/
+
+// Prime number checker
+// Check if a given number is prime
+fn is_prime(n: i32) -> bool {
+    if (n <= 1) {
+        return false;
+    }
+    if (n <= 3) {
+        return true;
+    }
+    if (n % 2 == 0 || n % 3 == 0) {
+        return false;
+    }
+    
+    let mut i: i32 = 5;
+    while (i * i <= n) {
+        if (n % i == 0 || n % (i + 2) == 0) {
+            return false;
+        }
+        i += 6;
+    }
+    return true;
+}
+
+fn main() {
+    let n: i32 = getInt();
+    
+    if (is_prime(n)) {
+        printInt(1); // Prime
+    } else {
+        printInt(0); // Not prime
+    }
+    exit(0);
+}

@@ -1,0 +1,682 @@
+/*
+Test Package: Semantic-2
+Test Target: comprehensive
+Author: Wenxin Zheng
+Time: 2025-08-17
+Verdict: Success
+Test Name: Comprehensive Test 4: Recursive Algorithms and Deep Call Stack Optimization
+Summary: This test focuses on compiler optimization of:
+Details:
+Tail recursion optimization
+Call stack management and optimization
+Recursive function inlining decisions
+Deep recursion performance
+Function prologue/epilogue optimization
+Return value optimization
+*/
+
+// comprehensive4.rx - Comprehensive Test 4: Recursive Algorithms and Deep Call Stack Optimization
+// This test focuses on compiler optimization of:
+// - Tail recursion optimization
+// - Call stack management and optimization
+// - Recursive function inlining decisions
+// - Deep recursion performance
+// - Function prologue/epilogue optimization
+// - Return value optimization
+
+fn main() {
+    // Performance test marker - start
+    printInt(1400);
+    
+    // Test 1: Deep recursive algorithms
+    // Tests compiler's tail recursion optimization and stack management
+    testDeepRecursiveAlgorithms();
+    
+    // Test 2: Mutual recursion patterns
+    // Tests optimization of mutually recursive functions
+    testMutualRecursion();
+    
+    // Test 3: Tree traversal algorithms
+    // Tests recursive tree operations optimization
+    testTreeTraversalAlgorithms();
+    
+    // Test 4: Divide and conquer algorithms
+    // Tests optimization of recursive divide and conquer patterns
+    testDivideAndConquerAlgorithms();
+    
+    // Test 5: Recursive mathematical computations
+    // Tests optimization of mathematical recursive functions
+    testRecursiveMathematicalComputations();
+    
+    // Performance test marker - end
+    printInt(1499);
+}
+
+// Test 1: Deep Recursive Algorithms
+fn testDeepRecursiveAlgorithms() {
+    printInt(1401); // Start deep recursion test
+    
+    // Test tail recursion optimization
+    let factorial_result: i32 = tailRecursiveFactorial(20, 1);
+    printInt(factorial_result);
+    
+    // Test deep recursion with accumulator
+    let sum_result: i32 = deepRecursiveSum(1000, 0);
+    printInt(sum_result);
+    
+    // Test recursive countdown
+    let countdown_result: i32 = recursiveCountdown(500);
+    printInt(countdown_result);
+    
+    // Test recursive power calculation
+    let power_result: i32 = recursivePower(2, 20);
+    printInt(power_result);
+    
+    printInt(1402); // End deep recursion test
+}
+
+// Tail recursive factorial (should be optimized to loop)
+fn tailRecursiveFactorial(n: i32, accumulator: i32) -> i32 {
+    if (n <= 1) {
+        return accumulator;
+    }
+    return tailRecursiveFactorial(n - 1, accumulator * n);
+}
+
+// Deep recursive sum with accumulator
+fn deepRecursiveSum(n: i32, accumulator: i32) -> i32 {
+    if (n <= 0) {
+        return accumulator;
+    }
+    return deepRecursiveSum(n - 1, accumulator + n);
+}
+
+// Recursive countdown function
+fn recursiveCountdown(n: i32) -> i32 {
+    if (n <= 0) {
+        return 0;
+    }
+    return 1 + recursiveCountdown(n - 1);
+}
+
+// Recursive power calculation
+fn recursivePower(base: i32, exponent: i32) -> i32 {
+    if (exponent == 0) {
+        return 1;
+    }
+    if (exponent == 1) {
+        return base;
+    }
+    if (exponent % 2 == 0) {
+        let half_power: i32 = recursivePower(base, exponent / 2);
+        return half_power * half_power;
+    } else {
+        return base * recursivePower(base, exponent - 1);
+    }
+}
+
+// Test 2: Mutual Recursion Patterns
+fn testMutualRecursion() {
+    printInt(1403); // Start mutual recursion test
+    
+    // Test mutual recursion with even/odd functions
+    let even_result: i32 = countEvenOddMutual(100);
+    printInt(even_result);
+    
+    // Test mutual recursion with ping-pong pattern
+    let ping_pong_result: i32 = pingPongMutual(50, true);
+    printInt(ping_pong_result);
+    
+    // Test mutual recursion with state machines
+    let state_result: i32 = stateMachineA(75, 0);
+    printInt(state_result);
+    
+    printInt(1404); // End mutual recursion test
+}
+
+// Mutual recursion: even/odd checking
+fn isEvenMutual(n: i32) -> i32 {
+    if (n == 0) {
+        return 1; // true
+    }
+    return isOddMutual(n - 1);
+}
+
+fn isOddMutual(n: i32) -> i32 {
+    if (n == 0) {
+        return 0; // false
+    }
+    return isEvenMutual(n - 1);
+}
+
+fn countEvenOddMutual(limit: i32) -> i32 {
+    let mut count: i32 = 0;
+    let mut i: i32 = 0;
+    
+    while (i <= limit) {
+        if (isEvenMutual(i) == 1) {
+            count = count + 1;
+        }
+        i = i + 1;
+    }
+    
+    return count;
+}
+
+// Mutual recursion: ping-pong pattern
+fn pingMutual(n: i32, add_value: i32) -> i32 {
+    if (n <= 0) {
+        return add_value;
+    }
+    return pongMutual(n - 1, add_value + 1);
+}
+
+fn pongMutual(n: i32, add_value: i32) -> i32 {
+    if (n <= 0) {
+        return add_value;
+    }
+    return pingMutual(n - 1, add_value + 2);
+}
+
+fn pingPongMutual(n: i32, start_with_ping: bool) -> i32 {
+    if (start_with_ping) {
+        return pingMutual(n, 0);
+    } else {
+        return pongMutual(n, 0);
+    }
+}
+
+// Mutual recursion: state machine pattern
+fn stateMachineA(n: i32, value: i32) -> i32 {
+    if (n <= 0) {
+        return value;
+    }
+    if (n % 3 == 0) {
+        return stateMachineB(n - 1, value + 10);
+    } else {
+        return stateMachineC(n - 1, value + 1);
+    }
+}
+
+fn stateMachineB(n: i32, value: i32) -> i32 {
+    if (n <= 0) {
+        return value;
+    }
+    if (n % 2 == 0) {
+        return stateMachineC(n - 1, value + 5);
+    } else {
+        return stateMachineA(n - 1, value + 2);
+    }
+}
+
+fn stateMachineC(n: i32, value: i32) -> i32 {
+    if (n <= 0) {
+        return value;
+    }
+    if (n % 5 == 0) {
+        return stateMachineA(n - 1, value + 20);
+    } else {
+        return stateMachineB(n - 1, value + 3);
+    }
+}
+
+// Test 3: Tree Traversal Algorithms
+fn testTreeTraversalAlgorithms() {
+    printInt(1405); // Start tree traversal test
+    
+    // Build a binary tree structure using arrays
+    let mut tree_nodes: [i32; 127] = [0; 127]; // Complete binary tree with 7 levels
+    buildBinaryTree(tree_nodes);
+    
+    // Test different traversal methods
+    let preorder_sum: i32 = preorderTraversal(tree_nodes, 0);
+    printInt(preorder_sum);
+    
+    let inorder_sum: i32 = inorderTraversal(tree_nodes, 0);
+    printInt(inorder_sum);
+    
+    let postorder_sum: i32 = postorderTraversal(tree_nodes, 0);
+    printInt(postorder_sum);
+    
+    // Test tree search operations
+    let search_result: i32 = recursiveTreeSearch(tree_nodes, 0, 50);
+    printInt(search_result);
+    
+    // Test tree depth calculation
+    let depth_result: i32 = calculateTreeDepth(tree_nodes, 0);
+    printInt(depth_result);
+    
+    printInt(1406); // End tree traversal test
+}
+
+// Build binary tree with values
+fn buildBinaryTree(mut tree: [i32; 127]) {
+    let mut i: i32 = 0;
+    while (i < 127) {
+        tree[i] = (i + 1) * 10; // Simple value assignment
+        i = i + 1;
+    }
+}
+
+// Preorder traversal (root, left, right)
+fn preorderTraversal(tree: [i32; 127], index: i32) -> i32 {
+    if (index >= 127 || tree[index] == 0) {
+        return 0;
+    }
+    
+    let current_value: i32 = tree[index];
+    let left_sum: i32 = preorderTraversal(tree, 2 * index + 1);
+    let right_sum: i32 = preorderTraversal(tree, 2 * index + 2);
+    
+    return current_value + left_sum + right_sum;
+}
+
+// Inorder traversal (left, root, right)
+fn inorderTraversal(tree: [i32; 127], index: i32) -> i32 {
+    if (index >= 127 || tree[index] == 0) {
+        return 0;
+    }
+    
+    let left_sum: i32 = inorderTraversal(tree, 2 * index + 1);
+    let current_value: i32 = tree[index];
+    let right_sum: i32 = inorderTraversal(tree, 2 * index + 2);
+    
+    return left_sum + current_value + right_sum;
+}
+
+// Postorder traversal (left, right, root)
+fn postorderTraversal(tree: [i32; 127], index: i32) -> i32 {
+    if (index >= 127 || tree[index] == 0) {
+        return 0;
+    }
+    
+    let left_sum: i32 = postorderTraversal(tree, 2 * index + 1);
+    let right_sum: i32 = postorderTraversal(tree, 2 * index + 2);
+    let current_value: i32 = tree[index];
+    
+    return left_sum + right_sum + current_value;
+}
+
+// Recursive tree search
+fn recursiveTreeSearch(tree: [i32; 127], index: i32, target: i32) -> i32 {
+    if (index >= 127 || tree[index] == 0) {
+        return 0; // Not found
+    }
+    
+    if (tree[index] == target) {
+        return 1; // Found
+    }
+    
+    let left_result: i32 = recursiveTreeSearch(tree, 2 * index + 1, target);
+    if (left_result == 1) {
+        return 1;
+    }
+    
+    let right_result: i32 = recursiveTreeSearch(tree, 2 * index + 2, target);
+    return right_result;
+}
+
+// Calculate tree depth recursively
+fn calculateTreeDepth(tree: [i32; 127], index: i32) -> i32 {
+    if (index >= 127 || tree[index] == 0) {
+        return 0;
+    }
+    
+    let left_depth: i32 = calculateTreeDepth(tree, 2 * index + 1);
+    let right_depth: i32 = calculateTreeDepth(tree, 2 * index + 2);
+    
+    let max_depth: i32;
+    if (left_depth > right_depth) {
+        max_depth = left_depth;
+    } else {
+        max_depth = right_depth;
+    }
+    
+    return 1 + max_depth;
+}
+
+// Test 4: Divide and Conquer Algorithms
+fn testDivideAndConquerAlgorithms() {
+    printInt(1407); // Start divide and conquer test
+    
+    // Test recursive merge sort
+    let mut test_array: [i32; 100] = [0; 100];
+    initializeRandomArray(test_array, 100);
+    let sort_result: i32 = recursiveMergeSort(test_array, 0, 99);
+    printInt(sort_result);
+    
+    // Test recursive binary search
+    let search_target: i32 = 42;
+    let binary_search_result: i32 = recursiveBinarySearch(test_array, 0, 99, search_target);
+    printInt(binary_search_result);
+    
+    // Test recursive quick select
+    let kth_element: i32 = recursiveQuickSelect(test_array, 0, 99, 50);
+    printInt(kth_element);
+    
+    // Test recursive matrix multiplication
+    let matrix_result: i32 = testRecursiveMatrixMultiplication();
+    printInt(matrix_result);
+    
+    printInt(1408); // End divide and conquer test
+}
+
+// Initialize array with pseudo-random values
+fn initializeRandomArray(mut arr: [i32; 100], size: i32) {
+    let mut seed: i32 = 12345;
+    let mut i: i32 = 0;
+    
+    while (i < size) {
+        seed = (seed * 1664525 + 1013904223) % 2147483647;
+        if (seed < 0) {
+            seed = -seed;
+        }
+        arr[i] = seed % 1000;
+        i = i + 1;
+    }
+}
+
+// Recursive merge sort
+fn recursiveMergeSort(mut arr: [i32; 100], left: i32, right: i32) -> i32 {
+    if (left >= right) {
+        return 0;
+    }
+    
+    let mid: i32 = left + (right - left) / 2;
+    let left_comparisons: i32 = recursiveMergeSort(arr, left, mid);
+    let right_comparisons: i32 = recursiveMergeSort(arr, mid + 1, right);
+    let merge_comparisons: i32 = recursiveMerge(arr, left, mid, right);
+    
+    return left_comparisons + right_comparisons + merge_comparisons;
+}
+
+// Recursive merge operation
+fn recursiveMerge(mut arr: [i32; 100], left: i32, mid: i32, right: i32) -> i32 {
+    let left_size: i32 = mid - left + 1;
+    let right_size: i32 = right - mid;
+    
+    // Create temporary arrays
+    let mut left_arr: [i32; 50] = [0; 50];
+    let mut right_arr: [i32; 50] = [0; 50];
+    
+    // Copy data to temporary arrays
+    let mut i: i32 = 0;
+    while (i < left_size) {
+        left_arr[i] = arr[left + i];
+        i = i + 1;
+    }
+    
+    let mut j: i32 = 0;
+    while (j < right_size) {
+        right_arr[j] = arr[mid + 1 + j];
+        j = j + 1;
+    }
+    
+    // Merge the temporary arrays back
+    i = 0;
+    j = 0;
+    let mut k: i32 = left;
+    let mut comparisons: i32 = 0;
+    
+    while (i < left_size && j < right_size) {
+        comparisons = comparisons + 1;
+        if (left_arr[i] <= right_arr[j]) {
+            arr[k] = left_arr[i];
+            i = i + 1;
+        } else {
+            arr[k] = right_arr[j];
+            j = j + 1;
+        }
+        k = k + 1;
+    }
+    
+    // Copy remaining elements
+    while (i < left_size) {
+        arr[k] = left_arr[i];
+        i = i + 1;
+        k = k + 1;
+    }
+    
+    while (j < right_size) {
+        arr[k] = right_arr[j];
+        j = j + 1;
+        k = k + 1;
+    }
+    
+    return comparisons;
+}
+
+// Recursive binary search
+fn recursiveBinarySearch(arr: [i32; 100], left: i32, right: i32, target: i32) -> i32 {
+    if (left > right) {
+        return -1; // Not found
+    }
+    
+    let mid: i32 = left + (right - left) / 2;
+    
+    if (arr[mid] == target) {
+        return mid;
+    } else if (arr[mid] > target) {
+        return recursiveBinarySearch(arr, left, mid - 1, target);
+    } else {
+        return recursiveBinarySearch(arr, mid + 1, right, target);
+    }
+}
+
+// Recursive quick select algorithm
+fn recursiveQuickSelect(mut arr: [i32; 100], left: i32, right: i32, k: i32) -> i32 {
+    if (left == right) {
+        return arr[left];
+    }
+    
+    let pivot_index: i32 = recursivePartition(arr, left, right);
+    
+    if (k == pivot_index) {
+        return arr[k];
+    } else if (k < pivot_index) {
+        return recursiveQuickSelect(arr, left, pivot_index - 1, k);
+    } else {
+        return recursiveQuickSelect(arr, pivot_index + 1, right, k);
+    }
+}
+
+// Recursive partition for quick select
+fn recursivePartition(mut arr: [i32; 100], left: i32, right: i32) -> i32 {
+    let pivot: i32 = arr[right];
+    let mut i: i32 = left - 1;
+    let mut j: i32 = left;
+    
+    while (j < right) {
+        if (arr[j] <= pivot) {
+            i = i + 1;
+            let temp: i32 = arr[i];
+            arr[i] = arr[j];
+            arr[j] = temp;
+        }
+        j = j + 1;
+    }
+    
+    let temp: i32 = arr[i + 1];
+    arr[i + 1] = arr[right];
+    arr[right] = temp;
+    
+    return i + 1;
+}
+
+// Test recursive matrix multiplication
+fn testRecursiveMatrixMultiplication() -> i32 {
+    let mut matrix_a: [i32; 16] = [0; 16]; // 4x4 matrix
+    let mut matrix_b: [i32; 16] = [0; 16]; // 4x4 matrix
+    let mut result_matrix: [i32; 16] = [0; 16]; // 4x4 result
+    
+    // Initialize matrices
+    initializeMatrix(matrix_a, 4);
+    initializeMatrix(matrix_b, 4);
+    
+    // Perform recursive matrix multiplication
+    recursiveMatrixMultiply(matrix_a, matrix_b, result_matrix, 4);
+    
+    // Calculate sum of result matrix
+    let mut sum: i32 = 0;
+    let mut i: i32 = 0;
+    while (i < 16) {
+        sum = sum + result_matrix[i];
+        i = i + 1;
+    }
+    
+    return sum;
+}
+
+// Initialize matrix with values
+fn initializeMatrix(mut matrix: [i32; 16], size: i32) {
+    let mut i: i32 = 0;
+    while (i < size * size) {
+        matrix[i] = (i % 10) + 1;
+        i = i + 1;
+    }
+}
+
+// Recursive matrix multiplication
+fn recursiveMatrixMultiply(matrix_a: [i32; 16], matrix_b: [i32; 16], mut result: [i32; 16], size: i32) {
+    if (size == 1) {
+        result[0] = matrix_a[0] * matrix_b[0];
+        return;
+    }
+    
+    // For simplicity, implement basic multiplication for small matrices
+    let mut i: i32 = 0;
+    while (i < size) {
+        let mut j: i32 = 0;
+        while (j < size) {
+            result[i * size + j] = 0;
+            let mut k: i32 = 0;
+            while (k < size) {
+                result[i * size + j] = result[i * size + j] + 
+                    matrix_a[i * size + k] * matrix_b[k * size + j];
+                k = k + 1;
+            }
+            j = j + 1;
+        }
+        i = i + 1;
+    }
+}
+
+// Test 5: Recursive Mathematical Computations
+fn testRecursiveMathematicalComputations() {
+    printInt(1409); // Start recursive math test
+    
+    // Test recursive GCD computation
+    let gcd_result: i32 = recursiveGCD(1071, 462);
+    printInt(gcd_result);
+    
+    // Test recursive Fibonacci sequence
+    let fibonacci_result: i32 = recursiveFibonacci(25);
+    printInt(fibonacci_result);
+    
+    // Test recursive combinatorics
+    let combination_result: i32 = recursiveCombination(10, 5);
+    printInt(combination_result);
+    
+    // Test recursive number theory functions
+    let sum_of_divisors: i32 = recursiveSumOfDivisors(60);
+    printInt(sum_of_divisors);
+    
+    // Test recursive digit operations
+    let digit_sum: i32 = recursiveDigitSum(123456789);
+    printInt(digit_sum);
+    
+    printInt(1410); // End recursive math test
+}
+
+// Recursive GCD using Euclidean algorithm
+fn recursiveGCD(a: i32, b: i32) -> i32 {
+    if (b == 0) {
+        return a;
+    }
+    return recursiveGCD(b, a % b);
+}
+
+// Recursive Fibonacci (inefficient but tests deep recursion)
+fn recursiveFibonacci(n: i32) -> i32 {
+    if (n <= 1) {
+        return n;
+    }
+    return recursiveFibonacci(n - 1) + recursiveFibonacci(n - 2);
+}
+
+// Recursive combination calculation (n choose k)
+fn recursiveCombination(n: i32, k: i32) -> i32 {
+    if (k == 0 || k == n) {
+        return 1;
+    }
+    if (k == 1) {
+        return n;
+    }
+    return recursiveCombination(n - 1, k - 1) + recursiveCombination(n - 1, k);
+}
+
+// Recursive sum of divisors
+fn recursiveSumOfDivisors(n: i32) -> i32 {
+    return recursiveSumOfDivisorsHelper(n, 1, 0);
+}
+
+fn recursiveSumOfDivisorsHelper(n: i32, current: i32, sum: i32) -> i32 {
+    if (current > n) {
+        return sum;
+    }
+    
+    if (n % current == 0) {
+        return recursiveSumOfDivisorsHelper(n, current + 1, sum + current);
+    } else {
+        return recursiveSumOfDivisorsHelper(n, current + 1, sum);
+    }
+}
+
+// Recursive digit sum
+fn recursiveDigitSum(n: i32) -> i32 {
+    if (n < 10) {
+        return n;
+    }
+    return (n % 10) + recursiveDigitSum(n / 10);
+}
+
+// Additional recursive helper functions for comprehensive testing
+fn recursiveArraySum(arr: [i32; 100], index: i32, size: i32) -> i32 {
+    if (index >= size) {
+        return 0;
+    }
+    return arr[index] + recursiveArraySum(arr, index + 1, size);
+}
+
+fn recursiveArrayMax(arr: [i32; 100], index: i32, size: i32, current_max: i32) -> i32 {
+    if (index >= size) {
+        return current_max;
+    }
+    
+    let new_max: i32;
+    if (arr[index] > current_max) {
+        new_max = arr[index];
+    } else {
+        new_max = current_max;
+    }
+    
+    return recursiveArrayMax(arr, index + 1, size, new_max);
+}
+
+fn recursiveStringLength(value: i32, length: i32) -> i32 {
+    if (value < 10) {
+        return length + 1;
+    }
+    return recursiveStringLength(value / 10, length + 1);
+}
+
+fn recursiveIsPalindrome(n: i32, reversed: i32, original: i32) -> i32 {
+    if (n == 0) {
+        if (reversed == original) {
+            return 1; // true
+        } else {
+            return 0; // false
+        }
+    }
+    return recursiveIsPalindrome(n / 10, reversed * 10 + (n % 10), original);
+}

@@ -1,0 +1,408 @@
+/*
+Test Package: Semantic-1
+Test Target: misc
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: Suffix Array with LCP array construction using Karp-Miller-Rosenberg algorithm with variable reassignment error
+*/
+
+// Suffix Array construction with LCP (Longest Common Prefix) array
+// Using Karp-Miller-Rosenberg algorithm with nested recursive optimization
+
+struct SuffixArrayElement {
+    suffix_index: i32,
+    rank_first_half: i32,
+    rank_second_half: i32,
+    lcp_with_next: i32,
+}
+
+struct SuffixLCPProcessor {
+    text: [i32; 150],
+    length: i32,
+    suffix_array: [i32; 150],
+    rank_array: [i32; 150],
+    temp_rank: [i32; 150],
+    lcp_array: [i32; 150],
+    bucket_count: [i32; 300],
+    suffix_elements: [SuffixArrayElement; 150],
+}
+
+// Counting sort for suffix array construction with nested loops
+fn counting_sort_suffixes(processor: &mut SuffixLCPProcessor, 
+                         n: i32, 
+                         sort_by_second: bool) {
+    // Initialize buckets
+    let mut i: i32 = 0;
+    let elements: &mut [SuffixArrayElement; 150] = &mut processor.suffix_elements;
+    while (i < 300) {
+        processor.bucket_count[i as usize] = 0;
+        i += 1;
+    }
+    
+    // Count occurrences
+    i = 0;
+    while (i < n) {
+        let key: i32 = if (sort_by_second) { 
+            elements[i as usize].rank_second_half + 150  // Offset for negative values
+        } else { 
+            elements[i as usize].rank_first_half + 150 
+        };
+        processor.bucket_count[key as usize] += 1;
+        i += 1;
+    }
+    
+    // Convert to cumulative counts
+    i = 1;
+    while (i < 300) {
+        processor.bucket_count[i as usize] += processor.bucket_count[(i-1) as usize];
+        i += 1;
+    }
+    
+    // Build sorted array (from right to left for stability)
+    let mut temp_elements: [SuffixArrayElement; 150] = [SuffixArrayElement {
+        suffix_index: 0,
+        rank_first_half: 0,
+        rank_second_half: 0,
+        lcp_with_next: 0,
+    }; 150];
+    
+    i = n - 1;
+    while (i >= 0) {
+        let key: i32 = if (sort_by_second) { 
+            elements[i as usize].rank_second_half + 150
+        } else { 
+            elements[i as usize].rank_first_half + 150
+        };
+        processor.bucket_count[key as usize] -= 1;
+        temp_elements[processor.bucket_count[key as usize] as usize] = elements[i as usize];
+        i -= 1;
+    }
+    
+    // Copy back
+    i = 0;
+    while (i < n) {
+        elements[i as usize] = temp_elements[i as usize];
+        i += 1;
+    }
+}
+
+// Build suffix array using Karp-Miller-Rosenberg algorithm
+fn build_suffix_array_kmr(processor: &mut SuffixLCPProcessor) {
+    let n: i32 = processor.length;
+    
+    // Initialize first iteration (single characters)
+    let mut i: i32 = 0;
+    while (i < n) {
+        processor.suffix_elements[i as usize] = SuffixArrayElement {
+            suffix_index: i,
+            rank_first_half: processor.text[i as usize],
+            rank_second_half: if (i + 1 < n) { processor.text[(i+1) as usize] } else { -1 },
+            lcp_with_next: 0,
+        };
+        i += 1;
+    }
+    
+    // Sort by first character, then by second
+    counting_sort_suffixes(processor, n, true);
+    counting_sort_suffixes(processor, n, false);
+    
+    // Build initial rank array
+    i = 0;
+    while (i < n) {
+        processor.rank_array[processor.suffix_elements[i as usize].suffix_index as usize] = i;
+        i += 1;
+    }
+    
+    // Iteratively double the length
+    let mut step: i32 = 2;
+    while (step < n) {
+        // Update ranks for current step
+        i = 0;
+        while (i < n) {
+            let suffix_idx: i32 = processor.suffix_elements[i as usize].suffix_index;
+            processor.suffix_elements[i as usize].rank_first_half = 
+                processor.rank_array[suffix_idx as usize];
+            
+            let second_half_idx: i32 = suffix_idx + step;
+            processor.suffix_elements[i as usize].rank_second_half = 
+                if (second_half_idx < n) { 
+                    processor.rank_array[second_half_idx as usize] 
+                } else { 
+                    -1 
+                };
+            i += 1;
+        }
+        
+        // Sort again
+        counting_sort_suffixes(processor, n, true);
+        counting_sort_suffixes(processor, n, false);
+        
+        // Update ranks based on new order
+        processor.temp_rank[processor.suffix_elements[0].suffix_index as usize] = 0;
+        i = 1;
+        while (i < n) {
+            let curr: &SuffixArrayElement = &processor.suffix_elements[i as usize];
+            let prev: &SuffixArrayElement = &processor.suffix_elements[(i-1) as usize];
+            
+            let new_rank: i32 = if (curr.rank_first_half == prev.rank_first_half && 
+                             curr.rank_second_half == prev.rank_second_half) {
+                processor.temp_rank[prev.suffix_index as usize]
+            } else {
+                i
+            };
+            
+            processor.temp_rank[curr.suffix_index as usize] = new_rank;
+            i += 1;
+        }
+        
+        // Copy temp ranks back
+        i = 0;
+        while (i < n) {
+            processor.rank_array[i as usize] = processor.temp_rank[i as usize];
+            i += 1;
+        }
+        
+        step *= 2;
+    }
+    
+    // Build final suffix array
+    i = 0;
+    while (i < n) {
+        processor.suffix_array[processor.rank_array[i as usize] as usize] = i;
+        i += 1;
+    }
+}
+
+// Compute LCP array using Kasai's algorithm with recursive optimization
+fn compute_lcp_array_recursive(processor: &mut SuffixLCPProcessor, 
+                              suffix_idx: i32, 
+                              current_lcp: i32) {
+    if (suffix_idx >= processor.length) {
+        return;
+    }
+    
+    let rank: i32 = processor.rank_array[suffix_idx as usize];
+    
+    if (rank == processor.length - 1) {
+        // Last suffix has no next suffix
+        processor.lcp_array[rank as usize] = 0;
+        // Tail recursion for next suffix
+        compute_lcp_array_recursive(processor, suffix_idx + 1, 0);
+        return;
+    }
+    
+    let next_suffix_idx: i32 = processor.suffix_array[(rank + 1) as usize];
+    let mut lcp: i32 = if (current_lcp > 0) { current_lcp - 1 } else { 0 };
+    
+    // Extend LCP as much as possible
+    while (suffix_idx + lcp < processor.length && 
+          next_suffix_idx + lcp < processor.length &&
+          processor.text[(suffix_idx + lcp) as usize] == 
+          processor.text[(next_suffix_idx + lcp) as usize]) {
+        lcp += 1;
+    }
+    
+    processor.lcp_array[rank as usize] = lcp;
+    
+    // Tail recursion with current LCP value
+    compute_lcp_array_recursive(processor, suffix_idx + 1, lcp);
+}
+
+// Advanced pattern matching using suffix array and LCP array
+fn pattern_matching_with_lcp(processor: &SuffixLCPProcessor, 
+                           pattern: [i32; 50], 
+                           pattern_len: i32) -> i32 {
+    let mut matches: i32 = 0;
+    let n: i32 = processor.length;
+    
+    // Binary search for first occurrence
+    let mut left: i32 = 0;
+    let mut right: i32 = n - 1;
+    let mut first_match: i32 = -1;
+    
+    while (left <= right) {
+        let mid: i32 = (left + right) / 2;
+        let suffix_idx: i32 = processor.suffix_array[mid as usize];
+        
+        // Compare pattern with suffix
+        let mut cmp_result: i32 = 0;
+        let mut i: i32 = 0;
+        while (i < pattern_len && suffix_idx + i < n) {
+            if (pattern[i as usize] < processor.text[(suffix_idx + i) as usize]) {
+                cmp_result = -1;
+                break;
+            } else if (pattern[i as usize] > processor.text[(suffix_idx + i) as usize]) {
+                cmp_result = 1;
+                break;
+            }
+            i += 1;
+        }
+        
+        if (cmp_result == 0) {
+            first_match = mid;
+            right = mid - 1;  // Continue searching left for first occurrence
+        } else if (cmp_result < 0) {
+            right = mid - 1;
+        } else {
+            left = mid + 1;
+        }
+    }
+    
+    if (first_match == -1) {
+        return 0;  // No matches found
+    }
+    
+    // Count consecutive matches using LCP array
+    matches = 1;
+    let mut idx: i32 = first_match;
+    
+    // Count matches to the right
+    while (idx < n - 1 && processor.lcp_array[idx as usize] >= pattern_len) {
+        matches += 1;
+        idx += 1;
+    }
+    
+    // Count matches to the left
+    idx = first_match - 1;
+    while (idx >= 0 && processor.lcp_array[idx as usize] >= pattern_len) {
+        matches += 1;
+        idx -= 1;
+    }
+    
+    return matches;
+}
+
+// Complex nested analysis with recursive pattern validation
+fn analyze_suffix_patterns(processor: &SuffixLCPProcessor) -> i32 {
+    let mut analysis_score: i32 = 0;
+    let n: i32 = processor.length;
+    
+    let mut i: i32 = 0;
+    while (i < n - 1) {
+        let lcp_val: i32 = processor.lcp_array[i as usize];
+        
+        if (lcp_val > 0) {
+            // Analyze patterns with same LCP length
+            let mut j: i32 = i + 1;
+            while (j < n && processor.lcp_array[(j-1) as usize] >= lcp_val) {
+                // Nested loop for detailed pattern analysis
+                let mut k: i32 = 0;
+                while (k < lcp_val) {
+                    let suffix1_idx: i32 = processor.suffix_array[i as usize];
+                    let suffix2_idx: i32 = processor.suffix_array[j as usize];
+                    
+                    if (processor.text[(suffix1_idx + k) as usize] == 
+                       processor.text[(suffix2_idx + k) as usize]) {
+                        analysis_score += 1;
+                    }
+                    k += 1;
+                }
+                j += 1;
+            }
+        }
+        i += 1;
+    }
+    
+    return analysis_score;
+}
+
+// Recursive suffix tree simulation using suffix array
+fn simulate_suffix_tree_operations(processor: &SuffixLCPProcessor, 
+                                 node_depth: i32, 
+                                 start_idx: i32, 
+                                 end_idx: i32) -> i32 {
+    if (node_depth > 20 || start_idx >= end_idx) {
+        return 0;  // Base case for recursion
+    }
+    
+    let mut operations: i32 = 0;
+    let mut i: i32 = start_idx;
+    
+    while (i < end_idx) {
+        // Find range of suffixes with same prefix of length node_depth
+        let mut j: i32 = i + 1;
+        while (j <= end_idx && j < processor.length && 
+              processor.lcp_array[(j-1) as usize] >= node_depth) {
+            j += 1;
+        }
+        
+        if (j > i + 1) {
+            // Recursive call for internal node
+            operations += simulate_suffix_tree_operations(processor, node_depth + 1, i, j);
+        }
+        
+        operations += 1;  // Count this node
+        i = j;
+    }
+    
+    return operations;
+}
+
+// Initialize processor with complex text analysis
+fn create_suffix_lcp_processor(input_text: [i32; 150], text_length: i32) -> SuffixLCPProcessor {
+    let mut processor: SuffixLCPProcessor = SuffixLCPProcessor {
+        text: input_text,
+        length: text_length,
+        suffix_array: [0; 150],
+        rank_array: [0; 150],
+        temp_rank: [0; 150],
+        lcp_array: [0; 150],
+        bucket_count: [0; 300],
+        suffix_elements: [SuffixArrayElement {
+            suffix_index: 0,
+            rank_first_half: 0,
+            rank_second_half: 0,
+            lcp_with_next: 0,
+        }; 150],
+    };
+    
+    // Build suffix array
+    build_suffix_array_kmr(&mut processor);
+    
+    // Compute LCP array
+    compute_lcp_array_recursive(&mut processor, 0, 0);
+    
+    return processor;
+}
+
+// Main analysis with complex pattern matching
+fn perform_suffix_analysis() -> i32 {
+    // Test string: "banana$" represented as integers
+    let test_text: [i32; 150] = [98, 97, 110, 97, 110, 97, 36, 0, 0, 0, 0, 0, 0, 0, 0,
+                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    
+    let processor: SuffixLCPProcessor = create_suffix_lcp_processor(test_text, 7);
+    
+    // Pattern to search: "ana"
+    let pattern: [i32; 50] = [97, 110, 97, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                   0, 0, 0, 0, 0];
+    
+    let matches: i32 = pattern_matching_with_lcp(&processor, pattern, 3);
+    let analysis_score: i32 = analyze_suffix_patterns(&processor);
+    let tree_operations: i32 = simulate_suffix_tree_operations(&processor, 0, 0, processor.length);
+    
+    // Variable name conflict - redeclaring 'processor' with different type
+    processor = 42;  // ERROR: 'processor' already declared as SuffixLCPProcessor
+    
+    return matches + analysis_score + tree_operations + processor;
+}
+
+fn main() {
+    let result: i32 = perform_suffix_analysis();
+    printInt(result);
+    exit(0);
+}
+
+
+

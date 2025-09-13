@@ -1,0 +1,19 @@
+/*
+Test Package: Semantic-1
+Test Target: if
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: if statement test, variable shadowing with undefined variable reference
+*/
+
+fn main() {
+    let mut a: i32 = 5;
+    if (a == 5) {
+        let mut a: i32 = 7;
+        a += 1;
+    }
+    a += 1;
+    a = a + b; 
+    exit(0);
+}

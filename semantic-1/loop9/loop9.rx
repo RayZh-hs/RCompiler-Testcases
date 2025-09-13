@@ -1,0 +1,22 @@
+/*
+Test Package: Semantic-1
+Test Target: loop
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: loop test, syntax error - invalid struct expression in while condition
+*/
+
+struct Pair {
+    x: i32,
+    y: i32,
+}
+
+fn main() {
+    let i: i32 = 0;
+    let j: i32 = 0;
+    while (Pair {x: i, y: j} < 3) {
+        let v: i32 = i + j;
+    }
+    exit(0);
+}

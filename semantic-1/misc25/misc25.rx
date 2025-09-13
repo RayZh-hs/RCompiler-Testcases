@@ -1,0 +1,216 @@
+/*
+Test Package: Semantic-1
+Test Target: misc
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: Graph implementation with DFS and BFS traversal
+*/
+
+// Graph implementation with DFS and BFS traversal
+// Adjacency matrix representation for undirected graph
+struct Graph {
+    adjacency_matrix: [[bool; 100]; 100],
+    vertex_count: i32,
+    visited: [bool; 100],
+}
+
+impl Graph {
+    fn new(vertices: i32) -> Graph {
+        Graph {
+            adjacency_matrix: [[false; 100]; 100],
+            vertex_count: vertices,
+            visited: [false; 100],
+        }
+    }
+    
+    fn add_edge(&mut self, src: i32, dest: i32) {
+        if (src >= 0 && src < self.vertex_count && dest >= 0 && dest < self.vertex_count) {
+            self.adjacency_matrix[src as usize][dest as usize] = true;
+            self.adjacency_matrix[dest as usize][src as usize] = true; // Undirected graph
+        }
+    }
+    
+    fn clear_visited(&mut self) {
+        let mut i: i32 = 0;
+        while (i < self.vertex_count) {
+            self.visited[i as usize] = false;
+            i += 1;
+        }
+    }
+    
+    fn dfs_recursive(&mut self, vertex: i32) {
+        self.visited[vertex as usize] = true;
+        printInt(vertex);
+        
+        let mut i: i32 = 0;
+        while (i < self.vertex_count) {
+            if (self.adjacency_matrix[vertex as usize][i as usize] && !self.visited[i as usize]) {
+                self.dfs_recursive(i);
+            }
+            i += 1;
+        }
+    }
+    
+    fn dfs(&mut self, start_vertex: i32) {
+        self.clear_visited();
+        if (start_vertex >= 0 && start_vertex < self.vertex_count) {
+            self.dfs_recursive(start_vertex);
+        }
+    }
+    
+    fn bfs(&mut self, start_vertex: i32) {
+        self.clear_visited();
+        
+        if (start_vertex < 0 || start_vertex >= self.vertex_count) {
+            return;
+        }
+        
+        // Simple queue implementation using array
+        let mut queue: [i32; 100] = [0; 100];
+        let mut front: i32 = 0;
+        let mut rear: i32 = 0;
+        
+        // Enqueue start vertex
+        queue[rear as usize] = start_vertex;
+        rear += 1;
+        self.visited[start_vertex as usize] = true;
+        
+        while (front < rear) {
+            let current_vertex: i32 = queue[front as usize];
+            front += 1;
+            printInt(current_vertex);
+            
+            let mut i: i32 = 0;
+            while (i < self.vertex_count) {
+                if (self.adjacency_matrix[current_vertex as usize][i as usize] && !self.visited[i as usize]) {
+                    queue[rear as usize] = i;
+                    rear += 1;
+                    self.visited[i as usize] = true;
+                }
+                i += 1;
+            }
+        }
+    }
+    
+    fn has_path(&mut self, src: i32, dest: i32) -> bool {
+        if (src == dest) {
+            return true;
+        }
+        
+        self.clear_visited();
+        
+        // Use DFS to find path
+        let mut stack: [i32; 100] = [0; 100];
+        let mut top: i32 = 0;
+        
+        stack[top as usize] = src;
+        top += 1;
+        self.visited[src as usize] = true;
+        
+        while (top > 0) {
+            top -= 1;
+            let current: i32 = stack[top as usize];
+            
+            if (current == dest) {
+                return true;
+            }
+            
+            let mut i: i32 = 0;
+            while (i < self.vertex_count) {
+                if (self.adjacency_matrix[current as usize][i as usize] && !self.visited[i as usize]) {
+                    stack[top as usize] = i;
+                    top += 1;
+                    self.visited[i as usize] = true;
+                }
+                i += 1;
+            }
+        }
+        
+        return false;
+    }
+    
+    fn count_connected_components(&mut self) -> i32 {
+        self.clear_visited();
+        let mut components: i32 = 0;
+        
+        let mut i: i32 = 0;
+        while (i < self.vertex_count) {
+            if (!self.visited[i as usize]) {
+                self.dfs_recursive(i);
+                components += 1;
+            }
+            i += 1;
+        }
+        
+        return components;
+    }
+    
+    fn is_connected(&mut self) -> bool {
+        return self.count_connected_components() == 1;
+    }
+    
+    fn print_adjacency_matrix(&self) {
+        let mut i: i32 = 0;
+        while (i < self.vertex_count) {
+            let mut j: i32 = 0;
+            while (j < self.vertex_count) {
+                if (self.adjacency_matrix[i as usize][j as usize]) {
+                    printInt(1);
+                } else {
+                    printInt(0);
+                }
+                j += 1;
+            }
+            i += 1;
+        }
+    }
+}
+
+fn main() {
+    let vertices: i32 = getInt();
+    let mut graph: Graph = Graph::new(vertices);
+    
+    let edges: i32 = getInt();
+    let mut i: i32 = 0;
+    while (i < edges) {
+        let src: i32 = getInt();
+        let dest: i32 = getInt();
+        graph.add_edge(src, dest);
+        i += 1;
+    }
+    
+    let operations: i32 = getInt();
+    i = 0;
+    while (i < operations) {
+        let operation: i32 = getInt();
+        
+        if (operation == 1) { // DFS
+            let start: i32 = getInt();
+            graph.dfs(start);
+        } else if (operation == 2) { // BFS
+            let start: i32 = getInt();
+            graph.bfs(start);
+        } else if (operation == 3) { // Has path
+            let src: i32 = getInt();
+            let dest: i32 = getInt();
+            if (graph.has_path(src, dest)) {
+                printInt(1);
+            } else {
+                printInt(0);
+            }
+        } else if (operation == 4) { // Count connected components
+            let components: i32 = graph.count_connected_components();
+            printInt(components);
+        } else if (operation == 5) { // Is connected
+            if (graph.is_connected()) {
+                printInt(1);
+            } else {
+                printInt(0);
+            }
+        }
+        
+        i += 1;
+    }
+    exit(0);
+}

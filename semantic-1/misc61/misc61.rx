@@ -1,0 +1,336 @@
+/*
+Test Package: Semantic-1
+Test Target: misc
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: Hybrid Z-algorithm and Manacher's algorithm with struct-int comparison error in complex string analysis
+*/
+
+// Hybrid Z-algorithm and Manacher's algorithm for palindrome-aware string matching
+// This combines Z-array computation with palindrome detection for advanced pattern analysis
+
+struct ZManacherNode {
+    z_value: i32,
+    palindrome_radius: i32,
+    is_palindrome_center: bool,
+    pattern_match_pos: i32,
+}
+
+struct HybridAnalyzer {
+    text: [i32; 200],
+    length: i32,
+    z_array: [i32; 200],
+    manacher_array: [i32; 400],  // For transformed string
+    hybrid_nodes: [ZManacherNode; 200],
+    palindrome_centers: [i32; 100],
+    center_count: i32,
+}
+
+// Compute Z-array using Z-algorithm with tail recursion optimization
+fn compute_z_array_recursive(analyzer: &mut HybridAnalyzer, left: i32, right: i32, pos: i32) {
+    if (pos >= analyzer.length) {
+        return;
+    }
+    
+    if (pos > right) {
+        // Naive comparison from current position
+        let mut match_len: i32 = 0;
+        while (pos + match_len < analyzer.length && 
+              analyzer.text[match_len as usize] == analyzer.text[(pos + match_len) as usize]) {
+            match_len += 1;
+        }
+        analyzer.z_array[pos as usize] = match_len;
+        
+        if (match_len > 0) {
+            // Tail recursive call with new window
+            compute_z_array_recursive(analyzer, pos, pos + match_len - 1, pos + 1);
+        } else {
+            compute_z_array_recursive(analyzer, left, right, pos + 1);
+        }
+    } else {
+        let k: i32 = pos - left;
+        let beta: i32 = right - pos + 1;
+        
+        if (analyzer.z_array[k as usize] < beta) {
+            analyzer.z_array[pos as usize] = analyzer.z_array[k as usize];
+            compute_z_array_recursive(analyzer, left, right, pos + 1);
+        } else {
+            // Extend comparison beyond current window
+            let mut match_len: i32 = beta;
+            while (pos + match_len < analyzer.length && 
+                  analyzer.text[match_len as usize] == analyzer.text[(pos + match_len) as usize]) {
+                match_len += 1;
+            }
+            analyzer.z_array[pos as usize] = match_len;
+            compute_z_array_recursive(analyzer, pos, pos + match_len - 1, pos + 1);
+        }
+    }
+}
+
+// Transform string for Manacher's algorithm (insert special characters)
+fn transform_for_manacher(analyzer: &mut HybridAnalyzer) -> [i32; 400] {
+    let mut transformed: [i32; 400] = [0; 400];
+    let mut idx: i32 = 0;
+    
+    transformed[idx as usize] = -1;  // Special boundary character
+    idx += 1;
+    
+    let mut i: i32 = 0;
+    while (i < analyzer.length) {
+        transformed[idx as usize] = -2;  // Separator character
+        idx += 1;
+        transformed[idx as usize] = analyzer.text[i as usize];
+        idx += 1;
+        i += 1;
+    }
+    
+    transformed[idx as usize] = -2;
+    idx += 1;
+    transformed[idx as usize] = -3;  // End boundary
+    
+    return transformed;
+}
+
+// Manacher's algorithm with nested loop optimization
+fn compute_manacher_array(analyzer: &mut HybridAnalyzer) {
+    let transformed: [i32; 400] = transform_for_manacher(analyzer);
+    let transformed_len: i32 = 2 * analyzer.length + 3;
+    
+    let mut center: i32 = 0;
+    let mut right_boundary: i32 = 0;
+    let mut i: i32 = 1;
+    
+    while (i < transformed_len - 1) {
+        let mirror: i32 = 2 * center - i;
+        
+        if (i < right_boundary) {
+            analyzer.manacher_array[i as usize] = 
+                if (analyzer.manacher_array[mirror as usize] < right_boundary - i) {
+                    analyzer.manacher_array[mirror as usize]
+                } else {
+                    right_boundary - i
+                };
+        }
+        
+        // Expand around center i
+        let mut expand_count: i32 = 0;
+        while (transformed[(i - analyzer.manacher_array[i as usize] - 1) as usize] == 
+              transformed[(i + analyzer.manacher_array[i as usize] + 1) as usize]) {
+            analyzer.manacher_array[i as usize] += 1;
+            expand_count += 1;
+            
+            // Nested loop for pattern verification
+            let mut j: i32 = 0;
+            while (j < expand_count) {
+                if (j > 50) { break; }  // Prevent infinite nested loops
+                j += 1;
+            }
+        }
+        
+        if (i + analyzer.manacher_array[i as usize] > right_boundary) {
+            center = i;
+            right_boundary = i + analyzer.manacher_array[i as usize];
+        }
+        
+        i += 1;
+    }
+}
+
+// Extract palindrome centers and create hybrid nodes
+fn extract_palindrome_info(analyzer: &mut HybridAnalyzer) {
+    analyzer.center_count = 0;
+    let mut i: i32 = 0;
+    
+    while (i < analyzer.length) {
+        let manacher_idx: i32 = 2 * i + 2;  // Map to transformed index
+        let palindrome_radius: i32 = analyzer.manacher_array[manacher_idx as usize] / 2;
+        
+        analyzer.hybrid_nodes[i as usize] = ZManacherNode {
+            z_value: analyzer.z_array[i as usize],
+            palindrome_radius: palindrome_radius,
+            is_palindrome_center: palindrome_radius > 0,
+            pattern_match_pos: -1,  // Will be computed later
+        };
+        
+        if (palindrome_radius > 0) {
+            analyzer.palindrome_centers[analyzer.center_count as usize] = i;
+            analyzer.center_count += 1;
+        }
+        
+        i += 1;
+    }
+}
+
+// Complex recursive pattern matching using both Z-array and palindrome info
+fn find_hybrid_patterns_recursive(analyzer: &mut HybridAnalyzer, 
+                                  pattern: [i32; 50], 
+                                  pattern_len: i32, 
+                                  start_pos: i32, 
+                                  matches: &mut [i32; 100], 
+                                  match_count: &mut i32) -> i32 {
+    if (start_pos >= analyzer.length - pattern_len + 1) {
+        return *match_count;
+    }
+    
+    // Check if current position has sufficient Z-value
+    if (analyzer.hybrid_nodes[start_pos as usize].z_value >= pattern_len) {
+        // Verify the match manually
+        let mut is_match: bool = true;
+        let mut i: i32 = 0;
+        
+        while (i < pattern_len) {
+            if (analyzer.text[(start_pos + i) as usize] != pattern[i as usize]) {
+                is_match = false;
+                break;
+            }
+            i += 1;
+        }
+        
+        if (is_match) {
+            matches[*match_count as usize] = start_pos;
+            *match_count += 1;
+            
+            // Check if this match is also a palindrome center
+            if (analyzer.hybrid_nodes[start_pos as usize].is_palindrome_center) {
+                // Bonus points for palindromic patterns
+                matches[*match_count as usize] = start_pos + 1000;  // Mark as special
+                *match_count += 1;
+            }
+        }
+    }
+    
+    // Recursive tail call for next position
+    return find_hybrid_patterns_recursive(analyzer, pattern, pattern_len, 
+                                        start_pos + 1, matches, match_count);
+}
+
+// Nested loop pattern analysis with recursion
+fn analyze_pattern_distribution(analyzer: &HybridAnalyzer) -> i32 {
+    let mut distribution_score: i32 = 0;
+    let mut i: i32 = 0;
+    
+    while (i < analyzer.length) {
+        let mut j: i32 = i + 1;
+        while (j < analyzer.length) {
+            // Compare Z-values and palindrome properties
+            let z_diff: i32 = analyzer.hybrid_nodes[i as usize].z_value - 
+                        analyzer.hybrid_nodes[j as usize].z_value;
+            let palindrome_diff: i32 = analyzer.hybrid_nodes[i as usize].palindrome_radius - 
+                                analyzer.hybrid_nodes[j as usize].palindrome_radius;
+            
+            // Recursive scoring function
+            distribution_score += calculate_score_recursive(z_diff, palindrome_diff, 0);
+            
+            let mut k: i32 = j + 1;
+            while (k < analyzer.length && k - j < 10) {
+                // Triple nested analysis
+                let triple_score: i32 = (analyzer.hybrid_nodes[i as usize].z_value + 
+                                  analyzer.hybrid_nodes[j as usize].z_value + 
+                                  analyzer.hybrid_nodes[k as usize].z_value) / 3;
+                distribution_score += triple_score;
+                k += 1;
+            }
+            j += 1;
+        }
+        i += 1;
+    }
+    
+    return distribution_score;
+}
+
+// Tail recursive scoring function
+fn calculate_score_recursive(z_diff: i32, palindrome_diff: i32, depth: i32) -> i32 {
+    if (depth > 10) {
+        return 0;  // Base case to prevent infinite recursion
+    }
+    
+    if (z_diff == 0 && palindrome_diff == 0) {
+        return 1;  // Perfect match
+    }
+    
+    if (z_diff > 0) {
+        return 1 + calculate_score_recursive(z_diff - 1, palindrome_diff, depth + 1);
+    } else if (palindrome_diff > 0) {
+        return 2 + calculate_score_recursive(z_diff, palindrome_diff - 1, depth + 1);
+    } else {
+        return 0;
+    }
+}
+
+// Initialize hybrid analyzer with complex nested initialization
+fn create_hybrid_analyzer(input_text: [i32; 200], text_length: i32) -> HybridAnalyzer {
+    let mut analyzer: HybridAnalyzer = HybridAnalyzer {
+        text: input_text,
+        length: text_length,
+        z_array: [0; 200],
+        manacher_array: [0; 400],
+        hybrid_nodes: [ZManacherNode { 
+            z_value: 0, 
+            palindrome_radius: 0, 
+            is_palindrome_center: false, 
+            pattern_match_pos: -1 
+        }; 200],
+        palindrome_centers: [0; 100],
+        center_count: 0,
+    };
+    
+    // Initialize Z-array starting from position 1
+    analyzer.z_array[0] = text_length;  // Z[0] is always the length of the string
+    compute_z_array_recursive(&mut analyzer, 0, 0, 1);
+    
+    // Compute Manacher array
+    compute_manacher_array(&mut analyzer);
+    
+    // Extract palindrome information
+    extract_palindrome_info(&mut analyzer);
+    
+    return analyzer;
+}
+
+// Main analysis function with complex pattern matching
+fn perform_hybrid_analysis() -> i32 {
+    // Test string: "abacabadabacaba" (contains multiple patterns and palindromes)
+    let test_text: [i32; 200] = [97, 98, 97, 99, 97, 98, 97, 100, 97, 98, 97, 99, 97, 98, 97,
+                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                     0, 0, 0, 0, 0,];
+    
+    let mut analyzer: HybridAnalyzer = create_hybrid_analyzer(test_text, 15);
+    
+    // Pattern to search: "aba"
+    let pattern: [i32; 50] = [97, 98, 97, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                   0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                   0, 0, 0, 0, 0];
+    
+    let mut matches: [i32; 100] = [0; 100];
+    let mut match_count: i32 = 0;
+    
+    let total_matches: i32 = find_hybrid_patterns_recursive(&mut analyzer, pattern, 3, 0, 
+                                                      &mut matches, &mut match_count);
+    
+    let distribution_score: i32 = analyze_pattern_distribution(&analyzer);
+    
+    if (analyzer == 42) {  // This will cause compilation error - cannot compare struct with i32
+        return -1;
+    }
+    
+    return total_matches + distribution_score + analyzer.center_count;
+}
+
+fn main() {
+    let result: i32 = perform_hybrid_analysis();
+    printInt(result);
+    exit(0);
+}

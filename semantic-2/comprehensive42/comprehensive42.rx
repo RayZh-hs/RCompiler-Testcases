@@ -1,0 +1,156 @@
+/*
+Test Package: Semantic-2
+Test Target: comprehensive
+Author: Wenxin Zheng
+Time: 2025-08-17
+Verdict: Success
+Test Name: Custom Memory Allocator Simulation
+Summary: This test comprehensively evaluates compiler optimizations for:
+Details:
+Simulated pointer arithmetic and memory management through array manipulation.
+Complex linked-list data structure updates within a large buffer.
+Loop-intensive allocation and deallocation patterns to test performance.
+Management of memory fragmentation and coalescing logic.
+Optimization of deeply nested conditional statements for block management.
+Scope resolution for variables across different allocation phases.
+*/
+
+// comprehensive42.rx - Custom Memory Allocator Simulation
+// This test comprehensively evaluates compiler optimizations for:
+// - Simulated pointer arithmetic and memory management through array manipulation.
+// - Complex linked-list data structure updates within a large buffer.
+// - Loop-intensive allocation and deallocation patterns to test performance.
+// - Management of memory fragmentation and coalescing logic.
+// - Optimization of deeply nested conditional statements for block management.
+// - Scope resolution for variables across different allocation phases.
+
+fn main() {
+    let mut heap: [i32; 1024] = [0; 1024];
+    let mut free_list_head: i32 = 0;
+    let mut total_blocks: i32 = 0;
+
+    fn init_heap(mut heap: &mut [i32; 1024], mut free_list_head: &mut i32) {
+        let heap_size: i32 = 1024;
+        let block_size: i32 = 16;
+        let num_blocks: i32 = heap_size / block_size;
+        let mut i: i32 = 0;
+        while (i < num_blocks) {
+            let current_addr: i32 = i * block_size;
+            heap[current_addr] = (i + 1) * block_size; // Next pointer
+            i = i + 1;
+        }
+        heap[(num_blocks - 1) * block_size] = -1; // End of list
+        *free_list_head = 0;
+    }
+
+    fn alloc(mut heap: &mut [i32; 1024], mut free_list_head: &mut i32) -> i32 {
+        if (*free_list_head == -1) {
+            return -1; // Out of memory
+        }
+        let block_addr: i32 = *free_list_head;
+        *free_list_head = heap[block_addr];
+        heap[block_addr] = -2; // Mark as allocated
+        return block_addr;
+    }
+
+    fn free(mut heap: &mut [i32; 1024], mut free_list_head: &mut i32, addr: i32) {
+        heap[addr] = *free_list_head;
+        *free_list_head = addr;
+    }
+
+    init_heap(&mut heap, &mut free_list_head);
+
+    let mut allocations: [i32; 64] = [0; 64];
+    let mut i: i32 = 0;
+    let mut successful_allocs: i32 = 0;
+
+    while (i < 64) {
+        let addr: i32 = alloc(&mut heap, &mut free_list_head);
+        if (addr != -1) {
+            allocations[i] = addr;
+            successful_allocs = successful_allocs + 1;
+        }
+        i = i + 1;
+    }
+
+    i = 0;
+    while (i < 32) {
+        if (i % 2 == 0) {
+            free(&mut heap, &mut free_list_head, allocations[i]);
+            allocations[i] = -1;
+        }
+        i = i + 1;
+    }
+
+    i = 0;
+    while (i < 16) {
+        let addr: i32 = alloc(&mut heap, &mut free_list_head);
+        if (addr != -1) {
+            let mut j: i32 = 0;
+            let mut placed: bool = false;
+            while (j < 64) {
+                if (allocations[j] == -1 && !placed) {
+                    allocations[j] = addr;
+                    placed = true;
+                }
+                j = j + 1;
+            }
+        }
+        i = i + 1;
+    }
+
+    let mut active_blocks: i32 = 0;
+    i = 0;
+    while (i < 64) {
+        if (allocations[i] != -1) {
+            active_blocks = active_blocks + 1;
+        }
+        i = i + 1;
+    }
+
+    // Hidden Error: `fragmentation_metric` is defined in a nested scope
+    // but used later, which should cause a scope error.
+    if (active_blocks > 40) {
+        let mut max_contiguous_free: i32 = 0;
+        let mut current_contiguous: i32 = 0;
+        let mut current_ptr: i32 = free_list_head;
+        while (current_ptr != -1) {
+            current_contiguous = current_contiguous + 1;
+            let next_ptr: i32 = heap[current_ptr];
+            if (next_ptr != current_ptr + 16) {
+                if (current_contiguous > max_contiguous_free) {
+                    max_contiguous_free = current_contiguous;
+                }
+                current_contiguous = 0;
+            }
+            current_ptr = next_ptr;
+        }
+        let fragmentation_metric: i32 = max_contiguous_free * 100 / (1024 / 16 - active_blocks);
+    }
+
+    if (active_blocks < 48) {
+        let mut i: i32 = 32;
+        while (i < 64) {
+            if (i % 3 == 0) {
+                if (allocations[i] != -1) {
+                    free(&mut heap, &mut free_list_head, allocations[i]);
+                    allocations[i] = -1;
+                }
+            }
+            i = i + 1;
+        }
+    }
+
+    let mut final_check_sum: i32 = 0;
+    i = 0;
+    while (i < 1024) {
+        if (heap[i] == -2) {
+            final_check_sum = final_check_sum + i;
+        }
+        i = i + 1;
+    }
+
+    // This line will cause a compile error because `fragmentation_metric` is out of scope.
+    printInt(fragmentation_metric);
+    printInt(final_check_sum);
+}

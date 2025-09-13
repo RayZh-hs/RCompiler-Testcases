@@ -1,0 +1,32 @@
+{
+    "active": 1,
+    "cmp": [
+        "compileexitcode"
+    ],
+    "compileexitcode": 0,
+    "compilememorylimit": 256,
+    "compiletimelimit": 15,
+    "exitcode": 0,
+    "id": 2031848,
+    "input_path": "src/return14/return14.in",
+    "input_visible": 1,
+    "metainfo": {
+        "caseauthor": "Ruitian Wang",
+        "comment": "Valid return in if expression - early return does not affect if expression type",
+        "lastmodified": "2025-08-27"
+    },
+    "name": "return14",
+    "name_visible": 1,
+    "output_path": "src/return14/return14.out",
+    "output_visible": 1,
+    "provide": [
+        "compilestderr",
+        "compileexitcode"
+    ],
+    "runtimelimit": -1,
+    "runtimememorylimit": 256,
+    "source_path": "src/return14/return14.rx",
+    "source_visible": 1,
+    "stage_id": 23891,
+    "stage_name": "semantic-1"
+}

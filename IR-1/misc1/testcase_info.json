@@ -1,0 +1,32 @@
+{
+    "active": 1,
+    "cmp": [
+        "compileexitcode"
+    ],
+    "compileexitcode": 0,
+    "compilememorylimit": 256,
+    "compiletimelimit": 15,
+    "exitcode": 0,
+    "id": 2032048,
+    "input_path": "src/misc1/misc1.in",
+    "input_visible": 0,
+    "metainfo": {
+        "caseauthor": "Wenxin Zheng",
+        "comment": "",
+        "lastmodified": "2025-08-17"
+    },
+    "name": "misc1",
+    "name_visible": 1,
+    "output_path": "src/misc1/misc1.out",
+    "output_visible": 0,
+    "provide": [
+        "compilestderr",
+        "compileexitcode"
+    ],
+    "runtimelimit": -1,
+    "runtimememorylimit": 256,
+    "source_path": "src/misc1/misc1.rx",
+    "source_visible": 0,
+    "stage_id": 23892,
+    "stage_name": "IR-1"
+}

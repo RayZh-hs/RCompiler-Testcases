@@ -1,0 +1,479 @@
+/*
+Test Package: Semantic-1
+Test Target: misc
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: Heavy-Light Decomposition with Link-Cut Tree operations with missing struct field initialization error in HeavyLightTree
+*/
+
+// Heavy-Light Decomposition combined with Link-Cut Tree operations
+// Advanced tree decomposition for dynamic tree queries and path operations
+
+const MAXN: usize = 200;
+
+struct TreeNode {
+    parent: i32,
+    children: [i32; 2],
+    child_count: i32,
+    subtree_size: i32,
+    heavy_child: i32,
+    chain_id: i32,
+    depth: i32,
+    value: i32,
+    path_sum: i32,
+    is_preferred_child: bool,
+}
+
+struct HeavyLightTree {
+    nodes: [TreeNode; MAXN],
+    node_count: i32,
+    chain_heads: [i32; MAXN],
+    chain_count: i32,
+    root_node: i32,
+    euler_tour: [i32; 2 * MAXN],
+    euler_index: i32,
+    segment_trees: [[i32; 4 * MAXN]; MAXN], // One per chain
+    chain_sizes: [i32; MAXN],
+}
+
+struct LinkCutNode {
+    left_child: i32,
+    right_child: i32,
+    parent: i32,
+    value: i32,
+    sum: i32,
+    lazy_add: i32,
+    is_reversed: bool,
+    // Missing field: original_index - this will cause compilation error ???
+}
+
+struct LinkCutTree {
+    splay_nodes: [LinkCutNode; MAXN],
+    node_count: i32,
+    auxiliary_trees: [i32; MAXN], // Root of auxiliary tree for each node
+}
+
+// Initialize tree node with default values
+fn create_tree_node(node_id: i32, parent_id: i32, node_value: i32) -> TreeNode {
+    TreeNode {
+        parent: parent_id,
+        children: [-1; 2],
+        child_count: 0,
+        subtree_size: 1,
+        heavy_child: -1,
+        chain_id: -1,
+        depth: 0,
+        value: node_value,
+        path_sum: node_value,
+        is_preferred_child: false,
+    }
+}
+
+// DFS to compute subtree sizes and find heavy children
+fn compute_subtree_sizes_recursive(
+    tree: &mut HeavyLightTree,
+    node_id: i32,
+    parent_id: i32,
+    current_depth: i32,
+) {
+    tree.nodes[node_id as usize].parent = parent_id;
+    tree.nodes[node_id as usize].depth = current_depth;
+    tree.nodes[node_id as usize].subtree_size = 1;
+
+    let mut max_child_size: i32 = 0;
+    let mut heavy_child: i32 = -1;
+
+    let mut i: i32 = 0;
+    while (i < tree.nodes[node_id as usize].child_count) {
+        let child_id: i32 = tree.nodes[node_id as usize].children[i as usize];
+
+        compute_subtree_sizes_recursive(tree, child_id, node_id, current_depth + 1);
+
+        tree.nodes[node_id as usize].subtree_size += tree.nodes[child_id as usize].subtree_size;
+
+        if (tree.nodes[child_id as usize].subtree_size > max_child_size) {
+            max_child_size = tree.nodes[child_id as usize].subtree_size;
+            heavy_child = child_id;
+        }
+        i += 1;
+    }
+
+    tree.nodes[node_id as usize].heavy_child = heavy_child;
+}
+
+// Heavy-Light Decomposition with chain creation
+fn build_heavy_light_decomposition(
+    tree: &mut HeavyLightTree,
+    node_id: i32,
+    chain_id: i32,
+    is_chain_head: bool,
+) {
+    if (is_chain_head) {
+        tree.chain_heads[chain_id as usize] = node_id;
+    }
+
+    tree.nodes[node_id as usize].chain_id = chain_id;
+
+    // Process heavy child first (continue same chain)
+    let heavy_child: i32 = tree.nodes[node_id as usize].heavy_child;
+    if (heavy_child != -1) {
+        tree.nodes[heavy_child as usize].is_preferred_child = true;
+        build_heavy_light_decomposition(tree, heavy_child, chain_id, false);
+    }
+
+    // Process light children (start new chains)
+    let mut i: i32 = 0;
+    while (i < tree.nodes[node_id as usize].child_count) {
+        let child_id: i32 = tree.nodes[node_id as usize].children[i as usize];
+
+        if (child_id != heavy_child) {
+            tree.chain_count += 1;
+            build_heavy_light_decomposition(tree, child_id, tree.chain_count, true);
+        }
+        i += 1;
+    }
+}
+
+// Build segment tree for a specific chain
+fn build_chain_segment_tree(tree: &mut HeavyLightTree, chain_id: i32) {
+    let chain_head: i32 = tree.chain_heads[chain_id as usize];
+    let mut chain_nodes: [i32; MAXN] = [0i32; MAXN];
+    let mut chain_size: i32 = 0;
+
+    // Collect all nodes in this chain
+    let mut current: i32 = chain_head;
+    while (current != -1 && tree.nodes[current as usize].chain_id == chain_id) {
+        chain_nodes[chain_size as usize] = current;
+        chain_size += 1;
+        current = tree.nodes[current as usize].heavy_child;
+    }
+
+    tree.chain_sizes[chain_id as usize] = chain_size;
+
+    // Build segment tree bottom-up
+    let mut i: i32 = chain_size;
+    while (i < 2 * chain_size) {
+        let node_idx: i32 = chain_nodes[(i - chain_size) as usize];
+        tree.segment_trees[chain_id as usize][i as usize] = tree.nodes[node_idx as usize].value;
+        i += 1;
+    }
+
+    i = chain_size - 1;
+    while (i >= 1) {
+        tree.segment_trees[chain_id as usize][i as usize] = tree.segment_trees[chain_id as usize]
+            [(2 * i) as usize]
+            + tree.segment_trees[chain_id as usize][(2 * i + 1) as usize];
+        i -= 1;
+    }
+}
+
+// Query sum on path from node_a to node_b using Heavy-Light Decomposition
+fn query_path_sum_hld(tree: &HeavyLightTree, node_a: i32, node_b: i32) -> i32 {
+    let mut total_sum: i32 = 0;
+    let mut current_a: i32 = node_a;
+    let mut current_b: i32 = node_b;
+
+    // Move both nodes up until they're in the same chain
+    while (tree.nodes[current_a as usize].chain_id != tree.nodes[current_b as usize].chain_id) {
+        // Move the node up which has deeper chain head
+        let chain_id_a: i32 = tree.nodes[current_a as usize].chain_id;
+        let chain_id_b: i32 = tree.nodes[current_b as usize].chain_id;
+        let head_a: i32 = tree.chain_heads[chain_id_a as usize];
+        let head_b: i32 = tree.chain_heads[chain_id_b as usize];
+
+        if (tree.nodes[head_a as usize].depth > tree.nodes[head_b as usize].depth) {
+            let chain_id: i32 = tree.nodes[current_a as usize].chain_id;
+            let chain_head: i32 = tree.chain_heads[chain_id as usize];
+
+            // Query sum from current_a to chain head
+            total_sum += query_chain_range_sum(
+                tree,
+                chain_id,
+                get_chain_position(tree, current_a, chain_id),
+                get_chain_position(tree, chain_head, chain_id),
+            );
+
+            current_a = tree.nodes[chain_head as usize].parent;
+        } else {
+            let chain_id: i32 = tree.nodes[current_b as usize].chain_id;
+            let chain_head: i32 = tree.chain_heads[chain_id as usize];
+
+            total_sum += query_chain_range_sum(
+                tree,
+                chain_id,
+                get_chain_position(tree, current_b, chain_id),
+                get_chain_position(tree, chain_head, chain_id),
+            );
+
+            current_b = tree.nodes[chain_head as usize].parent;
+        }
+    }
+
+    // Both nodes are now in the same chain
+    let chain_id: i32 = tree.nodes[current_a as usize].chain_id;
+    let pos_a: i32 = get_chain_position(tree, current_a, chain_id);
+    let pos_b: i32 = get_chain_position(tree, current_b, chain_id);
+
+    let start_pos: i32 = if (pos_a < pos_b) { pos_a } else { pos_b };
+    let end_pos: i32 = if (pos_a < pos_b) { pos_b } else { pos_a };
+
+    total_sum += query_chain_range_sum(tree, chain_id, start_pos, end_pos);
+
+    return total_sum;
+}
+
+// Get position of node within its chain
+fn get_chain_position(tree: &HeavyLightTree, node_id: i32, chain_id: i32) -> i32 {
+    let chain_head: i32 = tree.chain_heads[chain_id as usize];
+    let mut position: i32 = 0;
+    let mut current: i32 = chain_head;
+
+    while (current != node_id && current != -1) {
+        current = tree.nodes[current as usize].heavy_child;
+        position += 1;
+    }
+
+    return position;
+}
+
+// Query range sum in a specific chain using segment tree
+fn query_chain_range_sum(tree: &HeavyLightTree, chain_id: i32, left: i32, right: i32) -> i32 {
+    let chain_size: i32 = tree.chain_sizes[chain_id as usize];
+    let mut result: i32 = 0;
+    let mut l: i32 = left + chain_size;
+    let mut r: i32 = right + chain_size + 1;
+
+    while (l < r) {
+        if (l % 2 == 1) {
+            result += tree.segment_trees[chain_id as usize][l as usize];
+            l += 1;
+        }
+        if (r % 2 == 1) {
+            r -= 1;
+            result += tree.segment_trees[chain_id as usize][r as usize];
+        }
+        l /= 2;
+        r /= 2;
+    }
+
+    return result;
+}
+
+fn create_linkcut_node(node_value: i32) -> LinkCutNode {
+    LinkCutNode {
+        left_child: -1,
+        right_child: -1,
+        parent: -1,
+        value: node_value,
+        sum: node_value,
+        lazy_add: 0,
+        is_reversed: false,
+    }
+}
+
+// Splay operation for Link-Cut Tree
+fn splay_operation_recursive(lct: &mut LinkCutTree, node_id: i32, depth: i32) {
+    if (depth > 50 || node_id == -1) {
+        return; // Prevent infinite recursion
+    }
+
+    let parent: i32 = lct.splay_nodes[node_id as usize].parent;
+    if (parent == -1) {
+        return; // Already root
+    }
+
+    let grandparent: i32 = lct.splay_nodes[parent as usize].parent;
+
+    if (grandparent == -1) {
+        // Zig case
+        rotate_linkcut_tree(lct, node_id);
+    } else {
+        // Zig-zig or Zig-zag cases
+        if ((lct.splay_nodes[parent as usize].left_child == node_id)
+            == (lct.splay_nodes[grandparent as usize].left_child == parent))
+        {
+            // Zig-zig
+            rotate_linkcut_tree(lct, parent);
+            rotate_linkcut_tree(lct, node_id);
+        } else {
+            // Zig-zag
+            rotate_linkcut_tree(lct, node_id);
+            rotate_linkcut_tree(lct, node_id);
+        }
+    }
+    splay_operation_recursive(lct, node_id, depth + 1);
+}
+
+// Rotate operation for splay tree
+fn rotate_linkcut_tree(lct: &mut LinkCutTree, node_id: i32) {
+    let parent: i32 = lct.splay_nodes[node_id as usize].parent;
+    if (parent == -1) {
+        return;
+    }
+
+    let grandparent: i32 = lct.splay_nodes[parent as usize].parent;
+
+    if (lct.splay_nodes[parent as usize].left_child == node_id) {
+        // Left rotation
+        lct.splay_nodes[parent as usize].left_child = lct.splay_nodes[node_id as usize].right_child;
+        if (lct.splay_nodes[node_id as usize].right_child != -1) {
+            lct.splay_nodes[lct.splay_nodes[node_id as usize].right_child as usize].parent = parent;
+        }
+        lct.splay_nodes[node_id as usize].right_child = parent;
+    } else {
+        // Right rotation
+        lct.splay_nodes[parent as usize].right_child = lct.splay_nodes[node_id as usize].left_child;
+        if (lct.splay_nodes[node_id as usize].left_child != -1) {
+            lct.splay_nodes[lct.splay_nodes[node_id as usize].left_child as usize].parent = parent;
+        }
+        lct.splay_nodes[node_id as usize].left_child = parent;
+    }
+
+    lct.splay_nodes[node_id as usize].parent = grandparent;
+    lct.splay_nodes[parent as usize].parent = node_id;
+
+    if (grandparent != -1) {
+        if (lct.splay_nodes[grandparent as usize].left_child == parent) {
+            lct.splay_nodes[grandparent as usize].left_child = node_id;
+        } else {
+            lct.splay_nodes[grandparent as usize].right_child = node_id;
+        }
+    }
+}
+
+// Complex nested analysis combining HLD and Link-Cut operations
+fn perform_hybrid_tree_analysis(hld_tree: &mut HeavyLightTree, lct: &mut LinkCutTree) -> i32 {
+    let mut analysis_score: i32 = 0;
+    let operations: i32 = MAXN as i32;
+
+    let mut op: i32 = 0;
+    while (op < operations) {
+        let mut inner_loop: i32 = 0;
+        while (inner_loop < 5) {
+            let node_a: i32 = op % hld_tree.node_count;
+            let node_b: i32 = (op + inner_loop + 1) % hld_tree.node_count;
+            // HLD path query
+            let hld_sum: i32 = query_path_sum_hld(hld_tree, node_a, node_b);
+            analysis_score += hld_sum % 1000;
+
+            // Link-Cut tree operations
+            splay_operation_recursive(lct, node_a, 0);
+            splay_operation_recursive(lct, node_b, 0);
+
+            // Nested analysis of tree structure
+            let mut depth_analysis: i32 = 0;
+            while (depth_analysis < 3) {
+                let mut structure_score: i32 = 0;
+                let mut k: i32 = 0;
+                while (k < 10) {
+                    if (node_a + k < hld_tree.node_count) {
+                        structure_score +=
+                            hld_tree.nodes[(node_a + k) as usize].subtree_size as i32;
+                    }
+                    k += 1;
+                }
+                analysis_score += structure_score % 100;
+                depth_analysis += 1;
+            }
+
+            inner_loop += 1;
+        }
+        op += 1;
+    }
+
+    return analysis_score;
+}
+
+// Initialize Heavy-Light Tree with complex structure
+fn create_heavy_light_tree() -> HeavyLightTree {
+    let mut tree: HeavyLightTree = HeavyLightTree {
+        nodes: [create_tree_node(0, -1, 0); MAXN],
+        node_count: MAXN as i32,
+        chain_heads: [-1; MAXN],
+        chain_count: 0,
+        root_node: 0,
+        euler_index: 0,
+        segment_trees: [[0; 4 * MAXN]; MAXN],
+        chain_sizes: [0; MAXN],
+    };
+
+    // Build a sample tree structure
+    let mut i: i32 = 0;
+    while (i < tree.node_count) {
+        tree.nodes[i as usize] = create_tree_node(i, -1, (i + 1) as i32);
+
+        // Add children (each node has 1-3 children)
+        if (i * 2 + 1 < tree.node_count) {
+            tree.nodes[i as usize].children[tree.nodes[i as usize].child_count as usize] =
+                i * 2 + 1;
+            tree.nodes[i as usize].child_count += 1;
+        }
+        if (i * 2 + 2 < tree.node_count) {
+            tree.nodes[i as usize].children[tree.nodes[i as usize].child_count as usize] =
+                i * 2 + 2;
+            tree.nodes[i as usize].child_count += 1;
+        }
+        i += 1;
+    }
+
+    // Compute subtree sizes and heavy children
+    compute_subtree_sizes_recursive(&mut tree, 0, -1, 0);
+
+    // Build Heavy-Light Decomposition
+    build_heavy_light_decomposition(&mut tree, 0, 0, true);
+
+    // Build segment trees for each chain
+    let mut chain_id: i32 = 0;
+    while (chain_id <= tree.chain_count) {
+        build_chain_segment_tree(&mut tree, chain_id);
+        chain_id += 1;
+    }
+
+    return tree;
+}
+
+// Initialize Link-Cut Tree (this will fail due to missing field)
+fn create_linkcut_tree(size: i32) -> LinkCutTree {
+    let mut lct: LinkCutTree = LinkCutTree {
+        splay_nodes: [create_linkcut_node(0); MAXN], // This will fail - missing field in LinkCutNode
+        node_count: size,
+        auxiliary_trees: [-1; MAXN],
+    };
+
+    let mut i: i32 = 0;
+    while (i < size) {
+        lct.splay_nodes[i as usize] = create_linkcut_node((i + 1) as i32);
+        i += 1;
+    }
+
+    return lct;
+}
+
+// Main analysis function
+fn perform_combined_analysis() -> i32 {
+    let mut hld_tree: HeavyLightTree = create_heavy_light_tree();
+    let mut lct: LinkCutTree = create_linkcut_tree(MAXN as i32); // This will cause compilation error
+
+    let analysis_result: i32 = perform_hybrid_tree_analysis(&mut hld_tree, &mut lct);
+
+    // Additional complex queries
+    let mut additional_sum: i32 = 0;
+    let mut i: i32 = 0;
+    while (i < 10) {
+        let mut j: i32 = i + 1;
+        while (j < 15) {
+            additional_sum += query_path_sum_hld(&hld_tree, i, j);
+            j += 1;
+        }
+        i += 1;
+    }
+
+    return analysis_result + additional_sum;
+}
+
+fn main() {
+    let result: i32 = perform_combined_analysis();
+    printInt(result);
+    exit(0);
+}

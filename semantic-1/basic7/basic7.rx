@@ -1,0 +1,37 @@
+/*
+Test Package: Semantic-1
+Test Target: basic
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: basic test, underscore placeholder in function return position
+*/
+
+fn main() {
+    let matrix: Matrix = Matrix::identity();
+    let trace: i32 = matrix.trace();
+    let keep: i32 = trace;
+    exit(0);
+}
+
+struct Matrix {
+    m: [[i32; 3]; 3],
+}
+
+impl Matrix {
+    fn identity() -> Self {
+        Matrix { m: [
+            [1, 0, 0],
+            [0, 1, 0],
+            [0, 0, 1],
+        ] }
+    }
+
+    fn trace(&self) -> i32 {
+        self.m[0][0] + self.m[1][1] + self.m[2][2]
+    }
+
+    fn determinant(self) -> i32 {
+        _
+    }
+}

@@ -1,0 +1,378 @@
+/*
+Test Package: Semantic-2
+Test Target: comprehensive
+Author: Wenxin Zheng
+Time: 2025-08-17
+Verdict: Success
+Test Name: Custom Virtual Machine Execution Simulation
+Summary: This test comprehensively evaluates compiler optimizations for:
+Details:
+Large switch-case style dispatch for instruction decoding (simulated with if-else chains).
+Complex arithmetic and bitwise operations for ALU simulation.
+Pointer-like arithmetic using array indices for memory and stack access.
+Deeply nested conditional logic for instruction execution and flag updates.
+Loop performance for program execution cycle and memory initialization.
+Optimization of multi-dimensional array accesses for register file and memory simulation.
+Function call overhead for handling VM subroutines and system calls.
+Branch prediction in the context of frequent conditional jumps in the VM program.
+*/
+
+// comprehensive29.rx - Custom Virtual Machine Execution Simulation
+// This test comprehensively evaluates compiler optimizations for:
+// - Large switch-case style dispatch for instruction decoding (simulated with if-else chains).
+// - Complex arithmetic and bitwise operations for ALU simulation.
+// - Pointer-like arithmetic using array indices for memory and stack access.
+// - Deeply nested conditional logic for instruction execution and flag updates.
+// - Loop performance for program execution cycle and memory initialization.
+// - Optimization of multi-dimensional array accesses for register file and memory simulation.
+// - Function call overhead for handling VM subroutines and system calls.
+// - Branch prediction in the context of frequent conditional jumps in the VM program.
+
+let REGISTER_COUNT: i32 = 16;
+let MEMORY_SIZE: i32 = 2048;
+let STACK_SIZE: i32 = 256;
+
+// VM State
+let mut registers: [i32; 16];
+let mut memory: [i32; 2048];
+let mut stack: [i32; 256];
+
+let mut pc: i32; // Program Counter
+let mut sp: i32; // Stack Pointer
+let mut zf: bool; // Zero Flag
+let mut cf: bool; // Carry Flag
+let mut halt: bool;
+
+fn init_vm() {
+    let i: i32 = 0;
+    while (i < REGISTER_COUNT) {
+        registers[i] = 0;
+        i = i + 1;
+    }
+    i = 0;
+    while (i < MEMORY_SIZE) {
+        memory[i] = 0;
+        i = i + 1;
+    }
+    i = 0;
+    while (i < STACK_SIZE) {
+        stack[i] = 0;
+        i = i + 1;
+    }
+
+    pc = 0;
+    sp = STACK_SIZE;
+    zf = false;
+    cf = false;
+    halt = false;
+}
+
+fn load_program() {
+    // A complex program to test various instructions and logic.
+    // This program calculates Fibonacci numbers iteratively and recursively,
+    // performs some complex arithmetic, and tests conditional branches.
+
+    // Opcodes:
+    // 0: HALT, 1: MOV_REG, 2: MOV_IMM, 3: ADD, 4: SUB, 5: MUL, 6: DIV
+    // 7: AND, 8: OR, 9: XOR, 10: NOT, 11: SHL, 12: SHR
+    // 13: PUSH, 14: POP, 15: LOAD, 16: STORE
+    // 17: JMP, 18: JZ, 19: JNZ, 20: JC, 21: JNC
+    // 22: CALL, 23: RET, 24: CMP_REG, 25: CMP_IMM
+    // 26: PRINT_REG
+
+    let program: [i32; 200] = [
+        // --- Part 1: Iterative Fibonacci ---
+        // R0: n, R1: a, R2: b, R3: temp, R4: counter
+        2, 0, 15,       // MOV R0, 15 (Calculate Fib(15))
+        2, 1, 0,        // MOV R1, 0  (a = 0)
+        2, 2, 1,        // MOV R2, 1  (b = 1)
+        1, 4, 0,        // MOV R4, R0 (counter = n)
+        25, 4, 1,       // CMP R4, 1
+        18, 36, 0,      // JZ fib_iter_end (if n <= 1, jump to end)
+
+        // Loop start (pc=21)
+        1, 3, 1,        // MOV R3, R1 (temp = a)
+        1, 1, 2,        // MOV R1, R2 (a = b)
+        3, 2, 3, 0,     // ADD R2, R3 (b = b + temp)
+        4, 4, 1, 0,     // SUB R4, 1
+        25, 4, 1,       // CMP R4, 1
+        19, 21, 0,      // JNZ loop_start
+
+        // fib_iter_end (pc=36)
+        26, 1, 0,       // PRINT_REG R1 (Print result of iterative fib)
+
+        // --- Part 2: Recursive Fibonacci Setup ---
+        2, 0, 10,       // MOV R0, 10 (Calculate Fib(10) recursively)
+        13, 0, 0,       // PUSH R0
+        22, 81, 0,      // CALL fib_recursive
+        14, 1, 0,       // POP R1 (get result)
+        26, 1, 0,       // PRINT_REG R1
+
+        // --- Part 3: Complex arithmetic and bitwise ops ---
+        2, 5, 12345,    // MOV R5, 12345
+        2, 6, 54321,    // MOV R6, 54321
+        7, 5, 6, 0,     // AND R5, R6
+        26, 5, 0,       // PRINT_REG R5
+        2, 5, 12345,    // Reset R5
+        8, 5, 6, 0,     // OR R5, R6
+        26, 5, 0,       // PRINT_REG R5
+        11, 5, 3, 0,    // SHL R5, 3
+        26, 5, 0,       // PRINT_REG R5
+        12, 5, 5, 0,    // SHR R5, 5
+        26, 5, 0,       // PRINT_REG R5
+
+        0, 0, 0,        // HALT
+
+        // --- fib_recursive function (pc=81) ---
+        // Arg is on stack, R0 is used for calculations
+        13, 14, 0,      // PUSH R14 (link register)
+        13, 2, 0,       // PUSH R2
+        13, 3, 0,       // PUSH R3
+
+        // Load argument
+        15, 0, 1, 4,    // LOAD R0, [SP+4] (arg is at sp+4*word_size, simplified here)
+        
+        25, 0, 2,       // CMP R0, 2
+        20, 108, 0,     // JC fib_base_case (if n < 2)
+
+        // Recursive step
+        4, 0, 1, 0,     // SUB R0, 1 (n-1)
+        13, 0, 0,       // PUSH R0
+        22, 81, 0,      // CALL fib_recursive
+        14, 2, 0,       // POP R2 (result of fib(n-1))
+
+        4, 0, 1, 0,     // SUB R0, 1 (n-2)
+        13, 0, 0,       // PUSH R0
+        22, 81, 0,      // CALL fib_recursive
+        14, 3, 0,       // POP R3 (result of fib(n-2))
+
+        3, 0, 2, 3,     // ADD R0, R2, R3
+        17, 114, 0,     // JMP fib_end
+
+        // fib_base_case (pc=108)
+        15, 0, 1, 4,    // LOAD R0, [SP+4]
+        
+        // fib_end (pc=114)
+        16, 0, 1, 4,    // STORE R0, [SP+4] (store return value)
+        14, 3, 0,       // POP R3
+        14, 2, 0,       // POP R2
+        14, 14, 0,      // POP R14
+        23, 0, 0        // RET
+    ];
+
+    let i: i32 = 0;
+    while (i < 200) {
+        memory[i] = program[i];
+        i = i + 1;
+    }
+}
+
+fn fetch_decode_execute() {
+    while (halt == false) {
+        if (pc < 0 || pc >= MEMORY_SIZE) {
+            halt = true;
+        }
+        if (halt == true) {
+            // loop exit
+        } else {
+            let opcode: i32 = memory[pc];
+            pc = pc + 1;
+
+            // Simulating a switch statement with if-else if
+            if (opcode == 0) { // HALT
+                halt = true;
+            } else if opcode == 1 { // MOV_REG
+                let r_dst: i32 = memory[pc];
+                let r_src: i32 = memory[pc+1];
+                registers[r_dst] = registers[r_src];
+                pc = pc + 2;
+            } else if opcode == 2 { // MOV_IMM
+                let r_dst: i32 = memory[pc];
+                let imm: i32 = memory[pc+1];
+                registers[r_dst] = imm;
+                pc = pc + 2;
+            } else if opcode == 3 { // ADD
+                let r_dst: i32 = memory[pc];
+                let r_src: i32 = memory[pc+1];
+                let res: i32 = registers[r_dst] + registers[r_src];
+                // Simplified overflow check
+                if (registers[r_dst] > 0 && registers[r_src] > 0 && res < 0) {
+                    cf = true;
+                } else if registers[r_dst] < 0 && registers[r_src] < 0 && res > 0 {
+                    cf = true;
+                } else {
+                    cf = false;
+                }
+                registers[r_dst] = res;
+                zf = res == 0;
+                pc = pc + 2;
+            } else if opcode == 4 { // SUB
+                let r_dst: i32 = memory[pc];
+                let r_src: i32 = memory[pc+1];
+                let res: i32 = registers[r_dst] - registers[r_src];
+                // Simplified borrow check
+                if (registers[r_dst] > 0 && registers[r_src] < 0 && res < 0) {
+                    cf = true;
+                } else if registers[r_dst] < 0 && registers[r_src] > 0 && res > 0 {
+                    cf = true;
+                } else {
+                    cf = false;
+                }
+                registers[r_dst] = res;
+                zf = res == 0;
+                pc = pc + 2;
+            } else if opcode == 5 { // MUL
+                let r_dst: i32 = memory[pc];
+                let r_src: i32 = memory[pc+1];
+                registers[r_dst] = registers[r_dst] * registers[r_src];
+                zf = registers[r_dst] == 0;
+                pc = pc + 2;
+            } else if opcode == 6 { // DIV
+                let r_dst: i32 = memory[pc];
+                let r_src: i32 = memory[pc+1];
+                if (registers[r_src] != 0) {
+                    registers[r_dst] = registers[r_dst] / registers[r_src];
+                } else {
+                    halt = true; // Division by zero
+                }
+                zf = registers[r_dst] == 0;
+                pc = pc + 2;
+            } else if opcode == 7 { // AND
+                let r_dst: i32 = memory[pc];
+                let r_src: i32 = memory[pc+1];
+                registers[r_dst] = registers[r_dst] & registers[r_src];
+                zf = registers[r_dst] == 0;
+                pc = pc + 2;
+            } else if opcode == 8 { // OR
+                let r_dst: i32 = memory[pc];
+                let r_src: i32 = memory[pc+1];
+                registers[r_dst] = registers[r_dst] | registers[r_src];
+                zf = registers[r_dst] == 0;
+                pc = pc + 2;
+            } else if opcode == 9 { // XOR
+                let r_dst: i32 = memory[pc];
+                let r_src: i32 = memory[pc+1];
+                registers[r_dst] = registers[r_dst] ^ registers[r_src];
+                zf = registers[r_dst] == 0;
+                pc = pc + 2;
+            } else if opcode == 10 { // NOT
+                let r_dst: i32 = memory[pc];
+                registers[r_dst] = !registers[r_dst];
+                zf = registers[r_dst] == 0;
+                pc = pc + 1;
+            } else if opcode == 11 { // SHL
+                let r_dst: i32 = memory[pc];
+                let imm: i32 = memory[pc+1];
+                registers[r_dst] = registers[r_dst] << imm;
+                zf = registers[r_dst] == 0;
+                pc = pc + 2;
+            } else if opcode == 12 { // SHR
+                let r_dst: i32 = memory[pc];
+                let imm: i32 = memory[pc+1];
+                registers[r_dst] = registers[r_dst] >> imm;
+                zf = registers[r_dst] == 0;
+                pc = pc + 2;
+            } else if opcode == 13 { // PUSH
+                let r_src: i32 = memory[pc];
+                sp = sp - 1;
+                stack[sp] = registers[r_src];
+                pc = pc + 1;
+            } else if opcode == 14 { // POP
+                let r_dst: i32 = memory[pc];
+                registers[r_dst] = stack[sp];
+                sp = sp + 1;
+                pc = pc + 1;
+            } else if opcode == 15 { // LOAD
+                let r_dst: i32 = memory[pc];
+                let r_addr: i32 = memory[pc+1];
+                let offset: i32 = memory[pc+2];
+                let addr: i32 = registers[r_addr] + offset;
+                if (addr >= 0 && addr < MEMORY_SIZE) {
+                    registers[r_dst] = memory[addr];
+                } else {
+                    halt = true;
+                }
+                pc = pc + 3;
+            } else if opcode == 16 { // STORE
+                let r_src: i32 = memory[pc];
+                let r_addr: i32 = memory[pc+1];
+                let offset: i32 = memory[pc+2];
+                let addr: i32 = registers[r_addr] + offset;
+                if (addr >= 0 && addr < MEMORY_SIZE) {
+                    memory[addr] = registers[r_src];
+                } else {
+                    halt = true;
+                }
+                pc = pc + 3;
+            } else if opcode == 17 { // JMP
+                pc = memory[pc];
+            } else if opcode == 18 { // JZ
+                if (zf) {
+                    pc = memory[pc];
+                } else {
+                    pc = pc + 1;
+                }
+            } else if opcode == 19 { // JNZ
+                if (!zf) {
+                    pc = memory[pc];
+                } else {
+                    pc = pc + 1;
+                }
+            } else if opcode == 20 { // JC
+                if (cf) {
+                    pc = memory[pc];
+                } else {
+                    pc = pc + 1;
+                }
+            } else if opcode == 21 { // JNC
+                if (!cf) {
+                    pc = memory[pc];
+                } else {
+                    pc = pc + 1;
+                }
+            } else if opcode == 22 { // CALL
+                sp = sp - 1;
+                stack[sp] = pc + 1; // Push return address
+                pc = memory[pc];
+            } else if opcode == 23 { // RET
+                pc = stack[sp];
+                sp = sp + 1;
+            } else if opcode == 24 { // CMP_REG
+                let r1: i32 = memory[pc];
+                let r2: i32 = memory[pc+1];
+                let val1: i32 = registers[r1];
+                let val2: i32 = registers[r2];
+                zf = val1 == val2;
+                cf = val1 < val2;
+                pc = pc + 2;
+            } else if opcode == 25 { // CMP_IMM
+                let r1: i32 = memory[pc];
+                let imm: i32 = memory[pc+1];
+                let val1: i32 = registers[r1];
+                zf = val1 == imm;
+                cf = val1 < imm;
+                pc = pc + 2;
+            } else if opcode == 26 { // PRINT_REG
+                let r_src: i32 = memory[pc];
+                printInt(registers[r_src]);
+                pc = pc + 1;
+            } else {
+                // Invalid opcode
+                halt = true;
+            }
+        }
+    }
+}
+
+fn main() {
+    init_vm();
+    load_program();
+    fetch_decode_execute();
+    
+    // Final check to ensure halt worked
+    if (halt) {
+        printInt(1337);
+    } else {
+        printInt(9999);
+    }
+}

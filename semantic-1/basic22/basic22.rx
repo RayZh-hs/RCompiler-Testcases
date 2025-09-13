@@ -1,0 +1,46 @@
+/*
+Test Package: Semantic-1
+Test Target: basic
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: basic test, quickselect algorithm for finding median
+*/
+
+fn partition(a: &mut [i32; 11], low: usize, high: usize) -> usize {
+    let pivot: i32 = a[high];
+    let mut i: usize = low;
+    let mut j: usize = low;
+    while (j < high) {
+        if (a[j] < pivot) {
+            let tmp: i32 = a[i];
+            a[i] = a[j];
+            a[j] = tmp;
+            i += 1;
+        }
+        j += 1;
+    }
+    let tmp: i32 = a[i];
+    a[i] = a[high];
+    a[high] = tmp;
+    i
+}
+fn select_k(a: &mut [i32; 11], low: usize, high: usize, k: usize) -> i32 {
+    if (low == high) {
+        return a[low];
+    }
+    let p: usize = partition(a, low, high);
+    if (k == p) {
+        a[p]
+    } else if (k < p) {
+        select_k(a, low, p - 1, k)
+    } else {
+        select_k(a, p + 1, high, k)
+    }
+}
+fn main() {
+    let mut values: [i32; 11] = [42, 7, 13, 99, 5, 8, 1, 77, 56, 23, 11];
+    let median_index: usize = 5usize;
+    let median: i32 = select_k(&mut values, 0, 10, median_index);
+    exit(0);
+}

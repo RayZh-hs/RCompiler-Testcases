@@ -1,0 +1,347 @@
+/*
+Test Package: Semantic-2
+Test Target: comprehensive
+Author: Wenxin Zheng
+Time: 2025-08-17
+Verdict: Success
+Test Name: Stack-Based Virtual Machine Interpreter
+Summary: This test comprehensively evaluates compiler optimizations for:
+Details:
+Large instruction dispatch loop (simulating a switch statement).
+Stack manipulation using array-based data structures.
+Program flow control based on interpreted bytecode.
+Integer arithmetic and logical operations within the VM.
+Function call simulation and stack frame management.
+*/
+
+// comprehensive31.rx - Stack-Based Virtual Machine Interpreter
+// This test comprehensively evaluates compiler optimizations for:
+// - Large instruction dispatch loop (simulating a switch statement).
+// - Stack manipulation using array-based data structures.
+// - Program flow control based on interpreted bytecode.
+// - Integer arithmetic and logical operations within the VM.
+// - Function call simulation and stack frame management.
+
+fn printInt(n: i32) {}
+
+const STACK_SIZE: i32 = 256;
+const PROG_MEM_SIZE: i32 = 1024;
+
+const PUSH: i32 = 1;
+const POP: i32 = 2;
+const ADD: i32 = 3;
+const SUB: i32 = 4;
+const MUL: i32 = 5;
+const DIV: i32 = 6;
+const EQ: i32 = 7;
+const LT: i32 = 8;
+const GT: i32 = 9;
+const JMP: i32 = 10;
+const JZ: i32 = 11;
+const JNZ: i32 = 12;
+const CALL: i32 = 13;
+const RET: i32 = 14;
+const PRINT: i32 = 15;
+const HALT: i32 = 0;
+
+struct VM {
+    pc: i32,
+    sp: i32,
+    stack: [i32; STACK_SIZE],
+    program: [i32; PROG_MEM_SIZE],
+}
+
+fn main() {
+    let mut vm: VM = VM {
+        pc: 0,
+        sp: -1,
+        stack: [0; STACK_SIZE],
+        program: [0; PROG_MEM_SIZE],
+    };
+
+    load_program(&mut vm);
+    execute(&mut vm);
+    printInt(9999);
+}
+
+fn load_program(vm: &mut VM) {
+    let mut prog: [i32; PROG_MEM_SIZE] = [0; PROG_MEM_SIZE];
+
+    let mut i: i32 = 0;
+
+    prog[i] = PUSH; i = i + 1;
+    prog[i] = 10; i = i + 1;
+    prog[i] = PUSH; i = i + 1;
+    prog[i] = 20; i = i + 1;
+    prog[i] = CALL; i = i + 1;
+    prog[i] = 50; i = i + 1;
+    prog[i] = PRINT; i = i + 1;
+    prog[i] = HALT; i = i + 1;
+
+    i = 50;
+    prog[i] = PUSH; i = i + 1;
+    prog[i] = 5; i = i + 1;
+    prog[i] = PUSH; i = i + 1;
+    prog[i] = 3; i = i + 1;
+    prog[i] = SUB; i = i + 1;
+    prog[i] = PRINT; i = i + 1;
+    prog[i] = PUSH; i = i + 1;
+    prog[i] = 100; i = i + 1;
+    prog[i] = CALL; i = i + 1;
+    prog[i] = 200; i = i + 1;
+    prog[i] = ADD; i = i + 1;
+    prog[i] = RET; i = i + 1;
+
+    i = 100;
+    prog[i] = PUSH; i = i + 1;
+    prog[i] = 1; i = i + 1;
+    prog[i] = PUSH; i = i + 1;
+    prog[i] = 1; i = i + 1;
+    let mut j: i32 = 0;
+    while (j < 10) {
+        prog[i] = ADD; i = i + 1;
+        prog[i] = PUSH; i = i + 1;
+        prog[i] = vm.stack[vm.sp]; i = i + 1;
+        prog[i] = PUSH; i = i + 1;
+        prog[i] = vm.stack[vm.sp - 1]; i = i + 1;
+        j = j + 1;
+    }
+    prog[i] = POP; i = i + 1;
+    prog[i] = PRINT; i = i + 1;
+    prog[i] = RET; i = i + 1;
+
+    i = 200;
+    prog[i] = PUSH; i = i + 1;
+    prog[i] = 10; i = i + 1;
+    prog[i] = PUSH; i = i + 1;
+    prog[i] = 0; i = i + 1;
+    prog[i] = PUSH; i = i + 1;
+    prog[i] = 1; i = i + 1;
+    let loop_start: i32 = i;
+    prog[i] = PUSH; i = i + 1;
+    prog[i] = vm.stack[vm.sp - 2]; i = i + 1;
+    prog[i] = PUSH; i = i + 1;
+    prog[i] = vm.stack[vm.sp - 2]; i = i + 1;
+    prog[i] = ADD; i = i + 1;
+    prog[i] = POP; i = i + 1;
+    prog[i] = vm.stack[vm.sp - 2] = vm.stack[vm.sp]; i = i + 1;
+    prog[i] = POP; i = i + 1;
+    prog[i] = PUSH; i = i + 1;
+    prog[i] = vm.stack[vm.sp - 1]; i = i + 1;
+    prog[i] = PUSH; i = i + 1;
+    prog[i] = 1; i = i + 1;
+    prog[i] = ADD; i = i + 1;
+    prog[i] = POP; i = i + 1;
+    prog[i] = vm.stack[vm.sp - 1] = vm.stack[vm.sp]; i = i + 1;
+    prog[i] = POP; i = i + 1;
+    prog[i] = PUSH; i = i + 1;
+    prog[i] = vm.stack[vm.sp]; i = i + 1;
+    prog[i] = PUSH; i = i + 1;
+    prog[i] = 10; i = i + 1;
+    prog[i] = LT; i = i + 1;
+    prog[i] = JNZ; i = i + 1;
+    prog[i] = loop_start; i = i + 1;
+    prog[i] = POP; i = i + 1;
+    prog[i] = POP; i = i + 1;
+    prog[i] = RET; i = i + 1;
+
+    vm.program = prog;
+}
+
+fn execute(vm: &mut VM) {
+    let mut running: bool = true;
+    while (running) {
+        let op: i32 = fetch(vm);
+        if (op == HALT) {
+            running = false;
+        } else if (op == PUSH) {
+            let val: i32 = fetch(vm);
+            push(vm, val);
+        } else if (op == POP) {
+            pop(vm);
+        } else if (op == ADD) {
+            let b: i32 = pop(vm);
+            let a: i32 = pop(vm);
+            push(vm, a + b);
+        } else if (op == SUB) {
+            let b: i32 = pop(vm);
+            let a: i32 = pop(vm);
+            push(vm, a - b);
+        } else if (op == MUL) {
+            let b: i32 = pop(vm);
+            let a: i32 = pop(vm);
+            push(vm, a * b);
+        } else if (op == DIV) {
+            let b: i32 = pop(vm);
+            let a: i32 = pop(vm);
+            if (b != 0) {
+                push(vm, a / b);
+            } else {
+                printInt(-1);
+                running = false;
+            }
+        } else if (op == EQ) {
+            let b: i32 = pop(vm);
+            let a: i32 = pop(vm);
+            push(vm, if (a == b) { 1 } else { 0 });
+        } else if (op == LT) {
+            let b: i32 = pop(vm);
+            let a: i32 = pop(vm);
+            push(vm, if (a < b) { 1 } else { 0 });
+        } else if (op == GT) {
+            let b: i32 = pop(vm);
+            let a: i32 = pop(vm);
+            push(vm, if (a > b) { 1 } else { 0 });
+        } else if (op == JMP) {
+            vm.pc = fetch(vm);
+        } else if (op == JZ) {
+            let addr: i32 = fetch(vm);
+            if (pop(vm) == 0) {
+                vm.pc = addr;
+            }
+        } else if (op == JNZ) {
+            let addr: i32 = fetch(vm);
+            if (pop(vm) != 0) {
+                vm.pc = addr;
+            }
+        } else if (op == CALL) {
+            let addr: i32 = fetch(vm);
+            push(vm, vm.pc);
+            vm.pc = addr;
+        } else if (op == RET) {
+            vm.pc = pop(vm);
+        } else if (op == PRINT) {
+            printInt(vm.stack[vm.sp]);
+        } else {
+            printInt(-2);
+            running = false;
+        }
+    }
+}
+
+fn fetch(vm: &mut VM) -> i32 {
+    let instruction: i32 = vm.program[vm.pc];
+    vm.pc = vm.pc + 1;
+    return instruction;
+}
+
+fn push(vm: &mut VM, val: i32) {
+    vm.sp = vm.sp + 1;
+    vm.stack[vm.sp] = val;
+}
+
+fn pop(vm: &mut VM) -> i32 {
+    let val: i32 = vm.stack[vm.sp];
+    vm.sp = vm.sp - 1;
+    return val;
+}
+
+fn deep_recursive_test(vm: &mut VM, depth: i32) {
+    if depth <= 0 {
+        return;
+    }
+    push(vm, depth);
+    deep_recursive_test(vm, depth - 1);
+    let val: i32 = pop(vm);
+    push(vm, val + 1);
+}
+
+fn complex_stack_manipulation(vm: &mut VM) {
+    let mut i: i32 = 0;
+    while (i < 20) {
+        push(vm, i);
+        i = i + 1;
+    }
+    i = 0;
+    while (i < 10) {
+        let a: i32 = pop(vm);
+        let b: i32 = pop(vm);
+        push(vm, a + b);
+        i = i + 1;
+    }
+    printInt(pop(vm));
+}
+
+fn run_fibonacci_in_vm(vm: &mut VM, n: i32) {
+    let mut prog: [i32; PROG_MEM_SIZE] = [0; PROG_MEM_SIZE];
+    let mut i: i32 = 0;
+
+    prog[i] = PUSH; i = i + 1;
+    prog[i] = n; i = i + 1;
+    prog[i] = CALL; i = i + 1;
+    prog[i] = 10; i = i + 1;
+    prog[i] = PRINT; i = i + 1;
+    prog[i] = HALT; i = i + 1;
+
+    i = 10;
+    let fib_start: i32 = i;
+    prog[i] = PUSH; i = i + 1;
+    prog[i] = vm.stack[vm.sp]; i = i + 1;
+    prog[i] = PUSH; i = i + 1;
+    prog[i] = 2; i = i + 1;
+    prog[i] = LT; i = i + 1;
+    prog[i] = JZ; i = i + 1;
+    prog[i] = fib_start + 20; i = i + 1;
+
+    prog[i] = PUSH; i = i + 1;
+    prog[i] = vm.stack[vm.sp]; i = i + 1;
+    prog[i] = PUSH; i = i + 1;
+    prog[i] = 1; i = i + 1;
+    prog[i] = SUB; i = i + 1;
+    prog[i] = CALL; i = i + 1;
+    prog[i] = fib_start; i = i + 1;
+
+    prog[i] = PUSH; i = i + 1;
+    prog[i] = vm.stack[vm.sp + 1]; i = i + 1;
+    prog[i] = PUSH; i = i + 1;
+    prog[i] = 2; i = i + 1;
+    prog[i] = SUB; i = i + 1;
+    prog[i] = CALL; i = i + 1;
+    prog[i] = fib_start; i = i + 1;
+
+    prog[i] = ADD; i = i + 1;
+    prog[i] = RET; i = i + 1;
+
+    i = fib_start + 20;
+    prog[i] = POP; i = i + 1;
+    prog[i] = PUSH; i = i + 1;
+    prog[i] = vm.stack[vm.sp]; i = i + 1;
+    prog[i] = RET; i = i + 1;
+
+    let mut old_prog: [i32; PROG_MEM_SIZE] = vm.program;
+    let old_pc: i32 = vm.pc;
+    let old_sp: i32 = vm.sp;
+
+    vm.program = prog;
+    vm.pc = 0;
+    vm.sp = -1;
+    execute(vm);
+
+    vm.program = old_prog;
+    vm.pc = old_pc;
+    vm.sp = old_sp;
+}
+
+fn error_case_test(vm: VM) {
+    let mut local_vm: VM = vm;
+    local_vm.sp = local_vm.sp + 10;
+    if (local_vm.sp > STACK_SIZE) {
+        printInt(-100);
+    }
+    local_vm.sp = -10;
+    let val: i32 = pop(&mut local_vm);
+    printInt(val);
+}
+
+fn another_test_scenario() {
+    let mut vm: VM = VM {
+        pc: 0,
+        sp: -1,
+        stack: [0; STACK_SIZE],
+        program: [0; PROG_MEM_SIZE],
+    };
+    run_fibonacci_in_vm(&mut vm, 15);
+    complex_stack_manipulation(&mut vm);
+    deep_recursive_test(&mut vm, 30);
+    error_case_test(vm);
+}

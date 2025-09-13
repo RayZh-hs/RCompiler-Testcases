@@ -1,0 +1,35 @@
+/*
+Test Package: Semantic-1
+Test Target: loop
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: loop test, nested infinite loops with break condition using flag variable
+*/
+
+fn main() {
+    let mut count: i32 = 0;
+    let mut i: u32 = 0u32;
+    let mut should_break: bool = false;
+    loop {
+        if (i >= 5) { break; }
+        let mut j: u32 = 0u32;
+        loop {
+            if (j >= 5) { break; }
+            if (i == j) { 
+                j += 1;
+                continue; 
+            }
+            if (i + j > 6) { 
+                should_break = true;
+                break; 
+            }
+            count += 1;
+            j += 1;
+        }
+        if (should_break) { break; }
+        i += 1;
+    }
+    let _: i32 = count;
+    exit(0);
+}

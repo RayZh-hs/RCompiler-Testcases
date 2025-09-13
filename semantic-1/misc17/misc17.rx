@@ -1,0 +1,138 @@
+/*
+Test Package: Semantic-1
+Test Target: misc
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: Min Heap implementation using array
+*/
+
+// Min Heap implementation using array
+// Complete binary tree stored in array format
+struct MinHeap {
+    data: [i32; 1000],
+    size: i32,
+    capacity: i32,
+}
+
+impl MinHeap {
+    fn new() -> MinHeap {
+        MinHeap {
+            data: [0; 1000],
+            size: 0,
+            capacity: 1000,
+        }
+    }
+    
+    fn parent_index(&self, index: i32) -> i32 {
+        return (index - 1) / 2;
+    }
+    
+    fn left_child_index(&self, index: i32) -> i32 {
+        return 2 * index + 1;
+    }
+    
+    fn right_child_index(&self, index: i32) -> i32 {
+        return 2 * index + 2;
+    }
+    
+    fn swap(&mut self, i: i32, j: i32) {
+        let temp: i32 = self.data[i as usize];
+        self.data[i as usize] = self.data[j as usize];
+        self.data[j as usize] = temp;
+    }
+    
+    fn heapify_up(&mut self, index: i32) {
+        let mut current: i32 = index;
+        while (current > 0) {
+            let parent: i32 = self.parent_index(current);
+            if (self.data[current as usize] >= self.data[parent as usize]) {
+                break;
+            }
+            self.swap(current, parent);
+            current = parent;
+        }
+    }
+    
+    fn heapify_down(&mut self, index: i32) {
+        let mut current: i32 = index;
+        loop {
+            let left: i32 = self.left_child_index(current);
+            let right: i32 = self.right_child_index(current);
+            let mut smallest: i32 = current;
+            
+            if (left < self.size && self.data[left as usize] < self.data[smallest as usize]) {
+                smallest = left;
+            }
+            
+            if (right < self.size && self.data[right as usize] < self.data[smallest as usize]) {
+                smallest = right;
+            }
+            
+            if (smallest == current) {
+                break;
+            }
+            
+            self.swap(current, smallest);
+            current = smallest;
+        }
+    }
+    
+    fn insert(&mut self, value: i32) -> bool {
+        if (self.size >= self.capacity) {
+            return false;
+        }
+        
+        self.data[self.size as usize] = value;
+        self.heapify_up(self.size);
+        self.size += 1;
+        return true;
+    }
+    
+    fn extract_min(&mut self) -> i32 {
+        if (self.size == 0) {
+            return -1;
+        }
+        
+        let min_value: i32 = self.data[0];
+        self.size -= 1;
+        self.data[0] = self.data[self.size as usize];
+        self.heapify_down(0);
+        return min_value;
+    }
+    
+    fn peek(&self) -> i32 {
+        if (self.size == 0) {
+            return -1;
+        }
+        return self.data[0];
+    }
+    
+    fn is_empty(&self) -> bool {
+        return self.size == 0;
+    }
+}
+
+fn main() {
+    let mut heap: MinHeap = MinHeap::new();
+    let n: i32 = getInt();
+    
+    let mut i: i32 = 0;
+    while (i < n) {
+        let operation: i32 = getInt();
+        
+        if (operation == 1) {
+            let value: i32 = getInt();
+            heap.insert(value);
+        } else if (operation == 2) {
+            let min_val: i32 = heap.extract_min();
+            printInt(min_val);
+        } else if (operation == 3) {
+            let min_val: i32 = heap.peek();
+            printInt(min_val);
+        }
+        
+        i += 1;
+    }
+    exit(0);
+}

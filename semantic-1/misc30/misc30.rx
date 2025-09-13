@@ -1,0 +1,290 @@
+/*
+Test Package: Semantic-1
+Test Target: misc
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: Red-Black Tree implementation (self-balancing BST)
+*/
+
+// Red-Black Tree implementation (self-balancing BST)
+// Maintains balance through color properties and rotations
+
+struct RBNode {
+    value: i32,
+    color: bool, // true for RED, false for BLACK
+    parent: i32,
+    left: i32,
+    right: i32,
+}
+
+struct RedBlackTree {
+    nodes: [RBNode; 1000],
+    root: i32,
+    nil_node: i32, // Sentinel node
+    node_count: i32,
+}
+
+impl RBNode {
+    fn new(value: i32) -> RBNode {
+        RBNode {
+            value: value,
+            color: true, // New nodes are RED
+            parent: -1,
+            left: -1,
+            right: -1,
+        }
+    }
+}
+
+impl RedBlackTree {
+    fn new() -> RedBlackTree {
+        let mut rb_tree: RedBlackTree = RedBlackTree {
+            nodes: [RBNode::new(0); 1000],
+            root: -1,
+            nil_node: 0,
+            node_count: 1,
+        };
+        
+        // Initialize NIL node (sentinel)
+        rb_tree.nodes[0] = RBNode::new(0);
+        rb_tree.nodes[0].color = false; // NIL is BLACK
+        rb_tree.nodes[0].parent = -1;
+        rb_tree.nodes[0].left = -1;
+        rb_tree.nodes[0].right = -1;
+        
+        return rb_tree;
+    }
+    
+    fn create_node(&mut self, value: i32) -> i32 {
+        if (self.node_count >= 1000) {
+            return -1;
+        }
+        
+        let index: i32 = self.node_count;
+        self.nodes[index as usize] = RBNode::new(value);
+        self.nodes[index as usize].left = self.nil_node;
+        self.nodes[index as usize].right = self.nil_node;
+        self.nodes[index as usize].parent = self.nil_node;
+        self.node_count += 1;
+        return index;
+    }
+    
+    fn is_red(&self, node: i32) -> bool {
+        if (node == -1 || node == self.nil_node) {
+            return false;
+        }
+        return self.nodes[node as usize].color;
+    }
+    
+    fn set_color(&mut self, node: i32, color: bool) {
+        if (node != -1 && node != self.nil_node) {
+            self.nodes[node as usize].color = color;
+        }
+    }
+    
+    fn left_rotate(&mut self, x: i32) {
+        let y: i32 = self.nodes[x as usize].right;
+        self.nodes[x as usize].right = self.nodes[y as usize].left;
+        
+    if (self.nodes[y as usize].left != self.nil_node) {
+            self.nodes[self.nodes[y as usize].left as usize].parent = x;
+        }
+        
+        self.nodes[y as usize].parent = self.nodes[x as usize].parent;
+        
+    if (self.nodes[x as usize].parent == self.nil_node) {
+            self.root = y;
+    } else if (x == self.nodes[self.nodes[x as usize].parent as usize].left) {
+            self.nodes[self.nodes[x as usize].parent as usize].left = y;
+        } else {
+            self.nodes[self.nodes[x as usize].parent as usize].right = y;
+        }
+        
+        self.nodes[y as usize].left = x;
+        self.nodes[x as usize].parent = y;
+    }
+    
+    fn right_rotate(&mut self, y: i32) {
+        let x: i32 = self.nodes[y as usize].left;
+        self.nodes[y as usize].left = self.nodes[x as usize].right;
+        
+    if (self.nodes[x as usize].right != self.nil_node) {
+            self.nodes[self.nodes[x as usize].right as usize].parent = y;
+        }
+        
+        self.nodes[x as usize].parent = self.nodes[y as usize].parent;
+        
+    if (self.nodes[y as usize].parent == self.nil_node) {
+            self.root = x;
+    } else if (y == self.nodes[self.nodes[y as usize].parent as usize].right) {
+            self.nodes[self.nodes[y as usize].parent as usize].right = x;
+        } else {
+            self.nodes[self.nodes[y as usize].parent as usize].left = x;
+        }
+        
+        self.nodes[x as usize].right = y;
+        self.nodes[y as usize].parent = x;
+    }
+    
+    fn insert_fixup(&mut self, mut z: i32) {
+        while (self.is_red(self.nodes[z as usize].parent)) {
+            if (self.nodes[z as usize].parent == self.nodes[self.nodes[self.nodes[z as usize].parent as usize].parent as usize].left) {
+                let y: i32 = self.nodes[self.nodes[self.nodes[z as usize].parent as usize].parent as usize].right;
+                
+                if (self.is_red(y)) {
+                    self.set_color(self.nodes[z as usize].parent, false);
+                    self.set_color(y, false);
+                    self.set_color(self.nodes[self.nodes[z as usize].parent as usize].parent, true);
+                    z = self.nodes[self.nodes[z as usize].parent as usize].parent;
+                } else {
+                    if (z == self.nodes[self.nodes[z as usize].parent as usize].right) {
+                        z = self.nodes[z as usize].parent;
+                        self.left_rotate(z);
+                    }
+                    self.set_color(self.nodes[z as usize].parent, false);
+                    self.set_color(self.nodes[self.nodes[z as usize].parent as usize].parent, true);
+                    self.right_rotate(self.nodes[self.nodes[z as usize].parent as usize].parent);
+                }
+            } else {
+                let y: i32 = self.nodes[self.nodes[self.nodes[z as usize].parent as usize].parent as usize].left;
+                
+                if (self.is_red(y)) {
+                    self.set_color(self.nodes[z as usize].parent, false);
+                    self.set_color(y, false);
+                    self.set_color(self.nodes[self.nodes[z as usize].parent as usize].parent, true);
+                    z = self.nodes[self.nodes[z as usize].parent as usize].parent;
+                } else {
+                    if (z == self.nodes[self.nodes[z as usize].parent as usize].left) {
+                        z = self.nodes[z as usize].parent;
+                        self.right_rotate(z);
+                    }
+                    self.set_color(self.nodes[z as usize].parent, false);
+                    self.set_color(self.nodes[self.nodes[z as usize].parent as usize].parent, true);
+                    self.left_rotate(self.nodes[self.nodes[z as usize].parent as usize].parent);
+                }
+            }
+        }
+        self.set_color(self.root, false);
+    }
+    
+    fn insert(&mut self, value: i32) {
+        let z: i32 = self.create_node(value);
+        if (z == -1) {
+            return;
+        }
+        
+        let mut y: i32 = self.nil_node;
+        let mut x: i32 = self.root;
+        
+        while (x != self.nil_node && x != -1) {
+            y = x;
+            if (self.nodes[z as usize].value < self.nodes[x as usize].value) {
+                x = self.nodes[x as usize].left;
+            } else {
+                x = self.nodes[x as usize].right;
+            }
+        }
+        
+        self.nodes[z as usize].parent = y;
+        
+    if (y == self.nil_node) {
+            self.root = z;
+    } else if (self.nodes[z as usize].value < self.nodes[y as usize].value) {
+            self.nodes[y as usize].left = z;
+        } else {
+            self.nodes[y as usize].right = z;
+        }
+        
+        self.insert_fixup(z);
+    }
+    
+    fn search_recursive(&self, node: i32, value: i32) -> bool {
+    if (node == self.nil_node || node == -1) {
+            return false;
+        }
+        
+    if (value == self.nodes[node as usize].value) {
+            return true;
+    } else if (value < self.nodes[node as usize].value) {
+            return self.search_recursive(self.nodes[node as usize].left, value);
+        } else {
+            return self.search_recursive(self.nodes[node as usize].right, value);
+        }
+    }
+    
+    fn search(&self, value: i32) -> bool {
+        return self.search_recursive(self.root, value);
+    }
+    
+    fn inorder_recursive(&self, node: i32) {
+    if (node != self.nil_node && node != -1) {
+            self.inorder_recursive(self.nodes[node as usize].left);
+            printInt(self.nodes[node as usize].value);
+            self.inorder_recursive(self.nodes[node as usize].right);
+        }
+    }
+    
+    fn inorder_traversal(&self) {
+        self.inorder_recursive(self.root);
+    }
+    
+    fn get_black_height(&self, node: i32) -> i32 {
+    if (node == self.nil_node || node == -1) {
+            return 0;
+        }
+        
+        let left_height: i32 = self.get_black_height(self.nodes[node as usize].left);
+        let adjustment: i32 = if (self.is_red(node)) { 0 } else { 1 };
+        return left_height + adjustment;
+    }
+    
+    fn validate_rb_properties(&self) -> bool {
+        // Check if root is black and tree satisfies RB properties
+    if (self.root == -1) {
+            return true;
+        }
+        
+    if (self.is_red(self.root)) {
+            return false;
+        }
+        
+        return true; // Simplified validation
+    }
+}
+
+fn main() {
+    let mut rb_tree: RedBlackTree = RedBlackTree::new();
+    let n: i32 = getInt();
+    
+    let mut i: i32 = 0;
+    while (i < n) {
+        let operation: i32 = getInt();
+        
+        if (operation == 1) { // Insert
+            let value: i32 = getInt();
+            rb_tree.insert(value);
+        } else if (operation == 2) { // Search
+            let value: i32 = getInt();
+            if (rb_tree.search(value)) {
+                printInt(1);
+            } else {
+                printInt(0);
+            }
+        } else if (operation == 3) { // Inorder traversal
+            rb_tree.inorder_traversal();
+        } else if (operation == 4) { // Get black height
+            let height: i32 = rb_tree.get_black_height(rb_tree.root);
+            printInt(height);
+        } else if (operation == 5) { // Validate RB properties
+            if (rb_tree.validate_rb_properties()) {
+                printInt(1);
+            } else {
+                printInt(0);
+            }
+        }
+        
+        i += 1;
+    }
+    exit(0);
+}

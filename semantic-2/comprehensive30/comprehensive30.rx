@@ -1,0 +1,355 @@
+/*
+Test Package: Semantic-2
+Test Target: comprehensive
+Author: Wenxin Zheng
+Time: 2025-08-17
+Verdict: Success
+Test Name: Advanced Memory Management Simulation
+Summary: This test comprehensively evaluates compiler optimizations for:
+Details:
+Simulation of dynamic memory allocation with a static buffer.
+Complex array manipulation and index-based pointer arithmetic.
+Management of data structures like free lists for memory blocks.
+Loop-heavy logic for searching and coalescing memory blocks.
+Optimization of conditional branches for memory state checks.
+*/
+
+// comprehensive30.rx - Advanced Memory Management Simulation
+// This test comprehensively evaluates compiler optimizations for:
+// - Simulation of dynamic memory allocation with a static buffer.
+// - Complex array manipulation and index-based pointer arithmetic.
+// - Management of data structures like free lists for memory blocks.
+// - Loop-heavy logic for searching and coalescing memory blocks.
+// - Optimization of conditional branches for memory state checks.
+
+fn printInt(n: i32) {}
+
+const HEAP_SIZE: i32 = 1024;
+const BLOCK_HEADER_SIZE: i32 = 2;
+const FREE_FLAG: i32 = 0;
+const USED_FLAG: i32 = 1;
+
+fn main() {
+    let mut heap: [i32; HEAP_SIZE] = [0; HEAP_SIZE];
+    let mut free_list_head: i32 = 0;
+
+    init_heap(&mut heap, &mut free_list_head);
+
+    let mut p1: i32 = 0;
+    let mut p2: i32 = 0;
+    let mut p3: i32 = 0;
+    let mut p4: i32 = 0;
+    let mut p5: i32 = 0;
+
+    p1 = my_malloc(&mut heap, &mut free_list_head, 100);
+    if (p1 > 0) {
+        printInt(1001);
+        fill_memory(&mut heap, p1, 100, 1);
+    }
+
+    p2 = my_malloc(&mut heap, &mut free_list_head, 200);
+    if (p2 > 0) {
+        printInt(1002);
+        fill_memory(&mut heap, p2, 200, 2);
+    }
+
+    p3 = my_malloc(&mut heap, &mut free_list_head, 150);
+    if (p3 > 0) {
+        printInt(1003);
+        fill_memory(&mut heap, p3, 150, 3);
+    }
+
+    my_free(&mut heap, &mut free_list_head, p2);
+    printInt(1004);
+
+    p4 = my_malloc(&mut heap, &mut free_list_head, 50);
+    if (p4 > 0) {
+        printInt(1005);
+        fill_memory(&mut heap, p4, 50, 4);
+    }
+
+    p5 = my_malloc(&mut heap, &mut free_list_head, 250);
+    if (p5 < 0) {
+        printInt(1006);
+    }
+
+    my_free(&mut heap, &mut free_list_head, p1);
+    my_free(&mut heap, &mut free_list_head, p3);
+    my_free(&mut heap, &mut free_list_head, p4);
+    printInt(1007);
+
+    p1 = my_malloc(&mut heap, &mut free_list_head, 800);
+    if (p1 > 0) {
+        printInt(1008);
+        fill_memory(&mut heap, p1, 800, 5);
+    }
+
+    verify_memory(&mut heap, p1, 800, 5);
+    printInt(9999);
+}
+
+fn init_heap(heap: &mut [i32; HEAP_SIZE], free_list_head: &mut i32) {
+    heap[0] = HEAP_SIZE - BLOCK_HEADER_SIZE;
+    heap[1] = FREE_FLAG;
+    heap[2] = -1;
+    *free_list_head = 0;
+}
+
+fn my_malloc(heap: &mut [i32; HEAP_SIZE], free_list_head: &mut i32, size: i32) -> i32 {
+    let mut current: i32 = *free_list_head;
+    let mut prev: i32 = -1;
+    let required_size: i32 = size;
+
+    while (current != -1) {
+        let block_size: i32 = heap[current];
+        let is_free: i32 = heap[current + 1];
+
+        if (is_free == FREE_FLAG && block_size >= required_size) {
+            let remaining_size: i32 = block_size - required_size - BLOCK_HEADER_SIZE;
+            if (remaining_size > BLOCK_HEADER_SIZE) {
+                let new_block_pos: i32 = current + BLOCK_HEADER_SIZE + required_size;
+                heap[new_block_pos] = remaining_size;
+                heap[new_block_pos + 1] = FREE_FLAG;
+                heap[new_block_pos + 2] = heap[current + 2];
+
+                heap[current] = required_size;
+                heap[current + 1] = USED_FLAG;
+                heap[current + 2] = new_block_pos;
+            } else {
+                heap[current + 1] = USED_FLAG;
+            }
+
+            if (prev == -1) {
+                if (remaining_size > BLOCK_HEADER_SIZE) {
+                    *free_list_head = current + BLOCK_HEADER_SIZE + required_size;
+                } else {
+                    *free_list_head = heap[current + 2];
+                }
+            } else {
+                if (remaining_size > BLOCK_HEADER_SIZE) {
+                    heap[prev + 2] = current + BLOCK_HEADER_SIZE + required_size;
+                } else {
+                    heap[prev + 2] = heap[current + 2];
+                }
+            }
+            return current + BLOCK_HEADER_SIZE;
+        }
+        prev = current;
+        current = heap[current + 2];
+    }
+    return -1;
+}
+
+fn my_free(heap: &mut [i32; HEAP_SIZE], free_list_head: &mut i32, ptr: i32) {
+    if (ptr <= BLOCK_HEADER_SIZE) {
+        return;
+    }
+    let block_start: i32 = ptr - BLOCK_HEADER_SIZE;
+    heap[block_start + 1] = FREE_FLAG;
+
+    let mut current: i32 = *free_list_head;
+    let mut prev: i32 = -1;
+    while (current != -1 && current < block_start) {
+        prev = current;
+        current = heap[current + 2];
+    }
+
+    if (prev == -1) {
+        heap[block_start + 2] = *free_list_head;
+        *free_list_head = block_start;
+    } else {
+        heap[block_start + 2] = heap[prev + 2];
+        heap[prev + 2] = block_start;
+    }
+
+    coalesce(heap, *free_list_head);
+}
+
+fn coalesce(heap: &mut [i32; HEAP_SIZE], free_list_head: i32) {
+    let mut current: i32 = free_list_head;
+    while (current != -1) {
+        let next_ptr_in_list: i32 = heap[current + 2];
+        let block_size: i32 = heap[current];
+        let physical_next_block: i32 = current + BLOCK_HEADER_SIZE + block_size;
+
+        if (physical_next_block == next_ptr_in_list) {
+            let next_block_size: i32 = heap[next_ptr_in_list];
+            let new_size: i32 = block_size + BLOCK_HEADER_SIZE + next_block_size;
+            heap[current] = new_size;
+            heap[current + 2] = heap[next_ptr_in_list + 2];
+        } else {
+            current = heap[current + 2];
+        }
+    }
+}
+
+fn fill_memory(heap: &mut [i32; HEAP_SIZE], start: i32, size: i32, value: i32) {
+    let mut i: i32 = 0;
+    while (i < size) {
+        heap[start + i] = value * 10000 + i;
+        i = i + 1;
+    }
+}
+
+fn verify_memory(heap: &[i32; HEAP_SIZE], start: i32, size: i32, value: i32) {
+    let mut i: i32 = 0;
+    let mut errors: i32 = 0;
+    while (i < size) {
+        if (heap[start + i] != value * 10000 + i) {
+            errors = errors + 1;
+        }
+        i = i + 1;
+    }
+    if (errors > 0) {
+        printInt(-999);
+    }
+}
+
+fn complex_memory_churn(heap: &mut [i32; HEAP_SIZE], free_list_head: &mut i32) {
+    let mut p: [i32; 20] = [0; 20];
+    let mut i: i32 = 0;
+    while (i < 20) {
+        p[i] = my_malloc(heap, free_list_head, 20 + i * 2);
+        if (p[i] > 0) {
+            fill_memory(heap, p[i], 20 + i * 2, 10 + i);
+        }
+        i = i + 1;
+    }
+
+    i = 0;
+    while (i < 20) {
+        if (i % 2 == 0) {
+            my_free(heap, free_list_head, p[i]);
+        }
+        i = i + 1;
+    }
+
+    i = 1;
+    while (i < 20) {
+        if (i % 2 != 0) {
+            verify_memory(heap, p[i], 20 + i * 2, 10 + i);
+        }
+        i = i + 1;
+    }
+
+    let mut p_large: i32 = my_malloc(heap, free_list_head, 300);
+    if (p_large > 0) {
+        fill_memory(heap, p_large, 300, 100);
+    }
+
+    i = 1;
+    while (i < 20) {
+        if (i % 2 != 0) {
+            my_free(heap, free_list_head, p[i]);
+        }
+        i = i + 1;
+    }
+
+    my_free(heap, free_list_head, p_large);
+
+    let final_alloc: i32 = my_malloc(heap, free_list_head, HEAP_SIZE - 100);
+    if (final_alloc > 0) {
+        printInt(8888);
+    }
+}
+
+fn another_level_of_scope() {
+    let mut heap: [i32; HEAP_SIZE] = [0; HEAP_SIZE];
+    let mut free_list_head: i32 = 0;
+    init_heap(&mut heap, &mut free_list_head);
+    complex_memory_churn(&mut heap, &mut free_list_head);
+
+    let mut p1: i32 = 0;
+    {
+        let mut p2: i32 = my_malloc(&mut heap, &mut free_list_head, 50);
+        if (p2 > 0) {
+            fill_memory(&mut heap, p2, 50, 50);
+            p1 = p2;
+        }
+    }
+
+    if (p1 > 0) {
+        verify_memory(&heap, p1, 50, 50);
+    }
+
+    let mut outer_var: i32 = 1;
+    if (outer_var == 1) {
+        let inner_var: i32 = 2;
+        let mut i: i32 = 0;
+        while (i < 10) {
+            let loop_var: i32 = i;
+            if (i == 5) {
+                let mut another_block_var: i32 = 5;
+                another_block_var = another_block_var + loop_var;
+                printInt(another_block_var);
+            }
+            i = i + 1;
+        }
+    }
+
+    let mut test_ptr: i32 = my_malloc(&mut heap, &mut free_list_head, 10);
+    if (test_ptr > 0) {
+        fill_memory(&mut heap, test_ptr, 10, 99);
+    }
+
+    let mut another_ptr: i32 = 0;
+    if (true) {
+        let temp_ptr: i32 = my_malloc(&mut heap, &mut free_list_head, 20);
+        if (temp_ptr > 0) {
+            fill_memory(&mut heap, temp_ptr, 20, 88);
+            another_ptr = temp_ptr;
+        }
+    }
+
+    if (another_ptr > 0) {
+        verify_memory(&heap, another_ptr, 20, 88);
+    }
+
+    let mut i: i32 = 0;
+    while (i < 5) {
+        let mut j: i32 = 0;
+        let mut ptr_arr: [i32; 5] = [0; 5];
+        while (j < 5) {
+            let mut k: i32 = 0;
+            let size: i32 = (i + j + 1) * 2;
+            ptr_arr[j] = my_malloc(&mut heap, &mut free_list_head, size);
+            if (ptr_arr[j] > 0) {
+                fill_memory(&mut heap, ptr_arr[j], size, i * 10 + j);
+            }
+            j = j + 1;
+        }
+
+        j = 0;
+        while (j < 5) {
+            if (ptr_arr[j] > 0) {
+                my_free(&mut heap, &mut free_list_head, ptr_arr[j]);
+            }
+            j = j + 1;
+        }
+        i = i + 1;
+    }
+
+    let final_check: i32 = my_malloc(&mut heap, &mut free_list_head, HEAP_SIZE - 50);
+    if (final_check > 0) {
+        printInt(7777);
+    } else {
+        printInt(-7777);
+    }
+
+    {
+        let mut shadow_var: i32 = 10;
+        if (shadow_var > 5) {
+            let mut shadow_var: i32 = 20;
+            shadow_var = shadow_var + 1;
+            printInt(shadow_var);
+        }
+        printInt(shadow_var);
+    }
+
+    let mut error_ptr: i32 = 0;
+    if (true) {
+        let temp_ptr_for_error: i32 = my_malloc(&mut heap, &mut free_list_head, 1);
+        error_ptr = temp_ptr_for_error;
+    }
+    my_free(&mut heap, &mut free_list_head, temp_ptr_for_error);
+}

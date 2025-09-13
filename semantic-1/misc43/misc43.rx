@@ -1,0 +1,153 @@
+/*
+Test Package: Semantic-1
+Test Target: misc
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: Elliptic curve point addition and scalar multiplication over finite fields
+*/
+
+// Elliptic curve point addition and scalar multiplication
+// Implements elliptic curve operations over finite fields
+
+struct EllipticPoint {
+    x: i32,
+    y: i32,
+    is_infinity: bool,
+}
+
+fn mod_inverse(mut a: i32, mut m: i32) -> i32 {
+    if (m == 1) {
+        return 0;
+    }
+    
+    let m0: i32 = m;
+    let mut x0: i32 = 0;
+    let mut x1: i32 = 1;
+    
+    while (a > 1) {
+        let q: i32 = a / m;
+        let mut t: i32 = m;
+        
+        m = a % m;
+        a = t;
+        t = x0;
+        
+        x0 = x1 - q * x0;
+        x1 = t;
+    }
+    
+    if (x1 < 0) {
+        x1 = x1 + m0;
+    }
+    
+    return x1;
+}
+
+fn point_add(p1: EllipticPoint, p2: EllipticPoint, a: i32, prime: i32) -> EllipticPoint {
+    if (p1.is_infinity) {
+        return p2;
+    }
+    if (p2.is_infinity) {
+        return p1;
+    }
+    
+    if (p1.x == p2.x) {
+        if (p1.y == p2.y) {
+            // Point doubling
+            let numerator: i32 = (3 * p1.x * p1.x + a) % prime;
+            let denominator: i32 = (2 * p1.y) % prime;
+            let slope: i32 = (numerator * mod_inverse(denominator, prime)) % prime;
+            
+            let x3: i32 = (slope * slope - 2 * p1.x) % prime;
+            let y3: i32 = (slope * (p1.x - x3) - p1.y) % prime;
+            
+            return EllipticPoint {
+                x: if (x3 < 0) { x3 + prime } else { x3 },
+                y: if (y3 < 0) { y3 + prime } else { y3 },
+                is_infinity: false,
+            };
+        } else {
+            return EllipticPoint {
+                x: 0,
+                y: 0,
+                is_infinity: true,
+            };
+        }
+    }
+    
+    let numerator: i32 = (p2.y - p1.y) % prime;
+    let denominator: i32 = (p2.x - p1.x) % prime;
+    let slope: i32 = (numerator * mod_inverse(denominator, prime)) % prime;
+    
+    let x3: i32 = (slope * slope - p1.x - p2.x) % prime;
+    let y3: i32 = (slope * (p1.x - x3) - p1.y) % prime;
+    
+    return EllipticPoint {
+        x: if (x3 < 0) { x3 + prime } else { x3 },
+        y: if (y3 < 0) { y3 + prime } else { y3 },
+        is_infinity: false,
+    };
+}
+
+fn scalar_multiply_recursive(k: i32, point: EllipticPoint, a: i32, prime: i32, 
+                           depth: i32) -> EllipticPoint {
+    if (k == 0 || depth > 20) {
+        return EllipticPoint {
+            x: 0,
+            y: 0,
+            is_infinity: true,
+        };
+    }
+    
+    if (k == 1) {
+        return point;
+    }
+    
+    if (k % 2 == 0) {
+        let half_point: EllipticPoint = scalar_multiply_recursive(k / 2, point, a, prime, depth + 1);
+        return point_add(half_point, half_point, a, prime);
+    } else {
+        let reduced_point: EllipticPoint = scalar_multiply_recursive(k - 1, point, a, prime, depth + 1);
+        return point_add(point, reduced_point, a, prime);
+    }
+}
+
+fn elliptic_curve_order(base_point: EllipticPoint, a: i32, prime: i32) -> i32 {
+    let mut current: EllipticPoint = base_point;
+    let mut order: i32 = 1;
+    
+    while (order < prime + 1) {
+        current = point_add(current, base_point, a, prime);
+        order = order + 1;
+        
+        if (current.is_infinity) {
+            return order;
+        }
+    }
+    
+    return -1; // Order not found within reasonable bounds
+}
+
+fn main() {
+    let x: i32 = getInt();
+    let y: i32 = getInt();
+    let a: i32 = getInt();
+    let prime: i32 = getInt();
+    let k: i32 = getInt();
+    
+    let point: EllipticPoint = EllipticPoint {
+        x: x,
+        y: y,
+        is_infinity: false,
+    };
+    
+    let result: EllipticPoint = scalar_multiply_recursive(k, point, a, prime, 0);
+    
+    if (result.is_infinity) {
+        printInt(-1);
+    } else {
+        printInt(result.x);
+    }
+    exit(0);
+}

@@ -1,0 +1,14 @@
+/*
+Test Package: Semantic-1
+Test Target: expr
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: Expression error: Invalid operator expression - consecutive operators
+*/
+
+// Error: Invalid operator expression - consecutive operators
+fn main() {
+    let x: i32 = 5 + * 3;  // Invalid: + followed by * without operand
+    exit(0);
+}

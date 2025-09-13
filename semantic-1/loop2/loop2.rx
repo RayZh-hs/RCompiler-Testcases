@@ -1,0 +1,29 @@
+/*
+Test Package: Semantic-1
+Test Target: loop
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: loop test, nested while loops with conditional logic
+*/
+
+fn main() -> () {
+    let mut combos: u32 = 0u32;
+    let mut x: u32 = 0u32;
+    while (x < 4) {
+        let mut y: u32 = 0;
+        while (y < 4) {
+            let mut z: u32 = 0;
+            while (z < 4) {
+                if (x + y + z == 3) {
+                    combos += 1;
+                }
+                z += 1;
+            }
+            y += 1;
+        }
+        x += 1;
+    }
+    let _: u32 = combos;
+    exit(0);
+}

@@ -1,0 +1,80 @@
+/*
+Test Package: Semantic-1
+Test Target: misc
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: misc test, stack implementation with array
+*/
+
+// Stack implementation using array
+// Basic stack operations: push, pop, peek, is_empty
+struct Stack {
+    data: [i32; 50],
+    top: i32,
+}
+
+impl Stack {
+    fn new() -> Stack {
+        Stack {
+            data: [0; 50],
+            top: -1,
+        }
+    }
+    
+    fn is_empty(&self) -> bool {
+        return self.top == -1;
+    }
+    
+    fn push(&mut self, value: i32) -> bool {
+        if (self.top >= 49) {
+            return false; // Stack overflow
+        }
+        self.top += 1;
+        self.data[self.top as usize] = value;
+        return true;
+    }
+    
+    fn pop(&mut self) -> i32 {
+        if (self.is_empty()) {
+            return -1; // Stack underflow
+        }
+        let value: i32 = self.data[self.top as usize];
+        self.top -= 1;
+        return value;
+    }
+    
+    fn peek(&self) -> i32 {
+        if (self.is_empty()) {
+            return -1;
+        }
+        return self.data[self.top as usize];
+    }
+}
+
+fn main() {
+    let mut stack: Stack = Stack::new();
+    let n: i32 = getInt();
+    
+    let mut i: i32 = 0;
+    while (i < n) {
+        let operation: i32 = getInt();
+        
+        if (operation == 1) {
+            // Push operation
+            let value: i32 = getInt();
+            stack.push(value);
+        } else if (operation == 2) {
+            // Pop operation
+            let value: i32 = stack.pop();
+            printInt(value);
+        } else if (operation == 3) {
+            // Peek operation
+            let value: i32 = stack.peek();
+            printInt(value);
+        }
+        
+        i += 1;
+    }
+    exit(0);
+}

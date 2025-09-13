@@ -1,0 +1,301 @@
+/*
+Test Package: Semantic-2
+Test Target: comprehensive
+Author: Wenxin Zheng
+Time: 2025-08-17
+Verdict: Success
+Test Name: Simulation of a Simple File System
+Summary: This test comprehensively evaluates compiler optimizations for:
+Details:
+Simulating a block-based file system using a large array.
+Managing complex, interconnected data structures (inodes, data blocks, free lists).
+Pointer-like logic using array indices for block references.
+Deeply nested logic for file operations (create, write, read, delete).
+Optimization of loops for searching directories and allocating blocks.
+Handling of error conditions and state consistency.
+Correctness of variable lifetimes and mutability in a complex simulation.
+*/
+
+// comprehensive41.rx - Simulation of a Simple File System
+// This test comprehensively evaluates compiler optimizations for:
+// - Simulating a block-based file system using a large array.
+// - Managing complex, interconnected data structures (inodes, data blocks, free lists).
+// - Pointer-like logic using array indices for block references.
+// - Deeply nested logic for file operations (create, write, read, delete).
+// - Optimization of loops for searching directories and allocating blocks.
+// - Handling of error conditions and state consistency.
+// - Correctness of variable lifetimes and mutability in a complex simulation.
+
+let BLOCK_SIZE: i32 = 64;
+let NUM_BLOCKS: i32 = 256;
+let FS_SIZE: i32 = BLOCK_SIZE * NUM_BLOCKS;
+let MAX_INODES: i32 = 128;
+let MAX_FILENAME_LEN: i32 = 16;
+let INODE_SIZE: i32 = 24;
+let ROOT_INODE_NUM: i32 = 0;
+
+let fs_data: [i32; 16384] = [0; 16384];
+let inode_table_type: [i32; 128] = [0; 128];
+let inode_table_size: [i32; 128] = [0; 128];
+let inode_table_blocks: [[i32; 6]; 128] = [[0; 6]; 128];
+let mut free_block_bitmap: [bool; 256] = [false; 256];
+let mut free_inode_bitmap: [bool; 128] = [false; 128];
+
+let INODE_TYPE_FREE: i32 = 0;
+let INODE_TYPE_FILE: i32 = 1;
+let INODE_TYPE_DIR: i32 = 2;
+
+fn fs_format() {
+    let mut i: i32 = 0;
+    while (i < NUM_BLOCKS) {
+        free_block_bitmap[i] = true;
+        i = i + 1;
+    }
+    i = 0;
+    while (i < MAX_INODES) {
+        free_inode_bitmap[i] = true;
+        i = i + 1;
+    }
+
+    let root_inode: i32 = allocate_inode();
+    let root_block: i32 = allocate_block();
+    inode_table_type[root_inode] = INODE_TYPE_DIR;
+    inode_table_size[root_inode] = 0;
+    inode_table_blocks[root_inode][0] = root_block;
+}
+
+fn allocate_inode() -> i32 {
+    let mut i: i32 = 0;
+    while (i < MAX_INODES) {
+        if (free_inode_bitmap[i]) {
+            free_inode_bitmap[i] = false;
+            inode_table_type[i] = INODE_TYPE_FREE;
+            inode_table_size[i] = 0;
+            let mut j: i32 = 0;
+            while (j < 6) {
+                inode_table_blocks[i][j] = 0;
+                j = j + 1;
+            }
+            return i;
+        }
+        i = i + 1;
+    }
+    return -1;
+}
+
+fn allocate_block() -> i32 {
+    let mut i: i32 = 0;
+    while (i < NUM_BLOCKS) {
+        if (free_block_bitmap[i]) {
+            free_block_bitmap[i] = false;
+            return i;
+        }
+        i = i + 1;
+    }
+    return -1;
+}
+
+fn find_in_dir(dir_inode_num: i32, filename: [i32; 16]) -> i32 {
+    let dir_size: i32 = inode_table_size[dir_inode_num];
+    let num_entries: i32 = dir_size / INODE_SIZE;
+    let mut i: i32 = 0;
+    while (i < num_entries) {
+        let block_idx: i32 = i * INODE_SIZE / BLOCK_SIZE;
+        let offset_in_block: i32 = (i * INODE_SIZE) % BLOCK_SIZE;
+        let data_block: i32 = inode_table_blocks[dir_inode_num][block_idx];
+        let entry_addr: i32 = data_block * BLOCK_SIZE + offset_in_block;
+
+        let mut match: bool = true;
+        let mut j: i32 = 0;
+        while (j < MAX_FILENAME_LEN) {
+            if (fs_data[entry_addr + j] != filename[j]) {
+                match = false;
+                break;
+            }
+            j = j + 1;
+        }
+        if (match) {
+            return fs_data[entry_addr + MAX_FILENAME_LEN];
+        }
+        i = i + 1;
+    }
+    return -1;
+}
+
+fn create_file(parent_dir_inode: i32, filename: [i32; 16]) -> i32 {
+    if (find_in_dir(parent_dir_inode, filename) != -1) {
+        return -1;
+    }
+    let new_inode_num: i32 = allocate_inode();
+    if (new_inode_num == -1) {
+        return -1;
+    }
+    inode_table_type[new_inode_num] = INODE_TYPE_FILE;
+
+    let dir_size: i32 = inode_table_size[parent_dir_inode];
+    let block_idx: i32 = dir_size / BLOCK_SIZE;
+    let offset_in_block: i32 = dir_size % BLOCK_SIZE;
+    let data_block: i32 = inode_table_blocks[parent_dir_inode][block_idx];
+    let entry_addr: i32 = data_block * BLOCK_SIZE + offset_in_block;
+
+    let mut i: i32 = 0;
+    while (i < MAX_FILENAME_LEN) {
+        fs_data[entry_addr + i] = filename[i];
+        i = i + 1;
+    }
+    fs_data[entry_addr + MAX_FILENAME_LEN] = new_inode_num;
+    inode_table_size[parent_dir_inode] = dir_size + INODE_SIZE;
+
+    return new_inode_num;
+}
+
+fn write_file(inode_num: i32, data: [i32; 100], len: i32) -> i32 {
+    let mut bytes_written: i32 = 0;
+    let mut data_ptr: i32 = 0;
+    let mut block_alloc_count: i32 = 0;
+
+    while (data_ptr < len) {
+        let block_idx: i32 = inode_table_size[inode_num] / BLOCK_SIZE;
+        if (block_idx >= 6) {
+            return -1;
+        }
+        let mut current_block: i32 = inode_table_blocks[inode_num][block_idx];
+        if (current_block == 0) {
+            current_block = allocate_block();
+            if (current_block == -1) {
+                return -1;
+            }
+            inode_table_blocks[inode_num][block_idx] = current_block;
+            block_alloc_count = block_alloc_count + 1;
+        }
+
+        let offset_in_block: i32 = inode_table_size[inode_num] % BLOCK_SIZE;
+        let write_addr: i32 = current_block * BLOCK_SIZE + offset_in_block;
+        fs_data[write_addr] = data[data_ptr];
+
+        inode_table_size[inode_num] = inode_table_size[inode_num] + 1;
+        data_ptr = data_ptr + 1;
+        bytes_written = bytes_written + 1;
+    }
+    return bytes_written;
+}
+
+fn read_file(inode_num: i32) -> i32 {
+    let size: i32 = inode_table_size[inode_num];
+    let mut checksum: i32 = 0;
+    let mut bytes_read: i32 = 0;
+
+    while (bytes_read < size) {
+        let block_idx: i32 = bytes_read / BLOCK_SIZE;
+        let offset_in_block: i32 = bytes_read % BLOCK_SIZE;
+        let data_block: i32 = inode_table_blocks[inode_num][block_idx];
+        let read_addr: i32 = data_block * BLOCK_SIZE + offset_in_block;
+        checksum = checksum + fs_data[read_addr];
+        bytes_read = bytes_read + 1;
+    }
+    return checksum;
+}
+
+fn str_to_arr(s: i32) -> [i32; 16] {
+    let mut arr: [i32; 16] = [0; 16];
+    if (s == 1) {
+        arr[0] = 102; arr[1] = 105; arr[2] = 108; arr[3] = 101; arr[4] = 49;
+    } else if (s == 2) {
+        arr[0] = 100; arr[1] = 97; arr[2] = 116; arr[3] = 97;
+    } else if (s == 3) {
+        arr[0] = 116; arr[1] = 101; arr[2] = 109; arr[3] = 112;
+    }
+    return arr;
+}
+
+fn main() {
+    fs_format();
+
+    let file1_name: [i32; 16] = str_to_arr(1);
+    let file1_inode: i32 = create_file(ROOT_INODE_NUM, file1_name);
+    printInt(file1_inode);
+
+    let mut data1: [i32; 100] = [0; 100];
+    let mut i: i32 = 0;
+    while (i < 100) {
+        data1[i] = i * 3;
+        i = i + 1;
+    }
+    let written1: i32 = write_file(file1_inode, data1, 80);
+    printInt(written1);
+
+    let checksum1: i32 = read_file(file1_inode);
+    printInt(checksum1);
+
+    let file2_name: [i32; 16] = str_to_arr(2);
+    let file2_inode: i32 = create_file(ROOT_INODE_NUM, file2_name);
+    printInt(file2_inode);
+
+    let mut data2: [i32; 100] = [0; 100];
+    i = 0;
+    while (i < 100) {
+        data2[i] = 100 - i;
+        i = i + 1;
+    }
+    let written2: i32 = write_file(file2_inode, data2, 150);
+    printInt(written2);
+
+    let checksum2: i32 = read_file(file2_inode);
+    printInt(checksum2);
+
+    let found_inode: i32 = find_in_dir(ROOT_INODE_NUM, file1_name);
+    printInt(found_inode);
+
+    let not_found_name: [i32; 16] = str_to_arr(3);
+    let not_found_inode: i32 = find_in_dir(ROOT_INODE_NUM, not_found_name);
+    printInt(not_found_inode);
+
+    let mut free_blocks: i32 = 0;
+    i = 0;
+    while (i < NUM_BLOCKS) {
+        if (free_block_bitmap[i]) {
+            free_blocks = free_blocks + 1;
+        }
+        i = i + 1;
+    }
+    printInt(free_blocks);
+
+    let mut free_inodes: i32 = 0;
+    i = 0;
+    while (i < MAX_INODES) {
+        if (free_inode_bitmap[i]) {
+            free_inodes = free_inodes + 1;
+        }
+        i = i + 1;
+    }
+    printInt(free_inodes);
+
+    let mut fs_checksum: i32 = 0;
+    i = 0;
+    while (i < FS_SIZE) {
+        fs_checksum = fs_checksum + fs_data[i];
+        i = i + 1;
+    }
+    printInt(fs_checksum % 10000);
+
+    let mut j: i32 = 0;
+    while (j < 10) {
+        let mut data: [i32; 100] = [0; 100];
+        let mut k: i32 = 0;
+        while (k < 10) {
+            data[k] = j * 10 + k;
+            k = k + 1;
+        }
+        write_file(file1_inode, data, 10);
+        j = j + 1;
+    }
+    printInt(read_file(file1_inode));
+
+    let mut final_status: i32 = 1;
+    let mut k: i32 = 0;
+    while (k < 5) {
+        let mut final_status: i32 = final_status + k;
+        k = k + 1;
+    }
+    printInt(final_status);
+}

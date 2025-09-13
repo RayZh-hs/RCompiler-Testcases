@@ -1,0 +1,16 @@
+/*
+Test Package: Semantic-1
+Test Target: type
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: Type error: boolean cannot be used as array index
+*/
+
+// Type error: boolean cannot be used as array index
+fn main() {
+    let arr: [i32; 3] = [1, 2, 3];
+    let index: bool = true;
+    let value: i32 = arr[index];
+    exit(0);
+}

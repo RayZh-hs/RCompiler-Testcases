@@ -1,0 +1,31 @@
+/*
+Test Package: Semantic-1
+Test Target: expr
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: Expression error: Missing closing bracket in array index expression - combines call, return, if, block, array, index, and literal expressions
+*/
+
+fn fibonacci(n: i32) -> i32 {
+    if (n <= 1) {
+        return n;
+    } else {
+        return fibonacci(n - 1) + fibonacci(n - 2);
+    }
+}
+
+fn main() {
+    let input: i32 = getInt();
+    let fib_result: i32 = fibonacci(input);
+    let processed: i32 = {
+        let temp: i32 = fib_result + 10;
+        temp * 2
+    };
+    let condition: bool = processed > 0;
+    if (condition) {
+        printInt(processed);
+    }
+    let array_val: i32 = [processed][0;
+    exit(0);
+}

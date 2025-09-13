@@ -1,0 +1,17 @@
+/*
+Test Package: Semantic-1
+Test Target: expr
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: Expression error: Invalid loop expression - missing opening brace in while loop
+*/
+
+// Error: Invalid loop expression - missing opening brace in while loop
+fn main() {
+    let mut i: i32 = 0;
+    while (i < 5)  // Missing opening brace {
+        i += 1;
+}
+    exit(0);
+}

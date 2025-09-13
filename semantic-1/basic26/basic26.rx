@@ -1,0 +1,34 @@
+/*
+Test Package: Semantic-1
+Test Target: basic
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: basic test, permutation generation using recursive backtracking
+*/
+
+fn swap(arr: &mut [u32; 4], i: usize, j: usize) {
+    let temp: u32 = arr[i];
+    arr[i] = arr[j];
+    arr[j] = temp;
+}
+fn permute(arr: &mut [u32; 4], l: usize, r: usize, counter: &mut usize) {
+    if (l == r) {
+        *counter += 1;
+        return;
+    }
+    let mut i: usize = l;
+    while (i <= r) {
+        swap(arr, l, i);
+        permute(arr, l + 1, r, counter);
+        swap(arr, l, i);
+        i += 1;
+    }
+}
+fn main() {
+    let mut bytes: [u32; 4] = [1, 2, 3, 4];
+    let mut total: usize = 0usize;
+    permute(&mut bytes, 0, 3, &mut total);
+    let permutation_count: usize = total;
+    exit(0);
+}

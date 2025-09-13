@@ -1,0 +1,19 @@
+/*
+Test Package: Semantic-1
+Test Target: expr
+Author: Ruitian Wang
+Time: 2025-08-08
+Verdict: Pass
+Comment: Valid return expression - return statement without semicolon is legal in Rust
+*/
+
+// Valid: return statement without semicolon is legal in Rust
+fn calculate() -> i32 {
+    let x: i32 = 42;
+    return x  // No semicolon needed after return value
+}
+
+fn main() {
+    printInt(calculate());
+    exit(0);
+}

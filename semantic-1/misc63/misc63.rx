@@ -1,0 +1,468 @@
+/*
+Test Package: Semantic-1
+Test Target: misc
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: Persistent Segment Tree with lazy propagation and path copying with function name collision error
+*/
+
+// Persistent Segment Tree with Lazy Propagation for Range Updates
+// Supports historical queries with path copying and efficient memory management
+
+struct SegmentNode {
+    left_child: i32,  // Index of left child (-1 if leaf)
+    right_child: i32, // Index of right child (-1 if leaf)
+    sum_value: i32,   // Sum of range
+    lazy_add: i32,    // Lazy propagation value for addition
+    lazy_mult: i32,   // Lazy propagation value for multiplication
+    version_id: i32,  // Version when this node was created
+    range_left: i32,  // Left boundary of range
+    range_right: i32, // Right boundary of range
+}
+
+impl SegmentNode {
+    fn copy(&self) -> SegmentNode {
+        SegmentNode {
+            left_child: self.left_child,
+            right_child: self.right_child,
+            sum_value: self.sum_value,
+            lazy_add: self.lazy_add,
+            lazy_mult: self.lazy_mult,
+            version_id: self.version_id,
+            range_left: self.range_left,
+            range_right: self.range_right,
+        }
+    }
+}
+
+struct PersistentSegmentTree {
+    nodes: [SegmentNode; 5000],
+    node_count: i32,
+    version_roots: [i32; 100], // Root node for each version
+    current_version: i32,
+    base_array: [i32; 200],
+    array_size: i32,
+}
+
+// Initialize a new segment tree node
+fn create_segment_node(left: i32, right: i32, version: i32) -> SegmentNode {
+    SegmentNode {
+        left_child: -1,
+        right_child: -1,
+        sum_value: 0,
+        lazy_add: 0,
+        lazy_mult: 1, // Identity for multiplication
+        version_id: version,
+        range_left: left,
+        range_right: right,
+    }
+}
+
+// Create new node as copy of existing node (path copying for persistence)
+fn copy_node(tree: &mut PersistentSegmentTree, original_idx: i32, new_version: i32) -> i32 {
+    if (tree.node_count >= 5000) {
+        return -1; // No more space
+    }
+
+    let new_idx: i32 = tree.node_count;
+    tree.nodes[new_idx as usize] = tree.nodes[original_idx as usize].copy();
+    tree.nodes[new_idx as usize].version_id = new_version;
+    tree.node_count += 1;
+
+    return new_idx;
+}
+
+// Push lazy propagation values down to children
+fn push_lazy_propagation(tree: &mut PersistentSegmentTree, node_idx: i32, version: i32) {
+    if (node_idx == -1) {
+        return;
+    }
+
+    let lazy_add: i32 = tree.nodes[node_idx as usize].lazy_add;
+    let lazy_mult: i32 = tree.nodes[node_idx as usize].lazy_mult;
+
+    if (lazy_add == 0 && lazy_mult == 1) {
+        return; // No lazy values to push
+    }
+
+    let range_size: i32 = tree.nodes[node_idx as usize].range_right
+        - tree.nodes[node_idx as usize].range_left + 1;
+
+    // Apply lazy values to current node
+    tree.nodes[node_idx as usize].sum_value =
+        tree.nodes[node_idx as usize].sum_value * lazy_mult + lazy_add * range_size;
+
+    // If not leaf, create new children and push values
+    if (tree.nodes[node_idx as usize].left_child != -1) {
+        let new_left: i32 = copy_node(tree, tree.nodes[node_idx as usize].left_child, version);
+        let new_right: i32 = copy_node(tree, tree.nodes[node_idx as usize].right_child, version);
+
+        tree.nodes[node_idx as usize].left_child = new_left;
+        tree.nodes[node_idx as usize].right_child = new_right;
+
+        // Push to left child
+        if (new_left != -1) {
+            tree.nodes[new_left as usize].lazy_mult =
+                tree.nodes[new_left as usize].lazy_mult * lazy_mult;
+            tree.nodes[new_left as usize].lazy_add =
+                tree.nodes[new_left as usize].lazy_add * lazy_mult + lazy_add;
+        }
+
+        // Push to right child
+        if (new_right != -1) {
+            tree.nodes[new_right as usize].lazy_mult =
+                tree.nodes[new_right as usize].lazy_mult * lazy_mult;
+            tree.nodes[new_right as usize].lazy_add =
+                tree.nodes[new_right as usize].lazy_add * lazy_mult + lazy_add;
+        }
+    }
+
+    // Clear lazy values from current node
+    tree.nodes[node_idx as usize].lazy_add = 0;
+    tree.nodes[node_idx as usize].lazy_mult = 1;
+}
+
+// Build initial segment tree recursively
+fn build_segment_tree_recursive(
+    tree: &mut PersistentSegmentTree,
+    left: i32,
+    right: i32,
+    version: i32,
+) -> i32 {
+    if (tree.node_count >= 5000) {
+        return -1;
+    }
+
+    let node_idx: i32 = tree.node_count;
+    tree.nodes[node_idx as usize] = create_segment_node(left, right, version);
+    tree.node_count += 1;
+
+    if (left == right) {
+        // Leaf node
+        tree.nodes[node_idx as usize].sum_value = tree.base_array[left as usize];
+        return node_idx;
+    }
+
+    let mid: i32 = (left + right) / 2;
+    let left_child: i32 = build_segment_tree_recursive(tree, left, mid, version);
+    let right_child: i32 = build_segment_tree_recursive(tree, mid + 1, right, version);
+
+    tree.nodes[node_idx as usize].left_child = left_child;
+    tree.nodes[node_idx as usize].right_child = right_child;
+
+    // Calculate sum from children
+    let left_sum: i32 = if (left_child != -1) {
+        tree.nodes[left_child as usize].sum_value
+    } else {
+        0
+    };
+    let right_sum: i32 = if (right_child != -1) {
+        tree.nodes[right_child as usize].sum_value
+    } else {
+        0
+    };
+    tree.nodes[node_idx as usize].sum_value = left_sum + right_sum;
+
+    return node_idx;
+}
+
+// Range update with lazy propagation and path copying
+fn update_range_recursive(
+    tree: &mut PersistentSegmentTree,
+    node_idx: i32,
+    query_left: i32,
+    query_right: i32,
+    add_value: i32,
+    mult_value: i32,
+    version: i32,
+) -> i32 {
+    if (node_idx == -1) {
+        return -1;
+    }
+
+    let new_node: i32 = copy_node(tree, node_idx, version);
+    push_lazy_propagation(tree, new_node, version);
+
+    let node_left: i32 = tree.nodes[new_node as usize].range_left;
+    let node_right: i32 = tree.nodes[new_node as usize].range_right;
+
+    // No intersection
+    if (query_right < node_left || query_left > node_right) {
+        return new_node;
+    }
+
+    // Complete overlap
+    if (query_left <= node_left && node_right <= query_right) {
+        let range_size: i32 = node_right - node_left + 1;
+        tree.nodes[new_node as usize].sum_value =
+            tree.nodes[new_node as usize].sum_value * mult_value + add_value * range_size;
+        tree.nodes[new_node as usize].lazy_mult =
+            tree.nodes[new_node as usize].lazy_mult * mult_value;
+        tree.nodes[new_node as usize].lazy_add =
+            tree.nodes[new_node as usize].lazy_add * mult_value + add_value;
+        return new_node;
+    }
+
+    // Partial overlap - recurse on children
+    let left_child: i32 = tree.nodes[new_node as usize].left_child;
+    let right_child: i32 = tree.nodes[new_node as usize].right_child;
+
+    let new_left: i32 = update_range_recursive(
+        tree,
+        left_child,
+        query_left,
+        query_right,
+        add_value,
+        mult_value,
+        version,
+    );
+    let new_right: i32 = update_range_recursive(
+        tree,
+        right_child,
+        query_left,
+        query_right,
+        add_value,
+        mult_value,
+        version,
+    );
+
+    tree.nodes[new_node as usize].left_child = new_left;
+    tree.nodes[new_node as usize].right_child = new_right;
+
+    // Recalculate sum
+    let left_sum: i32 = if (new_left != -1) {
+        push_lazy_propagation(tree, new_left, version);
+        tree.nodes[new_left as usize].sum_value
+    } else {
+        0
+    };
+    let right_sum: i32 = if (new_right != -1) {
+        push_lazy_propagation(tree, new_right, version);
+        tree.nodes[new_right as usize].sum_value
+    } else {
+        0
+    };
+
+    tree.nodes[new_node as usize].sum_value = left_sum + right_sum;
+
+    return new_node;
+}
+
+// Query range sum with lazy propagation handling
+fn query_range_recursive(
+    tree: &mut PersistentSegmentTree,
+    node_idx: i32,
+    query_left: i32,
+    query_right: i32,
+) -> i32 {
+    if (node_idx == -1) {
+        return 0;
+    }
+
+    push_lazy_propagation(tree, node_idx, tree.current_version);
+
+    let node_left: i32 = tree.nodes[node_idx as usize].range_left;
+    let node_right: i32 = tree.nodes[node_idx as usize].range_right;
+
+    // No intersection
+    if (query_right < node_left || query_left > node_right) {
+        return 0;
+    }
+
+    // Complete overlap
+    if (query_left <= node_left && node_right <= query_right) {
+        return tree.nodes[node_idx as usize].sum_value;
+    }
+
+    // Partial overlap
+    let left_child: i32 = tree.nodes[node_idx as usize].left_child;
+    let right_child: i32 = tree.nodes[node_idx as usize].right_child;
+
+    let left_sum: i32 = query_range_recursive(tree, left_child, query_left, query_right);
+    let right_sum: i32 = query_range_recursive(tree, right_child, query_left, query_right);
+
+    return left_sum + right_sum;
+}
+
+// Complex nested operations with multiple version management
+fn perform_complex_operations(tree: &mut PersistentSegmentTree) -> i32 {
+    let mut total_sum: i32 = 0i32;
+    let operations: i32 = 50;
+
+    let mut op: i32 = 0;
+    while (op < operations) {
+        let version: i32 = tree.current_version + 1;
+        tree.current_version = version;
+
+        // Different types of operations in nested loops
+        let mut inner_op: i32 = 0;
+        while (inner_op < 5) {
+            let left: i32 = op % tree.array_size;
+            let right: i32 = (op + inner_op + 1) % tree.array_size;
+
+            let actual_left: i32 = if (left < right) { left } else { right };
+            let actual_right: i32 = if (left < right) { right } else { left };
+
+            if (op % 3 == 0) {
+                // Range addition
+                let new_root: i32 = update_range_recursive(
+                    tree,
+                    tree.version_roots[(version - 1) as usize],
+                    actual_left,
+                    actual_right,
+                    op + 1,
+                    1,
+                    version,
+                );
+                tree.version_roots[version as usize] = new_root;
+            } else if (op % 3 == 1) {
+                // Range multiplication
+                let new_root: i32 = update_range_recursive(
+                    tree,
+                    tree.version_roots[(version - 1) as usize],
+                    actual_left,
+                    actual_right,
+                    0,
+                    2,
+                    version,
+                );
+                tree.version_roots[version as usize] = new_root;
+            } else {
+                // Range query on previous version
+                let query_version: i32 = if (version > 1) { version - 1 } else { 0 };
+                let sum: i32 = query_range_recursive(
+                    tree,
+                    tree.version_roots[query_version as usize],
+                    actual_left,
+                    actual_right,
+                );
+                total_sum = (total_sum + sum) % 1000000007;
+            }
+            inner_op += 1;
+        }
+
+        // Recursive analysis of version differences
+        if (version > 1) {
+            total_sum += analyze_version_differences(tree, version - 1, version);
+        }
+
+        op += 1;
+    }
+
+    return total_sum;
+}
+
+// Analyze differences between versions recursively
+fn analyze_version_differences(
+    tree: &PersistentSegmentTree,
+    old_version: i32,
+    new_version: i32,
+) -> i32 {
+    let mut difference_score: i32 = 0i32;
+
+    let mut i: i32 = 0;
+    while (i < tree.array_size) {
+        let old_sum: i32 =
+            query_range_recursive_const(tree, tree.version_roots[old_version as usize], i, i);
+        let new_sum: i32 =
+            query_range_recursive_const(tree, tree.version_roots[new_version as usize], i, i);
+        difference_score += (new_sum - old_sum).abs();
+        i += 1;
+    }
+
+    return difference_score;
+}
+
+// Const version of query for analysis (doesn't modify tree)
+fn query_range_recursive_const(
+    tree: &PersistentSegmentTree,
+    node_idx: i32,
+    query_left: i32,
+    query_right: i32,
+) -> i32 {
+    if (node_idx == -1) {
+        return 0;
+    }
+
+    let node_left: i32 = tree.nodes[node_idx as usize].range_left;
+    let node_right: i32 = tree.nodes[node_idx as usize].range_right;
+
+    if (query_right < node_left || query_left > node_right) {
+        return 0;
+    }
+
+    if (query_left <= node_left && node_right <= query_right) {
+        return tree.nodes[node_idx as usize].sum_value;
+    }
+
+    let left_child: i32 = tree.nodes[node_idx as usize].left_child;
+    let right_child: i32 = tree.nodes[node_idx as usize].right_child;
+
+    return query_range_recursive_const(tree, left_child, query_left, query_right)
+        + query_range_recursive_const(tree, right_child, query_left, query_right);
+}
+
+// FUNCTION NAME COLLISION: This function has the same name as one above
+fn analyze_version_differences(tree: &PersistentSegmentTree,
+                              version1: i32,
+                              version2: i32,
+                              depth: i32) -> i32 {  // ERROR: Function name collision
+    if depth > 10 {
+        return 0;
+    }
+
+    return analyze_version_differences(tree, version1, version2, depth + 1);
+}
+
+// Initialize persistent segment tree with base values
+fn create_persistent_segment_tree(initial_values: [i32; 200], size: i32) -> PersistentSegmentTree {
+    let mut tree: PersistentSegmentTree = PersistentSegmentTree {
+        nodes: [create_segment_node(0, 0, 0); 5000],
+        node_count: 0,
+        version_roots: [-1; 100],
+        current_version: 0,
+        base_array: initial_values,
+        array_size: size,
+    };
+
+    // Build initial version
+    let root: i32 = build_segment_tree_recursive(&mut tree, 0, size - 1, 0);
+    tree.version_roots[0] = root;
+
+    return tree;
+}
+
+// Main function with complex persistent operations
+fn perform_persistent_analysis() -> i32 {
+    // Initialize array with pattern: 1, 2, 3, 4, 5, 1, 2, 3, 4, 5, ...
+    let mut initial_array: [i32; 200] = [0i32; 200];
+    let mut i: i32 = 0;
+    while (i < 200) {
+        initial_array[i as usize] = (i % 5) + 1;
+        i += 1;
+    }
+
+    let mut tree: PersistentSegmentTree = create_persistent_segment_tree(initial_array, 20);
+
+    let operations_result: i32 = perform_complex_operations(&mut tree);
+
+    // Historical query analysis
+    let mut historical_sum: i32 = 0i32;
+    i = 0;
+    while (i <= tree.current_version) {
+        let node_idx: i32 = tree.version_roots[i as usize];
+        let query_right: i32 = tree.array_size - 1;
+        let version_sum: i32 = query_range_recursive(&mut tree, node_idx, 0, query_right);
+        historical_sum += version_sum;
+        i += 1;
+    }
+
+    return operations_result + historical_sum;
+}
+
+fn main() {
+    let result: i32 = perform_persistent_analysis();
+    printInt(result);
+    exit(0);
+}

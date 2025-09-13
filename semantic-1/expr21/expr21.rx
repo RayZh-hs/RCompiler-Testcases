@@ -1,0 +1,23 @@
+/*
+Test Package: Semantic-1
+Test Target: expr
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: Expression error: Missing semicolon after block expression - combines block, operator, if, and literal expressions
+*/
+
+fn main() {
+    let a: i32 = 10;
+    let b: i32 = 20;
+    let c: i32 = {
+        let temp: i32 = a + b;
+        temp * 2
+    }
+    if (c > 50) {
+        printInt(c);
+    } else {
+        printInt(-c);
+    }
+    exit(0);
+}

@@ -1,0 +1,42 @@
+/*
+Test Package: Semantic-1
+Test Target: misc
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: Integer partition recursive counting with iterative summation
+*/
+
+// Integer partition problem: count ways to write n as sum of positive integers
+// Classic number theory problem using recursion with memoization-like approach
+fn partition_recursive(n: i32, max_val: i32) -> i32 {
+    if (n == 0) {
+        return 1; // One way to partition 0 (empty partition)
+    } else if (n < 0 || max_val <= 0) {
+        return 0; // No valid partitions
+    } else {
+        // Include max_val in partition or exclude it
+        return partition_recursive(n - max_val, max_val) + partition_recursive(n, max_val - 1);
+    }
+}
+
+// Calculate partition numbers for multiple values
+fn calculate_partition_sum(limit: i32) -> i32 {
+    let mut total: i32 = 0;
+    let mut n: i32 = 1;
+    
+    while (n <= limit) {
+        let partitions: i32 = partition_recursive(n, n);
+        total += partitions;
+        n += 1;
+    }
+    
+    return total;
+}
+
+fn main() {
+    let limit: i32 = 5;
+    let result: i32 = calculate_partition_sum(limit);
+    printInt(result);
+    exit(0);
+}

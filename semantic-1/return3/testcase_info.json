@@ -1,0 +1,32 @@
+{
+    "active": 1,
+    "cmp": [
+        "compileexitcode"
+    ],
+    "compileexitcode": -1,
+    "compilememorylimit": 256,
+    "compiletimelimit": 15,
+    "exitcode": 0,
+    "id": 2031837,
+    "input_path": "src/return3/return3.in",
+    "input_visible": 1,
+    "metainfo": {
+        "caseauthor": "Bohan Zhang",
+        "comment": "exit function test, the main function must have an exit function call as a final statement",
+        "lastmodified": "2025-08-24"
+    },
+    "name": "return3",
+    "name_visible": 1,
+    "output_path": "src/return3/return3.out",
+    "output_visible": 1,
+    "provide": [
+        "compilestderr",
+        "compileexitcode"
+    ],
+    "runtimelimit": -1,
+    "runtimememorylimit": 256,
+    "source_path": "src/return3/return3.rx",
+    "source_visible": 1,
+    "stage_id": 23891,
+    "stage_name": "semantic-1"
+}

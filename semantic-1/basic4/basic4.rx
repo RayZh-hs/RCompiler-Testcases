@@ -1,0 +1,50 @@
+/*
+Test Package: Semantic-1
+Test Target: basic
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: basic test, struct definition and implementation with methods
+*/
+
+fn main() {
+    let first_point: Point = Point { x: 3, y: 4 };
+    let second_point: Point = Point { x: -1, y: 8 };
+    let mut segment: Line = Line { start: first_point, end: second_point };
+
+    let len: i32 = segment.length();
+    let mut counter: i32 = 0;
+    while (counter < len as i32) {
+        counter += 1;
+    }
+
+    segment.shift(2, -3);
+    let distance: i32 = segment.length();
+    let store: i32 = distance;
+    exit(0);
+}
+
+struct Point {
+    x: i32,
+    y: i32,
+}
+
+struct Line {
+    start: Point,
+    end: Point,
+}
+
+impl Line {
+    fn length(&self) -> i32 {
+        let dx: i32 = (self.end.x - self.start.x) as i32;
+        let dy: i32 = (self.end.y - self.start.y) as i32;
+        (dx * dx + dy * dy)
+    }
+
+    fn shift(&mut self, dx: i32, dy: i32) {
+        self.start.x += dx;
+        self.start.y += dy;
+        self.end.x += dx;
+        self.end.y += dy;
+    }
+}

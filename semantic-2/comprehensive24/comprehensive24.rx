@@ -1,0 +1,803 @@
+/*
+Test Package: Semantic-2
+Test Target: comprehensive
+Author: Wenxin Zheng
+Time: 2025-08-17
+Verdict: Success
+Test Name: Virtual Memory Management and Page Replacement Algorithm Simulator
+Summary: This test comprehensively evaluates compiler optimizations for:
+Details:
+Complex virtual memory management with multi-level page tables
+Advanced page replacement algorithms (LRU, CLOCK, Working Set)
+Cache hierarchy simulation with multiple levels and policies
+Memory allocation tracking with fragmentation analysis
+Complex bit manipulation for page table entries and flags
+Nested loop optimization for memory access patterns
+Branch prediction optimization for cache hit/miss scenarios
+Array access pattern optimization for sparse data structures
+*/
+
+// comprehensive24.rx - Virtual Memory Management and Page Replacement Algorithm Simulator
+// This test comprehensively evaluates compiler optimizations for:
+// - Complex virtual memory management with multi-level page tables
+// - Advanced page replacement algorithms (LRU, CLOCK, Working Set)
+// - Cache hierarchy simulation with multiple levels and policies
+// - Memory allocation tracking with fragmentation analysis
+// - Complex bit manipulation for page table entries and flags
+// - Nested loop optimization for memory access patterns
+// - Branch prediction optimization for cache hit/miss scenarios
+// - Array access pattern optimization for sparse data structures
+
+fn main() {
+    printInt(42);
+    
+    // Virtual Memory System Configuration
+    let page_size: i32 = 4096;
+    let virtual_address_space: i32 = 1048576; // 1MB virtual space
+    let physical_memory_size: i32 = 262144;   // 256KB physical memory
+    let num_virtual_pages: i32 = virtual_address_space / page_size; // 256 virtual pages
+    let num_physical_frames: i32 = physical_memory_size / page_size; // 64 physical frames
+    
+    // Page Table Structure (simplified two-level)
+    let mut page_directory: [i32; 16] = [0; 16];  // Top-level directory
+    let mut page_tables: [[i32; 16]; 16] = [[0; 16]; 16]; // Second-level tables
+    let mut frame_allocation_table: [i32; 64] = [0; 64]; // Physical frame status
+    let mut reverse_mapping: [i32; 64] = [-1; 64]; // Frame to page mapping
+    
+    // Page Replacement Algorithm Data Structures
+    let mut lru_counter: [i32; 256] = [0; 256]; // LRU timestamps for each virtual page
+    let mut reference_bits: [bool; 256] = [false; 256]; // Reference bits for CLOCK algorithm
+    let mut modify_bits: [bool; 256] = [false; 256]; // Dirty bits for write operations
+    let mut clock_hand: i32 = 0; // Current position in CLOCK algorithm
+    let mut working_set_window: i32 = 50; // Working set window size
+    let mut access_history: [i32; 1000] = [0; 1000]; // Recent page accesses
+    let mut history_head: i32 = 0;
+    
+    // Cache Hierarchy Simulation
+    let mut l1_cache: [[i32; 4]; 64] = [[0; 4]; 64]; // L1 cache: 64 sets, 4 ways
+    let mut l1_tags: [[i32; 4]; 64] = [[-1; 4]; 64]; // L1 cache tags
+    let mut l1_valid: [[bool; 4]; 64] = [[false; 4]; 64]; // L1 validity bits
+    let mut l1_lru_bits: [[i32; 4]; 64] = [[0; 4]; 64]; // L1 LRU counters
+    
+    let mut l2_cache: [[i32; 8]; 128] = [[0; 8]; 128]; // L2 cache: 128 sets, 8 ways
+    let mut l2_tags: [[i32; 8]; 128] = [[-1; 8]; 128]; // L2 cache tags
+    let mut l2_valid: [[bool; 8]; 128] = [[false; 8]; 128]; // L2 validity bits
+    let mut l2_lru_bits: [[i32; 8]; 128] = [[0; 8]; 128]; // L2 LRU counters
+    
+    // Memory Access Statistics
+    let mut total_accesses: i32 = 0;
+    let mut page_faults: i32 = 0;
+    let mut l1_hits: i32 = 0;
+    let mut l1_misses: i32 = 0;
+    let mut l2_hits: i32 = 0;
+    let mut l2_misses: i32 = 0;
+    let mut tlb_hits: i32 = 0;
+    let mut tlb_misses: i32 = 0;
+    
+    // TLB (Translation Lookaside Buffer) Simulation
+    let mut tlb_virtual_tags: [i32; 16] = [-1; 16];
+    let mut tlb_physical_frames: [i32; 16] = [-1; 16];
+    let mut tlb_valid: [bool; 16] = [false; 16];
+    let mut tlb_lru_counters: [i32; 16] = [0; 16];
+    
+    // Memory Fragmentation Tracking
+    let mut free_frame_list: [i32; 64] = [0; 64]; // List of free frames
+    let mut free_frame_count: i32 = num_physical_frames;
+    let mut fragmentation_score: i32 = 0;
+    
+    // Initialize free frame list
+    let mut i: i32 = 0;
+    while (i < num_physical_frames) {
+        free_frame_list[i] = i;
+        frame_allocation_table[i] = 0; // 0 = free, 1 = allocated
+        i = i + 1;
+    }
+    
+    // Complex memory access pattern simulation
+    let access_patterns: i32 = 5000;
+    let mut access_count: i32 = 0;
+    let mut current_time: i32 = 0;
+    
+    while (access_count < access_patterns) {
+        current_time = current_time + 1;
+        
+        // Generate complex memory access patterns
+        let virtual_address: i32 = generate_memory_access_pattern(access_count, access_patterns);
+        let virtual_page: i32 = virtual_address / page_size;
+        let page_offset: i32 = virtual_address % page_size;
+        
+        total_accesses = total_accesses + 1;
+        
+        // Record access in history for working set calculation
+        access_history[history_head] = virtual_page;
+        history_head = (history_head + 1) % 1000;
+        
+        // TLB Lookup
+        let tlb_hit: bool = lookup_tlb(virtual_page, &tlb_virtual_tags, &tlb_valid);
+        if (tlb_hit) {
+            tlb_hits = tlb_hits + 1;
+        } else {
+            tlb_misses = tlb_misses + 1;
+            
+            // Page Table Walk
+            let page_dir_index: i32 = virtual_page / 16;
+            let page_table_index: i32 = virtual_page % 16;
+            
+            let mut physical_frame: i32 = -1;
+            let page_table_entry: i32 = page_tables[page_dir_index][page_table_index];
+            
+            if (page_table_entry > 0) { // Page is mapped
+                physical_frame = page_table_entry - 1; // Convert from 1-based to 0-based
+                
+                // Update page access information
+                reference_bits[virtual_page] = true;
+                lru_counter[virtual_page] = current_time;
+                
+                // Update TLB
+                update_tlb(virtual_page, physical_frame, &mut tlb_virtual_tags,
+                          &mut tlb_physical_frames, &mut tlb_valid, &mut tlb_lru_counters);
+            } else {
+                // Page fault! Need to allocate a frame
+                page_faults = page_faults + 1;
+                
+                if (free_frame_count > 0) {
+                    // Allocate a free frame
+                    physical_frame = allocate_free_frame(&mut free_frame_list, &mut free_frame_count,
+                                                       &mut frame_allocation_table);
+                } else {
+                    // Need to use page replacement algorithm
+                    physical_frame = page_replacement_algorithm(
+                        &mut page_tables, &mut reverse_mapping, &mut reference_bits,
+                        &mut modify_bits, &mut clock_hand, &mut lru_counter,
+                        &access_history, history_head, working_set_window,
+                        current_time, access_count
+                    );
+                }
+                
+                if (physical_frame >= 0) {
+                    // Map the page to the frame
+                    page_tables[page_dir_index][page_table_index] = physical_frame + 1; // 1-based
+                    reverse_mapping[physical_frame] = virtual_page;
+                    reference_bits[virtual_page] = true;
+                    lru_counter[virtual_page] = current_time;
+                    frame_allocation_table[physical_frame] = 1; // Mark as allocated
+                    
+                    // Update TLB
+                    update_tlb(virtual_page, physical_frame, &mut tlb_virtual_tags,
+                              &mut tlb_physical_frames, &mut tlb_valid, &mut tlb_lru_counters);
+                }
+            }
+            
+            // Simulate page loading time penalty
+            current_time = current_time + 100; // Page fault penalty
+        }
+        
+        // Simulate cache access if we have a valid physical address
+        if (physical_frame >= 0) {
+            let physical_address: i32 = physical_frame * page_size + page_offset;
+            
+            // L1 Cache Access
+            let l1_hit: bool = access_l1_cache(physical_address, &mut l1_cache, &mut l1_tags,
+                                             &mut l1_valid, &mut l1_lru_bits, current_time);
+            if (l1_hit) {
+                l1_hits = l1_hits + 1;
+            } else {
+                l1_misses = l1_misses + 1;
+                
+                // L2 Cache Access
+                let l2_hit: bool = access_l2_cache(physical_address, &mut l2_cache, &mut l2_tags,
+                                                 &mut l2_valid, &mut l2_lru_bits, current_time);
+                if (l2_hit) {
+                    l2_hits = l2_hits + 1;
+                } else {
+                    l2_misses = l2_misses + 1;
+                    current_time = current_time + 200; // Main memory access penalty
+                }
+            }
+        }
+        
+        // Simulate write operations (mark pages as dirty)
+        if (access_count % 4 == 0 && virtual_page < 256) {
+            modify_bits[virtual_page] = true;
+        }
+        
+        // Periodic memory compaction and defragmentation
+        if (access_count % 500 == 0) {
+            fragmentation_score = analyze_memory_fragmentation(&frame_allocation_table,
+                                                              num_physical_frames);
+            if (fragmentation_score > 30) {
+                compact_memory(&mut page_tables, &mut reverse_mapping, &mut frame_allocation_table,
+                              &mut free_frame_list, &mut free_frame_count, num_physical_frames);
+            }
+        }
+        
+        // Working set analysis
+        if (access_count % 100 == 0) {
+            let working_set_size: i32 = calculate_working_set_size(&access_history, history_head,
+                                                                  working_set_window);
+            // Adjust working set window based on recent behavior
+            if (working_set_size > 40) {
+                working_set_window = working_set_window + 5;
+            } else if (working_set_size < 20 && working_set_window > 10) {
+                working_set_window = working_set_window - 5;
+            }
+        }
+        
+        // Adaptive cache policy adjustment
+        if (access_count % 200 == 0) {
+            adjust_cache_policies(&mut l1_lru_bits, &mut l2_lru_bits, l1_hits, l1_misses,
+                                 l2_hits, l2_misses);
+        }
+        
+        access_count = access_count + 1;
+    }
+    
+    // Complex performance analysis
+    let page_fault_rate: i32 = (page_faults * 100) / total_accesses;
+    let l1_hit_rate: i32 = (l1_hits * 100) / total_accesses;
+    let l2_hit_rate: i32 = (l2_hits * 100) / total_accesses;
+    let tlb_hit_rate: i32 = (tlb_hits * 100) / total_accesses;
+    
+    // Memory utilization analysis
+    let memory_utilization: i32 = ((num_physical_frames - free_frame_count) * 100) / num_physical_frames;
+    
+    // Advanced metrics calculation
+    let avg_memory_access_time: i32 = calculate_average_memory_access_time(
+        l1_hits, l1_misses, l2_hits, l2_misses, page_faults
+    );
+    
+    let final_fragmentation: i32 = analyze_memory_fragmentation(&frame_allocation_table,
+                                                               num_physical_frames);
+    
+    // Output comprehensive results
+    printInt(page_fault_rate);
+    printInt(l1_hit_rate);
+    printInt(l2_hit_rate);
+    printInt(tlb_hit_rate);
+    printInt(memory_utilization);
+    printInt(avg_memory_access_time);
+    printInt(final_fragmentation);
+    printInt(working_set_window);
+}
+
+// Generate complex memory access patterns for testing
+fn generate_memory_access_pattern(access_num: i32, total_accesses: i32) -> i32 {
+    let pattern_type: i32 = (access_num / 100) % 6;
+    
+    if (pattern_type == 0) {
+        // Sequential access pattern
+        (access_num * 64) % 1048576
+    } else if (pattern_type == 1) {
+        // Random access pattern
+        ((access_num * 17 + 23) * 131 + 47) % 1048576
+    } else if (pattern_type == 2) {
+        // Strided access pattern
+        (access_num * 512) % 1048576
+    } else if (pattern_type == 3) {
+        // Locality-based access pattern (80% local, 20% random)
+        let base_addr: i32 = ((access_num / 50) * 8192) % 1048576;
+        if ((access_num * 7) % 10 < 8) {
+            base_addr + ((access_num * 3) % 1024)
+        } else {
+            ((access_num * 19 + 37) * 113) % 1048576
+        }
+    } else if (pattern_type == 4) {
+        // Working set pattern (concentrate on a few pages)
+        let working_set_base: i32 = ((access_num / 200) * 16384) % 1048576;
+        working_set_base + ((access_num * 5) % 4096)
+    } else {
+        // Sparse access pattern (wide distribution)
+        ((access_num * 97 + 113) * 211 + 307) % 1048576
+    }
+}
+
+// TLB lookup function
+fn lookup_tlb(virtual_page: i32, tlb_tags: &[i32; 16], tlb_valid: &[bool; 16]) -> bool {
+    let mut i: i32 = 0;
+    while (i < 16) {
+        if (tlb_valid[i] && tlb_tags[i] == virtual_page) {
+            return true;
+        }
+        i = i + 1;
+    }
+    false
+}
+
+// Update TLB with new translation
+fn update_tlb(virtual_page: i32, physical_frame: i32, tlb_tags: &mut [i32; 16],
+              tlb_frames: &mut [i32; 16], tlb_valid: &mut [bool; 16],
+              tlb_lru: &mut [i32; 16]) {
+    // Find LRU entry to replace
+    let mut lru_index: i32 = 0;
+    let mut min_counter: i32 = tlb_lru[0];
+    
+    let mut i: i32 = 1;
+    while (i < 16) {
+        if (tlb_lru[i] < min_counter) {
+            min_counter = tlb_lru[i];
+            lru_index = i;
+        }
+        i = i + 1;
+    }
+    
+    // Update the LRU entry
+    tlb_tags[lru_index] = virtual_page;
+    tlb_frames[lru_index] = physical_frame;
+    tlb_valid[lru_index] = true;
+    
+    // Update all LRU counters
+    i = 0;
+    while (i < 16) {
+        if (i == lru_index) {
+            tlb_lru[i] = 1000; // High priority
+        } else {
+            tlb_lru[i] = tlb_lru[i] - 1;
+        }
+        i = i + 1;
+    }
+}
+
+// Allocate a free frame from the free list
+fn allocate_free_frame(free_list: &mut [i32; 64], free_count: &mut i32,
+                      allocation_table: &mut [i32; 64]) -> i32 {
+    if *free_count <= 0 {
+        return -1; // No free frames
+    }
+    
+    *free_count = *free_count - 1;
+    let frame: i32 = free_list[*free_count];
+    allocation_table[frame] = 1; // Mark as allocated
+    frame
+}
+
+// Advanced page replacement algorithm combining multiple strategies
+fn page_replacement_algorithm(page_tables: &mut [[i32; 16]; 16], reverse_mapping: &mut [i32; 64],
+                             reference_bits: &mut [bool; 256], modify_bits: &mut [bool; 256],
+                             clock_hand: &mut i32, lru_counter: &mut [i32; 256],
+                             access_history: &[i32; 1000], history_head: i32,
+                             working_set_window: i32, current_time: i32, access_num: i32) -> i32 {
+    // Choose replacement algorithm based on system state
+    let algorithm_choice: i32 = (access_num / 50) % 4;
+    
+    if algorithm_choice == 0 {
+        // Enhanced CLOCK algorithm
+        enhanced_clock_replacement(reverse_mapping, reference_bits, modify_bits, clock_hand)
+    } else if algorithm_choice == 1 {
+        // LRU replacement
+        lru_replacement(reverse_mapping, lru_counter, current_time)
+    } else if algorithm_choice == 2 {
+        // Working set based replacement
+        working_set_replacement(reverse_mapping, access_history, history_head, working_set_window)
+    } else {
+        // Adaptive algorithm (combines multiple factors)
+        adaptive_replacement(reverse_mapping, reference_bits, modify_bits, lru_counter,
+                           current_time, access_history, history_head, working_set_window)
+    }
+}
+
+// Enhanced CLOCK algorithm with second chance for dirty pages
+fn enhanced_clock_replacement(reverse_mapping: &mut [i32; 64], reference_bits: &mut [bool; 256],
+                             modify_bits: &mut [bool; 256], clock_hand: &mut i32) -> i32 {
+    let start_hand: i32 = *clock_hand;
+    let mut passes: i32 = 0;
+    
+    while (passes < 3) { // Maximum 3 passes to avoid infinite loop
+        let frame: i32 = *clock_hand;
+        let virtual_page: i32 = reverse_mapping[frame];
+        
+        if (virtual_page >= 0 && virtual_page < 256) {
+            if !reference_bits[virtual_page] {
+                if !modify_bits[virtual_page] || passes >= 2 {
+                    // Found victim: clean page or dirty page after 2 passes
+                    *clock_hand = (*clock_hand + 1) % 64;
+                    return frame;
+                }
+            } else {
+                reference_bits[virtual_page] = false; // Give second chance
+            }
+        }
+        
+        *clock_hand = (*clock_hand + 1) % 64;
+        if *clock_hand == start_hand {
+            passes = passes + 1;
+        }
+    }
+    
+    // Fallback: return current clock hand position
+    let victim: i32 = *clock_hand;
+    *clock_hand = (*clock_hand + 1) % 64;
+    victim
+}
+
+// LRU replacement algorithm
+fn lru_replacement(reverse_mapping: &[i32; 64], lru_counter: &[i32; 256], current_time: i32) -> i32 {
+    let mut victim_frame: i32 = 0;
+    let mut oldest_time: i32 = current_time + 1;
+    
+    let mut i: i32 = 0;
+    while (i < 64) {
+        let virtual_page: i32 = reverse_mapping[i];
+        if (virtual_page >= 0 && virtual_page < 256) {
+            if (lru_counter[virtual_page] < oldest_time) {
+                oldest_time = lru_counter[virtual_page];
+                victim_frame = i;
+            }
+        }
+        i = i + 1;
+    }
+    
+    victim_frame
+}
+
+// Working set based replacement
+fn working_set_replacement(reverse_mapping: &[i32; 64], access_history: &[i32; 1000],
+                          history_head: i32, window_size: i32) -> i32 {
+    // Build working set from recent accesses
+    let mut working_set: [bool; 256] = [false; 256];
+    let mut i: i32 = 0;
+    let start_pos: i32 = if history_head >= window_size {
+        history_head - window_size
+    } else {
+        1000 - (window_size - history_head)
+    };
+    
+    let mut pos: i32 = start_pos;
+    while (i < window_size) {
+        if (pos >= 0 && pos < 1000) {
+            let page: i32 = access_history[pos];
+            if (page >= 0 && page < 256) {
+                working_set[page] = true;
+            }
+        }
+        pos = (pos + 1) % 1000;
+        i = i + 1;
+    }
+    
+    // Find frame with page not in working set
+    i = 0;
+    while (i < 64) {
+        let virtual_page: i32 = reverse_mapping[i];
+        if (virtual_page >= 0 && virtual_page < 256 && !working_set[virtual_page]) {
+            return i;
+        }
+        i = i + 1;
+    }
+    
+    // If all pages are in working set, fall back to simple replacement
+    (history_head * 7) % 64
+}
+
+// Adaptive replacement algorithm
+fn adaptive_replacement(reverse_mapping: &[i32; 64], reference_bits: &[bool; 256],
+                       modify_bits: &[bool; 256], lru_counter: &[i32; 256],
+                       current_time: i32, access_history: &[i32; 1000],
+                       history_head: i32, window_size: i32) -> i32 {
+    let mut best_frame: i32 = 0;
+    let mut best_score: i32 = -1;
+    
+    let mut i: i32 = 0;
+    while (i < 64) {
+        let virtual_page: i32 = reverse_mapping[i];
+        if (virtual_page >= 0 && virtual_page < 256) {
+            let mut score: i32 = 0;
+            
+            // Factor 1: Age (older is better for replacement)
+            let age: i32 = current_time - lru_counter[virtual_page];
+            score = score + age / 10;
+            
+            // Factor 2: Reference bit (unreferenced is better)
+            if !reference_bits[virtual_page] {
+                score = score + 50;
+            }
+            
+            // Factor 3: Dirty bit (clean is better)
+            if !modify_bits[virtual_page] {
+                score = score + 30;
+            }
+            
+            // Factor 4: Working set membership (non-member is better)
+            let in_working_set: bool = check_working_set_membership(virtual_page, access_history,
+                                                                   history_head, window_size);
+            if !in_working_set {
+                score = score + 40;
+            }
+            
+            if score > best_score {
+                best_score = score;
+                best_frame = i;
+            }
+        }
+        i = i + 1;
+    }
+    
+    best_frame
+}
+
+// Check if page is in working set
+fn check_working_set_membership(page: i32, access_history: &[i32; 1000],
+                               history_head: i32, window_size: i32) -> bool {
+    let mut i: i32 = 0;
+    let start_pos: i32 = if history_head >= window_size {
+        history_head - window_size
+    } else {
+        1000 - (window_size - history_head)
+    };
+    
+    let mut pos: i32 = start_pos;
+    while (i < window_size) {
+        if (pos >= 0 && pos < 1000 && access_history[pos] == page) {
+            return true;
+        }
+        pos = (pos + 1) % 1000;
+        i = i + 1;
+    }
+    false
+}
+
+// L1 Cache access simulation
+fn access_l1_cache(address: i32, cache: &mut [[i32; 4]; 64], tags: &mut [[i32; 4]; 64],
+                   valid: &mut [[bool; 4]; 64], lru_bits: &mut [[i32; 4]; 64], time: i32) -> bool {
+    let set_index: i32 = (address / 64) % 64;
+    let tag: i32 = address / (64 * 64);
+    
+    // Check for hit
+    let mut i: i32 = 0;
+    while (i < 4) {
+        if (valid[set_index][i] && tags[set_index][i] == tag) {
+            // Cache hit - update LRU
+            update_cache_lru(lru_bits, set_index, i, time, 4);
+            return true;
+        }
+        i = i + 1;
+    }
+    
+    // Cache miss - find LRU way to replace
+    let victim_way: i32 = find_lru_way(lru_bits, set_index, 4);
+    tags[set_index][victim_way] = tag;
+    valid[set_index][victim_way] = true;
+    update_cache_lru(lru_bits, set_index, victim_way, time, 4);
+    
+    false
+}
+
+// L2 Cache access simulation
+fn access_l2_cache(address: i32, cache: &mut [[i32; 8]; 128], tags: &mut [[i32; 8]; 128],
+                   valid: &mut [[bool; 8]; 128], lru_bits: &mut [[i32; 8]; 128], time: i32) -> bool {
+    let set_index: i32 = (address / 64) % 128;
+    let tag: i32 = address / (64 * 128);
+    
+    // Check for hit
+    let mut i: i32 = 0;
+    while (i < 8) {
+        if (valid[set_index][i] && tags[set_index][i] == tag) {
+            // Cache hit - update LRU
+            update_cache_lru_8way(lru_bits, set_index, i, time);
+            return true;
+        }
+        i = i + 1;
+    }
+    
+    // Cache miss - find LRU way to replace
+    let victim_way: i32 = find_lru_way_8(lru_bits, set_index);
+    tags[set_index][victim_way] = tag;
+    valid[set_index][victim_way] = true;
+    update_cache_lru_8way(lru_bits, set_index, victim_way, time);
+    
+    false
+}
+
+// Update cache LRU for 4-way cache
+fn update_cache_lru(lru_bits: &mut [[i32; 4]; 64], set_index: i32, way: i32, time: i32, ways: i32) {
+    lru_bits[set_index][way] = time;
+}
+
+// Update cache LRU for 8-way cache
+fn update_cache_lru_8way(lru_bits: &mut [[i32; 8]; 128], set_index: i32, way: i32, time: i32) {
+    lru_bits[set_index][way] = time;
+}
+
+// Find LRU way in 4-way cache
+fn find_lru_way(lru_bits: &[[i32; 4]; 64], set_index: i32, ways: i32) -> i32 {
+    let mut lru_way: i32 = 0;
+    let mut min_time: i32 = lru_bits[set_index][0];
+    
+    let mut i: i32 = 1;
+    while (i < ways) {
+        if (lru_bits[set_index][i] < min_time) {
+            min_time = lru_bits[set_index][i];
+            lru_way = i;
+        }
+        i = i + 1;
+    }
+    
+    lru_way
+}
+
+// Find LRU way in 8-way cache
+fn find_lru_way_8(lru_bits: &[[i32; 8]; 128], set_index: i32) -> i32 {
+    let mut lru_way: i32 = 0;
+    let mut min_time: i32 = lru_bits[set_index][0];
+    
+    let mut i: i32 = 1;
+    while (i < 8) {
+        if (lru_bits[set_index][i] < min_time) {
+            min_time = lru_bits[set_index][i];
+            lru_way = i;
+        }
+        i = i + 1;
+    }
+    
+    lru_way
+}
+
+// Analyze memory fragmentation
+fn analyze_memory_fragmentation(allocation_table: &[i32; 64], num_frames: i32) -> i32 {
+    let mut free_blocks: i32 = 0;
+    let mut largest_free_block: i32 = 0;
+    let mut current_free_block: i32 = 0;
+    let mut total_free: i32 = 0;
+    
+    let mut i: i32 = 0;
+    while (i < num_frames) {
+        if (allocation_table[i] == 0) { // Free frame
+            current_free_block = current_free_block + 1;
+            total_free = total_free + 1;
+        } else { // Allocated frame
+            if current_free_block > 0 {
+                free_blocks = free_blocks + 1;
+                if current_free_block > largest_free_block {
+                    largest_free_block = current_free_block;
+                }
+                current_free_block = 0;
+            }
+        }
+        i = i + 1;
+    }
+    
+    // Handle last block if it's free
+    if current_free_block > 0 {
+        free_blocks = free_blocks + 1;
+        if current_free_block > largest_free_block {
+            largest_free_block = current_free_block;
+        }
+    }
+    
+    // Calculate fragmentation score (higher = more fragmented)
+    if total_free == 0 {
+        0
+    } else {
+        100 - ((largest_free_block * 100) / total_free)
+    }
+}
+
+// Compact memory to reduce fragmentation
+fn compact_memory(page_tables: &mut [[i32; 16]; 16], reverse_mapping: &mut [i32; 64],
+                  allocation_table: &mut [i32; 64], free_list: &mut [i32; 64],
+                  free_count: &mut i32, num_frames: i32) {
+    let mut compacted_pos: i32 = 0;
+    let mut i: i32 = 0;
+    
+    // Move all allocated frames to the beginning
+    while (i < num_frames) {
+        if (allocation_table[i] == 1) { // Allocated frame
+            if i != compacted_pos {
+                // Move frame from position i to compacted_pos
+                let virtual_page: i32 = reverse_mapping[i];
+                reverse_mapping[compacted_pos] = virtual_page;
+                reverse_mapping[i] = -1;
+                allocation_table[compacted_pos] = 1;
+                allocation_table[i] = 0;
+                
+                // Update page table entry
+                if virtual_page >= 0 && virtual_page < 256 {
+                    let page_dir_index: i32 = virtual_page / 16;
+                    let page_table_index: i32 = virtual_page % 16;
+                    page_tables[page_dir_index][page_table_index] = compacted_pos + 1;
+                }
+            }
+            compacted_pos = compacted_pos + 1;
+        }
+        i = i + 1;
+    }
+    
+    // Update free list
+    *free_count = num_frames - compacted_pos;
+    i = 0;
+    while (i < *free_count) {
+        free_list[i] = compacted_pos + i;
+        i = i + 1;
+    }
+}
+
+// Calculate working set size
+fn calculate_working_set_size(access_history: &[i32; 1000], history_head: i32,
+                             window_size: i32) -> i32 {
+    let mut unique_pages: [bool; 256] = [false; 256];
+    let mut working_set_size: i32 = 0;
+    
+    let start_pos: i32 = if history_head >= window_size {
+        history_head - window_size
+    } else {
+        1000 - (window_size - history_head)
+    };
+    
+    let mut i: i32 = 0;
+    let mut pos: i32 = start_pos;
+    while (i < window_size) {
+        if (pos >= 0 && pos < 1000) {
+            let page: i32 = access_history[pos];
+            if (page >= 0 && page < 256 && !unique_pages[page]) {
+                unique_pages[page] = true;
+                working_set_size = working_set_size + 1;
+            }
+        }
+        pos = (pos + 1) % 1000;
+        i = i + 1;
+    }
+    
+    working_set_size
+}
+
+// Adjust cache policies based on performance
+fn adjust_cache_policies(l1_lru: &mut [[i32; 4]; 64], l2_lru: &mut [[i32; 8]; 128],
+                        l1_hits: i32, l1_misses: i32, l2_hits: i32, l2_misses: i32) {
+    let l1_hit_rate: i32 = if l1_hits + l1_misses > 0 {
+        (l1_hits * 100) / (l1_hits + l1_misses)
+    } else {
+        0
+    };
+    
+    let l2_hit_rate: i32 = if l2_hits + l2_misses > 0 {
+        (l2_hits * 100) / (l2_hits + l2_misses)
+    } else {
+        0
+    };
+    
+    // If hit rates are low, adjust replacement policies
+    if l1_hit_rate < 70 {
+        // Make L1 cache more conservative (age entries faster)
+        let mut i: i32 = 0;
+        while (i < 64) {
+            let mut j: i32 = 0;
+            while (j < 4) {
+                l1_lru[i][j] = l1_lru[i][j] - 10;
+                j = j + 1;
+            }
+            i = i + 1;
+        }
+    }
+    
+    if l2_hit_rate < 60 {
+        // Make L2 cache more conservative
+        let mut i: i32 = 0;
+        while (i < 128) {
+            let mut j: i32 = 0;
+            while (j < 8) {
+                l2_lru[i][j] = l2_lru[i][j] - 15;
+                j = j + 1;
+            }
+            i = i + 1;
+        }
+    }
+}
+
+// Calculate average memory access time
+fn calculate_average_memory_access_time(l1_hits: i32, l1_misses: i32, l2_hits: i32,
+                                       l2_misses: i32, page_faults: i32) -> i32 {
+    let total_accesses: i32 = l1_hits + l1_misses;
+    if total_accesses == 0 {
+        return 0;
+    }
+    
+    let l1_hit_time: i32 = 1;
+    let l2_hit_time: i32 = 10;
+    let memory_access_time: i32 = 100;
+    let page_fault_time: i32 = 10000;
+    
+    let total_time: i32 = l1_hits * l1_hit_time +
+                         l2_hits * (l1_hit_time + l2_hit_time) +
+                         l2_misses * (l1_hit_time + l2_hit_time + memory_access_time) +
+                         page_faults * page_fault_time;
+    
+    total_time / total_accesses
+}

@@ -1,0 +1,43 @@
+/*
+Test Package: Semantic-1
+Test Target: misc
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: misc test, GCD and LCM calculation
+*/
+
+// GCD and LCM calculation
+// Calculate greatest common divisor and least common multiple
+fn gcd(a: i32, b: i32) -> i32 {
+    if (b == 0) {
+        return a;
+    }
+    return gcd(b, a % b);
+}
+
+fn lcm(a: i32, b: i32) -> i32 {
+    return (a * b) / gcd(a, b);
+}
+
+fn absolute(x: i32) -> i32 {
+    if (x < 0) {
+        return -x;
+    }
+    return x;
+}
+
+fn main() {
+    let a: i32 = getInt();
+    let b: i32 = getInt();
+    
+    let abs_a: i32 = absolute(a);
+    let abs_b: i32 = absolute(b);
+    
+    let gcd_result: i32 = gcd(abs_a, abs_b);
+    let lcm_result: i32 = lcm(abs_a, abs_b);
+    
+    printInt(gcd_result);
+    printInt(lcm_result);
+    exit(0);
+}

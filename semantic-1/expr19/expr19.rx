@@ -1,0 +1,21 @@
+/*
+Test Package: Semantic-1
+Test Target: expr
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: Combines call, literal, operator, and grouped expressions; trailing comma in function call is allowed
+*/
+
+fn add(a: i32, b: i32) -> i32 {
+    a + b
+}
+
+fn main() {
+    let x: i32 = 5;
+    let y: i32 = 10;
+    let result: i32 = add(x, y,);
+    let doubled: i32 = result * 2;
+    printInt((doubled + 1) / 3);
+    exit(0);
+}

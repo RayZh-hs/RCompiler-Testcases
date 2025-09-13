@@ -1,0 +1,40 @@
+/*
+Test Package: Semantic-1
+Test Target: misc
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: misc test, factorial calculation using recursion
+*/
+
+// Factorial calculation using recursion
+// Calculate n! (factorial of n)
+fn factorial(n: i32) -> i32 {
+    if (n <= 1) {
+        return 1;
+    }
+    return n * factorial(n - 1);
+}
+
+fn is_even(n: i32) -> bool {
+    return (n % 2 == 0);
+}
+
+fn main() {
+    let n: i32 = getInt();
+    
+    if (n < 0) {
+        printInt(-1); // Invalid input
+        return;
+    }
+    
+    let result: i32 = factorial(n);
+    
+    // Check if result is even or odd
+    if (is_even(result)) {
+        printInt(result * 2); // Double if even
+    } else {
+        printInt(result); // Keep original if odd
+    }
+    exit(0);
+}

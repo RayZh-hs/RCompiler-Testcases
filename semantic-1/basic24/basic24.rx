@@ -1,0 +1,48 @@
+/*
+Test Package: Semantic-1
+Test Target: basic
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: basic test, breadth-first search on graph with adjacency matrix
+*/
+
+const N: usize = 6;
+fn bfs(g: &[[u32; N]; N], root: usize, visited: &mut [bool; N], order: &mut [usize; N]) {
+    let mut queue: [usize; N] = [0; N];
+    let mut head: usize = 0usize;
+    let mut tail: usize = 0usize;
+    queue[tail] = root;
+    tail += 1;
+    visited[root] = true;
+    let mut pos: usize = 0usize;
+    while (head < tail) {
+        let v: usize = queue[head];
+        order[pos] = v;
+        pos += 1;
+        head += 1;
+        let mut i: usize = 0usize;
+        while (i < N) {
+            if (g[v][i] != 0 && !visited[i]) {
+                queue[tail] = i;
+                tail += 1;
+                visited[i] = true;
+            }
+            i += 1;
+        }
+    }
+}
+fn main() {
+    let graph: [[u32; N]; N] = [
+        [0, 1, 1, 0, 0, 0],
+        [1, 0, 0, 1, 0, 0],
+        [1, 0, 0, 1, 1, 0],
+        [0, 1, 1, 0, 1, 1],
+        [0, 0, 1, 1, 0, 1],
+        [0, 0, 0, 1, 1, 0],
+    ];
+    let mut visited: [bool; 6] = [false; N];
+    let mut order: [usize; 6] = [0usize; N];
+    bfs(&graph, 0, &mut visited, &mut order);
+    exit(0);
+}

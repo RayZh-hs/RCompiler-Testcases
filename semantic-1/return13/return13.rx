@@ -1,0 +1,19 @@
+/*
+Test Package: Semantic-1
+Test Target: return
+Author: Ruitian Wang
+Time: 2025-08-27
+Verdict: Pass
+Comment: Valid return statement in expression context
+*/
+
+// Valid: Return statement can be used as expression value (never type coercion)
+fn test_return_expr() -> i32 {
+    let x: i32 = return 42;
+    x
+}
+
+fn main() {
+    let result: i32 = test_return_expr();
+    exit(0);
+}

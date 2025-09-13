@@ -1,0 +1,56 @@
+/*
+Test Package: Semantic-1
+Test Target: type
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: Type error: string assigned to i32 field in linked list structure
+*/
+
+// Complete program with type error: pointer arithmetic with wrong types
+const MAXN: usize = 20;
+
+struct Node {
+    value: i32,
+    next: i32,
+}
+
+struct NodePool {
+    nodes: [Node; MAXN],
+    size: usize,
+}
+
+impl NodePool {
+    fn new() -> Self {
+        NodePool {
+            nodes: [Node { value: 0, next: 0 }; MAXN],
+            size: 0,
+        }
+    }
+}
+
+fn create_node(pool: &mut NodePool, val: i32) -> i32 {
+    pool.size += 1;
+    pool.nodes[pool.size] = Node { value: val, next: 0 };
+    pool.size as i32
+}
+
+fn traverse_list(pool: &NodePool, head: i32) {
+    let mut current: i32 = head;
+    while (current != 0) {
+        printlnInt(pool.nodes[current as usize].value);
+        current = pool.nodes[current as usize].next;
+    }
+}
+
+fn main() {
+    let mut pool: NodePool = NodePool::new();
+    let node1: i32 = create_node(&mut pool, 10);
+    let node2: i32 = create_node(&mut pool, 20);
+    pool.nodes[node1 as usize].next = node2;
+    
+    // Type error: trying to assign string to i32 field
+    let invalid_node = Node { value: 30, next: "not an i32" };
+    traverse_list(&pool, node1);
+    exit(0);
+}

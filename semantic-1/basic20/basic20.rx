@@ -1,0 +1,44 @@
+/*
+Test Package: Semantic-1
+Test Target: basic
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: basic test, matrix multiplication with type alias and trace calculation
+*/
+
+const N: usize = 3;
+fn mul(a: &[[i32; N]; N], b: &[[i32; N]; N]) -> [[i32; N]; N] {
+    let mut out: [[i32; N]; N] = [[0i32; N]; N];
+    let mut i: usize = 0usize;
+    while (i < N) {
+        let mut j: usize = 0usize;
+        while (j < N) {
+            let mut k: usize = 0usize;
+            let mut cell: i32 = 0i32;
+            while (k < N) {
+                cell += a[i][k] * b[k][j];
+                k += 1;
+            }
+            out[i][j] = cell;
+            j += 1;
+        }
+        i += 1;
+    }
+    out
+}
+fn main() {
+    let a: [[i32; N]; N] = [[1, 2, 3], [4, 5, 6], [7, 8, 9]];
+    let b: [[i32; N]; N] = [[9, 8, 7], [6, 5, 4], [3, 2, 1]];
+    let c: [[i32; N]; N] = mul(&a, &b);
+    let d: [[i32; N]; N] = mul(&c, &a);
+    let e: [[i32; N]; N] = mul(&d, &b);
+    let mut trace: i32 = 0i32;
+    let mut idx: usize = 0usize;
+    while (idx < N) {
+        trace += e[idx][idx];
+        idx += 1;
+    }
+    let result: i32 = trace;
+    exit(0);
+}

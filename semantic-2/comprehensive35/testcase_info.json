@@ -1,0 +1,32 @@
+{
+    "active": 1,
+    "cmp": [
+        "compileexitcode"
+    ],
+    "compileexitcode": 0,
+    "compilememorylimit": 256,
+    "compiletimelimit": 15,
+    "exitcode": 0,
+    "id": 2031819,
+    "input_path": "src/comprehensive35/comprehensive35.in",
+    "input_visible": 0,
+    "metainfo": {
+        "caseauthor": "Wenxin Zheng",
+        "comment": "",
+        "lastmodified": "2025-08-17"
+    },
+    "name": "comprehensive35",
+    "name_visible": 0,
+    "output_path": "src/comprehensive35/comprehensive35.out",
+    "output_visible": 0,
+    "provide": [
+        "compilestderr",
+        "compileexitcode"
+    ],
+    "runtimelimit": -1,
+    "runtimememorylimit": 256,
+    "source_path": "src/comprehensive35/comprehensive35.rx",
+    "source_visible": 0,
+    "stage_id": 23890,
+    "stage_name": "semantic-2"
+}

@@ -1,0 +1,20 @@
+/*
+Test Package: Semantic-1
+Test Target: expr
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: Combines loop, if, break, operator, and literal expressions
+*/
+
+fn main() {
+    let mut x: i32 = 10;
+    let result: i32 = loop {
+        if (x == 0) {
+            break x + 1
+        }
+        x = x - 1;
+    };
+    printInt(result);
+    exit(0);
+}

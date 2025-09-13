@@ -1,0 +1,99 @@
+/*
+Test Package: Semantic-1
+Test Target: misc
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: Quadratic sieve algorithm for factorization using continued fractions
+*/
+
+// Quadratic sieve algorithm for factorization
+// Uses continued fractions and recursive sieve optimization
+fn isqrt(n: i32) -> i32 {
+    if (n < 2) {
+        return n;
+    }
+    
+    let mut x: i32 = n;
+    let mut y: i32 = (x + 1) / 2;
+    
+    while (y < x) {
+        x = y;
+        y = (x + n / x) / 2;
+    }
+    
+    return x;
+}
+
+fn sieve_recursive(base: i32, limit: i32, primes: &mut [i32; 100], count: &mut usize, current: i32) {
+    if (current > limit) {
+        return;
+    }
+    
+    let mut is_prime: bool = true;
+    let mut i: usize = 0;
+    
+    while (i < *count && primes[i] * primes[i] <= current) {
+        if (current % primes[i] == 0) {
+            is_prime = false;
+        }
+        i = i + 1;
+    }
+    
+    if (is_prime && current > 1) {
+        primes[*count as usize] = current;
+        *count = *count + 1;
+    }
+    
+    sieve_recursive(base, limit, primes, count, current + 1);
+}
+
+fn quadratic_residue(a: i32, p: i32) -> i32 {
+    let mut result: i32 = 1;
+    let mut base: i32 = a % p;
+    let mut exp: i32 = (p - 1) / 2;
+    
+    while (exp > 0) {
+        if (exp % 2 == 1) {
+            result = (result * base) % p;
+        }
+        base = (base * base) % p;
+        exp = exp / 2;
+    }
+    
+    return result;
+}
+
+fn quadratic_sieve(n: i32) -> i32 {
+    let sqrt_n: i32 = isqrt(n);
+    let mut primes: [i32; 100] = [0; 100];
+    let mut prime_count: usize = 0;
+    
+    sieve_recursive(2, sqrt_n, &mut primes, &mut prime_count, 2);
+    
+    let mut x: i32 = sqrt_n + 1;
+    while (x < sqrt_n + 100) {
+        let y_squared: i32 = x * x - n;
+        
+        if (y_squared > 0) {
+            let y: i32 = isqrt(y_squared);
+            if (y * y == y_squared) {
+                let factor: i32 = if (x > y) { x - y } else { y - x };
+                if (factor > 1 && factor < n) {
+                    return factor;
+                }
+            }
+        }
+        
+        x = x + 1;
+    }
+    
+    return n;
+}
+
+fn main() {
+    let n: i32 = getInt();
+    let factor: i32 = quadratic_sieve(n);
+    printInt(factor);
+    exit(0);
+}

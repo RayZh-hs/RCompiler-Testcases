@@ -1,0 +1,23 @@
+/*
+Test Package: Semantic-1
+Test Target: return
+Author: Ruitian Wang
+Time: 2025-08-27
+Verdict: Pass
+Comment: Valid return in while loop condition - early return does not affect loop semantics
+*/
+
+// Valid: return in while loop condition - early return does not affect loop semantics
+fn test_while_return(n: i32) -> i32 {
+    let mut i: i32 = 0;
+    while (if (n < 0) { return -1; } else { i < n }) {
+        i += 1;
+    }
+    i
+}
+
+fn main() {
+    let result1: i32 = test_while_return(5);   // Returns 5
+    let result2: i32 = test_while_return(-1);  // Returns -1
+    exit(0);
+}

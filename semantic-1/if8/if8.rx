@@ -1,0 +1,17 @@
+/*
+Test Package: Semantic-1
+Test Target: if
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: if statement test, chained if expression with multiple branches
+*/
+
+fn main() {
+    let score: i32 = 87;
+    let grade: char = if (score >= 90) { 'A' } 
+                else if (score >= 80) { 'B' } 
+                else { 'C' };
+    let _: char = grade;
+    exit(0);
+}

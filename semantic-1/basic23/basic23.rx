@@ -1,0 +1,64 @@
+/*
+Test Package: Semantic-1
+Test Target: basic
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: basic test, sudoku solver with backtracking algorithm
+*/
+
+fn is_safe(b: &[[u32; 4]; 4], row: usize, col: usize, num: u32) -> bool {
+    let mut i: usize = 0;
+    while (i < 4) {
+        if (b[row][i] == num || b[i][col] == num) {
+            return false;
+        }
+        i += 1;
+    }
+    let start_row: usize = row / 2 * 2;
+    let start_col: usize = col / 2 * 2;
+    let mut r: usize = 0;
+    while (r < 2) {
+        let mut c: usize = 0;
+        while (c < 2) {
+            if (b[start_row + r][start_col + c] == num) {
+                return false;
+            }
+            c += 1;
+        }
+        r += 1;
+    }
+    true
+}
+fn solve(b: &mut [[u32; 4]; 4], row: usize, col: usize) -> bool {
+    if (row == 4) {
+        return true;
+    }
+    let next_row: usize = if (col == 3) { row + 1 } else { row };
+    let next_col: usize = if (col == 3) { 0 } else { col + 1 };
+    if (b[row][col] != 0) {
+        return solve(b, next_row, next_col);
+    }
+    let mut num: u32 = 1u32;
+    while (num <= 4) {
+        if (is_safe(b, row, col, num)) {
+            b[row][col] = num;
+            if (solve(b, next_row, next_col)) {
+                return true;
+            }
+            b[row][col] = 0;
+        }
+        num += 1;
+    }
+    false
+}
+fn main() {
+    let mut board: [[u32; 4]; 4] = [
+        [1, 0, 0, 4],
+        [0, 0, 3, 0],
+        [0, 3, 0, 0],
+        [2, 0, 0, 1],
+    ];
+    let solved: bool = solve(&mut board, 0, 0);
+    exit(0);
+}

@@ -1,0 +1,32 @@
+{
+    "active": 1,
+    "cmp": [
+        "compileexitcode"
+    ],
+    "compileexitcode": -1,
+    "compilememorylimit": 256,
+    "compiletimelimit": 15,
+    "exitcode": -1,
+    "id": 2031838,
+    "input_path": "src/return4/return4.in",
+    "input_visible": 1,
+    "metainfo": {
+        "caseauthor": "Bohan Zhang",
+        "comment": "exit function test, the main function should not return any type but `()`",
+        "lastmodified": "2025-08-24"
+    },
+    "name": "return4",
+    "name_visible": 1,
+    "output_path": "src/return4/return4.out",
+    "output_visible": 1,
+    "provide": [
+        "compilestderr",
+        "compileexitcode"
+    ],
+    "runtimelimit": -1,
+    "runtimememorylimit": 256,
+    "source_path": "src/return4/return4.rx",
+    "source_visible": 1,
+    "stage_id": 23891,
+    "stage_name": "semantic-1"
+}

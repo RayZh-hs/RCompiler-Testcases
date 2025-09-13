@@ -1,0 +1,16 @@
+/*
+Test Package: Semantic-1
+Test Target: expr
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: Expression error: Invalid block expression - missing closing brace
+*/
+
+// Error: Invalid block expression - missing closing brace
+fn main() {
+    {
+        let x: i32 = 42;
+        printInt(x);
+    // Missing closing brace - LL(1) expects }
+}

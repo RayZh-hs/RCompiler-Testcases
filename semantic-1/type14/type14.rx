@@ -1,0 +1,33 @@
+/*
+Test Package: Semantic-1
+Test Target: type
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: Type error: inconsistent return types in conditional function
+*/
+
+// Complete program with type error: function return type inconsistency
+fn factorial(n: i32) -> i32 {
+    if (n <= 1) {
+        return 1;
+    } else {
+        return n * factorial(n - 1);
+    }
+}
+
+fn get_result(choice: bool) -> i32 {
+    if (choice) {
+        return factorial(5);
+    } else {
+        // Type error: returning string instead of i32
+        return "error occurred";
+    }
+}
+
+fn main() {
+    let input: i32 = getInt();
+    let result: i32 = get_result(input > 0);
+    printInt(result);
+    exit(0);
+}

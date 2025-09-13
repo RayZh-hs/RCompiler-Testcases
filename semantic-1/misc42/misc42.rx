@@ -1,0 +1,138 @@
+/*
+Test Package: Semantic-1
+Test Target: misc
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: Tonelli-Shanks algorithm for computing modular square roots
+*/
+
+// Tonelli-Shanks algorithm for computing modular square roots
+// Finds x such that x² ≡ n (mod p) using quadratic reciprocity
+fn power_mod(mut base: i32, mut exp: i32, modulus: i32) -> i32 {
+    let mut result: i32 = 1;
+    base = base % modulus;
+    
+    while (exp > 0) {
+        if (exp % 2 == 1) {
+            result = (result * base) % modulus;
+        }
+        exp = exp / 2;
+        base = (base * base) % modulus;
+    }
+    
+    return result;
+}
+
+fn legendre_symbol(a: i32, p: i32) -> i32 {
+    let result: i32 = power_mod(a, (p - 1) / 2, p);
+    if (result == p - 1) {
+        return -1;
+    }
+    return result;
+}
+
+fn find_quadratic_nonresidue(p: i32) -> i32 {
+    let mut z: i32 = 2;
+    
+    while (z < p) {
+        if (legendre_symbol(z, p) == -1) {
+            return z;
+        }
+        z = z + 1;
+    }
+    
+    return -1;
+}
+
+fn tonelli_shanks_recursive(n: i32, p: i32, q: i32, s: i32, z: i32, 
+                          m: i32, c: i32, t: i32, r: i32, iteration: i32) -> i32 {
+    if (t == 1) {
+        return r;
+    }
+    
+    if (iteration > 20) {
+        return -1; // Too many iterations
+    }
+    
+    // Find the smallest i such that t^(2^i) = 1 (mod p)
+    let mut i: i32 = 1;
+    let mut temp: i32 = (t * t) % p;
+    
+    while (temp != 1 && i < m) {
+        temp = (temp * temp) % p;
+        i = i + 1;
+    }
+    
+    if (i >= m) {
+        return -1; // No solution
+    }
+    
+    let b: i32 = power_mod(c, power_mod(2, m - i - 1, p - 1), p);
+    let new_m: i32 = i;
+    let new_c: i32 = (b * b) % p;
+    let new_t: i32 = (t * new_c) % p;
+    let new_r: i32 = (r * b) % p;
+    
+    return tonelli_shanks_recursive(n, p, q, s, z, new_m, new_c, new_t, new_r, iteration + 1);
+}
+
+fn modular_sqrt(n: i32, p: i32) -> i32 {
+    if (p == 2) {
+        return n % 2;
+    }
+    
+    if (legendre_symbol(n, p) != 1) {
+        return -1; // n is not a quadratic residue
+    }
+    
+    if (p % 4 == 3) {
+        return power_mod(n, (p + 1) / 4, p);
+    }
+    
+    // Find Q and S such that p - 1 = Q * 2^S with Q odd
+    let mut q: i32 = p - 1;
+    let mut s: i32 = 0;
+    
+    while (q % 2 == 0) {
+        q = q / 2;
+        s = s + 1;
+    }
+    
+    if (s == 1) {
+        return power_mod(n, (p + 1) / 4, p);
+    }
+    
+    let z: i32 = find_quadratic_nonresidue(p);
+    let mut m: i32 = s;
+    let mut c: i32 = power_mod(z, q, p);
+    let mut t: i32 = power_mod(n, q, p);
+    let mut r: i32 = power_mod(n, (q + 1) / 2, p);
+    
+    return tonelli_shanks_recursive(n, p, q, s, z, m, c, t, r, 0);
+}
+
+fn quadratic_reciprocity_test(a: i32, b: i32) -> i32 {
+    if (a <= 1 || b <= 1) {
+        return 0;
+    }
+    
+    let leg_a_b: i32 = legendre_symbol(a, b);
+    let leg_b_a: i32 = legendre_symbol(b, a);
+    
+    // Quadratic reciprocity law
+    if ((a - 1) % 4 == 0 || (b - 1) % 4 == 0) {
+        return leg_a_b * leg_b_a;
+    } else {
+        return -leg_a_b * leg_b_a;
+    }
+}
+
+fn main() {
+    let n: i32 = getInt();
+    let p: i32 = getInt();
+    
+    let sqrt_result: i32 = modular_sqrt(n, p);
+    printInt(sqrt_result);
+    exit(0);
+}

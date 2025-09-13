@@ -1,0 +1,19 @@
+/*
+Test Package: Semantic-1
+Test Target: expr
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: Expression error: Missing closing bracket in array index - combines array, index, if, operator, and literal expressions
+*/
+
+fn main() {
+    let numbers: [i32; 5] = [1, 2, 3, 4, 5];
+    let index: usize = 2;
+    let value: i32 = numbers[index;
+    if value != 0 {
+        printInt(value * 2);
+    }
+    let sum: i32 = value + numbers[0];
+    exit(0);
+}

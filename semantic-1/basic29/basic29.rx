@@ -1,0 +1,33 @@
+/*
+Test Package: Semantic-1
+Test Target: basic
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: basic test, 3x3 matrix determinant and transpose operations
+*/
+
+fn det3(m: &[[i32; 3]; 3]) -> i32 {
+    let a: i32 = m[0][0] * (m[1][1] * m[2][2] - m[1][2] * m[2][1]);
+    let b: i32 = m[0][1] * (m[1][0] * m[2][2] - m[1][2] * m[2][0]);
+    let c: i32 = m[0][2] * (m[1][0] * m[2][1] - m[1][1] * m[2][0]);
+    a - b + c
+}
+fn transpose(src: &[[i32; 3]; 3], dst: &mut [[i32; 3]; 3]) {
+    let mut r: usize = 0;
+    while (r < 3) {
+        let mut c: usize = 0;
+        while (c < 3) {
+            dst[r][c] = src[c][r];
+            c += 1;
+        }
+        r += 1;
+    }
+}
+fn main() {
+    let m: [[i32; 3]; 3] = [[2, 3, 1], [4, 0, 5], [7, 2, 6]];
+    let d: i32 = det3(&m);
+    let mut t: [[i32; 3]; 3] = [[0; 3]; 3];
+    transpose(&m, &mut t);
+    exit(0);
+}

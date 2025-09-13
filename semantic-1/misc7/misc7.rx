@@ -1,0 +1,49 @@
+/*
+Test Package: Semantic-1
+Test Target: misc
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: misc test, binary search algorithm
+*/
+
+// Binary search algorithm
+// Search for a target value in a sorted array
+fn binary_search(arr: &[i32; 20], target: i32, size: i32) -> i32 {
+    let mut left: i32 = 0;
+    let mut right: i32 = size - 1;
+    
+    while (left <= right) {
+        let mid: i32 = left + (right - left) / 2;
+        
+        if (arr[mid as usize] == target) {
+            return mid;
+        }
+        
+        if (arr[mid as usize] < target) {
+            left = mid + 1;
+        } else {
+            right = mid - 1;
+        }
+    }
+    
+    return -1; // Not found
+}
+
+fn main() {
+    let n: i32 = getInt();
+    let target: i32 = getInt();
+    
+    let mut arr: [i32; 20] = [0; 20];
+    let mut i: i32 = 0;
+    
+    // Read sorted array
+    while (i < n) {
+        arr[i as usize] = getInt();
+        i += 1;
+    }
+    
+    let result: i32 = binary_search(&arr, target, n);
+    printInt(result);
+    exit(0);
+}

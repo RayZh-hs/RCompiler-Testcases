@@ -1,0 +1,467 @@
+/*
+Test Package: Semantic-1
+Test Target: expr
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: Complex expression error: Missing closing parenthesis in expression - Graham scan convex hull algorithm with polar angle sorting, geometric computations, and stress testing
+*/
+
+#[derive(Copy, Clone)]
+struct ConvexHullPoint {
+    x: i32,
+    y: i32,
+    polar_angle: i32,
+    distance_squared: i32,
+    hull_index: i32,
+}
+
+impl ConvexHullPoint {
+    fn new(x_coord: i32, y_coord: i32) -> ConvexHullPoint {
+        ConvexHullPoint {
+            x: x_coord,
+            y: y_coord,
+            polar_angle: 0,
+            distance_squared: 0,
+            hull_index: -1,
+        }
+    }
+    
+    fn calculate_polar_properties(&mut self, reference_x: i32, reference_y: i32) {
+        let dx: i32 = self.x - reference_x;
+        let dy: i32 = self.y - reference_y;
+        
+        self.distance_squared = dx * dx + dy * dy;
+        
+        let angle_approximation: i32 = {
+            let abs_dx: i32 = if (dx < 0) { -dx } else { dx };
+            let abs_dy: i32 = if (dy < 0) { -dy } else { dy };
+            
+            if (abs_dx == 0 && abs_dy == 0) {
+                0
+            } else if (abs_dx == 0) {
+                if (dy > 0) { 90 } else { 270 }
+            } else if (abs_dy == 0) {
+                if (dx > 0) { 0 } else { 180 }
+            } else {
+                let ratio: i32 = (abs_dy * 1000) / abs_dx;
+                let base_angle: i32 = if (ratio <= 268) {
+                    ratio / 10
+                } else if (ratio <= 3732) {
+                    26 + (ratio - 268) / 50
+                } else {
+                    90 - (10000 - ratio) / 100
+                };
+                
+                if (dx > 0 && dy > 0) {
+                    base_angle
+                } else if (dx < 0 && dy > 0) {
+                    180 - base_angle
+                } else if (dx < 0 && dy < 0) {
+                    180 + base_angle
+                } else {
+                    360 - base_angle
+                }
+            }
+        };
+        
+        self.polar_angle = angle_approximation;
+    }
+    
+    fn cross_product(&self, other: &ConvexHullPoint, pivot: &ConvexHullPoint) -> i32 {
+        let vec1_x: i32 = self.x - pivot.x;
+        let vec1_y: i32 = self.y - pivot.y;
+        let vec2_x: i32 = other.x - pivot.x;
+        let vec2_y: i32 = other.y - pivot.y;
+        
+        return vec1_x * vec2_y - vec1_y * vec2_x;
+    }
+}
+
+fn find_bottom_most_point(points: &[ConvexHullPoint; 40]) -> i32 {
+    let mut bottom_index: i32 = 0;
+    let mut bottom_y: i32 = points[0].y;
+    let mut bottom_x: i32 = points[0].x;
+    
+    let mut search_index: i32 = 1;
+    loop {
+        if (search_index >= 40) {
+            break;
+        }
+        
+        let current_point: &ConvexHullPoint = &points[search_index as usize];
+        let is_lower: bool = current_point.y < bottom_y;
+        let is_same_y_but_left: bool = current_point.y == bottom_y && current_point.x < bottom_x;
+        
+        if (is_lower || is_same_y_but_left) {
+            bottom_index = search_index;
+            bottom_y = current_point.y;
+            bottom_x = current_point.x;
+        }
+        
+        search_index = search_index + 1;
+    }
+    
+    return bottom_index;
+}
+
+fn graham_scan_convex_hull(points: &mut [ConvexHullPoint; 40]) -> [i32; 40] {
+    let pivot_index: i32 = find_bottom_most_point(points);
+    let pivot_x: i32 = points[pivot_index as usize].x;
+    let pivot_y: i32 = points[pivot_index as usize].y;
+    
+    if (pivot_index != 0) {
+        let temp_point: ConvexHullPoint = points[0];
+        points[0] = points[pivot_index as usize];
+        points[pivot_index as usize] = temp_point;
+    }
+    
+    let mut polar_index: i32 = 1;
+    loop {
+        if (polar_index >= 40) {
+            break;
+        }
+        points[polar_index as usize].calculate_polar_properties(pivot_x, pivot_y);
+        polar_index = polar_index + 1;
+    }
+    
+    let mut sort_i: i32 = 1;
+    loop {
+        if (sort_i >= 39) {
+            break;
+        }
+        
+        let mut sort_j: i32 = sort_i + 1;
+        loop {
+            if (sort_j >= 40) {
+                break;
+            }
+            
+            let should_swap: bool = {
+                let angle_diff: i32 = points[sort_i as usize].polar_angle - points[sort_j as usize].polar_angle;
+                if (angle_diff > 0) {
+                    true
+                } else if (angle_diff == 0) {
+                    points[sort_i as usize].distance_squared > points[sort_j as usize].distance_squared
+                } else {
+                    false
+                }
+            };
+            
+            if (should_swap) {
+                let temp: ConvexHullPoint = points[sort_i as usize];
+                points[sort_i as usize] = points[sort_j as usize];
+                points[sort_j as usize] = temp;
+            }
+            
+            sort_j = sort_j + 1;
+        }
+        
+        sort_i = sort_i + 1;
+    }
+    
+    let mut hull_stack: [i32; 40] = [-1; 40];
+    let mut stack_top: i32;
+    
+    hull_stack[0] = 0;
+    hull_stack[1] = 1;
+    stack_top = 2;
+    
+    let mut scan_index: i32 = 2;
+    loop {
+        if (scan_index >= 40) {
+            break;
+        }
+        
+        loop {
+            if (stack_top < 2) {
+                break;
+            }
+            
+            let top_idx: i32 = hull_stack[(stack_top - 1) as usize];
+            let second_idx: i32 = hull_stack[(stack_top - 2) as usize];
+            
+            let cross_prod: i32 = points[scan_index as usize].cross_product(&points[top_idx as usize], &points[second_idx as usize]);
+            
+            if (cross_prod > 0) {
+                break;
+            } else {
+                stack_top = stack_top - 1;
+            }
+        }
+        
+        hull_stack[stack_top as usize] = scan_index;
+        points[scan_index as usize].hull_index = stack_top;
+        stack_top = stack_top + 1;
+        
+        scan_index = scan_index + 1;
+    }
+    
+    let mut hull_indices: [i32; 40] = [-1; 40];
+    let mut hull_copy_index: i32 = 0;
+    
+    loop {
+        if (hull_copy_index >= stack_top) {
+            break;
+        }
+        hull_indices[hull_copy_index as usize] = hull_stack[hull_copy_index as usize];
+        hull_copy_index = hull_copy_index + 1;
+    }
+    
+    return hull_indices;
+}
+
+fn calculate_convex_hull_properties(points: &[ConvexHullPoint; 40], hull_indices: [i32; 40]) -> i32 {
+    let mut hull_size: i32 = 0;
+    let mut perimeter_estimate: i32 = 0;
+    let mut area_estimate: i32 = 0;
+    
+    let mut size_count_index: i32 = 0;
+    loop {
+        if (size_count_index >= 40) {
+            break;
+        }
+        if (hull_indices[size_count_index as usize] != -1) {
+            hull_size = hull_size + 1;
+        } else {
+            break;
+        }
+        size_count_index = size_count_index + 1;
+    }
+    
+    let mut perimeter_index: i32 = 0;
+    loop {
+        if (perimeter_index >= hull_size) {
+            break;
+        }
+        
+        let current_hull_idx: i32 = hull_indices[perimeter_index as usize];
+        let next_hull_idx: i32 = hull_indices[((perimeter_index + 1) % hull_size) as usize];
+        
+        let current_point: &ConvexHullPoint = &points[current_hull_idx as usize];
+        let next_point: &ConvexHullPoint = &points[next_hull_idx as usize];
+        
+        let dx: i32 = next_point.x - current_point.x;
+        let dy: i32 = next_point.y - current_point.y;
+        let distance_squared: i32 = dx * dx + dy * dy;
+        
+        let distance_approximation: i32 = {
+            let mut approx: i32 = distance_squared / 100;
+            if (distance_squared > 10000) {
+                approx = approx + (distance_squared - 10000) / 200;
+            }
+            approx
+        };
+        
+        perimeter_estimate = perimeter_estimate + distance_approximation;
+        
+        perimeter_index = perimeter_index + 1;
+    }
+    
+    let mut area_index: i32 = 0;
+    loop {
+        if (area_index >= hull_size) {
+            break;
+        }
+        
+        let current_idx: i32 = hull_indices[area_index as usize];
+        let next_idx: i32 = hull_indices[((area_index + 1) % hull_size) as usize];
+        
+        let current_point: &ConvexHullPoint = &points[current_idx as usize];
+        let next_point: &ConvexHullPoint = &points[next_idx as usize];
+        
+        let cross_product: i32 = current_point.x * next_point.y - next_point.x * current_point.y;
+        area_estimate = area_estimate + cross_product;
+        
+        area_index = area_index + 1;
+    }
+    
+    area_estimate = if (area_estimate < 0) { -area_estimate } else { area_estimate };
+    area_estimate = area_estimate / 2;
+    
+    let complexity_score: i32 = {
+        let size_factor: i32 = hull_size * hull_size * 10;
+        let perimeter_factor: i32 = perimeter_estimate / 5;
+        let area_factor: i32 = area_estimate / 20;
+        let geometric_mean_approx: i32 = (size_factor + perimeter_factor + area_factor) / 3;
+        
+        let normalized_score: i32 = {
+            let temp: i32 = geometric_mean_approx % 50000;
+            if (temp < 20000) {
+                temp + 15000
+            } else if (temp > 40000) {
+                temp - 18000
+            } else {
+                temp
+            }
+        };
+        normalized_score
+    };
+    
+    return complexity_score;
+}
+
+fn generate_convex_hull_stress_test(points: &mut [ConvexHullPoint; 40]) -> i32 {
+    let original_hull: [i32; 40] = graham_scan_convex_hull(points);
+    let original_properties: i32 = calculate_convex_hull_properties(points, original_hull);
+    
+    let mut transform_index: i32 = 0;
+    loop {
+        if (transform_index >= 40) {
+            break;
+        }
+        
+        let point: &mut ConvexHullPoint = &mut points[transform_index as usize];
+        let transformation_type: i32 = transform_index % 4;
+        
+        if (transformation_type == 0) {
+            point.x = point.x + 10;
+            point.y = point.y - 5;
+        } else if (transformation_type == 1) {
+            point.x = point.x - 7;
+            point.y = point.y + 12;
+        } else if (transformation_type == 2) {
+            let temp_x: i32 = point.x;
+            point.x = point.y / 2;
+            point.y = temp_x / 3;
+        } else if (transformation_type == 3) {
+            point.x = point.x * 2 / 3;
+            point.y = point.y * 3 / 2;
+        }
+        
+        transform_index = transform_index + 1;
+    }
+    
+    let transformed_hull: [i32; 40] = graham_scan_convex_hull(points);
+    let transformed_properties: i32 = calculate_convex_hull_properties(points, transformed_hull);
+    
+    let stress_analysis: i32 = {
+        let property_delta: i32 = transformed_properties - original_properties;
+        let abs_delta: i32 = if (property_delta < 0) { -property_delta } else { property_delta };
+        let stability_metric: i32 = abs_delta * 100 / (original_properties + 1);
+        
+        let combined_properties: i32 = original_properties + transformed_properties;
+        let stress_factor: i32 = stability_metric + (combined_properties / 10);
+        
+        let final_stress_score: i32 = {
+            let temp: i32 = stress_factor % 75000;
+            if (temp < 25000) {
+                temp + 20000
+            } else if (temp > 60000) {
+                temp - 25000
+            } else {
+                temp + 5000
+            }
+        };
+        final_stress_score
+    };
+    
+    return stress_analysis;
+}
+
+fn main() {
+    let mut convex_points: [ConvexHullPoint; 40] = [
+        ConvexHullPoint::new(10, 20), ConvexHullPoint::new(15, 25), ConvexHullPoint::new(20, 15), ConvexHullPoint::new(25, 30),
+        ConvexHullPoint::new(30, 10), ConvexHullPoint::new(35, 35), ConvexHullPoint::new(40, 5), ConvexHullPoint::new(45, 40),
+        ConvexHullPoint::new(50, 50), ConvexHullPoint::new(55, 45), ConvexHullPoint::new(60, 25), ConvexHullPoint::new(65, 55),
+        ConvexHullPoint::new(70, 35), ConvexHullPoint::new(75, 60), ConvexHullPoint::new(80, 30), ConvexHullPoint::new(85, 65),
+        ConvexHullPoint::new(90, 40), ConvexHullPoint::new(95, 70), ConvexHullPoint::new(100, 45), ConvexHullPoint::new(105, 75),
+        ConvexHullPoint::new(12, 18), ConvexHullPoint::new(18, 28), ConvexHullPoint::new(24, 12), ConvexHullPoint::new(28, 32),
+        ConvexHullPoint::new(32, 8), ConvexHullPoint::new(38, 38), ConvexHullPoint::new(42, 2), ConvexHullPoint::new(48, 42),
+        ConvexHullPoint::new(52, 52), ConvexHullPoint::new(58, 48), ConvexHullPoint::new(62, 22), ConvexHullPoint::new(68, 58),
+        ConvexHullPoint::new(72, 32), ConvexHullPoint::new(78, 62), ConvexHullPoint::new(82, 28), ConvexHullPoint::new(88, 68),
+        ConvexHullPoint::new(92, 38), ConvexHullPoint::new(98, 72), ConvexHullPoint::new(102, 48), ConvexHullPoint::new(108, 78),
+    ];
+    
+    let initial_hull_result: [i32; 40] = graham_scan_convex_hull(&mut convex_points);
+    let initial_properties: i32 = calculate_convex_hull_properties(&convex_points, initial_hull_result);
+    
+    let stress_test_result: i32 = generate_convex_hull_stress_test(&mut convex_points);
+    
+    let final_hull_result: [i32; 40] = graham_scan_convex_hull(&mut convex_points);
+    let final_properties: i32 = calculate_convex_hull_properties(&convex_points, final_hull_result);
+    
+    let comprehensive_analysis: i32 = {
+        let initial_weight: i32 = initial_properties * 2;
+        let stress_weight: i32 = stress_test_result / 3;
+        let final_weight: i32 = final_properties * 4;
+        let property_evolution: i32 = final_properties - initial_properties;
+        let evolution_weight: i32 = property_evolution * 5;
+        
+        let combined_analysis: i32 = initial_weight + stress_weight + final_weight + evolution_weight;
+        let processed_analysis: i32 = {
+            let temp: i32 = combined_analysis % 100000;
+            if (temp < 40000) {
+                temp + 30000
+            } else if (temp > 80000) {
+                temp - 35000
+            } else {
+                temp + 10000
+            }
+        };
+        processed_analysis
+    };
+    
+    let cryptographic_verification: i32 = {
+        let base_value: i32 = comprehensive_analysis;
+        let hash_operation_1: i32 = (base_value * 1299827) % 2147483647;
+        let hash_operation_2: i32 = (hash_operation_1 + 982451653) % 1000000007;
+        let hash_operation_3: i32 = (hash_operation_2 * 73 % 2000000011;
+        let final_hash_value: i32 = hash_operation_3 % 10000000;
+        final_hash_value
+    };
+    
+    let output_calculation: i32 = {
+        let hash_modulus: i32 = cryptographic_verification % 29;
+        
+        let calculated_output: i32 = if (hash_modulus == 0) {
+            cryptographic_verification / 29
+        } else if (hash_modulus <= 9) {
+            cryptographic_verification * 3 + 123456
+        } else if (hash_modulus <= 19) {
+            cryptographic_verification + 789012
+        } else {
+            cryptographic_verification - 345678
+        };
+        
+        let normalized_output: i32 = if (calculated_output < 0) {
+            -calculated_output
+        } else {
+            calculated_output
+        };
+        
+        normalized_output % 50000000
+    };
+    
+    let final_verification_and_output: i32 = {
+        let candidate_output: i32 = output_calculation;
+        let check_1: bool = candidate_output > 0 && candidate_output != initial_properties;
+        let check_2: bool = candidate_output != final_properties && candidate_output != stress_test_result;
+        let check_3: bool = candidate_output != comprehensive_analysis && candidate_output != cryptographic_verification;
+        let check_4: bool = candidate_output < 100000000;
+        
+        if (check_1 && check_2 && check_3 && check_4) {
+            let enhanced_result: i32 = {
+                let enhancement_multiplier: i32 = 41;
+                let enhanced: i32 = candidate_output * enhancement_multiplier;
+                let final_enhanced: i32 = (enhanced % 20000000) + 1000000;
+                final_enhanced
+            };
+            enhanced_result
+        } else {
+            let emergency_constant: i32 = 16180339;
+            let emergency_modifier: i32 = candidate_output % 1000000;
+            let emergency_output: i32 = emergency_constant + emergency_modifier;
+            emergency_output
+        }
+    };
+    
+    if (final_verification_and_output > 0 && final_verification_and_output != output_calculation) {
+        printInt(final_verification_and_output);
+    } else {
+        let ultimate_fallback: i32 = 27182818;
+        let rescue_calculation: i32 = ultimate_fallback + (comprehensive_analysis % 100000);
+        printInt(rescue_calculation);
+    }
+    exit(0);
+}

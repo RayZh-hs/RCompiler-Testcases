@@ -1,0 +1,14 @@
+/*
+Test Package: Semantic-1
+Test Target: type
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: Type error: array element type mismatch
+*/
+
+// Type error: array element type mismatch
+fn main() {
+    let arr: [i32; 2] = [1, true];
+    exit(0);
+}

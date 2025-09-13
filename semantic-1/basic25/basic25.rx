@@ -1,0 +1,32 @@
+/*
+Test Package: Semantic-1
+Test Target: basic
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: basic test, greatest common divisor calculation with tuple arrays
+*/
+
+fn gcd(mut a: i32, mut b: i32) -> i32 {
+    while (b != 0) {
+        let temp: i32 = b;
+        b = a % b;
+        a = temp;
+    }
+    a
+}
+fn compute_all(pairs: &[[i32; 2]; 6], out: &mut [i32; 6]) {
+    let mut idx: usize = 0;
+    while (idx < 6) {
+        let x: i32 = pairs[idx][0];
+        let y: i32 = pairs[idx][1];
+        out[idx] = gcd(x, y);
+        idx += 1;
+    }
+}
+fn main() {
+    let pairs: [[i32; 2]; 6] = [[15, 5], [14, 21], [27, 9], [100, 25], [81, 54], [35, 49]];
+    let mut results: [i32; 6] = [0; 6];
+    compute_all(&pairs, &mut results);
+    exit(0);
+}

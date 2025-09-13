@@ -1,0 +1,20 @@
+/*
+Test Package: Semantic-1
+Test Target: type
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: Type error: enum variant type mismatch
+*/
+
+// Type error: enum variant type mismatch
+enum Color {
+    Red,
+    Green,
+    Blue,
+}
+
+fn main() {
+    let c = Color::Blue(5);
+    exit(0);
+}

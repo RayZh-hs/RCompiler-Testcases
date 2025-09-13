@@ -1,0 +1,266 @@
+/*
+Test Package: Semantic-2
+Test Target: comprehensive
+Author: Wenxin Zheng
+Time: 2025-08-17
+Verdict: Success
+Test Name: Hierarchical Data Processing and Tree Traversal
+Summary: This test comprehensively evaluates compiler optimizations for:
+Details:
+Recursive data structures (simulated trees using arrays).
+Complex recursive algorithms for tree traversal and manipulation.
+Dynamic-like behavior simulation with static arrays.
+Performance of function calls and stack usage in deep recursion.
+Conditional logic for node processing based on type and value.
+*/
+
+// comprehensive34.rx - Hierarchical Data Processing and Tree Traversal
+// This test comprehensively evaluates compiler optimizations for:
+// - Recursive data structures (simulated trees using arrays).
+// - Complex recursive algorithms for tree traversal and manipulation.
+// - Dynamic-like behavior simulation with static arrays.
+// - Performance of function calls and stack usage in deep recursion.
+// - Conditional logic for node processing based on type and value.
+
+fn printInt(n: i32) {}
+
+const NODE_POOL_SIZE: i32 = 512;
+const NODE_SIZE: i32 = 4;
+
+const TYPE_INTERNAL: i32 = 1;
+const TYPE_LEAF: i32 = 2;
+
+struct Node {
+    node_type: i32,
+    value: i32,
+    left: i32,
+    right: i32,
+}
+
+struct Tree {
+    pool: [Node; NODE_POOL_SIZE],
+    root: i32,
+    next_free: i32,
+}
+
+fn main() {
+    let mut tree: Tree = Tree {
+        pool: [Node { node_type: 0, value: 0, left: -1, right: -1 }; NODE_POOL_SIZE],
+        root: -1,
+        next_free: 0,
+    };
+
+    initialize_pool(&mut tree);
+
+    tree.root = build_complex_tree(&mut tree, 4, 100);
+
+    let mut sum: i32 = sum_tree(&tree, tree.root);
+    printInt(sum);
+
+    let mut height: i32 = find_height(&tree, tree.root);
+    printInt(height);
+
+    let mut search_val: i32 = 125;
+    let mut found: bool = find_value(&tree, tree.root, search_val);
+    if (found) {
+        printInt(search_val);
+    } else {
+        printInt(-1);
+    }
+
+    mirror_tree(&mut tree, tree.root);
+    sum = sum_tree(&tree, tree.root);
+    printInt(sum);
+
+    let mut error_sum: i32 = process_with_shadow_error(&tree, tree.root, 10);
+    printInt(error_sum);
+
+    printInt(9999);
+}
+
+fn initialize_pool(tree: &mut Tree) {
+    let mut i: i32 = 0;
+    while (i < NODE_POOL_SIZE) {
+        tree.pool[i].left = i + 1;
+        i = i + 1;
+    }
+    tree.pool[NODE_POOL_SIZE - 1].left = -1;
+    tree.next_free = 0;
+}
+
+fn alloc_node(tree: &mut Tree) -> i32 {
+    if (tree.next_free == -1) {
+        return -1;
+    }
+    let new_node_idx: i32 = tree.next_free;
+    tree.next_free = tree.pool[new_node_idx].left;
+    tree.pool[new_node_idx].left = -1;
+    tree.pool[new_node_idx].right = -1;
+    return new_node_idx;
+}
+
+fn build_complex_tree(tree: &mut Tree, depth: i32, base_value: i32) -> i32 {
+    if (depth <= 0) {
+        let leaf_idx: i32 = alloc_node(tree);
+        if (leaf_idx != -1) {
+            tree.pool[leaf_idx].node_type = TYPE_LEAF;
+            tree.pool[leaf_idx].value = base_value % 256;
+        }
+        return leaf_idx;
+    }
+
+    let root_idx: i32 = alloc_node(tree);
+    if (root_idx == -1) {
+        return -1;
+    }
+
+    tree.pool[root_idx].node_type = TYPE_INTERNAL;
+    tree.pool[root_idx].value = base_value;
+
+    tree.pool[root_idx].left = build_complex_tree(tree, depth - 1, base_value * 2 + 1);
+    tree.pool[root_idx].right = build_complex_tree(tree, depth - 1, base_value * 3 - 1);
+
+    return root_idx;
+}
+
+fn sum_tree(tree: &Tree, node_idx: i32) -> i32 {
+    if (node_idx == -1) {
+        return 0;
+    }
+
+    let node: &Node = &tree.pool[node_idx];
+    if (node.node_type == TYPE_LEAF) {
+        return node.value;
+    }
+
+    let left_sum: i32 = sum_tree(tree, node.left);
+    let right_sum: i32 = sum_tree(tree, node.right);
+
+    return node.value + left_sum + right_sum;
+}
+
+fn find_height(tree: &Tree, node_idx: i32) -> i32 {
+    if (node_idx == -1) {
+        return 0;
+    }
+    let left_height: i32 = find_height(tree, tree.pool[node_idx].left);
+    let right_height: i32 = find_height(tree, tree.pool[node_idx].right);
+    if (left_height > right_height) {
+        return left_height + 1;
+    } else {
+        return right_height + 1;
+    }
+}
+
+fn find_value(tree: &Tree, node_idx: i32, value: i32) -> bool {
+    if (node_idx == -1) {
+        return false;
+    }
+    let node: &Node = &tree.pool[node_idx];
+    if (node.value == value) {
+        return true;
+    }
+    if (find_value(tree, node.left, value)) {
+        return true;
+    }
+    if (find_value(tree, node.right, value)) {
+        return true;
+    }
+    return false;
+}
+
+fn mirror_tree(tree: &mut Tree, node_idx: i32) {
+    if (node_idx == -1) {
+        return;
+    }
+    let node: &mut Node = &mut tree.pool[node_idx];
+    let temp: i32 = node.left;
+    node.left = node.right;
+    node.right = temp;
+
+    mirror_tree(tree, node.left);
+    mirror_tree(tree, node.right);
+}
+
+fn process_with_shadow_error(tree: &Tree, node_idx: i32, threshold: i32) -> i32 {
+    if (node_idx == -1) {
+        return 0;
+    }
+
+    let mut current_sum: i32 = 0;
+    let node: &Node = &tree.pool[node_idx];
+
+    if (node.value > threshold) {
+        current_sum = current_sum + node.value;
+        let mut threshold: i32 = threshold + 10;
+        if (node.node_type == TYPE_INTERNAL) {
+            current_sum = current_sum + process_with_shadow_error(tree, node.left, threshold);
+            current_sum = current_sum + process_with_shadow_error(tree, node.right, threshold);
+        }
+    } else {
+        if (node.node_type == TYPE_INTERNAL) {
+            let mut threshold: i32 = threshold - 2;
+            current_sum = current_sum + process_with_shadow_error(tree, node.left, threshold);
+            current_sum = current_sum + process_with_shadow_error(tree, node.right, threshold);
+        }
+    }
+    return current_sum;
+}
+
+fn prune_tree(tree: &mut Tree, node_idx: i32, max_depth: i32, current_depth: i32) {
+    if (node_idx == -1 || current_depth >= max_depth) {
+        return;
+    }
+    let node: &mut Node = &mut tree.pool[node_idx];
+    if (current_depth == max_depth - 1) {
+        free_tree(tree, node.left);
+        free_tree(tree, node.right);
+        node.left = -1;
+        node.right = -1;
+        node.node_type = TYPE_LEAF;
+    } else {
+        prune_tree(tree, node.left, max_depth, current_depth + 1);
+        prune_tree(tree, node.right, max_depth, current_depth + 1);
+    }
+}
+
+fn free_tree(tree: &mut Tree, node_idx: i32) {
+    if (node_idx == -1) {
+        return;
+    }
+    free_tree(tree, tree.pool[node_idx].left);
+    free_tree(tree, tree.pool[node_idx].right);
+    tree.pool[node_idx].left = tree.next_free;
+    tree.next_free = node_idx;
+}
+
+fn another_tree_operation() {
+    let mut tree: Tree = Tree {
+        pool: [Node { node_type: 0, value: 0, left: -1, right: -1 }; NODE_POOL_SIZE],
+        root: -1,
+        next_free: 0,
+    };
+    initialize_pool(&mut tree);
+    tree.root = build_complex_tree(&mut tree, 5, 50);
+    prune_tree(&mut tree, tree.root, 3, 0);
+    let sum: i32 = sum_tree(&tree, tree.root);
+    printInt(sum);
+}
+
+fn yet_another_scenario() {
+    let mut tree: Tree = Tree {
+        pool: [Node { node_type: 0, value: 0, left: -1, right: -1 }; NODE_POOL_SIZE],
+        root: -1,
+        next_free: 0,
+    };
+    initialize_pool(&mut tree);
+    tree.root = build_complex_tree(&mut tree, 6, 20);
+    let mut i: i32 = 0;
+    while (i < 10) {
+        mirror_tree(&mut tree, tree.root);
+        i = i + 1;
+    }
+    let height: i32 = find_height(&tree, tree.root);
+    printInt(height);
+    another_tree_operation();
+}

@@ -1,0 +1,18 @@
+/*
+Test Package: Semantic-1
+Test Target: return
+Author: Ruitian Wang
+Time: 2025-08-26
+Verdict: Fail
+Comment: exit function test, exit() cannot be used in non-main functions
+*/
+
+fn main() {
+    hello();
+    exit(0);
+}
+
+fn hello() {
+    println("Hello, hello, it's good to be back");
+    exit(1);  // This should fail - exit() not allowed in non-main function
+}

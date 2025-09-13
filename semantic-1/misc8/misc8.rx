@@ -1,0 +1,78 @@
+/*
+Test Package: Semantic-1
+Test Target: misc
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: misc test, matrix transpose operation
+*/
+
+// Matrix transpose operation
+// Read a matrix and output its transpose
+struct Matrix {
+    data: [[i32; 5]; 5],
+    rows: i32,
+    cols: i32,
+}
+
+impl Matrix {
+    fn new(r: i32, c: i32) -> Matrix {
+        Matrix {
+            data: [[0; 5]; 5],
+            rows: r,
+            cols: c,
+        }
+    }
+    
+    fn set(&mut self, row: i32, col: i32, value: i32) {
+        self.data[row as usize][col as usize] = value;
+    }
+    
+    fn get(&self, row: i32, col: i32) -> i32 {
+        return self.data[row as usize][col as usize];
+    }
+    
+    fn transpose(&self) -> Matrix {
+        let mut result: Matrix = Matrix::new(self.cols, self.rows);
+        let mut i: i32 = 0;
+        while (i < self.rows) {
+            let mut j: i32 = 0;
+            while (j < self.cols) {
+                result.set(j, i, self.get(i, j));
+                j += 1;
+            }
+            i += 1;
+        }
+        return result;
+    }
+}
+
+fn main() {
+    let rows: i32 = getInt();
+    let cols: i32 = getInt();
+    let mut matrix: Matrix = Matrix::new(rows, cols);
+    
+    let mut i: i32 = 0;
+    while (i < rows) {
+        let mut j: i32 = 0;
+        while (j < cols) {
+            let value: i32 = getInt();
+            matrix.set(i, j, value);
+            j += 1;
+        }
+        i += 1;
+    }
+    
+    // Transpose and output
+    let transposed: Matrix = matrix.transpose();
+    i = 0;
+    while (i < cols) {
+        let mut j: i32 = 0;
+        while (j < rows) {
+            printInt(transposed.get(i, j));
+            j += 1;
+        }
+        i += 1;
+    }
+    exit(0);
+}

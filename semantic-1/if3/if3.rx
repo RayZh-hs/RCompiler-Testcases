@@ -1,0 +1,18 @@
+/*
+Test Package: Semantic-1
+Test Target: if
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: if statement test, arithmetic operations in condition
+*/
+
+fn main() {
+    let n: i32 = 8;
+    if (n % 2 == 0) {
+        let even: bool = true;
+    } else {
+        let even: bool = false;
+    }
+    exit(0);
+}

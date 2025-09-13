@@ -1,0 +1,85 @@
+/*
+Test Package: Semantic-1
+Test Target: basic
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: basic test, sudoku solver with return type mismatch (i32 vs bool)
+*/
+
+const N: usize = 9;
+
+fn valid(b: &[[i32; N]; N], r: usize, c: usize, n: i32) -> bool {
+    let mut i: usize = 0;
+    while (i < N) {
+        if (b[r][i] == n) {
+            return false;
+        }
+        i += 1;
+    }
+    let mut j: usize = 0;
+    while (j < N) {
+        if (b[j][c] == n) {
+            return false;
+        }
+        j += 1;
+    }
+    let br: usize = (r / 3) * 3;
+    let bc: usize = (c / 3) * 3;
+    let mut x: usize = 0;
+    while (x < 3) {
+        let mut y: usize = 0;
+        while (y < 3) {
+            if (b[br + x][bc + y] == n) {
+                return false;
+            }
+            y += 1;
+        }
+        x += 1;
+    }
+    true
+}
+
+fn solve(b: &mut [[i32; N]; N], p: usize) -> bool {
+    if (p == N * N) {
+        return true;
+    }
+    let r: usize = p / N;
+    let c: usize = p % N;
+    if (b[r][c] != 0) {
+        return solve(b, p + 1);
+    }
+    let mut n: i32 = 1;
+    while (n <= 9) {
+        if (valid(b, r, c, n)) {
+            b[r][c] = n;
+            if (solve(b, p + 1)) {
+                return true;
+            }
+            b[r][c] = 0;
+        }
+        n += 1;
+    }
+    0
+}
+
+fn main() {
+    let mut grid: [[i32; N]; N] = [
+        [5, 1, 7, 6, 0, 0, 0, 3, 4],
+        [2, 8, 9, 0, 0, 4, 0, 0, 0],
+        [3, 4, 6, 2, 0, 5, 0, 9, 0],
+        [6, 0, 2, 0, 0, 0, 0, 1, 0],
+        [0, 3, 8, 0, 0, 6, 0, 4, 7],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 9, 0, 0, 0, 0, 0, 7, 8],
+        [7, 0, 3, 4, 0, 0, 5, 6, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    ];
+    let done: bool = solve(&mut grid, 0);
+    if (done) {
+        let st: i32 = 1;
+    } else {
+        let st: i32 = 0;
+    }
+    exit(0);
+}

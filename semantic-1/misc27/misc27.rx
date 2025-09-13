@@ -1,0 +1,240 @@
+/*
+Test Package: Semantic-1
+Test Target: misc
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: Segment Tree implementation for range queries and updates
+*/
+
+// Segment Tree implementation for range queries and updates
+// Supports range sum queries and point updates
+struct SegmentTree {
+    tree: [i32; 4000], // 4 * n to handle all cases
+    n: i32,
+}
+
+impl SegmentTree {
+    fn new(size: i32) -> SegmentTree {
+        SegmentTree {
+            tree: [0; 4000],
+            n: size,
+        }
+    }
+    
+    fn build(&mut self, arr: &[i32; 1000], node: i32, start: i32, end: i32) {
+        if (start == end) {
+            self.tree[node as usize] = arr[start as usize];
+        } else {
+            let mid: i32 = (start + end) / 2;
+            self.build(arr, 2 * node, start, mid);
+            self.build(arr, 2 * node + 1, mid + 1, end);
+            self.tree[node as usize] = self.tree[(2 * node) as usize] + self.tree[(2 * node + 1) as usize];
+        }
+    }
+    
+    fn update_recursive(&mut self, node: i32, start: i32, end: i32, idx: i32, val: i32) {
+        if (start == end) {
+            self.tree[node as usize] = val;
+        } else {
+            let mid: i32 = (start + end) / 2;
+            if (idx <= mid) {
+                self.update_recursive(2 * node, start, mid, idx, val);
+            } else {
+                self.update_recursive(2 * node + 1, mid + 1, end, idx, val);
+            }
+            self.tree[node as usize] = self.tree[(2 * node) as usize] + self.tree[(2 * node + 1) as usize];
+        }
+    }
+    
+    fn query_recursive(&self, node: i32, start: i32, end: i32, l: i32, r: i32) -> i32 {
+        if (r < start || end < l) {
+            return 0; // Outside range
+        }
+        
+        if (l <= start && end <= r) {
+            return self.tree[node as usize]; // Complete overlap
+        }
+        
+        // Partial overlap
+        let mid: i32 = (start + end) / 2;
+        let left_sum: i32 = self.query_recursive(2 * node, start, mid, l, r);
+        let right_sum: i32 = self.query_recursive(2 * node + 1, mid + 1, end, l, r);
+        return left_sum + right_sum;
+    }
+    
+    fn init(&mut self, arr: &[i32; 1000]) {
+        self.build(arr, 1, 0, self.n - 1);
+    }
+    
+    fn update(&mut self, idx: i32, val: i32) {
+        self.update_recursive(1, 0, self.n - 1, idx, val);
+    }
+    
+    fn range_sum(&self, l: i32, r: i32) -> i32 {
+        return self.query_recursive(1, 0, self.n - 1, l, r);
+    }
+}
+
+// Segment Tree with Lazy Propagation for range updates
+struct LazySegmentTree {
+    tree: [i32; 4000],
+    lazy: [i32; 4000],
+    n: i32,
+}
+
+impl LazySegmentTree {
+    fn new(size: i32) -> LazySegmentTree {
+        LazySegmentTree {
+            tree: [0; 4000],
+            lazy: [0; 4000],
+            n: size,
+        }
+    }
+    
+    fn push(&mut self, node: i32, start: i32, end: i32) {
+        if (self.lazy[node as usize] != 0) {
+            self.tree[node as usize] += self.lazy[node as usize] * (end - start + 1);
+            
+            if (start != end) { // Not a leaf node
+                self.lazy[(2 * node) as usize] += self.lazy[node as usize];
+                self.lazy[(2 * node + 1) as usize] += self.lazy[node as usize];
+            }
+            
+            self.lazy[node as usize] = 0;
+        }
+    }
+    
+    fn range_update(&mut self, node: i32, start: i32, end: i32, l: i32, r: i32, val: i32) {
+        self.push(node, start, end);
+        
+        if (start > r || end < l) {
+            return; // Outside range
+        }
+        
+        if (start >= l && end <= r) {
+            self.lazy[node as usize] += val;
+            self.push(node, start, end);
+            return;
+        }
+        
+        let mid: i32 = (start + end) / 2;
+        self.range_update(2 * node, start, mid, l, r, val);
+        self.range_update(2 * node + 1, mid + 1, end, l, r, val);
+        
+        self.push(2 * node, start, mid);
+        self.push(2 * node + 1, mid + 1, end);
+        self.tree[node as usize] = self.tree[(2 * node) as usize] + self.tree[(2 * node + 1) as usize];
+    }
+    
+    fn range_query(&mut self, node: i32, start: i32, end: i32, l: i32, r: i32) -> i32 {
+        if (start > r || end < l) {
+            return 0; // Outside range
+        }
+        
+        self.push(node, start, end);
+        
+        if (start >= l && end <= r) {
+            return self.tree[node as usize]; // Complete overlap
+        }
+        
+        let mid: i32 = (start + end) / 2;
+        let left_sum: i32 = self.range_query(2 * node, start, mid, l, r);
+        let right_sum: i32 = self.range_query(2 * node + 1, mid + 1, end, l, r);
+        return left_sum + right_sum;
+    }
+    
+    fn update_range(&mut self, l: i32, r: i32, val: i32) {
+        self.range_update(1, 0, self.n - 1, l, r, val);
+    }
+    
+    fn query_range(&mut self, l: i32, r: i32) -> i32 {
+        return self.range_query(1, 0, self.n - 1, l, r);
+    }
+}
+
+// Segment Tree for Range Maximum Query
+struct MaxSegmentTree {
+    tree: [i32; 4000],
+    n: i32,
+}
+
+impl MaxSegmentTree {
+    fn new(size: i32) -> MaxSegmentTree {
+        MaxSegmentTree {
+            tree: [-2147483648; 4000], // Initialize with minimum i32 value
+            n: size,
+        }
+    }
+    
+    fn build(&mut self, arr: &[i32; 1000], node: i32, start: i32, end: i32) {
+        if (start == end) {
+            self.tree[node as usize] = arr[start as usize];
+        } else {
+            let mid: i32 = (start + end) / 2;
+            self.build(arr, 2 * node, start, mid);
+            self.build(arr, 2 * node + 1, mid + 1, end);
+            let left_max: i32 = self.tree[(2 * node) as usize];
+            let right_max: i32 = self.tree[(2 * node + 1) as usize];
+            self.tree[node as usize] = if (left_max > right_max) { left_max } else { right_max };
+        }
+    }
+    
+    fn query_max(&self, node: i32, start: i32, end: i32, l: i32, r: i32) -> i32 {
+        if (r < start || end < l) {
+            return -2147483648; // Return minimum value for out of range
+        }
+        
+        if (l <= start && end <= r) {
+            return self.tree[node as usize];
+        }
+        
+        let mid: i32 = (start + end) / 2;
+        let left_max: i32 = self.query_max(2 * node, start, mid, l, r);
+        let right_max: i32 = self.query_max(2 * node + 1, mid + 1, end, l, r);
+        return if (left_max > right_max) { left_max } else { right_max };
+    }
+    
+    fn init(&mut self, arr: &[i32; 1000]) {
+        self.build(arr, 1, 0, self.n - 1);
+    }
+    
+    fn range_max(&self, l: i32, r: i32) -> i32 {
+        return self.query_max(1, 0, self.n - 1, l, r);
+    }
+}
+
+fn main() {
+    let n: i32 = getInt();
+    let mut arr: [i32; 1000] = [0; 1000];
+    
+    let mut i: i32 = 0;
+    while (i < n) {
+        arr[i as usize] = getInt();
+        i += 1;
+    }
+    
+    let mut seg_tree: SegmentTree = SegmentTree::new(n);
+    seg_tree.init(&arr);
+    
+    let queries: i32 = getInt();
+    i = 0;
+    
+    while (i < queries) {
+        let operation: i32 = getInt();
+        
+        if (operation == 1) { // Range sum query
+            let l: i32 = getInt();
+            let r: i32 = getInt();
+            let sum: i32 = seg_tree.range_sum(l, r);
+            printInt(sum);
+        } else if (operation == 2) { // Point update
+            let idx: i32 = getInt();
+            let val: i32 = getInt();
+            seg_tree.update(idx, val);
+        }
+        
+        i += 1;
+    }
+    exit(0);
+}

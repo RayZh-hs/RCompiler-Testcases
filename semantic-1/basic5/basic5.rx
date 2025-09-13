@@ -1,0 +1,53 @@
+/*
+Test Package: Semantic-1
+Test Target: basic
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: basic test, incomplete trait implementation - missing empty method
+*/
+
+fn main() {
+    let mut stack: Stack = Stack::new();
+    let mut i: i32 = 0;
+    while (i < 10) {
+        stack.push(i);
+        i += 1;
+    }
+    while (!stack.empty()) {
+        stack.pop();
+    }
+    exit(0);
+}
+
+trait Container {
+    fn push(&mut self, value: i32);
+    fn pop(&mut self) -> i32;
+    fn empty(&self) -> bool;
+}
+
+struct Stack {
+    data: [i32; 16],
+    top: usize,
+}
+
+impl Stack {
+    fn new() -> Self {
+        Stack { data: [0; 16], top: 0 }
+    }
+}
+
+impl Container for Stack {
+    fn push(&mut self, value: i32) {
+        self.data[self.top] = value;
+        self.top += 1;
+    }
+
+    fn pop(&mut self) -> i32 {
+        if (self.top == 0) {
+            return 0;
+        }
+        self.top -= 1;
+        self.data[self.top]
+    }
+}

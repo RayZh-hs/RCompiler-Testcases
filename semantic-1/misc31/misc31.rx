@@ -1,0 +1,198 @@
+/*
+Test Package: Semantic-1
+Test Target: misc
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: Dijkstra's shortest path algorithm implementation
+*/
+
+// Dijkstra's shortest path algorithm implementation
+// Single-source shortest path in weighted graph
+struct Edge {
+    dest: i32,
+    weight: i32,
+}
+
+struct Graph {
+    adjacency_list: [[Edge; 100]; 100],
+    vertex_count: i32,
+    edge_counts: [i32; 100],
+}
+
+struct PriorityQueue {
+    heap: [i32; 1000],
+    distances: [i32; 1000],
+    size: i32,
+}
+
+impl Edge {
+    fn new(dest: i32, weight: i32) -> Edge {
+        Edge { dest: dest, weight: weight }
+    }
+}
+
+impl Graph {
+    fn new(vertices: i32) -> Graph {
+        Graph {
+            adjacency_list: [[Edge::new(0, 0); 100]; 100],
+            vertex_count: vertices,
+            edge_counts: [0; 100],
+        }
+    }
+    
+    fn add_edge(&mut self, src: i32, dest: i32, weight: i32) {
+        if (src >= 0 && src < self.vertex_count && dest >= 0 && dest < self.vertex_count) {
+            let count: i32 = self.edge_counts[src as usize];
+            if (count < 100) {
+                self.adjacency_list[src as usize][count as usize] = Edge::new(dest, weight);
+                self.edge_counts[src as usize] += 1;
+            }
+        }
+    }
+}
+
+impl PriorityQueue {
+    fn new() -> PriorityQueue {
+        PriorityQueue {
+            heap: [0; 1000],
+            distances: [2147483647; 1000],
+            size: 0,
+        }
+    }
+    
+    fn insert(&mut self, vertex: i32, distance: i32) {
+        self.heap[self.size as usize] = vertex;
+        self.distances[self.size as usize] = distance;
+        self.heapify_up(self.size);
+        self.size += 1;
+    }
+    
+    fn extract_min(&mut self) -> i32 {
+        if (self.size == 0) {
+            return -1;
+        }
+        
+        let min_vertex: i32 = self.heap[0];
+        self.size -= 1;
+        self.heap[0] = self.heap[self.size as usize];
+        self.distances[0] = self.distances[self.size as usize];
+        self.heapify_down(0);
+        return min_vertex;
+    }
+    
+    fn heapify_up(&mut self, mut index: i32) {
+        while (index > 0) {
+            let parent: i32 = (index - 1) / 2;
+            if (self.distances[index as usize] >= self.distances[parent as usize]) {
+                break;
+            }
+            self.swap(index, parent);
+            index = parent;
+        }
+    }
+    
+    fn heapify_down(&mut self, mut index: i32) {
+        loop {
+            let left: i32 = 2 * index + 1;
+            let right: i32 = 2 * index + 2;
+            let mut smallest: i32 = index;
+            
+            if (left < self.size && self.distances[left as usize] < self.distances[smallest as usize]) {
+                smallest = left;
+            }
+            
+            if (right < self.size && self.distances[right as usize] < self.distances[smallest as usize]) {
+                smallest = right;
+            }
+            
+            if (smallest == index) {
+                break;
+            }
+            
+            self.swap(index, smallest);
+            index = smallest;
+        }
+    }
+    
+    fn swap(&mut self, i: i32, j: i32) {
+        let temp_vertex: i32 = self.heap[i as usize];
+        let temp_distance: i32 = self.distances[i as usize];
+        
+        self.heap[i as usize] = self.heap[j as usize];
+        self.distances[i as usize] = self.distances[j as usize];
+        
+        self.heap[j as usize] = temp_vertex;
+        self.distances[j as usize] = temp_distance;
+    }
+    
+    fn is_empty(&self) -> bool {
+        return self.size == 0;
+    }
+}
+
+fn dijkstra(graph: &Graph, source: i32) -> [i32; 100] {
+    let mut distances: [i32; 100] = [2147483647; 100];
+    let mut visited: [bool; 100] = [false; 100];
+    let mut pq: PriorityQueue = PriorityQueue::new();
+    
+    distances[source as usize] = 0;
+    pq.insert(source, 0);
+    
+    while (!pq.is_empty()) {
+        let u: i32 = pq.extract_min();
+        
+        if (visited[u as usize]) {
+            continue;
+        }
+        
+        visited[u as usize] = true;
+        
+        let mut i: i32 = 0;
+        while (i < graph.edge_counts[u as usize]) {
+            let edge: Edge = Edge {
+                dest: graph.adjacency_list[u as usize][i as usize].dest,
+                weight: graph.adjacency_list[u as usize][i as usize].weight,
+            };
+            let v: i32 = edge.dest;
+            let weight: i32 = edge.weight;
+            
+            if (!visited[v as usize]) {
+                let new_distance: i32 = distances[u as usize] + weight;
+                if (new_distance < distances[v as usize]) {
+                    distances[v as usize] = new_distance;
+                    pq.insert(v, new_distance);
+                }
+            }
+            
+            i += 1;
+        }
+    }
+    
+    return distances;
+}
+
+fn main() {
+    let vertices: i32 = getInt();
+    let mut graph: Graph = Graph::new(vertices);
+    
+    let edges: i32 = getInt();
+    let mut i: i32 = 0;
+    while (i < edges) {
+        let src: i32 = getInt();
+        let dest: i32 = getInt();
+        let weight: i32 = getInt();
+        graph.add_edge(src, dest, weight);
+        i += 1;
+    }
+    
+    let source: i32 = getInt();
+    let distances: [i32; 100] = dijkstra(&graph, source);
+    
+    i = 0;
+    while (i < vertices) {
+        printInt(distances[i as usize]);
+        i += 1;
+    }
+    exit(0);
+}

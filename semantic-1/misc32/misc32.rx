@@ -1,0 +1,218 @@
+/*
+Test Package: Semantic-1
+Test Target: misc
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: Topological Sort using Kahn's algorithm (BFS-based)
+*/
+
+// Topological Sort using Kahn's algorithm (BFS-based)
+// For Directed Acyclic Graph (DAG) ordering
+struct Graph {
+    adjacency_list: [[i32; 100]; 100],
+    edge_counts: [i32; 100],
+    in_degree: [i32; 100],
+    vertex_count: i32,
+}
+
+struct Queue {
+    data: [i32; 1000],
+    front: i32,
+    rear: i32,
+    size: i32,
+}
+
+impl Graph {
+    fn new(vertices: i32) -> Graph {
+        Graph {
+            adjacency_list: [[-1; 100]; 100],
+            edge_counts: [0; 100],
+            in_degree: [0; 100],
+            vertex_count: vertices,
+        }
+    }
+    
+    fn add_edge(&mut self, src: i32, dest: i32) {
+        if (src >= 0 && src < self.vertex_count && dest >= 0 && dest < self.vertex_count) {
+            let count: i32 = self.edge_counts[src as usize];
+            if (count < 100) {
+                self.adjacency_list[src as usize][count as usize] = dest;
+                self.edge_counts[src as usize] += 1;
+                self.in_degree[dest as usize] += 1;
+            }
+        }
+    }
+    
+    fn topological_sort(&self) -> [i32; 100] {
+        let mut queue: Queue = Queue::new();
+        let mut result: [i32; 100] = [-1; 100];
+        let mut result_index: i32 = 0;
+        let mut temp_in_degree: [i32; 100] = [0; 100];
+        
+        // Copy in-degree array
+        let mut i: i32 = 0;
+        while (i < self.vertex_count) {
+            temp_in_degree[i as usize] = self.in_degree[i as usize];
+            i += 1;
+        }
+        
+        // Find all vertices with in-degree 0
+        i = 0;
+        while (i < self.vertex_count) {
+            if (temp_in_degree[i as usize] == 0) {
+                queue.enqueue(i);
+            }
+            i += 1;
+        }
+        
+        while (!queue.is_empty()) {
+            let u: i32 = queue.dequeue();
+            result[result_index as usize] = u;
+            result_index += 1;
+            
+            // For each neighbor of u
+            let mut j: i32 = 0;
+            while (j < self.edge_counts[u as usize]) {
+                let v: i32 = self.adjacency_list[u as usize][j as usize];
+                temp_in_degree[v as usize] -= 1;
+                
+                if (temp_in_degree[v as usize] == 0) {
+                    queue.enqueue(v);
+                }
+                
+                j += 1;
+            }
+        }
+        
+        return result;
+    }
+    
+    fn has_cycle(&self) -> bool {
+        let topo_result: [i32; 100] = self.topological_sort();
+        
+        // Count valid elements in topological sort
+        let mut count: i32 = 0;
+        let mut i: i32 = 0;
+        while (i < 100 && topo_result[i as usize] != -1) {
+            count += 1;
+            i += 1;
+        }
+        
+        return count != self.vertex_count;
+    }
+    
+    fn dfs_recursive(&self, visited: &mut [i32; 100], rec_stack: &mut [bool; 100], vertex: i32) -> bool {
+        visited[vertex as usize] = 1;
+        rec_stack[vertex as usize] = true;
+        
+        let mut i: i32 = 0;
+        while (i < self.edge_counts[vertex as usize]) {
+            let neighbor: i32 = self.adjacency_list[vertex as usize][i as usize];
+            
+            if (visited[neighbor as usize] == 0) {
+                if (self.dfs_recursive(visited, rec_stack, neighbor)) {
+                    return true;
+                }
+            } else if (rec_stack[neighbor as usize]) {
+                return true; // Back edge found - cycle detected
+            }
+            
+            i += 1;
+        }
+        
+        rec_stack[vertex as usize] = false;
+        return false;
+    }
+    
+    fn has_cycle_dfs(&self) -> bool {
+        let mut visited: [i32; 100] = [0; 100];
+        let mut rec_stack: [bool; 100] = [false; 100];
+        
+        let mut i: i32 = 0;
+        while (i < self.vertex_count) {
+            if (visited[i as usize] == 0) {
+                if (self.dfs_recursive(&mut visited, &mut rec_stack, i)) {
+                    return true;
+                }
+            }
+            i += 1;
+        }
+        
+        return false;
+    }
+}
+
+impl Queue {
+    fn new() -> Queue {
+        Queue {
+            data: [0; 1000],
+            front: 0,
+            rear: 0,
+            size: 0,
+        }
+    }
+    
+    fn enqueue(&mut self, value: i32) {
+        if (self.size < 1000) {
+            self.data[self.rear as usize] = value;
+            self.rear = (self.rear + 1) % 1000;
+            self.size += 1;
+        }
+    }
+    
+    fn dequeue(&mut self) -> i32 {
+        if (self.size == 0) {
+            return -1;
+        }
+        
+        let value: i32 = self.data[self.front as usize];
+        self.front = (self.front + 1) % 1000;
+        self.size -= 1;
+        return value;
+    }
+    
+    fn is_empty(&self) -> bool {
+        return (self.size == 0);
+    }
+}
+
+fn main() {
+    let vertices: i32 = getInt();
+    let mut graph: Graph = Graph::new(vertices);
+    
+    let edges: i32 = getInt();
+    let mut i: i32 = 0;
+    while (i < edges) {
+        let src: i32 = getInt();
+        let dest: i32 = getInt();
+        graph.add_edge(src, dest);
+        i += 1;
+    }
+    
+    let operation: i32 = getInt();
+    
+    if (operation == 1) { // Topological sort
+        let topo_order: [i32; 100] = graph.topological_sort();
+        i = 0;
+        while (i < vertices) {
+            if (topo_order[i as usize] != -1) {
+                printInt(topo_order[i as usize]);
+            }
+            i += 1;
+        }
+    } else if (operation == 2) { // Check for cycle using Kahn's algorithm
+        if (graph.has_cycle()) {
+            printInt(1);
+        } else {
+            printInt(0);
+        }
+    } else if (operation == 3) { // Check for cycle using DFS
+        if (graph.has_cycle_dfs()) {
+            printInt(1);
+        } else {
+            printInt(0);
+        }
+    }
+    exit(0);
+}

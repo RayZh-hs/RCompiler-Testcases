@@ -1,0 +1,14 @@
+/*
+Test Package: Semantic-1
+Test Target: expr
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: Expression error: Invalid path expression - double colon without identifier
+*/
+
+// Error: Invalid path expression - double colon without identifier
+fn main() {
+    let x: i32 = std::;  // Invalid path - :: followed by semicolon
+    exit(0);
+}

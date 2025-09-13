@@ -1,0 +1,59 @@
+/*
+Test Package: Semantic-1
+Test Target: basic
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: basic test, immutable array modification error
+*/
+
+const SIZE: usize = 25;
+
+fn fibonacci() -> [i32; SIZE] {
+    let mut fib: [i32; SIZE] = [0; SIZE];
+    let mut i: usize = 0;
+    while (i < SIZE) {
+        if (i == 0) {
+            fib[i] = 0;
+        } else if (i == 1) {
+            fib[i] = 1;
+        } else {
+            fib[i] = fib[i - 1] + fib[i - 2];
+        }
+        i += 1;
+    }
+    fib
+}
+
+fn even_sum(arr: [i32; SIZE]) -> i32 {
+    let mut s: i32 = 0;
+    let mut p: usize = 0;
+    while (p < SIZE) {
+        if (arr[p] % 2 == 0) {
+            s = s + arr[p];
+        }
+        p += 1;
+    }
+    s
+}
+
+fn above_count(arr: [i32; SIZE], t: i32) -> i32 {
+    let mut c: i32 = 0;
+    let mut z: usize = 0;
+    while (z < SIZE) {
+        if (arr[z] > t) {
+            c += 1;
+        }
+        z += 1;
+    }
+    c
+}
+
+fn main() {
+    let seq: [i32; SIZE] = fibonacci();
+    let es: i32 = even_sum(seq);
+    let ac: i32 = above_count(seq, 20);
+    let metric: i32 = es * ac;
+    seq[0] = 99;
+    exit(0);
+}

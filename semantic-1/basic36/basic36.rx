@@ -1,0 +1,55 @@
+/*
+Test Package: Semantic-1
+Test Target: basic
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: basic test, graph depth-first search with component counting
+*/
+
+const SIZE: usize = 10;
+
+fn dfs(g: [[i32; SIZE]; SIZE], v: &mut [i32; SIZE], n: usize) -> i32 {
+    v[n] = 1;
+    let mut sum: i32 = 1;
+    let mut i: usize = 0;
+    while (i < SIZE) {
+        if (g[n][i] == 1 && v[i] == 0) {
+            sum = sum + dfs(g, v, i);
+        }
+        i += 1;
+    }
+    sum
+}
+
+fn isolated(v: [i32; SIZE]) -> bool {
+    let mut k: usize = 0;
+    while (k < SIZE) {
+        if (v[k] == 0) {
+            return true;
+        }
+        k += 1;
+    }
+    false
+}
+
+fn main() {
+    let graph: [[i32; SIZE]; SIZE] = [
+        [0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+        [1, 0, 1, 0, 0, 0, 0, 0, 0, 0],
+        [0, 1, 0, 1, 0, 0, 0, 0, 0, 0],
+        [0, 0, 1, 0, 1, 0, 0, 0, 0, 0],
+        [0, 0, 0, 1, 0, 1, 0, 0, 0, 0],
+        [0, 0, 0, 0, 1, 0, 1, 0, 0, 0],
+        [0, 0, 0, 0, 0, 1, 0, 1, 0, 0],
+        [0, 0, 0, 0, 0, 0, 1, 0, 1, 0],
+        [0, 0, 0, 0, 0, 0, 0, 1, 0, 1],
+        [0, 0, 0, 0, 0, 0, 0, 0, 1, 0],
+    ];
+    let mut visited: [i32; SIZE] = [0; SIZE];
+    let component: i32 = dfs(graph, &mut visited, 0);
+    let lone: bool = isolated(visited);
+    let metric: i32 = component * if (lone) { 1 } else { 0 };
+    visited = [1; SIZE];
+    exit(0);
+}

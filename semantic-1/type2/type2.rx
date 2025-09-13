@@ -1,0 +1,14 @@
+/*
+Test Package: Semantic-1
+Test Target: type
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: Type error: string cannot be used in arithmetic operation
+*/
+
+// Type error: string cannot be used in arithmetic operation
+fn main() {
+    let result: i32 = "hello" + 5;
+    exit(0);
+}

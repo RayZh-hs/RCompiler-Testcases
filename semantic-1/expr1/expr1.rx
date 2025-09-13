@@ -1,0 +1,15 @@
+/*
+Test Package: Semantic-1
+Test Target: expr
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: Expression error: Invalid literal expression - missing semicolon after literal
+*/
+
+// Error: Invalid literal expression - missing semicolon after literal
+fn main() {
+    42  // Missing semicolon - LL(1) can detect this as unexpected token
+    printInt(1);
+    exit(0);
+}

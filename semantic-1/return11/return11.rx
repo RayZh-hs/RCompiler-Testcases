@@ -1,0 +1,21 @@
+/*
+Test Package: Semantic-1
+Test Target: return
+Author: Ruitian Wang
+Time: 2025-08-27
+Verdict: Fail
+Comment: Return statement missing in all code paths
+*/
+
+// Error: Return statement missing in all code paths
+fn conditional_return(x: i32) -> i32 {
+    if (x > 10) {
+        return x * 2;
+    }
+    // Missing return statement
+}
+
+fn main() {
+    let result: i32 = conditional_return(5);
+    exit(0);
+}

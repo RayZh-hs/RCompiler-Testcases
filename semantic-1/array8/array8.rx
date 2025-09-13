@@ -1,0 +1,17 @@
+/*
+Test Package: Semantic-1
+Test Target: array
+Author: Wenxin Zheng
+Time: 2025-08-07
+Verdict: Fail
+Comment: array test, multi-dimensional array element count mismatch
+*/
+
+fn main() {
+    let table: [[i32; 3]; 2] = [
+        [10, 20, 30],
+        [40, 50, 60],
+    ];
+    let row: [i32; 2] = table[0];
+    exit(0);
+}

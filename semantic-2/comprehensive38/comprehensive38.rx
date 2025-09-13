@@ -1,0 +1,305 @@
+/*
+Test Package: Semantic-2
+Test Target: comprehensive
+Author: Wenxin Zheng
+Time: 2025-08-17
+Verdict: Success
+Test Name: Complex Data Structure Simulation: B-Tree
+Summary: This test comprehensively evaluates compiler optimizations for:
+Details:
+Simulating a complex, pointer-heavy data structure (B-Tree) using arrays.
+Recursive insertion and search algorithms with deep call stacks.
+Management of node splitting and merging, involving significant data movement.
+Loop optimizations for searching keys within a node.
+Branch prediction for handling different cases in B-Tree operations (e.g., node full, leaf/internal node).
+Array indexing and arithmetic for navigating the tree structure.
+Scope errors related to recursive helper function state.
+*/
+
+// comprehensive38.rx - Complex Data Structure Simulation: B-Tree
+// This test comprehensively evaluates compiler optimizations for:
+// - Simulating a complex, pointer-heavy data structure (B-Tree) using arrays.
+// - Recursive insertion and search algorithms with deep call stacks.
+// - Management of node splitting and merging, involving significant data movement.
+// - Loop optimizations for searching keys within a node.
+// - Branch prediction for handling different cases in B-Tree operations (e.g., node full, leaf/internal node).
+// - Array indexing and arithmetic for navigating the tree structure.
+// - Scope errors related to recursive helper function state.
+
+let ORDER: i32 = 5;
+let MAX_KEYS: i32 = ORDER - 1;
+let MIN_KEYS: i32 = (ORDER - 1) / 2;
+let POOL_SIZE: i32 = 200;
+
+let node_pool_keys: [[i32; 4]; 200] = [[0; 4]; 200];
+let node_pool_children: [[i32; 5]; 200] = [[0; 5]; 200];
+let node_pool_is_leaf: [bool; 200] = [false; 200];
+let node_pool_num_keys: [i32; 200] = [0; 200];
+let mut next_node_idx: i32 = 0;
+let mut root_node_idx: i32 = -1;
+
+fn create_node(is_leaf: bool) -> i32 {
+    let idx: i32 = next_node_idx;
+    next_node_idx = next_node_idx + 1;
+    node_pool_is_leaf[idx] = is_leaf;
+    node_pool_num_keys[idx] = 0;
+    let mut i: i32 = 0;
+    while (i < MAX_KEYS) {
+        node_pool_keys[idx][i] = 0;
+        i = i + 1;
+    }
+    i = 0;
+    while (i < ORDER) {
+        node_pool_children[idx][i] = -1;
+        i = i + 1;
+    }
+    return idx;
+}
+
+fn split_child(parent_idx: i32, child_idx_in_parent: i32, child_idx: i32) {
+    let new_node_idx: i32 = create_node(node_pool_is_leaf[child_idx]);
+    node_pool_num_keys[new_node_idx] = MIN_KEYS;
+
+    let mut j: i32 = 0;
+    while (j < MIN_KEYS) {
+        node_pool_keys[new_node_idx][j] = node_pool_keys[child_idx][j + MIN_KEYS + 1];
+        j = j + 1;
+    }
+
+    if (!node_pool_is_leaf[child_idx]) {
+        j = 0;
+        while (j < MIN_KEYS + 1) {
+            node_pool_children[new_node_idx][j] = node_pool_children[child_idx][j + MIN_KEYS + 1];
+            j = j + 1;
+        }
+    }
+
+    node_pool_num_keys[child_idx] = MIN_KEYS;
+
+    j = node_pool_num_keys[parent_idx];
+    while (j > child_idx_in_parent) {
+        node_pool_children[parent_idx][j + 1] = node_pool_children[parent_idx][j];
+        j = j - 1;
+    }
+    node_pool_children[parent_idx][child_idx_in_parent + 1] = new_node_idx;
+
+    j = node_pool_num_keys[parent_idx] - 1;
+    while (j >= child_idx_in_parent) {
+        node_pool_keys[parent_idx][j + 1] = node_pool_keys[parent_idx][j];
+        j = j - 1;
+    }
+
+    node_pool_keys[parent_idx][child_idx_in_parent] = node_pool_keys[child_idx][MIN_KEYS];
+    node_pool_num_keys[parent_idx] = node_pool_num_keys[parent_idx] + 1;
+}
+
+fn insert_non_full(node_idx: i32, key: i32) {
+    let mut i: i32 = node_pool_num_keys[node_idx] - 1;
+
+    if (node_pool_is_leaf[node_idx]) {
+        while (i >= 0) {
+            if (node_pool_keys[node_idx][i] <= key) {
+                break;
+            }
+            node_pool_keys[node_idx][i + 1] = node_pool_keys[node_idx][i];
+            i = i - 1;
+        }
+        node_pool_keys[node_idx][i + 1] = key;
+        node_pool_num_keys[node_idx] = node_pool_num_keys[node_idx] + 1;
+    } else {
+        while (i >= 0) {
+            if (node_pool_keys[node_idx][i] <= key) {
+                break;
+            }
+            i = i - 1;
+        }
+        i = i + 1;
+        let child_to_insert_idx: i32 = node_pool_children[node_idx][i];
+        if (node_pool_num_keys[child_to_insert_idx] == MAX_KEYS) {
+            split_child(node_idx, i, child_to_insert_idx);
+            if (key > node_pool_keys[node_idx][i]) {
+                i = i + 1;
+            }
+        }
+        insert_non_full(node_pool_children[node_idx][i], key);
+    }
+}
+
+fn insert(key: i32) {
+    if (root_node_idx == -1) {
+        root_node_idx = create_node(true);
+        node_pool_keys[root_node_idx][0] = key;
+        node_pool_num_keys[root_node_idx] = 1;
+        return;
+    }
+
+    let root: i32 = root_node_idx;
+    if (node_pool_num_keys[root] == MAX_KEYS) {
+        let new_root_idx: i32 = create_node(false);
+        root_node_idx = new_root_idx;
+        node_pool_children[new_root_idx][0] = root;
+        split_child(new_root_idx, 0, root);
+        insert_non_full(new_root_idx, key);
+    } else {
+        insert_non_full(root, key);
+    }
+}
+
+fn search_recursive(node_idx: i32, key: i32) -> bool {
+    let mut i: i32 = 0;
+    while (i < node_pool_num_keys[node_idx]) {
+        if (key < node_pool_keys[node_idx][i]) {
+            break;
+        }
+        if (key == node_pool_keys[node_idx][i]) {
+            return true;
+        }
+        i = i + 1;
+    }
+
+    if (node_pool_is_leaf[node_idx]) {
+        return false;
+    } else {
+        let child_idx: i32 = node_pool_children[node_idx][i];
+        if (child_idx == -1) {
+            return false;
+        }
+        return search_recursive(child_idx, key);
+    }
+}
+
+fn traverse_and_sum(node_idx: i32) -> i32 {
+    if (node_idx == -1) {
+        return 0;
+    }
+    let mut sum: i32 = 0;
+    let mut i: i32 = 0;
+    let is_leaf: bool = node_pool_is_leaf[node_idx];
+
+    while (i < node_pool_num_keys[node_idx]) {
+        if (!is_leaf) {
+            sum = sum + traverse_and_sum(node_pool_children[node_idx][i]);
+        }
+        sum = sum + node_pool_keys[node_idx][i];
+        i = i + 1;
+    }
+    if (!is_leaf) {
+        sum = sum + traverse_and_sum(node_pool_children[node_idx][i]);
+    }
+    return sum;
+}
+
+fn get_height(node_idx: i32) -> i32 {
+    if (node_idx == -1) {
+        return 0;
+    }
+    if (node_pool_is_leaf[node_idx]) {
+        return 1;
+    }
+    return 1 + get_height(node_pool_children[node_idx][0]);
+}
+
+fn main() {
+    let mut i: i32 = 0;
+    let mut keys_to_insert: [i32; 100] = [0; 100];
+    let mut current: i32 = 100;
+    let mut step: i32 = 37;
+    let modulus: i32 = 251;
+
+    while (i < 100) {
+        current = (current + step) % modulus;
+        keys_to_insert[i] = current;
+        i = i + 1;
+    }
+
+    i = 0;
+    while (i < 100) {
+        insert(keys_to_insert[i]);
+        i = i + 1;
+    }
+
+    let mut found_count: i32 = 0;
+    i = 0;
+    while (i < 100) {
+        if (search_recursive(root_node_idx, keys_to_insert[i])) {
+            found_count = found_count + 1;
+        }
+        i = i + 1;
+    }
+    printInt(found_count);
+
+    let mut not_found_count: i32 = 0;
+    i = 0;
+    while (i < 50) {
+        if (!search_recursive(root_node_idx, 300 + i)) {
+            not_found_count = not_found_count + 1;
+        }
+        i = i + 1;
+    }
+    printInt(not_found_count);
+
+    let sum: i32 = traverse_and_sum(root_node_idx);
+    printInt(sum);
+
+    let height: i32 = get_height(root_node_idx);
+    printInt(height);
+
+    insert(500);
+    insert(501);
+    insert(502);
+    insert(503);
+    insert(504);
+    insert(505);
+
+    let new_sum: i32 = traverse_and_sum(root_node_idx);
+    printInt(new_sum);
+
+    let new_height: i32 = get_height(root_node_idx);
+    printInt(new_height);
+
+    let mut final_check: i32 = 0;
+    if search_recursive(root_node_idx, 503) {
+        final_check = 1;
+    }
+    printInt(final_check);
+
+    if !search_recursive(root_node_idx, 999) {
+        final_check = 2;
+    }
+    printInt(final_check);
+
+    let mut j: i32 = 100;
+    while (j < 150) {
+        insert(j * 3);
+        j = j + 1;
+    }
+
+    let final_sum: i32 = traverse_and_sum(root_node_idx);
+    printInt(final_sum);
+    printInt(get_height(root_node_idx));
+
+    let mut k: i32 = 0;
+    let mut total_nodes: i32 = 0;
+    while (k < next_node_idx) {
+        if (node_pool_num_keys[k] > 0) {
+            total_nodes = total_nodes + 1;
+        }
+        k = k + 1;
+    }
+    printInt(total_nodes);
+
+    let mut error_flag: bool = false;
+    let mut m: i32 = 0;
+    while (m < 10) {
+        if (m > 5) {
+            let mut error_flag: bool = true;
+        }
+        m = m + 1;
+    }
+
+    if (error_flag) {
+        printInt(999);
+    } else {
+        printInt(888);
+    }
+}

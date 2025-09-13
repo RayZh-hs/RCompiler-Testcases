@@ -1,0 +1,286 @@
+/*
+Test Package: Semantic-1
+Test Target: misc
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: Trie (Prefix Tree) implementation for string operations
+*/
+
+// Trie (Prefix Tree) implementation for string operations
+// Efficient data structure for word storage and prefix searches
+#[derive(Copy, Clone)]
+struct TrieNode {
+    children: [i32; 26], // Indices to child nodes, -1 for null
+    is_end_of_word: bool,
+    word_count: i32,
+}
+
+struct Trie {
+    nodes: [TrieNode; 10000],
+    node_count: i32,
+    root: i32,
+}
+
+impl TrieNode {
+    fn new() -> TrieNode {
+        TrieNode {
+            children: [-1; 26],
+            is_end_of_word: false,
+            word_count: 0,
+        }
+    }
+}
+
+impl Trie {
+    fn new() -> Trie {
+        let mut trie: Trie = Trie {
+            nodes: [TrieNode::new(); 10000],
+            node_count: 1,
+            root: 0,
+        };
+        trie.nodes[0] = TrieNode::new();
+        return trie;
+    }
+    
+    fn create_node(&mut self) -> i32 {
+        if (self.node_count >= 10000) {
+            return -1;
+        }
+        
+        let index: i32 = self.node_count;
+        self.nodes[index as usize] = TrieNode::new();
+        self.node_count += 1;
+        return index;
+    }
+    
+    fn char_to_index(&self, ch: i32) -> i32 {
+        if (ch >= 97 && ch <= 122) { // 'a' to 'z'
+            return ch - 97;
+        }
+        return -1;
+    }
+    
+    fn insert(&mut self, word: &[i32; 100], length: i32) {
+        let mut current: i32 = self.root;
+        
+        let mut i: i32 = 0;
+        while (i < length) {
+            let index: i32 = self.char_to_index(word[i as usize]);
+            if (index == -1) {
+                return; // Invalid character
+            }
+            
+            if (self.nodes[current as usize].children[index as usize] == -1) {
+                let new_node: i32 = self.create_node();
+                if (new_node == -1) {
+                    return; // Out of memory
+                }
+                self.nodes[current as usize].children[index as usize] = new_node;
+            }
+            
+            current = self.nodes[current as usize].children[index as usize];
+            i += 1;
+        }
+        
+        self.nodes[current as usize].is_end_of_word = true;
+        self.nodes[current as usize].word_count += 1;
+    }
+    
+    fn search(&self, word: &[i32; 100], length: i32) -> bool {
+        let mut current: i32 = self.root;
+        
+        let mut i: i32 = 0;
+        while (i < length) {
+            let index: i32 = self.char_to_index(word[i as usize]);
+            if (index == -1) {
+                return false;
+            }
+            
+            if (self.nodes[current as usize].children[index as usize] == -1) {
+                return false;
+            }
+            
+            current = self.nodes[current as usize].children[index as usize];
+            i += 1;
+        }
+        
+        return self.nodes[current as usize].is_end_of_word;
+    }
+    
+    fn starts_with(&self, prefix: &[i32; 100], length: i32) -> bool {
+        let mut current: i32 = self.root;
+        
+        let mut i: i32 = 0;
+        while (i < length) {
+            let index: i32 = self.char_to_index(prefix[i as usize]);
+            if (index == -1) {
+                return false;
+            }
+            
+            if (self.nodes[current as usize].children[index as usize] == -1) {
+                return false;
+            }
+            
+            current = self.nodes[current as usize].children[index as usize];
+            i += 1;
+        }
+        
+        return true;
+    }
+    
+    fn delete_helper(&mut self, node: i32, word: &[i32; 100], depth: i32, length: i32) -> bool {
+        if (depth == length) {
+            if (!self.nodes[node as usize].is_end_of_word) {
+                return false; // Word doesn't exist
+            }
+            
+            self.nodes[node as usize].is_end_of_word = false;
+            self.nodes[node as usize].word_count = 0;
+            
+            // Check if node has any children
+            let mut i: i32 = 0;
+            while (i < 26) {
+                if (self.nodes[node as usize].children[i as usize] != -1) {
+                    return false; // Don't delete if has children
+                }
+                i += 1;
+            }
+            
+            return true; // Can be deleted
+        }
+        
+        let index: i32 = self.char_to_index(word[depth as usize]);
+        if (index == -1) {
+            return false;
+        }
+        
+        let child: i32 = self.nodes[node as usize].children[index as usize];
+        if (child == -1) {
+            return false; // Word doesn't exist
+        }
+        
+        let should_delete_child: bool = self.delete_helper(child, word, depth + 1, length);
+        
+        if (should_delete_child) {
+            self.nodes[node as usize].children[index as usize] = -1;
+            
+            // Check if current node should be deleted
+            if (!self.nodes[node as usize].is_end_of_word) {
+                let mut i: i32 = 0;
+                while (i < 26) {
+                    if (self.nodes[node as usize].children[i as usize] != -1) {
+                        return false;
+                    }
+                    i += 1;
+                }
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    fn delete(&mut self, word: &[i32; 100], length: i32) {
+        self.delete_helper(self.root, word, 0, length);
+    }
+    
+    fn count_words_with_prefix(&self, prefix: &[i32; 100], length: i32) -> i32 {
+        let mut current: i32 = self.root;
+        
+        let mut i: i32 = 0;
+        while (i < length) {
+            let index: i32 = self.char_to_index(prefix[i as usize]);
+            if (index == -1) {
+                return 0;
+            }
+            
+            if (self.nodes[current as usize].children[index as usize] == -1) {
+                return 0;
+            }
+            
+            current = self.nodes[current as usize].children[index as usize];
+            i += 1;
+        }
+        
+        return self.count_words_from_node(current);
+    }
+    
+    fn count_words_from_node(&self, node: i32) -> i32 {
+        let mut count: i32 = 0;
+        
+        if (self.nodes[node as usize].is_end_of_word) {
+            count += self.nodes[node as usize].word_count;
+        }
+        
+        let mut i: i32 = 0;
+        while (i < 26) {
+            if (self.nodes[node as usize].children[i as usize] != -1) {
+                count += self.count_words_from_node(self.nodes[node as usize].children[i as usize]);
+            }
+            i += 1;
+        }
+        
+        return count;
+    }
+}
+
+fn main() {
+    let mut trie: Trie = Trie::new();
+    let operations: i32 = getInt();
+    
+    let mut i: i32 = 0;
+    while (i < operations) {
+        let operation: i32 = getInt();
+        
+        if (operation == 1) { // Insert word
+            let length: i32 = getInt();
+            let mut word: [i32; 100] = [0; 100];
+            let mut j: i32 = 0;
+            while (j < length) {
+                word[j as usize] = getInt();
+                j += 1;
+            }
+            trie.insert(&word, length);
+        } else if (operation == 2) { // Search word
+            let length: i32 = getInt();
+            let mut word: [i32; 100] = [0; 100];
+            let mut j: i32 = 0;
+            while (j < length) {
+                word[j as usize] = getInt();
+                j += 1;
+            }
+            if (trie.search(&word, length)) {
+                printInt(1);
+            } else {
+                printInt(0);
+            }
+        } else if (operation == 3) { // Starts with prefix
+            let length: i32 = getInt();
+            let mut prefix: [i32; 100] = [0; 100];
+            let mut j: i32 = 0;
+            while (j < length) {
+                prefix[j as usize] = getInt();
+                j += 1;
+            }
+            if (trie.starts_with(&prefix, length)) {
+                printInt(1);
+            } else {
+                printInt(0);
+            }
+        } else if (operation == 4) { // Count words with prefix
+            let length: i32 = getInt();
+            let mut prefix: [i32; 100] = [0; 100];
+            let mut j: i32 = 0;
+            while (j < length) {
+                prefix[j as usize] = getInt();
+                j += 1;
+            }
+            let count: i32 = trie.count_words_with_prefix(&prefix, length);
+            printInt(count);
+        }
+        
+        i += 1;
+    }
+    exit(0);
+}

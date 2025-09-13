@@ -1,0 +1,16 @@
+/*
+Test Package: Semantic-1
+Test Target: expr
+Author: Ruitian Wang
+Time: 2025-08-08
+Verdict: Fail
+Comment: Expression error: while condition missing parentheses
+*/
+
+fn main() {
+    let x: i32 = 10;
+    if x > 5 { // Error: if condition missing parentheses
+        printInt(x);
+    }
+    exit(0);
+}

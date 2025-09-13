@@ -1,0 +1,264 @@
+/*
+Test Package: Semantic-1
+Test Target: misc
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Success
+Comment: Bellman-Ford Algorithm for Single Source Shortest Path with negative weights
+*/
+
+// Bellman-Ford Algorithm for Single Source Shortest Path
+// Handles negative weight edges and detects negative cycles
+struct Edge {
+    src: i32,
+    dest: i32,
+    weight: i32,
+}
+
+struct Graph {
+    edges: [Edge; 1000],
+    edge_count: i32,
+    vertex_count: i32,
+}
+
+struct ShortestPathResult {
+    distances: [i32; 100],
+    predecessors: [i32; 100],
+    has_negative_cycle: bool,
+    source: i32,
+}
+
+impl Edge {
+    fn new(src: i32, dest: i32, weight: i32) -> Edge {
+        Edge {
+            src: src,
+            dest: dest,
+            weight: weight,
+        }
+    }
+}
+
+impl Graph {
+    fn new(vertices: i32) -> Graph {
+        Graph {
+            edges: [Edge::new(0, 0, 0); 1000],
+            edge_count: 0,
+            vertex_count: vertices,
+        }
+    }
+    
+    fn add_edge(&mut self, src: i32, dest: i32, weight: i32) {
+        if (self.edge_count < 1000) {
+            self.edges[self.edge_count as usize] = Edge::new(src, dest, weight);
+            self.edge_count += 1;
+        }
+    }
+    
+    fn bellman_ford(&self, source: i32) -> ShortestPathResult {
+        let mut result: ShortestPathResult = ShortestPathResult {
+            distances: [2147483647; 100], // Initialize to max i32 value (infinity)
+            predecessors: [-1; 100],
+            has_negative_cycle: false,
+            source: source,
+        };
+        
+        // Initialize source distance to 0
+        result.distances[source as usize] = 0;
+        
+        // Relax edges repeatedly
+        let mut iteration: i32 = 0;
+        while (iteration < self.vertex_count - 1) {
+            let mut i: i32 = 0;
+            while (i < self.edge_count) {
+                let edge: Edge = Edge {
+                    src: self.edges[i as usize].src,
+                    dest: self.edges[i as usize].dest,
+                    weight: self.edges[i as usize].weight,
+                };
+                let u: i32 = edge.src;
+                let v: i32 = edge.dest;
+                let weight: i32 = edge.weight;
+                
+                if (result.distances[u as usize] != 2147483647) {
+                    let new_distance: i32 = result.distances[u as usize] + weight;
+                    if (new_distance < result.distances[v as usize]) {
+                        result.distances[v as usize] = new_distance;
+                        result.predecessors[v as usize] = u;
+                    }
+                }
+                
+                i += 1;
+            }
+            iteration += 1;
+        }
+        
+        // Check for negative cycles
+        let mut i: i32 = 0;
+        while (i < self.edge_count) {
+            let edge: Edge = Edge {
+                src: self.edges[i as usize].src,
+                dest: self.edges[i as usize].dest,
+                weight: self.edges[i as usize].weight,
+            };
+            let u: i32 = edge.src;
+            let v: i32 = edge.dest;
+            let weight: i32 = edge.weight;
+            
+            if (result.distances[u as usize] != 2147483647) {
+                let new_distance: i32 = result.distances[u as usize] + weight;
+                if (new_distance < result.distances[v as usize]) {
+                    result.has_negative_cycle = true;
+                    break;
+                }
+            }
+            
+            i += 1;
+        }
+        
+        return result;
+    }
+    
+    fn has_negative_cycle(&self) -> bool {
+        // Run Bellman-Ford from vertex 0 to check for negative cycles
+        let result: ShortestPathResult = self.bellman_ford(0);
+        return result.has_negative_cycle;
+    }
+    
+    fn get_shortest_distance(&self, source: i32, destination: i32) -> i32 {
+        let result: ShortestPathResult = self.bellman_ford(source);
+        
+    if (result.has_negative_cycle) {
+            return -2147483648; // Return minimum i32 value to indicate negative cycle
+        }
+        
+        return result.distances[destination as usize];
+    }
+    
+    fn reconstruct_path(&self, source: i32, destination: i32) -> [i32; 100] {
+        let result: ShortestPathResult = self.bellman_ford(source);
+        let mut path: [i32; 100] = [-1; 100];
+        
+    if (result.has_negative_cycle || result.distances[destination as usize] == 2147483647) {
+            return path; // No path or negative cycle
+        }
+        
+        let mut path_vertices: [i32; 100] = [-1; 100];
+        let mut path_length: i32 = 0;
+        let mut current: i32 = destination;
+        
+        // Build path backwards
+    while (current != -1) {
+            path_vertices[path_length as usize] = current;
+            path_length += 1;
+            current = result.predecessors[current as usize];
+        }
+        
+        // Reverse path
+        let mut i: i32 = 0;
+    while (i < path_length) {
+            path[i as usize] = path_vertices[(path_length - 1 - i) as usize];
+            i += 1;
+        }
+        
+        return path;
+    }
+    
+    fn count_reachable_vertices(&self, source: i32) -> i32 {
+        let result: ShortestPathResult = self.bellman_ford(source);
+        let mut count: i32 = 0;
+        
+        let mut i: i32 = 0;
+        while (i < self.vertex_count) {
+            if (result.distances[i as usize] != 2147483647) {
+                count += 1;
+            }
+            i += 1;
+        }
+        
+        return count;
+    }
+    
+    fn find_all_shortest_distances(&self, source: i32) -> [i32; 100] {
+        let result: ShortestPathResult = self.bellman_ford(source);
+        return result.distances;
+    }
+    
+    fn has_path(&self, source: i32, destination: i32) -> bool {
+        let distance: i32 = self.get_shortest_distance(source, destination);
+        return distance != 2147483647 && distance != -2147483648;
+    }
+}
+
+impl ShortestPathResult {
+    fn print_distances(&self) {
+        let mut i: i32 = 0;
+        while (i < 100) {
+            if (self.distances[i as usize] != 2147483647) {
+                printInt(i);
+                printInt(self.distances[i as usize]);
+            }
+            i += 1;
+        }
+    }
+}
+
+fn main() {
+    let vertices: i32 = getInt();
+    let mut graph: Graph = Graph::new(vertices);
+    
+    let edges: i32 = getInt();
+    let mut i: i32 = 0;
+    while (i < edges) {
+        let src: i32 = getInt();
+        let dest: i32 = getInt();
+        let weight: i32 = getInt();
+        graph.add_edge(src, dest, weight);
+        i += 1;
+    }
+    
+    let operation: i32 = getInt();
+    
+    if (operation == 1) { // Check for negative cycle
+        if (graph.has_negative_cycle()) {
+            printInt(1);
+        } else {
+            printInt(0);
+        }
+    } else if (operation == 2) { // Single source shortest path
+        let source: i32 = getInt();
+        let distances: [i32; 100] = graph.find_all_shortest_distances(source);
+        i = 0;
+        while (i < vertices) {
+            if (distances[i as usize] != 2147483647) {
+                printInt(distances[i as usize]);
+            } else {
+                printInt(-1); // Unreachable
+            }
+            i += 1;
+        }
+    } else if (operation == 3) { // Shortest distance between two vertices
+        let source: i32 = getInt();
+        let destination: i32 = getInt();
+        let distance: i32 = graph.get_shortest_distance(source, destination);
+        if (distance == 2147483647) {
+            printInt(-1); // No path
+        } else if (distance == -2147483648) {
+            printInt(-2); // Negative cycle
+        } else {
+            printInt(distance);
+        }
+    } else if (operation == 4) { // Count reachable vertices
+        let source: i32 = getInt();
+        let reachable_count: i32 = graph.count_reachable_vertices(source);
+        printInt(reachable_count);
+    } else if (operation == 5) { // Check if path exists
+        let source: i32 = getInt();
+        let destination: i32 = getInt();
+        if (graph.has_path(source, destination)) {
+            printInt(1);
+        } else {
+            printInt(0);
+        }
+    }
+    exit(0);
+}

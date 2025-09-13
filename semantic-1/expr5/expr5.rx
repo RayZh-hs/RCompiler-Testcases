@@ -1,0 +1,14 @@
+/*
+Test Package: Semantic-1
+Test Target: expr
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: Expression error: Invalid grouped expression - missing closing parenthesis
+*/
+
+// Error: Invalid grouped expression - missing closing parenthesis
+fn main() {
+    let result: i32 = (5 + 3 * 2;  // Missing closing parenthesis
+    exit(0);
+}

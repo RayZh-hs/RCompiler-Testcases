@@ -1,0 +1,64 @@
+/*
+Test Package: Semantic-1
+Test Target: basic
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: basic test, multiple errors - return type mismatch, incomplete trait, static type error
+*/
+
+fn main() {
+    let mut deck: Deck = Deck::new();
+    deck.shuffle();
+    let top: Card = deck.draw();
+    let sink: Card = top;
+    exit(0);
+}
+
+enum Suit { Heart, Diamond, Club, Spade }
+
+struct Card {
+    v: i32,
+    s: Suit,
+}
+
+struct Deck {
+    pile: [Card; 52],
+    idx: usize,
+}
+
+impl Deck {
+    fn new() -> Self {
+        let template: Card = Card { v: 0, s: Suit::Heart };
+        Deck { pile: [template; 52], idx: 0 }
+    }
+
+    fn shuffle(&mut self) {
+        self.idx = 0;
+        while (self.idx < 52) {
+            let swap: usize = (self.idx * 31) % 52;
+            let temp: Card = self.pile[self.idx];
+            self.pile[self.idx] = self.pile[swap];
+            self.pile[swap] = temp;
+            self.idx += 1;
+        }
+        self.idx = 0;
+    }
+
+    fn draw(&mut self) -> Card {
+        if (self.idx >= 52) {
+            return 0;
+        }
+        let card: Card = self.pile[self.idx];
+        self.idx += 1;
+        card
+    }
+}
+
+trait Randomize {
+    fn shuffle(&mut self);
+}
+
+impl Randomize for Deck {}
+
+const COUNT: i32 = "52";
