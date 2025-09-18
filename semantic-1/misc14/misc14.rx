@@ -55,12 +55,11 @@ fn main() {
         return;
     }
     
-    let result: i32;
-    if (method == 1) {
-        result = power_iterative(base, exponent);
+    let result: i32 = if (method == 1) {
+        power_iterative(base, exponent)
     } else {
-        result = power_recursive(base, exponent);
-    }
+        power_recursive(base, exponent)
+    };
     
     printInt(result);
     exit(0);

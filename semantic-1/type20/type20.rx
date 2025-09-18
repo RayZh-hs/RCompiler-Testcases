@@ -43,7 +43,7 @@ fn main() {
     process_task_queue(&mut task_queue);
     
     // Type error: trying to assign array of different size
-    let small_queue: [Task; 3] = task_queue;
+    let small_queue: [Task; 2] = task_queue;  // Error: [Task; 3] cannot be assigned to [Task; 2]
     
     printInt(1);
     exit(0);

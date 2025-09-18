@@ -1,0 +1,29 @@
+/*
+Test Package: Semantic-1
+Test Target: expr
+Author: Wenxin Zheng
+Time: 2025-08-08
+Verdict: Fail
+Comment: Expression error: Missing closing parenthesis in method call - combines struct, method call, operator, if, and literal expressions
+*/
+
+struct Rectangle {
+    width: i32,
+    height: i32,
+}
+
+impl Rectangle {
+    fn area(&self) -> i32 {
+        self.width * self.height
+    }
+}
+
+fn main() {
+    let rect: Rectangle = Rectangle { width: 5, height: 3 };
+    let area: i32 = rect.area(;
+    printInt(area + 1);
+    if (area > 10) {
+        printInt(42);
+    }
+    exit(0);
+}
