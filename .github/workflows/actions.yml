@@ -32,6 +32,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add @official META_FILE || true
+          git add stages.json */ || true
           git diff --cached --quiet || git commit -m "Daily update: $(date -u '+%Y-%m-%d %H:%M UTC')"
           git push
