@@ -1,12 +1,19 @@
 name: Daily Fetch
 
 on:
+  push:
+    branches:
+      - main
   schedule:
     - cron: "0 0 * * *"
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   fetch-and-commit:
+    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
 
     steps:
@@ -27,11 +34,15 @@ jobs:
 
       - name: Run fetch script
         run: python .github/scripts/fetch_cases.py
-
-      - name: Commit and push changes
+      
+      - name: Configure git auth
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+
+      - name: Commit and push changes
+        run: |
           git add stages.json */ || true
           git diff --cached --quiet || git commit -m "Daily update: $(date -u '+%Y-%m-%d %H:%M UTC')"
           git push
