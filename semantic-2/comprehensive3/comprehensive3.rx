@@ -26,58 +26,58 @@ Complex mathematical expressions
 
 fn main() {
     // Performance test marker - start
-    printInt(3000);
-    
+    printlnInt(3000);
+
     // Test 1: Mathematical constants and series calculations
     // Tests optimization of mathematical series computations
     performMathematicalSeries();
-    
+
     // Test 2: Number theory algorithms
     // Tests optimization of modular arithmetic and primality testing
     performNumberTheoryAlgorithms();
-    
+
     // Test 3: Linear algebra with integer arithmetic
     // Tests optimization of matrix operations and vector computations
     performLinearAlgebraOperations();
-    
+
     // Test 4: Combinatorial algorithms
     // Tests optimization of factorial, permutation, and combination calculations
     performCombinatorialAlgorithms();
-    
+
     // Test 5: Cryptographic algorithms
     // Tests optimization of modular exponentiation and large number arithmetic
     performCryptographicOperations();
-    
+
     // Performance test marker - end
-    printInt(3999);
+    printlnInt(3999);
 }
 
 // Test 1: Mathematical Series Calculations
 // Tests optimization of iterative mathematical computations
 fn performMathematicalSeries() {
-    printInt(3001); // Start mathematical series
-    
+    printlnInt(3001); // Start mathematical series
+
     // Calculate approximation of mathematical constants using series
     let pi_approx = calculatePiApproximation(1000);
-    printInt(pi_approx);
-    
+    printlnInt(pi_approx);
+
     // Calculate Fibonacci series with large numbers
     let fibonacci_sum = calculateFibonacciSum(50);
-    printInt(fibonacci_sum);
-    
+    printlnInt(fibonacci_sum);
+
     // Calculate factorial series
     let factorial_series = calculateFactorialSeries(20);
-    printInt(factorial_series);
-    
+    printlnInt(factorial_series);
+
     // Calculate harmonic series approximation
     let harmonic_approx = calculateHarmonicSeries(10000);
-    printInt(harmonic_approx);
-    
+    printlnInt(harmonic_approx);
+
     // Calculate geometric series
     let geometric_result = calculateGeometricSeries(100, 3);
-    printInt(geometric_result);
-    
-    printInt(3002); // End mathematical series
+    printlnInt(geometric_result);
+
+    printlnInt(3002); // End mathematical series
 }
 
 // Calculate Pi approximation using Leibniz series
@@ -87,18 +87,18 @@ fn calculatePiApproximation(terms: i32) -> i32 {
     let mut denominator = 1;
     let mut sign = 1;
     let mut i = 0;
-    
+
     while (i < terms) {
         // Pi/4 = 1 - 1/3 + 1/5 - 1/7 + 1/9 - ...
         // Using integer arithmetic: multiply by 10000 for precision
         let term = (sign * 10000) / denominator;
         sum += term;
-        
+
         sign = -sign;
         denominator += 2;
         i += 1;
     }
-    
+
     // Return Pi approximation * 10000
     return (sum * 4) % 100000;
 }
@@ -109,20 +109,20 @@ fn calculateFibonacciSum(count: i32) -> i32 {
     let mut prev = 0;
     let mut curr = 1;
     let mut i = 0;
-    
+
     while (i < count) {
         sum += curr;
-        
+
         // Prevent overflow by taking modulo
         sum = sum % 1000000;
-        
+
         let temp = curr;
         curr = (prev + curr) % 1000000;
         prev = temp;
-        
+
         i += 1;
     }
-    
+
     return sum % 10000;
 }
 
@@ -131,13 +131,13 @@ fn calculateFactorialSeries(max_n: i32) -> i32 {
     let mut series_sum = 0;
     let mut factorial = 1;
     let mut n = 1;
-    
+
     while (n <= max_n) {
         factorial = (factorial * n) % 1000000; // Prevent overflow
         series_sum = (series_sum + factorial) % 1000000;
         n += 1;
     }
-    
+
     return series_sum % 10000;
 }
 
@@ -145,13 +145,13 @@ fn calculateFactorialSeries(max_n: i32) -> i32 {
 fn calculateHarmonicSeries(terms: i32) -> i32 {
     let mut sum = 0;
     let mut i = 1;
-    
+
     while (i <= terms) {
         // Use integer arithmetic: multiply by 10000 for precision
         sum += 10000 / i;
         i += 1;
     }
-    
+
     return sum % 10000;
 }
 
@@ -160,56 +160,56 @@ fn calculateGeometricSeries(terms: i32, ratio: i32) -> i32 {
     let mut sum = 0;
     let mut power = 1;
     let mut i = 0;
-    
+
     while (i < terms) {
         sum = (sum + power) % 1000000;
         power = (power * ratio) % 1000000;
         i += 1;
     }
-    
+
     return sum % 10000;
 }
 
 // Test 2: Number Theory Algorithms
 // Tests optimization of modular arithmetic and prime number operations
 fn performNumberTheoryAlgorithms() {
-    printInt(3003); // Start number theory
-    
+    printlnInt(3003); // Start number theory
+
     // Prime number generation and testing
     let prime_count = sieveOfEratosthenes(2000);
-    printInt(prime_count);
-    
+    printlnInt(prime_count);
+
     // Greatest common divisor calculations
     let gcd_results = performGCDOperations(100);
-    printInt(gcd_results);
-    
+    printlnInt(gcd_results);
+
     // Modular exponentiation tests
     let modexp_results = performModularExponentiation();
-    printInt(modexp_results);
-    
+    printlnInt(modexp_results);
+
     // Euler's totient function calculations
     let totient_sum = calculateTotientSum(100);
-    printInt(totient_sum);
-    
+    printlnInt(totient_sum);
+
     // Perfect number detection
     let perfect_count = findPerfectNumbers(1000);
-    printInt(perfect_count);
-    
-    printInt(3004); // End number theory
+    printlnInt(perfect_count);
+
+    printlnInt(3004); // End number theory
 }
 
 // Sieve of Eratosthenes for prime generation
-fn sieveOfEratosthenes(limit: i32) -> i32 {
+fn sieveOfEratosthenes(limit: usize) -> i32 {
     let mut is_prime: [i32; 2000] = [0; 2000];
     let mut prime_count = 0;
-    
+
     // Initialize all numbers as prime
     let mut i = 2;
     while (i < limit) {
         is_prime[i] = 1;
         i += 1;
     }
-    
+
     // Sieve process
     i = 2;
     while (i * i < limit) {
@@ -223,7 +223,7 @@ fn sieveOfEratosthenes(limit: i32) -> i32 {
         }
         i += 1;
     }
-    
+
     // Count primes
     i = 2;
     while (i < limit) {
@@ -232,7 +232,7 @@ fn sieveOfEratosthenes(limit: i32) -> i32 {
         }
         i += 1;
     }
-    
+
     return prime_count;
 }
 
@@ -240,21 +240,21 @@ fn sieveOfEratosthenes(limit: i32) -> i32 {
 fn performGCDOperations(limit: i32) -> i32 {
     let mut gcd_sum = 0;
     let mut i = 1;
-    
+
     while (i <= limit) {
         let mut j = 1;
         while (j <= limit) {
             // Calculate GCD using Euclidean algorithm
             gcd_sum += euclideanGCD(i * 13 + 7, j * 17 + 11);
-            
+
             // Calculate GCD using Stein's algorithm (binary GCD)
             gcd_sum += binaryGCD(i * 19 + 3, j * 23 + 5);
-            
+
             j += 10; // Skip some iterations for performance
         }
         i += 10;
     }
-    
+
     return gcd_sum % 10000;
 }
 
@@ -262,13 +262,13 @@ fn performGCDOperations(limit: i32) -> i32 {
 fn euclideanGCD(a: i32, b: i32) -> i32 {
     let mut x = a;
     let mut y = b;
-    
+
     while (y != 0) {
         let temp = y;
         y = x % y;
         x = temp;
     }
-    
+
     return x;
 }
 
@@ -277,42 +277,42 @@ fn binaryGCD(a: i32, b: i32) -> i32 {
     let mut x = a;
     let mut y = b;
     let mut shift = 0;
-    
+
     if (x == 0) {
         return y;
     }
     if (y == 0) {
         return x;
     }
-    
+
     // Factor out common powers of 2
-    while ( ((x | y) & 1) == 0 ) {
+    while (((x | y) & 1) == 0) {
         shift += 1;
         x >>= 1;
         y >>= 1;
     }
-    
+
     // Remove factors of 2 from x
-    while ( (x & 1) == 0 ) {
+    while ((x & 1) == 0) {
         x >>= 1;
     }
-    
+
     while (y != 0) {
         // Remove factors of 2 from y
-        while ( (y & 1) == 0 ) {
+        while ((y & 1) == 0) {
             y >>= 1;
         }
-        
+
         // Ensure x <= y
         if (x > y) {
             let temp = x;
             x = y;
             y = temp;
         }
-        
+
         y = y - x;
     }
-    
+
     return x << shift;
 }
 
@@ -320,19 +320,19 @@ fn binaryGCD(a: i32, b: i32) -> i32 {
 fn performModularExponentiation() -> i32 {
     let mut result_sum = 0;
     let mut base = 2;
-    
+
     while (base <= 10) {
         let mut exponent = 1;
         while (exponent <= 20) {
             let mut modulus = 97; // Use prime modulus
             let mod_result = modularPower(base, exponent, modulus);
             result_sum = (result_sum + mod_result) % 10000;
-            
+
             exponent += 1;
         }
         base += 1;
     }
-    
+
     return result_sum;
 }
 
@@ -341,16 +341,16 @@ fn modularPower(base: i32, exponent: i32, modulus: i32) -> i32 {
     let mut result = 1;
     let mut current_base = base % modulus;
     let mut current_exp = exponent;
-    
+
     while (current_exp > 0) {
         if (current_exp % 2 == 1) {
             result = (result * current_base) % modulus;
         }
-        
+
         current_exp >>= 1;
         current_base = (current_base * current_base) % modulus;
     }
-    
+
     return result;
 }
 
@@ -358,12 +358,12 @@ fn modularPower(base: i32, exponent: i32, modulus: i32) -> i32 {
 fn calculateTotientSum(n: i32) -> i32 {
     let mut totient_sum = 0;
     let mut i = 1;
-    
+
     while (i <= n) {
         totient_sum += eulerTotient(i);
         i += 1;
     }
-    
+
     return totient_sum % 10000;
 }
 
@@ -372,7 +372,7 @@ fn eulerTotient(n: i32) -> i32 {
     let mut result = n;
     let mut num = n;
     let mut p = 2;
-    
+
     // Check for factor 2
     if (num % 2 == 0) {
         while (num % 2 == 0) {
@@ -380,7 +380,7 @@ fn eulerTotient(n: i32) -> i32 {
         }
         result -= result / 2;
     }
-    
+
     // Check for odd factors
     p = 3;
     while (p * p <= num) {
@@ -392,12 +392,12 @@ fn eulerTotient(n: i32) -> i32 {
         }
         p += 2;
     }
-    
+
     // If num is still greater than 1, then it's a prime
     if (num > 1) {
         result -= result / num;
     }
-    
+
     return result;
 }
 
@@ -405,14 +405,14 @@ fn eulerTotient(n: i32) -> i32 {
 fn findPerfectNumbers(limit: i32) -> i32 {
     let mut perfect_count = 0;
     let mut num = 6; // First perfect number
-    
+
     while (num <= limit) {
         if (isPerfectNumber(num) == 1) {
             perfect_count += 1;
         }
         num += 1;
     }
-    
+
     return perfect_count;
 }
 
@@ -420,7 +420,7 @@ fn findPerfectNumbers(limit: i32) -> i32 {
 fn isPerfectNumber(n: i32) -> i32 {
     let mut divisor_sum = 1; // 1 is always a proper divisor
     let mut i = 2;
-    
+
     while (i * i <= n) {
         if (n % i == 0) {
             divisor_sum += i;
@@ -430,28 +430,28 @@ fn isPerfectNumber(n: i32) -> i32 {
         }
         i += 1;
     }
-    
+
     return (divisor_sum == n) as i32;
 }
 
 // Test 3: Linear Algebra Operations with Integer Arithmetic
 // Tests optimization of matrix and vector operations
 fn performLinearAlgebraOperations() {
-    printInt(3005); // Start linear algebra
-    
+    printlnInt(3005); // Start linear algebra
+
     // Matrix operations
     let matrix_result = performMatrixCalculations();
-    printInt(matrix_result);
-    
+    printlnInt(matrix_result);
+
     // Vector operations
     let vector_result = performVectorCalculations();
-    printInt(vector_result);
-    
+    printlnInt(vector_result);
+
     // System of linear equations (using integer arithmetic)
     let equation_result = solveLinearSystem();
-    printInt(equation_result);
-    
-    printInt(3006); // End linear algebra
+    printlnInt(equation_result);
+
+    printlnInt(3006); // End linear algebra
 }
 
 // Comprehensive matrix calculations
@@ -460,32 +460,32 @@ fn performMatrixCalculations() -> i32 {
     let mut matrix_a: [i32; 625] = [0; 625]; // 25x25
     let mut matrix_b: [i32; 625] = [0; 625]; // 25x25
     let mut result_matrix: [i32; 625] = [0; 625]; // 25x25
-    
+
     // Initialize matrices
-    initializeMatrixA(matrix_a, size);
-    initializeMatrixB(matrix_b, size);
-    
+    initializeMatrixA(&mut matrix_a, size);
+    initializeMatrixB(&mut matrix_b, size);
+
     // Matrix multiplication
-    multiplyMatrices(matrix_a, matrix_b, result_matrix, size);
-    
+    multiplyMatrices(&matrix_a, &matrix_b, &mut result_matrix, size);
+
     // Calculate matrix trace
-    let trace = calculateMatrixTrace(result_matrix, size);
-    
+    let trace = calculateMatrixTrace(&result_matrix, size);
+
     // Calculate matrix determinant (using cofactor expansion for small submatrix)
     let mut small_matrix: [i32; 16] = [0; 16]; // 4x4 submatrix
-    extractSubmatrix(result_matrix, small_matrix, size, 4);
+    extractSubmatrix(&result_matrix, &mut small_matrix, size, 4);
     let determinant = calculateDeterminant4x4(small_matrix);
-    
+
     return (trace + determinant) % 10000;
 }
 
 // Initialize matrix A with specific pattern
-fn initializeMatrixA(matrix: [i32; 625], size: i32) {
+fn initializeMatrixA(matrix: &mut [i32; 625], size: usize) {
     let mut i = 0;
     while (i < size) {
         let mut j = 0;
         while (j < size) {
-            matrix[i * size + j] = (i + j + 1) % 10;
+            matrix[i * size + j] = (i + j + 1) as i32 % 10;
             j += 1;
         }
         i += 1;
@@ -493,12 +493,12 @@ fn initializeMatrixA(matrix: [i32; 625], size: i32) {
 }
 
 // Initialize matrix B with different pattern
-fn initializeMatrixB(matrix: [i32; 625], size: i32) {
+fn initializeMatrixB(matrix: &mut [i32; 625], size: usize) {
     let mut i = 0;
     while (i < size) {
         let mut j = 0;
         while (j < size) {
-            matrix[i * size + j] = (i * j + 1) % 10;
+            matrix[i * size + j] = (i * j + 1) as i32 % 10;
             j += 1;
         }
         i += 1;
@@ -506,7 +506,7 @@ fn initializeMatrixB(matrix: [i32; 625], size: i32) {
 }
 
 // Matrix multiplication optimized for cache locality
-fn multiplyMatrices(a: [i32; 625], b: [i32; 625], result: [i32; 625], size: i32) {
+fn multiplyMatrices(a: &[i32; 625], b: &[i32; 625], result: &mut [i32; 625], size: usize) {
     // Initialize result matrix
     let mut i = 0;
     while (i < size) {
@@ -517,11 +517,11 @@ fn multiplyMatrices(a: [i32; 625], b: [i32; 625], result: [i32; 625], size: i32)
         }
         i += 1;
     }
-    
+
     // Blocked matrix multiplication for better cache performance
     let block_size = 5;
     let mut i_block = 0;
-    
+
     while (i_block < size) {
         let mut j_block = 0;
         while (j_block < size) {
@@ -529,25 +529,25 @@ fn multiplyMatrices(a: [i32; 625], b: [i32; 625], result: [i32; 625], size: i32)
             while (k_block < size) {
                 // Process block
                 i = i_block;
-                let i_end = i_block + block_size;
+                let mut i_end = i_block + block_size;
                 if (i_end > size) {
                     i_end = size;
                 }
-                
+
                 while (i < i_end) {
                     let mut j = j_block;
-                    let j_end = j_block + block_size;
+                    let mut j_end = j_block + block_size;
                     if (j_end > size) {
                         j_end = size;
                     }
-                    
+
                     while (j < j_end) {
                         let mut k = k_block;
-                        let k_end = k_block + block_size;
+                        let mut k_end = k_block + block_size;
                         if (k_end > size) {
                             k_end = size;
                         }
-                        
+
                         while (k < k_end) {
                             result[i * size + j] += a[i * size + k] * b[k * size + j];
                             k += 1;
@@ -565,20 +565,25 @@ fn multiplyMatrices(a: [i32; 625], b: [i32; 625], result: [i32; 625], size: i32)
 }
 
 // Calculate matrix trace (sum of diagonal elements)
-fn calculateMatrixTrace(matrix: [i32; 625], size: i32) -> i32 {
+fn calculateMatrixTrace(matrix: &[i32; 625], size: usize) -> i32 {
     let mut trace = 0;
     let mut i = 0;
-    
+
     while (i < size) {
         trace += matrix[i * size + i];
         i += 1;
     }
-    
+
     return trace;
 }
 
 // Extract submatrix for determinant calculation
-fn extractSubmatrix(source: [i32; 625], dest: [i32; 16], source_size: i32, dest_size: i32) {
+fn extractSubmatrix(
+    source: &[i32; 625],
+    dest: &mut [i32; 16],
+    source_size: usize,
+    dest_size: usize,
+) {
     let mut i = 0;
     while (i < dest_size) {
         let mut j = 0;
@@ -593,12 +598,12 @@ fn extractSubmatrix(source: [i32; 625], dest: [i32; 16], source_size: i32, dest_
 // Calculate determinant of 4x4 matrix using cofactor expansion
 fn calculateDeterminant4x4(matrix: [i32; 16]) -> i32 {
     let mut determinant = 0;
-    
+
     // First row expansion
     let mut col = 0;
     while (col < 4) {
         let mut minor: [i32; 9] = [0; 9]; // 3x3 minor
-        
+
         // Create 3x3 minor matrix
         let mut minor_i = 0;
         let mut i = 1; // Skip first row
@@ -615,20 +620,20 @@ fn calculateDeterminant4x4(matrix: [i32; 16]) -> i32 {
             minor_i += 1;
             i += 1;
         }
-        
+
         // Calculate 3x3 determinant
         let minor_det = calculateDeterminant3x3(minor);
-        
+
         // Add to total with appropriate sign
         if (col % 2 == 0) {
             determinant += matrix[col] * minor_det;
         } else {
             determinant -= matrix[col] * minor_det;
         }
-        
+
         col += 1;
     }
-    
+
     return determinant;
 }
 
@@ -637,7 +642,7 @@ fn calculateDeterminant3x3(matrix: [i32; 9]) -> i32 {
     let a = matrix[0] * (matrix[4] * matrix[8] - matrix[5] * matrix[7]);
     let b = matrix[1] * (matrix[3] * matrix[8] - matrix[5] * matrix[6]);
     let c = matrix[2] * (matrix[3] * matrix[7] - matrix[4] * matrix[6]);
-    
+
     return a - b + c;
 }
 
@@ -647,51 +652,51 @@ fn performVectorCalculations() -> i32 {
     let mut vector_a: [i32; 100] = [0; 100];
     let mut vector_b: [i32; 100] = [0; 100];
     let mut result_vector: [i32; 100] = [0; 100];
-    
+
     // Initialize vectors
-    initializeVectors(vector_a, vector_b, size);
-    
+    initializeVectors(&mut vector_a, &mut vector_b, size);
+
     // Vector dot product
-    let dot_product = vectorDotProduct(vector_a, vector_b, size);
-    
+    let dot_product = vectorDotProduct(&vector_a, &vector_b, size);
+
     // Vector addition
-    vectorAddition(vector_a, vector_b, result_vector, size);
-    
+    vectorAddition(&vector_a, &vector_b, &mut result_vector, size);
+
     // Vector magnitude calculation
     let magnitude_a = vectorMagnitude(vector_a, size);
     let magnitude_b = vectorMagnitude(vector_b, size);
-    
+
     // Vector scalar multiplication
-    vectorScalarMultiply(result_vector, 3, size);
-    
+    vectorScalarMultiply(&mut result_vector, 3, size);
+
     return (dot_product + magnitude_a + magnitude_b) % 10000;
 }
 
 // Initialize vectors with patterns
-fn initializeVectors(vec_a: [i32; 100], vec_b: [i32; 100], size: i32) {
+fn initializeVectors(vec_a: &mut [i32; 100], vec_b: &mut [i32; 100], size: usize) {
     let mut i = 0;
     while (i < size) {
-        vec_a[i] = (i + 1) % 20;
-        vec_b[i] = (i * 2 + 3) % 15;
+        vec_a[i] = (i + 1) as i32 % 20;
+        vec_b[i] = (i * 2 + 3) as i32 % 15;
         i += 1;
     }
 }
 
 // Vector dot product
-fn vectorDotProduct(vec_a: [i32; 100], vec_b: [i32; 100], size: i32) -> i32 {
+fn vectorDotProduct(vec_a: &[i32; 100], vec_b: &[i32; 100], size: usize) -> i32 {
     let mut dot_product = 0;
     let mut i = 0;
-    
+
     while (i < size) {
         dot_product += vec_a[i] * vec_b[i];
         i += 1;
     }
-    
+
     return dot_product % 10000;
 }
 
 // Vector addition
-fn vectorAddition(vec_a: [i32; 100], vec_b: [i32; 100], result: [i32; 100], size: i32) {
+fn vectorAddition(vec_a: &[i32; 100], vec_b: &[i32; 100], result: &mut [i32; 100], size: usize) {
     let mut i = 0;
     while (i < size) {
         result[i] = vec_a[i] + vec_b[i];
@@ -700,15 +705,15 @@ fn vectorAddition(vec_a: [i32; 100], vec_b: [i32; 100], result: [i32; 100], size
 }
 
 // Vector magnitude (using integer approximation)
-fn vectorMagnitude(vec: [i32; 100], size: i32) -> i32 {
+fn vectorMagnitude(vec: [i32; 100], size: usize) -> i32 {
     let mut sum_of_squares = 0;
     let mut i = 0;
-    
+
     while (i < size) {
         sum_of_squares += vec[i] * vec[i];
         i += 1;
     }
-    
+
     // Integer square root approximation
     return integerSquareRoot(sum_of_squares);
 }
@@ -718,20 +723,20 @@ fn integerSquareRoot(n: i32) -> i32 {
     if (n == 0) {
         return 0;
     }
-    
+
     let mut x = n;
     let mut prev_x = 0;
-    
+
     while (x != prev_x) {
         prev_x = x;
         x = (x + n / x) / 2;
     }
-    
+
     return x;
 }
 
 // Vector scalar multiplication
-fn vectorScalarMultiply(vec: [i32; 100], scalar: i32, size: i32) {
+fn vectorScalarMultiply(vec: &mut [i32; 100], scalar: i32, size: usize) {
     let mut i = 0;
     while (i < size) {
         vec[i] *= scalar;
@@ -743,41 +748,41 @@ fn vectorScalarMultiply(vec: [i32; 100], scalar: i32, size: i32) {
 fn solveLinearSystem() -> i32 {
     let size = 5;
     let mut augmented_matrix: [i32; 30] = [0; 30]; // 5x6 augmented matrix
-    
+
     // Initialize system of equations
-    initializeLinearSystem(augmented_matrix, size);
-    
+    initializeLinearSystem(&mut augmented_matrix, size);
+
     // Gaussian elimination
-    gaussianElimination(augmented_matrix, size);
-    
+    gaussianElimination(&mut augmented_matrix, size);
+
     // Back substitution and sum of solutions
     let solution_sum = backSubstitution(augmented_matrix, size);
-    
+
     return solution_sum % 10000;
 }
 
 // Initialize linear system Ax = b
-fn initializeLinearSystem(matrix: [i32; 30], size: i32) {
+fn initializeLinearSystem(matrix: &mut [i32; 30], size: usize) {
     let mut i = 0;
     while (i < size) {
         let mut j = 0;
         while (j < size) {
             // Create diagonally dominant matrix for numerical stability
             if (i == j) {
-                matrix[i * (size + 1) + j] = 10 + i;
+                matrix[i * (size + 1) + j] = 10 + i as i32;
             } else {
-                matrix[i * (size + 1) + j] = (i + j + 1) % 5;
+                matrix[i * (size + 1) + j] = (i + j + 1) as i32 % 5;
             }
             j += 1;
         }
         // Right-hand side
-        matrix[i * (size + 1) + size] = (i + 1) * 10;
+        matrix[i * (size + 1) + size] = (i + 1) as i32 * 10;
         i += 1;
     }
 }
 
 // Gaussian elimination with partial pivoting
-fn gaussianElimination(matrix: [i32; 30], size: i32) {
+fn gaussianElimination(matrix: &mut [i32; 30], size: usize) {
     let mut k = 0;
     while (k < size) {
         // Find pivot
@@ -789,12 +794,12 @@ fn gaussianElimination(matrix: [i32; 30], size: i32) {
             }
             i += 1;
         }
-        
+
         // Swap rows if needed
         if (max_row != k) {
             swapRows(matrix, k, max_row, size);
         }
-        
+
         // Eliminate column
         i = k + 1;
         while (i < size) {
@@ -808,13 +813,13 @@ fn gaussianElimination(matrix: [i32; 30], size: i32) {
             }
             i += 1;
         }
-        
+
         k += 1;
     }
 }
 
 // Swap two rows in the matrix
-fn swapRows(matrix: [i32; 30], row1: i32, row2: i32, size: i32) {
+fn swapRows(matrix: &mut [i32; 30], row1: usize, row2: usize, size: usize) {
     let mut j = 0;
     while (j <= size) {
         let temp = matrix[row1 * (size + 1) + j];
@@ -825,29 +830,30 @@ fn swapRows(matrix: [i32; 30], row1: i32, row2: i32, size: i32) {
 }
 
 // Back substitution to find solutions
-fn backSubstitution(matrix: [i32; 30], size: i32) -> i32 {
+fn backSubstitution(matrix: [i32; 30], size: usize) -> i32 {
     let mut solution_sum = 0;
     let mut solutions: [i32; 5] = [0; 5];
-    
+
     // Back substitution
-    let mut i = size - 1;
+    let mut i = (size - 1) as i32;
     while (i >= 0) {
+        i -= 1;
+        let i = (i + 1) as usize;
         solutions[i] = matrix[i * (size + 1) + size];
-        
+
         let mut j = i + 1;
         while (j < size) {
             solutions[i] -= matrix[i * (size + 1) + j] * solutions[j];
             j += 1;
         }
-        
+
         if (matrix[i * (size + 1) + i] != 0) {
             solutions[i] /= matrix[i * (size + 1) + i];
         }
-        
+
         solution_sum += solutions[i];
-        i -= 1;
     }
-    
+
     return solution_sum;
 }
 
@@ -863,58 +869,58 @@ fn abs(x: i32) -> i32 {
 // Test 4: Combinatorial Algorithms
 // Tests optimization of factorial and combinatorial calculations
 fn performCombinatorialAlgorithms() {
-    printInt(3007); // Start combinatorial algorithms
-    
+    printlnInt(3007); // Start combinatorial algorithms
+
     // Pascal's triangle calculation
     let pascal_sum = calculatePascalTriangle(20);
-    printInt(pascal_sum);
-    
+    printlnInt(pascal_sum);
+
     // Permutation calculations
     let permutation_sum = calculatePermutations(15);
-    printInt(permutation_sum);
-    
+    printlnInt(permutation_sum);
+
     // Combination calculations
     let combination_sum = calculateCombinations(20);
-    printInt(combination_sum);
-    
+    printlnInt(combination_sum);
+
     // Catalan numbers
     let catalan_sum = calculateCatalanNumbers(15);
-    printInt(catalan_sum);
-    
-    printInt(3008); // End combinatorial algorithms
+    printlnInt(catalan_sum);
+
+    printlnInt(3008); // End combinatorial algorithms
 }
 
 // Calculate Pascal's triangle and sum elements
-fn calculatePascalTriangle(rows: i32) -> i32 {
-    let mut triangle: [i32; 210] = [0; 210]; // Triangle with 20 rows max
+fn calculatePascalTriangle(rows: usize) -> i32 {
+    let mut triangle: [i32; 410] = [0; 410]; // Triangle with 20 rows max
     let mut total_sum = 0;
-    
+
     // First row
     triangle[0] = 1;
     total_sum += 1;
-    
+
     let mut row = 1;
     while (row < rows) {
         // First element of each row is 1
         triangle[row * rows] = 1;
         total_sum += 1;
-        
+
         // Calculate middle elements
         let mut col = 1;
         while (col < row) {
-            triangle[row * rows + col] = 
+            triangle[row * rows + col] =
                 triangle[(row - 1) * rows + col - 1] + triangle[(row - 1) * rows + col];
             total_sum += triangle[row * rows + col];
             col += 1;
         }
-        
+
         // Last element of each row is 1
         triangle[row * rows + row] = 1;
         total_sum += 1;
-        
+
         row += 1;
     }
-    
+
     return total_sum % 10000;
 }
 
@@ -922,7 +928,7 @@ fn calculatePascalTriangle(rows: i32) -> i32 {
 fn calculatePermutations(max_n: i32) -> i32 {
     let mut permutation_sum = 0;
     let mut n = 1;
-    
+
     while (n <= max_n) {
         let mut r = 1;
         while (r <= n) {
@@ -932,7 +938,7 @@ fn calculatePermutations(max_n: i32) -> i32 {
         }
         n += 1;
     }
-    
+
     return permutation_sum % 10000;
 }
 
@@ -940,12 +946,12 @@ fn calculatePermutations(max_n: i32) -> i32 {
 fn permutation(n: i32, r: i32) -> i32 {
     let mut result = 1;
     let mut i = n - r + 1;
-    
+
     while (i <= n) {
         result = (result * i) % 1000000; // Prevent overflow
         i += 1;
     }
-    
+
     return result;
 }
 
@@ -953,7 +959,7 @@ fn permutation(n: i32, r: i32) -> i32 {
 fn calculateCombinations(max_n: i32) -> i32 {
     let mut combination_sum = 0;
     let mut n = 1;
-    
+
     while (n <= max_n) {
         let mut r = 0;
         while (r <= n) {
@@ -963,7 +969,7 @@ fn calculateCombinations(max_n: i32) -> i32 {
         }
         n += 1;
     }
-    
+
     return combination_sum % 10000;
 }
 
@@ -972,25 +978,25 @@ fn combination(n: i32, r: i32) -> i32 {
     let actual_r = if (r > n - r) { n - r } else { r };
     let mut result = 1;
     let mut i = 0;
-    
+
     while (i < actual_r) {
         result = result * (n - i) / (i + 1);
         i += 1;
     }
-    
+
     return result % 1000000;
 }
 
 // Calculate Catalan numbers using dynamic programming
-fn calculateCatalanNumbers(count: i32) -> i32 {
+fn calculateCatalanNumbers(count: usize) -> i32 {
     let mut catalan: [i32; 15] = [0; 15];
     let mut catalan_sum = 0;
-    
+
     // Base cases
     catalan[0] = 1;
     catalan[1] = 1;
     catalan_sum = 2;
-    
+
     let mut i = 2;
     while (i < count) {
         catalan[i] = 0;
@@ -1002,64 +1008,64 @@ fn calculateCatalanNumbers(count: i32) -> i32 {
         catalan_sum = (catalan_sum + catalan[i]) % 1000000;
         i += 1;
     }
-    
+
     return catalan_sum % 10000;
 }
 
 // Test 5: Cryptographic Operations
 // Tests optimization of modular arithmetic and large number operations
 fn performCryptographicOperations() {
-    printInt(3009); // Start cryptographic operations
-    
+    printlnInt(3009); // Start cryptographic operations
+
     // RSA-style modular exponentiation
     let rsa_result = performRSAOperations();
-    printInt(rsa_result);
-    
+    printlnInt(rsa_result);
+
     // Modular inverse calculations
     let inverse_result = performModularInverse();
-    printInt(inverse_result);
-    
+    printlnInt(inverse_result);
+
     // Primality testing with Fermat's test
     let primality_result = performPrimalityTesting();
-    printInt(primality_result);
-    
+    printlnInt(primality_result);
+
     // Simple hash function implementations
     let hash_result = performHashOperations();
-    printInt(hash_result);
-    
-    printInt(3010); // End cryptographic operations
+    printlnInt(hash_result);
+
+    printlnInt(3010); // End cryptographic operations
 }
 
 // RSA-style operations with modular exponentiation
 fn performRSAOperations() -> i32 {
     let mut result_sum = 0;
-    
+
     // Simulate RSA encryption/decryption with small numbers
-    let p = 61;  // Small prime
-    let q = 53;  // Small prime
+    let p = 61; // Small prime
+    let q = 53; // Small prime
     let n = p * q; // Modulus
     let phi_n = (p - 1) * (q - 1); // Euler's totient
-    
+
     let e = 17; // Public exponent (must be coprime to phi_n)
     let d = modularInverse(e, phi_n); // Private exponent
-    
+
     // Encrypt and decrypt multiple messages
     let mut message = 2;
     while (message < 100) {
         // Encryption: ciphertext = message^e mod n
         let ciphertext = modularPower(message, e, n);
-        
+
         // Decryption: plaintext = ciphertext^d mod n
         let plaintext = modularPower(ciphertext, d, n);
-        
+
         // Verify encryption/decryption worked
         if (plaintext == message) {
             result_sum += message;
         }
-        
+
         message += 7; // Skip some values for performance
     }
-    
+
     return result_sum % 10000;
 }
 
@@ -1069,24 +1075,24 @@ fn modularInverse(a: i32, m: i32) -> i32 {
     let mut r = m;
     let mut old_s = 1;
     let mut s = 0;
-    
+
     while (r != 0) {
         let quotient = old_r / r;
-        
+
         let temp_r = r;
         r = old_r - quotient * r;
         old_r = temp_r;
-        
+
         let temp_s = s;
         s = old_s - quotient * s;
         old_s = temp_s;
     }
-    
+
     // Make sure result is positive
     if (old_s < 0) {
         old_s += m;
     }
-    
+
     return old_s;
 }
 
@@ -1094,16 +1100,17 @@ fn modularInverse(a: i32, m: i32) -> i32 {
 fn performModularInverse() -> i32 {
     let mut inverse_sum = 0;
     let modulus = 97; // Prime modulus
-    
+
     let mut a = 2;
     while (a < modulus) {
-        if (euclideanGCD(a, modulus) == 1) { // Check if coprime
+        if (euclideanGCD(a, modulus) == 1) {
+            // Check if coprime
             let inverse = modularInverse(a, modulus);
             inverse_sum = (inverse_sum + inverse) % 10000;
         }
         a += 1;
     }
-    
+
     return inverse_sum;
 }
 
@@ -1111,14 +1118,15 @@ fn performModularInverse() -> i32 {
 fn performPrimalityTesting() -> i32 {
     let mut probable_primes = 0;
     let mut num = 3;
-    
+
     while (num < 500) {
-        if (fermatPrimalityTest(num, 5) == 1) { // Test with 5 iterations
+        if (fermatPrimalityTest(num, 5) == 1) {
+            // Test with 5 iterations
             probable_primes += 1;
         }
         num += 2; // Check only odd numbers
     }
-    
+
     return probable_primes;
 }
 
@@ -1133,26 +1141,23 @@ fn fermatPrimalityTest(n: i32, iterations: i32) -> i32 {
     if (n % 2 == 0) {
         return 0;
     }
-    
+
     let mut seed = n; // Use n as seed for pseudorandom number generation
     let mut i = 0;
-    
+
     while (i < iterations) {
         // Generate pseudorandom base a
-        seed = (seed * 1664525 + 1013904223) % 2147483647;
-        if (seed < 0) {
-            seed = -seed;
-        }
+        seed = updateSeed(seed);
         let a = 2 + (seed % (n - 3)); // Base in range [2, n-1]
-        
+
         // Check if a^(n-1) ≡ 1 (mod n)
         if (modularPower(a, n - 1, n) != 1) {
             return 0; // Composite
         }
-        
+
         i += 1;
     }
-    
+
     return 1; // Probably prime
 }
 
@@ -1161,85 +1166,90 @@ fn performHashOperations() -> i32 {
     let input_size = 100;
     let mut input_data: [i32; 100] = [0; 100];
     let mut hash_sum = 0;
-    
+
     // Initialize input data
-    initializeHashInput(input_data, input_size);
-    
+    initializeHashInput(&mut input_data, input_size);
+
     // Test multiple hash functions
     let djb2_hash = djb2Hash(input_data, input_size);
     let sdbm_hash = sdbmHash(input_data, input_size);
     let fnv_hash = fnvHash(input_data, input_size);
-    
+
     hash_sum = (djb2_hash + sdbm_hash + fnv_hash) % 10000;
-    
+
     // Test hash distribution
     let distribution_score = testHashDistribution(input_data, input_size);
     hash_sum = (hash_sum + distribution_score) % 10000;
-    
+
     return hash_sum;
 }
 
+fn updateSeed(mut seed: i32) -> i32 {
+    seed = (seed * 1103 + 4721) % 1048583;
+    if (seed < 0) {
+        seed = -seed;
+    }
+    seed
+}
+
 // Initialize input data for hashing
-fn initializeHashInput(data: [i32; 100], size: i32) {
+fn initializeHashInput(data: &mut [i32; 100], size: usize) {
     let mut seed = 42;
     let mut i = 0;
-    
+
     while (i < size) {
-        seed = (seed * 1664525 + 1013904223) % 2147483647;
-        if (seed < 0) {
-            seed = -seed;
-        }
+        seed = updateSeed(seed);
         data[i] = seed % 256; // Byte values
         i += 1;
     }
 }
 
 // DJB2 hash function
-fn djb2Hash(data: [i32; 100], size: i32) -> i32 {
+fn djb2Hash(data: [i32; 100], size: usize) -> i32 {
     let mut hash = 5381;
     let mut i = 0;
-    
+
     while (i < size) {
-        hash = ((hash << 5) + hash) + data[i]; // hash * 33 + data[i]
+        hash = ((hash << 5) % 65536 + hash) % 65536 + data[i]; // hash * 33 + data[i]
         i += 1;
     }
-    
+
     return hash % 65536; // 16-bit hash
 }
 
 // SDBM hash function
-fn sdbmHash(data: [i32; 100], size: i32) -> i32 {
+fn sdbmHash(data: [i32; 100], size: usize) -> i32 {
     let mut hash = 0;
     let mut i = 0;
-    
+
     while (i < size) {
-        hash = data[i] + (hash << 6) + (hash << 16) - hash;
+        hash = data[i] + (hash << 6) % 65536 + (hash << 16) % 65536 - hash;
         i += 1;
     }
-    
+
     return hash % 65536; // 16-bit hash
 }
 
 // FNV-1a hash function (simplified)
-fn fnvHash(data: [i32; 100], size: i32) -> i32 {
+fn fnvHash(data: [i32; 100], size: usize) -> i32 {
     let fnv_prime = 16777619;
-    let mut hash = 2166136261; // FNV offset basis
+    let mut hash = 2166136261u32; // FNV offset basis
     let mut i = 0;
-    
+
     while (i < size) {
-        hash ^= data[i];
-        hash *= fnv_prime;
+        hash ^= data[i] as u32;
+        hash = (hash % 65536) * (fnv_prime % 65536) % 65536;
         i += 1;
     }
-    
-    return hash % 65536; // 16-bit hash
+
+    return hash as i32 % 65536; // 16-bit hash
 }
 
 // Test hash distribution by computing hashes for similar inputs
-fn testHashDistribution(base_data: [i32; 100], size: i32) -> i32 {
+fn testHashDistribution(base_data: [i32; 100], size: usize) -> i32 {
     let mut distribution_score = 0;
     let mut modified_data: [i32; 100] = [0; 100];
-    
+
     let mut modification = 1;
     while (modification <= 10) {
         // Copy base data and modify slightly
@@ -1248,16 +1258,16 @@ fn testHashDistribution(base_data: [i32; 100], size: i32) -> i32 {
             modified_data[i] = base_data[i];
             i += 1;
         }
-        
+
         // Modify one element
-        modified_data[modification * 7 % size] += modification;
-        
+        modified_data[modification * 7 % size] += modification as i32;
+
         // Calculate hash and accumulate
         let hash = djb2Hash(modified_data, size);
         distribution_score = (distribution_score + hash) % 10000;
-        
+
         modification += 1;
     }
-    
+
     return distribution_score;
 }

@@ -1,3 +1,4 @@
+
 /*
 Test Package: Semantic-2
 Test Target: comprehensive
@@ -26,68 +27,68 @@ Jump table optimization for switch-like constructs
 
 fn main() {
     // Performance test marker - start
-    printInt(2000);
-    
+    printlnInt(2000);
+
     // Test 1: Complex nested control structures
     // Tests branch prediction optimization and control flow analysis
     performComplexControlFlowTest();
-    
+
     // Test 2: Advanced graph algorithms
     // Tests pointer chasing optimization and memory locality
     performGraphAlgorithms();
-    
+
     // Test 3: Dynamic programming problems
     // Tests memoization optimization and loop nest optimization
     performDynamicProgramming();
-    
+
     // Test 4: State machine simulation
     // Tests jump table optimization and branch prediction
     performStateMachineSimulation();
-    
+
     // Test 5: Complex search and traversal algorithms
     // Tests function call optimization and loop unrolling
     performSearchAlgorithms();
-    
+
     // Performance test marker - end
-    printInt(2999);
+    printlnInt(2999);
 }
 
 // Test 1: Complex Control Flow Patterns
 // Tests compiler's ability to optimize complex branching and nested control structures
 fn performComplexControlFlowTest() {
-    printInt(2001); // Start control flow test
-    
+    printlnInt(2001); // Start control flow test
+
     // Test nested loops with complex conditions
-    let result1 = complexNestedLoops(100);
-    printInt(result1);
-    
+    let result1: i32 = complexNestedLoops(100);
+    printlnInt(result1);
+
     // Test multiple branching patterns
-    let result2 = multipleBranchingPatterns(1000);
-    printInt(result2);
-    
+    let result2: i32 = multipleBranchingPatterns(1000);
+    printlnInt(result2);
+
     // Test early exit patterns
-    let result3 = earlyExitPatterns(500);
-    printInt(result3);
-    
+    let result3: i32 = earlyExitPatterns(500);
+    printlnInt(result3);
+
     // Test switch-like behavior simulation
-    let result4 = simulateSwitchBehavior(200);
-    printInt(result4);
-    
-    printInt(2002); // End control flow test
+    let result4: i32 = simulateSwitchBehavior(200);
+    printlnInt(result4);
+
+    printlnInt(2002); // End control flow test
 }
 
 // Complex nested loops with multiple break/continue conditions
 fn complexNestedLoops(limit: i32) -> i32 {
-    let mut total = 0;
-    let mut i = 0;
-    
+    let mut total: i32 = 0;
+    let mut i: i32 = 0;
+
     while (i < limit) {
-        let mut j = 0;
-        let mut inner_sum = 0;
-        
+        let mut j: i32 = 0;
+        let mut inner_sum: i32 = 0;
+
         while (j < limit) {
-            let mut k = 0;
-            
+            let mut k: i32 = 0;
+
             // Triple nested loop with complex conditions
             while (k < 50) {
                 // Multiple branching conditions
@@ -107,7 +108,7 @@ fn complexNestedLoops(limit: i32) -> i32 {
                         inner_sum = 0;
                     }
                 }
-                
+
                 // Complex conditional increment
                 if (k % 2 == 0) {
                     k += 1;
@@ -115,22 +116,22 @@ fn complexNestedLoops(limit: i32) -> i32 {
                     k += 3;
                 }
             }
-            
+
             total += inner_sum;
-            
+
             // Conditional increment for j
             if (j % 3 == 0) {
                 j += 2;
             } else {
                 j += 1;
             }
-            
+
             // Early exit condition for middle loop
             if (total > 50000) {
                 break;
             }
         }
-        
+
         // Complex increment pattern for outer loop
         if (i % 10 == 0) {
             i += 5;
@@ -139,24 +140,24 @@ fn complexNestedLoops(limit: i32) -> i32 {
         } else {
             i += 1;
         }
-        
+
         // Global early exit condition
         if (total > 100000) {
             break;
         }
     }
-    
-    return total % 10000;
+
+    total % 10000
 }
 
 // Multiple branching patterns to test branch prediction
 fn multipleBranchingPatterns(iterations: i32) -> i32 {
-    let mut result = 0;
-    let mut i = 0;
-    
+    let mut result: i32 = 0;
+    let mut i: i32 = 0;
+
     while (i < iterations) {
-        let value = (i * 17 + 23) % 100;
-        
+        let value: i32 = (i * 17 + 23) % 100;
+
         // Complex branching tree
         if (value < 10) {
             if (value < 5) {
@@ -187,8 +188,8 @@ fn multipleBranchingPatterns(iterations: i32) -> i32 {
             }
         } else if (value < 80) {
             // Loop within branch
-            let mut temp = 0;
-            let mut j = 0;
+            let mut temp: i32 = 0;
+            let mut j: i32 = 0;
             while (j < value % 10) {
                 temp += j * j;
                 j += 1;
@@ -198,74 +199,74 @@ fn multipleBranchingPatterns(iterations: i32) -> i32 {
             // Complex arithmetic operations
             result += ((value * value) % 17) + ((value + 13) % 7);
         }
-        
+
         i += 1;
     }
-    
-    return result % 10000;
+
+    result % 10000
 }
 
 // Helper function for complex calculation
 fn complexCalculation(value: i32) -> i32 {
-    let mut temp = value;
-    let mut result = 0;
-    
+    let mut temp: i32 = value;
+    let mut result: i32 = 0;
+
     while (temp > 0) {
         result += temp % 10;
         temp /= 10;
     }
-    
-    return result * result;
+
+    result * result
 }
 
 // Helper function for simple calculation
 fn simpleCalculation(value: i32) -> i32 {
-    return value * 2 + 1;
+    value * 2 + 1
 }
 
 // Check if number has special properties
 fn isSpecialNumber(value: i32) -> i32 {
-    return (value % 7 == 0 || value % 11 == 0) as i32;
+    (value % 7 == 0 || value % 11 == 0) as i32
 }
 
 // Process special numbers
 fn processSpecialNumber(value: i32) -> i32 {
-    let mut result = value;
-    
+    let mut result: i32 = value;
+
     if (value % 7 == 0) {
         result *= 7;
     }
-    
+
     if (value % 11 == 0) {
         result *= 11;
     }
-    
-    return result % 1000;
+
+    result % 1000
 }
 
 // Process normal numbers
 fn processNormalNumber(value: i32) -> i32 {
-    return (value * 3 + 7) % 100;
+    (value * 3 + 7) % 100
 }
 
 // Early exit patterns testing
 fn earlyExitPatterns(limit: i32) -> i32 {
-    let mut found_count = 0;
-    let mut i = 0;
-    
+    let mut found_count: i32 = 0;
+    let mut i: i32 = 0;
+
     while (i < limit) {
-        let mut j = 0;
-        let mut found_in_row = 0;
-        
+        let mut j: i32 = 0;
+        let mut found_in_row: i32 = 0;
+
         // Search pattern with early exits
         while (j < limit) {
-            let value = (i * 31 + j * 17) % 100;
-            
+            let value: i32 = (i * 31 + j * 17) % 100;
+
             // Multiple early exit conditions
             if (value == 42) {
                 found_in_row += 1;
                 found_count += 1;
-                
+
                 // Early exit if found too many
                 if (found_count > 20) {
                     return found_count;
@@ -278,34 +279,34 @@ fn earlyExitPatterns(limit: i32) -> i32 {
                 j += 10;
                 continue;
             }
-            
+
             // Complex condition for early exit
             if (found_in_row > 3 && value % 13 == 0) {
                 break;
             }
-            
+
             j += 1;
         }
-        
+
         // Early exit from outer loop
         if (found_in_row > 5) {
             return found_count;
         }
-        
+
         i += 1;
     }
-    
-    return found_count;
+
+    found_count
 }
 
 // Simulate switch-like behavior using multiple if-else
 fn simulateSwitchBehavior(iterations: i32) -> i32 {
-    let mut total = 0;
-    let mut i = 0;
-    
+    let mut total: i32 = 0;
+    let mut i: i32 = 0;
+
     while (i < iterations) {
-        let case_value = i % 16; // 16 different cases
-        
+        let case_value: i32 = i % 16; // 16 different cases
+
         // Simulate switch statement with 16 cases
         if (case_value == 0) {
             total += processCase0(i);
@@ -340,86 +341,115 @@ fn simulateSwitchBehavior(iterations: i32) -> i32 {
         } else {
             total += processCase15(i);
         }
-        
+
         i += 1;
     }
-    
-    return total % 10000;
+
+    total % 10000
 }
 
 // Individual case processing functions for switch simulation
-fn processCase0(value: i32) -> i32 { return value * 2; }
-fn processCase1(value: i32) -> i32 { return value * 3 + 1; }
-fn processCase2(value: i32) -> i32 { return value * value % 100; }
-fn processCase3(value: i32) -> i32 { return (value + 5) * 2; }
-fn processCase4(value: i32) -> i32 { return value / 2 + 10; }
-fn processCase5(value: i32) -> i32 { return value % 7 + value % 11; }
-fn processCase6(value: i32) -> i32 { return value * 7 % 23; }
-fn processCase7(value: i32) -> i32 { return (value + 3) * (value + 7) % 50; }
-fn processCase8(value: i32) -> i32 { return value ^ 42; } // XOR operation
-fn processCase9(value: i32) -> i32 { return value * 13 % 17; }
-fn processCase10(value: i32) -> i32 { return value + value / 3; }
-fn processCase11(value: i32) -> i32 { return value * 19 % 31; }
-fn processCase12(value: i32) -> i32 { return (value * 2 + 1) % 25; }
-fn processCase13(value: i32) -> i32 { return value % 6 * value % 8; }
-fn processCase14(value: i32) -> i32 { return value + 47; }
-fn processCase15(value: i32) -> i32 { return value * 37 % 41; }
+fn processCase0(value: i32) -> i32 {
+    value * 2
+}
+fn processCase1(value: i32) -> i32 {
+    value * 3 + 1
+}
+fn processCase2(value: i32) -> i32 {
+    value * value % 100
+}
+fn processCase3(value: i32) -> i32 {
+    (value + 5) * 2
+}
+fn processCase4(value: i32) -> i32 {
+    value / 2 + 10
+}
+fn processCase5(value: i32) -> i32 {
+    value % 7 + value % 11
+}
+fn processCase6(value: i32) -> i32 {
+    value * 7 % 23
+}
+fn processCase7(value: i32) -> i32 {
+    (value + 3) * (value + 7) % 50
+}
+fn processCase8(value: i32) -> i32 {
+    value ^ 42
+} // XOR operation
+fn processCase9(value: i32) -> i32 {
+    value * 13 % 17
+}
+fn processCase10(value: i32) -> i32 {
+    value + value / 3
+}
+fn processCase11(value: i32) -> i32 {
+    value * 19 % 31
+}
+fn processCase12(value: i32) -> i32 {
+    (value * 2 + 1) % 25
+}
+fn processCase13(value: i32) -> i32 {
+    value % 6 * value % 8
+}
+fn processCase14(value: i32) -> i32 {
+    value + 47
+}
+fn processCase15(value: i32) -> i32 {
+    value * 37 % 41
+}
 
 // Test 2: Graph Algorithm Implementations
 // Tests optimization of pointer-intensive operations and irregular memory access
 fn performGraphAlgorithms() {
-    printInt(2003); // Start graph algorithms
-    
+    printlnInt(2003); // Start graph algorithms
+
     // Test graph traversal algorithms
-    let traversal_result = performGraphTraversal();
-    printInt(traversal_result);
-    
+    let traversal_result: i32 = performGraphTraversal();
+    printlnInt(traversal_result);
+
     // Test shortest path algorithms
-    let path_result = performShortestPath();
-    printInt(path_result);
-    
+    let path_result: i32 = performShortestPath();
+    printlnInt(path_result);
+
     // Test graph connectivity
-    let connectivity_result = performConnectivityTest();
-    printInt(connectivity_result);
-    
-    printInt(2004); // End graph algorithms
+    let connectivity_result: i32 = performConnectivityTest();
+    printlnInt(connectivity_result);
+
+    printlnInt(2004); // End graph algorithms
 }
 
 // Graph traversal using adjacency matrix representation
 fn performGraphTraversal() -> i32 {
-    let graph_size = 50;
+    let graph_size: usize = 50;
     let mut adjacency_matrix: [i32; 2500] = [0; 2500]; // 50x50 matrix
     let mut visited: [i32; 50] = [0; 50];
-    
+
     // Initialize random graph
-    initializeRandomGraph(adjacency_matrix, graph_size);
-    
+    initializeRandomGraph(&mut adjacency_matrix, graph_size);
+
     // Perform DFS traversal
-    let dfs_result = depthFirstSearch(adjacency_matrix, visited, graph_size, 0);
-    
+    let dfs_result: i32 = depthFirstSearch(&mut adjacency_matrix, &mut visited, graph_size, 0);
+
     // Reset visited array
-    resetArray(visited, graph_size);
-    
+    resetArray(&mut visited, graph_size);
+
     // Perform BFS traversal
-    let bfs_result = breadthFirstSearch(adjacency_matrix, visited, graph_size, 0);
-    
+    let bfs_result: i32 = breadthFirstSearch(&mut adjacency_matrix, &mut visited, graph_size, 0);
+
     return dfs_result + bfs_result;
 }
 
 // Initialize random graph with specific pattern
-fn initializeRandomGraph(matrix: [i32; 2500], size: i32) {
-    let mut seed = 12345;
-    let mut i = 0;
-    
+fn initializeRandomGraph(matrix: &mut [i32; 2500], size: usize) {
+    let mut seed: i32 = 12345;
+    let mut i: usize = 0;
+
     while (i < size) {
-        let mut j = 0;
+        let mut j: usize = 0;
         while (j < size) {
             if (i != j) {
-                seed = (seed * 1664525 + 1013904223) % 2147483647;
-                if (seed < 0) {
-                    seed = -seed;
-                }
-                
+                update(&mut seed);
+
                 // Create edge with 20% probability
                 if (seed % 100 < 20) {
                     matrix[i * size + j] = 1;
@@ -433,8 +463,8 @@ fn initializeRandomGraph(matrix: [i32; 2500], size: i32) {
 }
 
 // Reset array to all zeros
-fn resetArray(arr: [i32; 50], size: i32) {
-    let mut i = 0;
+fn resetArray(arr: &mut [i32; 50], size: usize) {
+    let mut i: usize = 0;
     while (i < size) {
         arr[i] = 0;
         i += 1;
@@ -442,26 +472,31 @@ fn resetArray(arr: [i32; 50], size: i32) {
 }
 
 // Depth-first search implementation
-fn depthFirstSearch(matrix: [i32; 2500], visited: [i32; 50], size: i32, start: i32) -> i32 {
-    let mut stack: [i32; 50] = [0; 50];
-    let mut stack_top = 0;
-    let mut visit_count = 0;
-    
+fn depthFirstSearch(
+    matrix: &mut [i32; 2500],
+    visited: &mut [i32; 50],
+    size: usize,
+    start: usize,
+) -> i32 {
+    let mut stack: [usize; 1000] = [0; 1000];
+    let mut stack_top: usize = 0;
+    let mut visit_count: i32 = 0;
+
     // Push start vertex
     stack[stack_top] = start;
     stack_top += 1;
-    
+
     while (stack_top > 0) {
         // Pop vertex
         stack_top -= 1;
-        let current = stack[stack_top];
-        
+        let current: usize = stack[stack_top];
+
         if (visited[current] == 0) {
             visited[current] = 1;
             visit_count += 1;
-            
+
             // Push all unvisited neighbors
-            let mut neighbor = 0;
+            let mut neighbor: usize = 0;
             while (neighbor < size) {
                 if (matrix[current * size + neighbor] == 1 && visited[neighbor] == 0) {
                     stack[stack_top] = neighbor;
@@ -471,30 +506,35 @@ fn depthFirstSearch(matrix: [i32; 2500], visited: [i32; 50], size: i32, start: i
             }
         }
     }
-    
-    return visit_count;
+
+    visit_count
 }
 
 // Breadth-first search implementation
-fn breadthFirstSearch(matrix: [i32; 2500], visited: [i32; 50], size: i32, start: i32) -> i32 {
-    let mut queue: [i32; 50] = [0; 50];
-    let mut queue_front = 0;
-    let mut queue_rear = 0;
-    let mut visit_count = 0;
-    
+fn breadthFirstSearch(
+    matrix: &mut [i32; 2500],
+    visited: &mut [i32; 50],
+    size: usize,
+    start: usize,
+) -> i32 {
+    let mut queue: [usize; 50] = [0; 50];
+    let mut queue_front: usize = 0;
+    let mut queue_rear: usize = 0;
+    let mut visit_count: i32 = 0;
+
     // Enqueue start vertex
     queue[queue_rear] = start;
     queue_rear += 1;
     visited[start] = 1;
     visit_count += 1;
-    
+
     while (queue_front < queue_rear) {
         // Dequeue vertex
-        let current = queue[queue_front];
+        let current: usize = queue[queue_front];
         queue_front += 1;
-        
+
         // Enqueue all unvisited neighbors
-        let mut neighbor = 0;
+        let mut neighbor: usize = 0;
         while (neighbor < size) {
             if (matrix[current * size + neighbor] == 1 && visited[neighbor] == 0) {
                 visited[neighbor] = 1;
@@ -505,26 +545,26 @@ fn breadthFirstSearch(matrix: [i32; 2500], visited: [i32; 50], size: i32, start:
             neighbor += 1;
         }
     }
-    
-    return visit_count;
+
+    visit_count
 }
 
 // Shortest path algorithms using Floyd-Warshall
 fn performShortestPath() -> i32 {
-    let graph_size = 30;
-    let mut distance_matrix: [i32; 900] = [0; 900]; // 30x30 matrix
-    
+    let graph_size: usize = 50;
+    let mut distance_matrix: [i32; 2500] = [0; 2500]; // 50x50 matrix
+
     // Initialize distance matrix
-    initializeDistanceMatrix(distance_matrix, graph_size);
-    
+    initializeDistanceMatrix(&mut distance_matrix, graph_size);
+
     // Floyd-Warshall algorithm
-    floydWarshall(distance_matrix, graph_size);
-    
+    floydWarshall(&mut distance_matrix, graph_size);
+
     // Calculate sum of all shortest distances
-    let mut total_distance = 0;
-    let mut i = 0;
+    let mut total_distance: i32 = 0;
+    let mut i: usize = 0;
     while (i < graph_size) {
-        let mut j = 0;
+        let mut j: usize = 0;
         while (j < graph_size) {
             if (i != j && distance_matrix[i * graph_size + j] < 1000000) {
                 total_distance += distance_matrix[i * graph_size + j];
@@ -533,27 +573,24 @@ fn performShortestPath() -> i32 {
         }
         i += 1;
     }
-    
-    return total_distance % 10000;
+
+    total_distance % 10000
 }
 
 // Initialize distance matrix with random weights
-fn initializeDistanceMatrix(matrix: [i32; 900], size: i32) {
-    let infinity = 1000000;
-    let mut seed = 54321;
-    let mut i = 0;
-    
+fn initializeDistanceMatrix(matrix: &mut [i32; 2500], size: usize) {
+    let infinity: i32 = 1000000;
+    let mut seed: i32 = 54321;
+    let mut i: usize = 0;
+
     while (i < size) {
-        let mut j = 0;
+        let mut j: usize = 0;
         while (j < size) {
             if (i == j) {
                 matrix[i * size + j] = 0;
             } else {
-                seed = (seed * 1664525 + 1013904223) % 2147483647;
-                if (seed < 0) {
-                    seed = -seed;
-                }
-                
+                update(&mut seed);
+
                 // Create edge with 30% probability
                 if (seed % 100 < 30) {
                     matrix[i * size + j] = (seed % 20) + 1; // Weight 1-20
@@ -568,16 +605,16 @@ fn initializeDistanceMatrix(matrix: [i32; 900], size: i32) {
 }
 
 // Floyd-Warshall shortest path algorithm
-fn floydWarshall(matrix: [i32; 900], size: i32) {
-    let mut k = 0;
+fn floydWarshall(matrix: &mut [i32; 2500], size: usize) {
+    let mut k: usize = 0;
     while (k < size) {
-        let mut i = 0;
+        let mut i: usize = 0;
         while (i < size) {
-            let mut j = 0;
+            let mut j: usize = 0;
             while (j < size) {
-                let current_distance = matrix[i * size + j];
-                let new_distance = matrix[i * size + k] + matrix[k * size + j];
-                
+                let current_distance: i32 = matrix[i * size + j];
+                let new_distance: i32 = matrix[i * size + k] + matrix[k * size + j];
+
                 if (new_distance < current_distance) {
                     matrix[i * size + j] = new_distance;
                 }
@@ -591,41 +628,41 @@ fn floydWarshall(matrix: [i32; 900], size: i32) {
 
 // Graph connectivity testing
 fn performConnectivityTest() -> i32 {
-    let graph_size = 40;
-    let mut adjacency_matrix: [i32; 1600] = [0; 1600]; // 40x40 matrix
-    
+    let graph_size: usize = 50;
+    let mut adjacency_matrix: [i32; 2500] = [0; 2500]; // 50x50 matrix
+
     // Initialize graph
-    initializeRandomGraph(adjacency_matrix, graph_size);
-    
+    initializeRandomGraph(&mut adjacency_matrix, graph_size);
+
     // Count connected components
-    let component_count = countConnectedComponents(adjacency_matrix, graph_size);
-    
-    return component_count;
+    let component_count: i32 = countConnectedComponents(&mut adjacency_matrix, graph_size);
+
+    component_count
 }
 
 // Count connected components using DFS
-fn countConnectedComponents(matrix: [i32; 1600], size: i32) -> i32 {
-    let mut visited: [i32; 40] = [0; 40];
-    let mut component_count = 0;
-    let mut vertex = 0;
-    
+fn countConnectedComponents(matrix: &mut [i32; 2500], size: usize) -> i32 {
+    let mut visited: [i32; 50] = [0; 50];
+    let mut component_count: i32 = 0;
+    let mut vertex: usize = 0;
+
     while (vertex < size) {
         if (visited[vertex] == 0) {
             // Start new component
             component_count += 1;
-            dfsMarkComponent(matrix, visited, size, vertex);
+            dfsMarkComponent(matrix, &mut visited, size, vertex);
         }
         vertex += 1;
     }
-    
-    return component_count;
+
+    component_count
 }
 
 // DFS to mark all vertices in a component
-fn dfsMarkComponent(matrix: [i32; 1600], visited: [i32; 40], size: i32, start: i32) {
+fn dfsMarkComponent(matrix: &mut [i32; 2500], visited: &mut [i32; 50], size: usize, start: usize) {
     visited[start] = 1;
-    
-    let mut neighbor = 0;
+
+    let mut neighbor: usize = 0;
     while (neighbor < size) {
         if (matrix[start * size + neighbor] == 1 && visited[neighbor] == 0) {
             dfsMarkComponent(matrix, visited, size, neighbor);
@@ -637,47 +674,46 @@ fn dfsMarkComponent(matrix: [i32; 1600], visited: [i32; 40], size: i32, start: i
 // Test 3: Dynamic Programming Problems
 // Tests memoization opportunities and loop nest optimization
 fn performDynamicProgramming() {
-    printInt(2005); // Start dynamic programming
-    
+    printlnInt(2005); // Start dynamic programming
+
     // Test longest common subsequence
-    let lcs_result = longestCommonSubsequence();
-    printInt(lcs_result);
-    
+    let lcs_result: i32 = longestCommonSubsequence();
+    printlnInt(lcs_result);
+
     // Test knapsack problem
-    let knapsack_result = knapsackProblem();
-    printInt(knapsack_result);
-    
+    let knapsack_result: i32 = knapsackProblem();
+    printlnInt(knapsack_result);
+
     // Test edit distance
-    let edit_result = editDistance();
-    printInt(edit_result);
-    
-    printInt(2006); // End dynamic programming
+    let edit_result: i32 = editDistance();
+    printlnInt(edit_result);
+
+    printlnInt(2006); // End dynamic programming
 }
 
 // Longest Common Subsequence problem
 fn longestCommonSubsequence() -> i32 {
-    let string1_length = 30;
-    let string2_length = 25;
+    let string1_length: usize = 30;
+    let string2_length: usize = 25;
     let mut string1: [i32; 30] = [0; 30];
     let mut string2: [i32; 25] = [0; 25];
-    let mut dp_table: [i32; 775] = [0; 775]; // (30+1) * (25+1) table
-    
+    let mut dp_table: [i32; 806] = [0; 806]; // (30+1) * (25+1) table
+
     // Initialize strings with pattern
-    initializeString(string1, string1_length, 17);
-    initializeString(string2, string2_length, 23);
-    
+    initializeStrings(&mut string1, &mut string2, 17, 23);
+
     // Fill DP table
-    let mut i = 1;
+    let mut i: usize = 1;
     while (i <= string1_length) {
-        let mut j = 1;
+        let mut j: usize = 1;
         while (j <= string2_length) {
             if (string1[i - 1] == string2[j - 1]) {
-                dp_table[i * (string2_length + 1) + j] = 
+                dp_table[i * (string2_length + 1) + j] =
                     dp_table[(i - 1) * (string2_length + 1) + (j - 1)] + 1;
             } else {
-                let option1 = dp_table[(i - 1) * (string2_length + 1) + j];
-                let option2 = dp_table[i * (string2_length + 1) + (j - 1)];
-                
+                let option1: i32 = dp_table[(i - 1) * (string2_length + 1) + j];
+                let option2: i32 = dp_table[i * (string2_length + 1) + (j - 1)];
+
                 if (option1 > option2) {
                     dp_table[i * (string2_length + 1) + j] = option1;
                 } else {
@@ -688,47 +724,52 @@ fn longestCommonSubsequence() -> i32 {
         }
         i += 1;
     }
-    
-    return dp_table[string1_length * (string2_length + 1) + string2_length];
+
+    dp_table[string1_length * (string2_length + 1) + string2_length]
 }
 
 // Initialize string with pattern
-fn initializeString(str: [i32; 30], length: i32, seed: i32) {
-    let mut current_seed = seed;
-    let mut i = 0;
-    
-    while (i < length) {
-        current_seed = (current_seed * 1664525 + 1013904223) % 2147483647;
-        if (current_seed < 0) {
-            current_seed = -current_seed;
-        }
-        str[i] = current_seed % 26; // 26 different characters
+fn initializeStrings(str1: &mut [i32; 30], str2: &mut [i32; 25], seed1: i32, seed2: i32) {
+    let mut current_seed: i32 = seed1;
+    let mut i: usize = 0;
+
+    while (i < 30) {
+        update(&mut current_seed);
+        str1[i] = current_seed % 26; // 26 different characters
         i += 1;
+    }
+
+    let mut current_seed: i32 = seed2;
+    let mut j: usize = 0;
+    while (j < 25) {
+        update(&mut current_seed);
+        str2[j] = current_seed % 26; // 26 different characters
+        j += 1;
     }
 }
 
 // 0-1 Knapsack problem
 fn knapsackProblem() -> i32 {
-    let item_count = 20;
-    let capacity = 100;
+    let item_count: usize = 20;
+    let capacity: usize = 100;
     let mut weights: [i32; 20] = [0; 20];
     let mut values: [i32; 20] = [0; 20];
     let mut dp_table: [i32; 2121] = [0; 2121]; // (20+1) * (100+1) table
-    
+
     // Initialize items
-    initializeKnapsackItems(weights, values, item_count);
-    
+    initializeKnapsackItems(&mut weights, &mut values, item_count);
+
     // Fill DP table
-    let mut i = 1;
+    let mut i: usize = 1;
     while (i <= item_count) {
-        let mut w = 1;
+        let mut w: usize = 1;
         while (w <= capacity) {
-            let without_item = dp_table[(i - 1) * (capacity + 1) + w];
-            
-            if (weights[i - 1] <= w) {
-                let with_item = values[i - 1] + 
-                    dp_table[(i - 1) * (capacity + 1) + (w - weights[i - 1])];
-                
+            let without_item: i32 = dp_table[(i - 1) * (capacity + 1) + w];
+
+            if (weights[i - 1] <= w as i32) {
+                let with_item: i32 = values[i - 1]
+                    + dp_table[(i - 1) * (capacity + 1) + (w - weights[i - 1] as usize)];
+
                 if (with_item > without_item) {
                     dp_table[i * (capacity + 1) + w] = with_item;
                 } else {
@@ -741,101 +782,89 @@ fn knapsackProblem() -> i32 {
         }
         i += 1;
     }
-    
-    return dp_table[item_count * (capacity + 1) + capacity];
+
+    dp_table[item_count * (capacity + 1) + capacity]
 }
 
 // Initialize knapsack items
-fn initializeKnapsackItems(weights: [i32; 20], values: [i32; 20], count: i32) {
-    let mut seed = 98765;
-    let mut i = 0;
-    
+fn initializeKnapsackItems(weights: &mut [i32; 20], values: &mut [i32; 20], count: usize) {
+    let mut seed: i32 = 98765;
+    let mut i: usize = 0;
+
     while (i < count) {
-        seed = (seed * 1664525 + 1013904223) % 2147483647;
-        if (seed < 0) {
-            seed = -seed;
-        }
+        update(&mut seed);
         weights[i] = (seed % 20) + 1; // Weight 1-20
-        
-        seed = (seed * 1664525 + 1013904223) % 2147483647;
-        if (seed < 0) {
-            seed = -seed;
-        }
+
+        update(&mut seed);
         values[i] = (seed % 50) + 1; // Value 1-50
-        
+
         i += 1;
     }
 }
 
 // Edit distance problem
 fn editDistance() -> i32 {
-    let string1_length = 15;
-    let string2_length = 12;
+    let string1_length: usize = 15;
+    let string2_length: usize = 12;
     let mut string1: [i32; 15] = [0; 15];
     let mut string2: [i32; 12] = [0; 12];
     let mut dp_table: [i32; 208] = [0; 208]; // (15+1) * (12+1) table
-    
+
     // Initialize strings
-    initializeEditStrings(string1, string2, string1_length, string2_length);
-    
+    initializeEditStrings(&mut string1, &mut string2, string1_length, string2_length);
+
     // Initialize first row and column
-    let mut i = 0;
+    let mut i: usize = 0;
     while (i <= string1_length) {
-        dp_table[i * (string2_length + 1) + 0] = i;
+        dp_table[i * (string2_length + 1) + 0] = i as i32;
         i += 1;
     }
-    
-    let mut j = 0;
+
+    let mut j: usize = 0;
     while (j <= string2_length) {
-        dp_table[0 * (string2_length + 1) + j] = j;
+        dp_table[0 * (string2_length + 1) + j] = j as i32;
         j += 1;
     }
-    
+
     // Fill DP table
     i = 1;
     while (i <= string1_length) {
         j = 1;
         while (j <= string2_length) {
             if (string1[i - 1] == string2[j - 1]) {
-                dp_table[i * (string2_length + 1) + j] = 
+                dp_table[i * (string2_length + 1) + j] =
                     dp_table[(i - 1) * (string2_length + 1) + (j - 1)];
             } else {
-                let insert_cost = dp_table[i * (string2_length + 1) + (j - 1)] + 1;
-                let delete_cost = dp_table[(i - 1) * (string2_length + 1) + j] + 1;
-                let replace_cost = dp_table[(i - 1) * (string2_length + 1) + (j - 1)] + 1;
-                
-                let min_cost = findMinimum(insert_cost, delete_cost, replace_cost);
+                let insert_cost: i32 = dp_table[i * (string2_length + 1) + (j - 1)] + 1;
+                let delete_cost: i32 = dp_table[(i - 1) * (string2_length + 1) + j] + 1;
+                let replace_cost: i32 = dp_table[(i - 1) * (string2_length + 1) + (j - 1)] + 1;
+
+                let min_cost: i32 = findMinimum(insert_cost, delete_cost, replace_cost);
                 dp_table[i * (string2_length + 1) + j] = min_cost;
             }
             j += 1;
         }
         i += 1;
     }
-    
+
     return dp_table[string1_length * (string2_length + 1) + string2_length];
 }
 
 // Initialize strings for edit distance
-fn initializeEditStrings(str1: [i32; 15], str2: [i32; 12], len1: i32, len2: i32) {
-    let mut seed1 = 11111;
-    let mut seed2 = 22222;
-    
-    let mut i = 0;
+fn initializeEditStrings(str1: &mut [i32; 15], str2: &mut [i32; 12], len1: usize, len2: usize) {
+    let mut seed1: i32 = 11111;
+    let mut seed2: i32 = 22222;
+
+    let mut i: usize = 0;
     while (i < len1) {
-        seed1 = (seed1 * 1664525 + 1013904223) % 2147483647;
-        if (seed1 < 0) {
-            seed1 = -seed1;
-        }
+        update(&mut seed1);
         str1[i] = seed1 % 10; // 10 different characters
         i += 1;
     }
-    
+
     i = 0;
     while (i < len2) {
-        seed2 = (seed2 * 1664525 + 1013904223) % 2147483647;
-        if (seed2 < 0) {
-            seed2 = -seed2;
-        }
+        update(&mut seed2);
         str2[i] = seed2 % 10; // 10 different characters
         i += 1;
     }
@@ -843,7 +872,7 @@ fn initializeEditStrings(str1: [i32; 15], str2: [i32; 12], len1: i32, len2: i32)
 
 // Find minimum of three values
 fn findMinimum(a: i32, b: i32, c: i32) -> i32 {
-    let mut min = a;
+    let mut min: i32 = a;
     if (b < min) {
         min = b;
     }
@@ -856,56 +885,53 @@ fn findMinimum(a: i32, b: i32, c: i32) -> i32 {
 // Test 4: State Machine Simulation
 // Tests jump table optimization and complex state transitions
 fn performStateMachineSimulation() {
-    printInt(2007); // Start state machine simulation
-    
+    printlnInt(2007); // Start state machine simulation
+
     // Test finite state automaton
-    let fsa_result = finiteStateAutomaton();
-    printInt(fsa_result);
-    
+    let fsa_result: i32 = finiteStateAutomaton();
+    printlnInt(fsa_result);
+
     // Test traffic light simulation
-    let traffic_result = trafficLightSimulation();
-    printInt(traffic_result);
-    
-    printInt(2008); // End state machine simulation
+    let traffic_result: i32 = trafficLightSimulation();
+    printlnInt(traffic_result);
+
+    printlnInt(2008); // End state machine simulation
 }
 
 // Finite state automaton simulation
 fn finiteStateAutomaton() -> i32 {
-    let input_length = 1000;
+    let input_length: usize = 1000;
     let mut input_sequence: [i32; 1000] = [0; 1000];
-    let mut current_state = 0;
-    let mut accepted_count = 0;
-    
+    let mut current_state: i32 = 0;
+    let mut accepted_count: i32 = 0;
+
     // Generate input sequence
-    generateInputSequence(input_sequence, input_length);
-    
+    generateInputSequence(&mut input_sequence, input_length);
+
     // Process input through state machine
-    let mut i = 0;
+    let mut i: usize = 0;
     while (i < input_length) {
-        let input_symbol = input_sequence[i];
+        let input_symbol: i32 = input_sequence[i];
         current_state = stateTransition(current_state, input_symbol);
-        
+
         // Check if in accepting state
         if (isAcceptingState(current_state) == 1) {
             accepted_count += 1;
         }
-        
+
         i += 1;
     }
-    
+
     return accepted_count;
 }
 
 // Generate input sequence for automaton
-fn generateInputSequence(sequence: [i32; 1000], length: i32) {
-    let mut seed = 13579;
-    let mut i = 0;
-    
+fn generateInputSequence(sequence: &mut [i32; 1000], length: usize) {
+    let mut seed: i32 = 13579;
+    let mut i: usize = 0;
+
     while (i < length) {
-        seed = (seed * 1664525 + 1013904223) % 2147483647;
-        if (seed < 0) {
-            seed = -seed;
-        }
+        update(&mut seed);
         sequence[i] = seed % 4; // 4 input symbols: 0, 1, 2, 3
         i += 1;
     }
@@ -984,7 +1010,8 @@ fn stateTransition(current_state: i32, input: i32) -> i32 {
         } else {
             return 4;
         }
-    } else { // current_state == 7
+    } else {
+        // current_state == 7
         if (input == 0) {
             return 3;
         } else if (input == 1) {
@@ -1004,31 +1031,31 @@ fn isAcceptingState(state: i32) -> i32 {
 
 // Traffic light simulation with complex timing
 fn trafficLightSimulation() -> i32 {
-    let simulation_time = 1000;
-    let mut north_south_state = 0; // 0=red, 1=yellow, 2=green
-    let mut east_west_state = 2;   // 0=red, 1=yellow, 2=green
-    let mut time_in_state = 0;
-    let mut state_changes = 0;
-    
-    let mut time = 0;
+    let simulation_time: i32 = 1000;
+    let mut north_south_state: i32 = 0; // 0=red, 1=yellow, 2=green
+    let mut east_west_state: i32 = 2; // 0=red, 1=yellow, 2=green
+    let mut time_in_state: i32 = 0;
+    let mut state_changes: i32 = 0;
+
+    let mut time: i32 = 0;
     while (time < simulation_time) {
         time_in_state += 1;
-        
+
         // Complex state transition logic
         if (shouldChangeState(north_south_state, east_west_state, time_in_state, time) == 1) {
             // Change states
-            let new_ns_state = getNextTrafficState(north_south_state);
-            let new_ew_state = getNextTrafficState(east_west_state);
-            
+            let new_ns_state: i32 = getNextTrafficState(north_south_state);
+            let new_ew_state: i32 = getNextTrafficState(east_west_state);
+
             north_south_state = new_ns_state;
             east_west_state = new_ew_state;
             time_in_state = 0;
             state_changes += 1;
         }
-        
+
         time += 1;
     }
-    
+
     return state_changes;
 }
 
@@ -1037,27 +1064,33 @@ fn shouldChangeState(ns_state: i32, ew_state: i32, time_in_state: i32, current_t
     // Green light duration: 30-50 time units (varies based on traffic)
     // Yellow light duration: 5 time units
     // Red light duration: 35-55 time units
-    
-    let traffic_factor = (current_time % 100) / 10; // Simulated traffic density
-    
-    if (ns_state == 2) { // North-South green
-        let green_duration = 30 + traffic_factor;
+
+    let traffic_factor: i32 = (current_time % 100) / 10; // Simulated traffic density
+
+    if (ns_state == 2) {
+        // North-South green
+        let green_duration: i32 = 30 + traffic_factor;
         return (time_in_state >= green_duration) as i32;
-    } else if (ns_state == 1) { // North-South yellow
+    } else if (ns_state == 1) {
+        // North-South yellow
         return (time_in_state >= 5) as i32;
-    } else { // North-South red
-        let red_duration = 35 + traffic_factor;
+    } else {
+        // North-South red
+        let red_duration: i32 = 35 + traffic_factor;
         return (time_in_state >= red_duration) as i32;
     }
 }
 
 // Get next traffic light state
 fn getNextTrafficState(current_state: i32) -> i32 {
-    if (current_state == 0) { // red -> green
+    if (current_state == 0) {
+        // red -> green
         return 2;
-    } else if (current_state == 1) { // yellow -> red
+    } else if (current_state == 1) {
+        // yellow -> red
         return 0;
-    } else { // green -> yellow
+    } else {
+        // green -> yellow
         return 1;
     }
 }
@@ -1065,189 +1098,193 @@ fn getNextTrafficState(current_state: i32) -> i32 {
 // Test 5: Search Algorithms
 // Tests function call optimization and different search patterns
 fn performSearchAlgorithms() {
-    printInt(2009); // Start search algorithms
-    
+    printlnInt(2009); // Start search algorithms
+
     // Test binary search variations
-    let binary_result = performBinarySearchTests();
-    printInt(binary_result);
-    
+    let binary_result: i32 = performBinarySearchTests();
+    printlnInt(binary_result);
+
     // Test pattern matching
-    let pattern_result = performPatternMatching();
-    printInt(pattern_result);
-    
-    printInt(2010); // End search algorithms
+    let pattern_result: i32 = performPatternMatching();
+    printlnInt(pattern_result);
+
+    printlnInt(2010); // End search algorithms
 }
 
 // Binary search variations testing
 fn performBinarySearchTests() -> i32 {
-    let array_size = 500;
+    let array_size: usize = 500;
     let mut sorted_array: [i32; 500] = [0; 500];
-    let mut search_results = 0;
-    
+    let mut search_results: i32 = 0;
+
     // Initialize sorted array
-    initializeSortedArray(sorted_array, array_size);
-    
+    initializeSortedArray(&mut sorted_array, array_size);
+
     // Test multiple binary searches
-    let mut target = 0;
+    let mut target: i32 = 0;
     while (target < 100) {
-        let result = binarySearch(sorted_array, array_size, target * 10);
+        let result: i32 = binarySearch(sorted_array, array_size, target * 10);
         if (result != -1) {
             search_results += 1;
         }
         target += 1;
     }
-    
+
     // Test binary search for first occurrence
     target = 0;
     while (target < 50) {
-        let result = binarySearchFirst(sorted_array, array_size, target * 20);
+        let result: i32 = binarySearchFirst(sorted_array, array_size, target * 20);
         if (result != -1) {
             search_results += result;
         }
         target += 1;
     }
-    
+
     // Test binary search for last occurrence
     target = 0;
     while (target < 50) {
-        let result = binarySearchLast(sorted_array, array_size, target * 20);
+        let result: i32 = binarySearchLast(sorted_array, array_size, target * 20);
         if (result != -1) {
             search_results += result;
         }
         target += 1;
     }
-    
-    return search_results % 10000;
+
+    return search_results % 10000
 }
 
 // Initialize sorted array with duplicates
-fn initializeSortedArray(arr: [i32; 500], size: i32) {
-    let mut i = 0;
+fn initializeSortedArray(arr: &mut [i32; 500], size: usize) {
+    let mut i: usize = 0;
     while (i < size) {
-        arr[i] = (i / 5) * 10; // Groups of 5 with same value
+        arr[i] = (i as i32 / 5) * 10; // Groups of 5 with same value
         i += 1;
     }
 }
 
 // Standard binary search
-fn binarySearch(arr: [i32; 500], size: i32, target: i32) -> i32 {
-    let mut left = 0;
-    let mut right = size - 1;
-    
+fn binarySearch(arr: [i32; 500], size: usize, target: i32) -> i32 {
+    let mut left: i32 = 0;
+    let mut right: i32 = (size - 1) as i32;
+
     while (left <= right) {
-        let mid = left + (right - left) / 2;
-        
-        if (arr[mid] == target) {
+        let mid: i32 = left + (right - left) / 2;
+
+        if (arr[mid as usize] == target) {
             return mid;
-        } else if (arr[mid] < target) {
+        } else if (arr[mid as usize] < target) {
             left = mid + 1;
         } else {
             right = mid - 1;
         }
     }
-    
+
     return -1;
 }
 
 // Binary search for first occurrence
-fn binarySearchFirst(arr: [i32; 500], size: i32, target: i32) -> i32 {
-    let mut left = 0;
-    let mut right = size - 1;
-    let mut result = -1;
-    
+fn binarySearchFirst(arr: [i32; 500], size: usize, target: i32) -> i32 {
+    let mut left: i32 = 0;
+    let mut right: i32 = (size - 1) as i32;
+    let mut result: i32 = -1;
+
     while (left <= right) {
-        let mid = left + (right - left) / 2;
-        
-        if (arr[mid] == target) {
+        let mid: i32 = left + (right - left) / 2;
+
+        if (arr[mid as usize] == target) {
             result = mid;
             right = mid - 1; // Continue searching in left half
-        } else if (arr[mid] < target) {
+        } else if (arr[mid as usize] < target) {
             left = mid + 1;
         } else {
             right = mid - 1;
         }
     }
-    
+
     return result;
 }
 
 // Binary search for last occurrence
-fn binarySearchLast(arr: [i32; 500], size: i32, target: i32) -> i32 {
-    let mut left = 0;
-    let mut right = size - 1;
-    let mut result = -1;
-    
+fn binarySearchLast(arr: [i32; 500], size: usize, target: i32) -> i32 {
+    let mut left: i32 = 0;
+    let mut right: i32 = (size - 1) as i32;
+    let mut result: i32 = -1;
+
     while (left <= right) {
-        let mid = left + (right - left) / 2;
-        
-        if (arr[mid] == target) {
+        let mid: i32 = left + (right - left) / 2;
+
+        if (arr[mid as usize] == target) {
             result = mid;
             left = mid + 1; // Continue searching in right half
-        } else if (arr[mid] < target) {
+        } else if (arr[mid as usize] < target) {
             left = mid + 1;
         } else {
             right = mid - 1;
         }
     }
-    
+
     return result;
 }
 
 // Pattern matching algorithms
 fn performPatternMatching() -> i32 {
-    let text_length = 200;
-    let pattern_length = 10;
+    let text_length: usize = 200;
+    let pattern_length: usize = 10;
     let mut text: [i32; 200] = [0; 200];
     let mut pattern: [i32; 10] = [0; 10];
-    
+
     // Initialize text and pattern
-    initializeTextAndPattern(text, pattern, text_length, pattern_length);
-    
+    initializeTextAndPattern(&mut text, &mut pattern, text_length, pattern_length);
+
     // Test naive pattern matching
-    let naive_matches = naivePatternMatching(text, pattern, text_length, pattern_length);
-    
+    let naive_matches: i32 = naivePatternMatching(&text, &pattern, text_length, pattern_length);
+
     // Test KMP pattern matching
-    let kmp_matches = kmpPatternMatching(text, pattern, text_length, pattern_length);
-    
+    let kmp_matches: i32 = kmpPatternMatching(&text, &pattern, text_length, pattern_length);
+
     return naive_matches + kmp_matches;
 }
 
 // Initialize text and pattern for matching
-fn initializeTextAndPattern(text: [i32; 200], pattern: [i32; 10], text_len: i32, pattern_len: i32) {
-    let mut seed = 24681;
-    
+fn initializeTextAndPattern(
+    text: &mut [i32; 200],
+    pattern: &mut [i32; 10],
+    text_len: usize,
+    pattern_len: usize,
+) {
+    let mut seed: i32 = 24681;
+
     // Initialize text
-    let mut i = 0;
+    let mut i: usize = 0;
     while (i < text_len) {
-        seed = (seed * 1664525 + 1013904223) % 2147483647;
-        if (seed < 0) {
-            seed = -seed;
-        }
+        update(&mut seed);
         text[i] = seed % 5; // 5 different characters
         i += 1;
     }
-    
+
     // Initialize pattern
     i = 0;
     while (i < pattern_len) {
-        seed = (seed * 1664525 + 1013904223) % 2147483647;
-        if (seed < 0) {
-            seed = -seed;
-        }
+        update(&mut seed);
         pattern[i] = seed % 5; // 5 different characters
         i += 1;
     }
 }
 
 // Naive pattern matching algorithm
-fn naivePatternMatching(text: [i32; 200], pattern: [i32; 10], text_len: i32, pattern_len: i32) -> i32 {
-    let mut matches = 0;
-    let mut i = 0;
-    
+fn naivePatternMatching(
+    text: &[i32; 200],
+    pattern: &[i32; 10],
+    text_len: usize,
+    pattern_len: usize,
+) -> i32 {
+    let mut matches: i32 = 0;
+    let mut i: usize = 0;
+
     while (i <= text_len - pattern_len) {
-        let mut j = 0;
-        let mut match_found = 1;
-        
+        let mut j: usize = 0;
+        let mut match_found: i32 = 1;
+
         while (j < pattern_len) {
             if (text[i + j] != pattern[j]) {
                 match_found = 0;
@@ -1255,35 +1292,40 @@ fn naivePatternMatching(text: [i32; 200], pattern: [i32; 10], text_len: i32, pat
             }
             j += 1;
         }
-        
+
         if (match_found == 1) {
             matches += 1;
         }
-        
+
         i += 1;
     }
-    
+
     return matches;
 }
 
 // KMP pattern matching algorithm
-fn kmpPatternMatching(text: [i32; 200], pattern: [i32; 10], text_len: i32, pattern_len: i32) -> i32 {
-    let mut lps: [i32; 10] = [0; 10]; // Longest proper prefix which is also suffix
-    let mut matches = 0;
-    
+fn kmpPatternMatching(
+    text: &[i32; 200],
+    pattern: &[i32; 10],
+    text_len: usize,
+    pattern_len: usize,
+) -> i32 {
+    let mut lps: [usize; 10] = [0; 10]; // Longest proper prefix which is also suffix
+    let mut matches: i32 = 0;
+
     // Compute LPS array
-    computeLPSArray(pattern, pattern_len, lps);
-    
+    computeLPSArray(pattern, pattern_len, &mut lps);
+
     // Search for pattern
-    let mut i = 0; // Index for text
-    let mut j = 0; // Index for pattern
-    
+    let mut i: usize = 0; // Index for text
+    let mut j: usize = 0; // Index for pattern
+
     while (i < text_len) {
         if (pattern[j] == text[i]) {
             i += 1;
             j += 1;
         }
-        
+
         if (j == pattern_len) {
             matches += 1;
             j = lps[j - 1];
@@ -1295,17 +1337,17 @@ fn kmpPatternMatching(text: [i32; 200], pattern: [i32; 10], text_len: i32, patte
             }
         }
     }
-    
+
     return matches;
 }
 
 // Compute LPS array for KMP algorithm
-fn computeLPSArray(pattern: [i32; 10], pattern_len: i32, lps: [i32; 10]) {
-    let mut len = 0; // Length of previous longest prefix suffix
-    let mut i = 1;
-    
+fn computeLPSArray(pattern: &[i32; 10], pattern_len: usize, lps: &mut [usize; 10]) {
+    let mut len: usize = 0; // Length of previous longest prefix suffix
+    let mut i: usize = 1;
+
     lps[0] = 0; // LPS[0] is always 0
-    
+
     while (i < pattern_len) {
         if (pattern[i] == pattern[len]) {
             len += 1;
@@ -1319,5 +1361,12 @@ fn computeLPSArray(pattern: [i32; 10], pattern_len: i32, lps: [i32; 10]) {
                 i += 1;
             }
         }
+    }
+}
+
+fn update(seed: &mut i32) {
+    *seed = (*seed * 1103 + 4721) % 1048583;
+    if (*seed < 0) {
+        *seed = -*seed;
     }
 }
