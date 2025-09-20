@@ -44,14 +44,14 @@ fn init_node(id: i32) -> Node {
 
 // Add edge to adjacency matrix
 fn add_edge(graph: &mut Graph, from: i32, to: i32) {
-    if from >= 0 && from < graph.node_count && to >= 0 && to < graph.node_count {
+    if (from >= 0 && from < graph.node_count && to >= 0 && to < graph.node_count) {
         graph.adjacency[from as usize][to as usize] = true;
     }
 }
 
 // Push to stack
 fn push_stack(state: &mut TarjanState, node_id: i32) {
-    if state.stack_size < 10 {
+    if (state.stack_size < 10) {
         state.stack[state.stack_size as usize] = node_id;
         state.stack_size += 1;
     }
@@ -59,7 +59,7 @@ fn push_stack(state: &mut TarjanState, node_id: i32) {
 
 // Pop from stack
 fn pop_stack(state: &mut TarjanState) -> i32 {
-    if state.stack_size > 0 {
+    if (state.stack_size > 0) {
         state.stack_size -= 1;
         return state.stack[state.stack_size as usize];
     }
@@ -69,8 +69,8 @@ fn pop_stack(state: &mut TarjanState) -> i32 {
 // Check if node is on stack
 fn is_on_stack(state: &TarjanState, node_id: i32) -> bool {
     let mut i: i32 = 0;
-    while i < state.stack_size {
-        if state.stack[i as usize] == node_id {
+    while (i < state.stack_size) {
+        if (state.stack[i as usize] == node_id) {
             return true;
         }
         i += 1;
@@ -80,7 +80,7 @@ fn is_on_stack(state: &TarjanState, node_id: i32) -> bool {
 
 // Find minimum of two values
 fn min_value(a: i32, b: i32) -> i32 {
-    if a < b {
+    if (a < b) {
         return a;
     }
     return b;
@@ -99,15 +99,15 @@ fn tarjan_scc_dfs(graph: &mut Graph, state: &mut TarjanState, node_id: i32) -> i
     
     // Explore all neighbors
     let mut neighbor: i32 = 0;
-    while neighbor < graph.node_count {
-        if graph.adjacency[node_id as usize][neighbor as usize] {
-            if graph.nodes[neighbor as usize].index == -1 {
+    while (neighbor < graph.node_count) {
+        if (graph.adjacency[node_id as usize][neighbor as usize]) {
+            if (graph.nodes[neighbor as usize].index == -1) {
                 // Recursive call for unvisited neighbor
                 tarjan_scc_dfs(graph, state, neighbor);
                 let neighbor_low: i32 = graph.nodes[neighbor as usize].low_link;
                 let current_low: i32 = graph.nodes[node_id as usize].low_link;
                 graph.nodes[node_id as usize].low_link = min_value(current_low, neighbor_low);
-            } else if graph.nodes[neighbor as usize].on_stack {
+            } else if (graph.nodes[neighbor as usize].on_stack) {
                 let neighbor_index: i32 = graph.nodes[neighbor as usize].index;
                 let current_low: i32 = graph.nodes[node_id as usize].low_link;
                 graph.nodes[node_id as usize].low_link = min_value(current_low, neighbor_index);
@@ -117,19 +117,19 @@ fn tarjan_scc_dfs(graph: &mut Graph, state: &mut TarjanState, node_id: i32) -> i
     }
     
     // If node is a root node, pop the stack and create SCC
-    if graph.nodes[node_id as usize].low_link == graph.nodes[node_id as usize].index {
+    if (graph.nodes[node_id as usize].low_link == graph.nodes[node_id as usize].index) {
         state.scc_count += 1;
         let mut component_size: i32 = 0;
         
         loop {
             let w: i32 = pop_stack(state);
-            if w == -1 {
+            if (w == -1) {
                 break;
             }
             graph.nodes[w as usize].on_stack = false;
             component_size += 1;
             
-            if w == node_id {
+            if (w == node_id) {
                 break;
             }
         }
@@ -156,8 +156,8 @@ fn find_all_sccs(graph: &mut Graph) -> i32 {
     let mut total_component_sizes: i32 = 0;
     let mut node_id: i32 = 0;
     
-    while node_id < graph.node_count {
-        if graph.nodes[node_id as usize].index == -1 {
+    while (node_id < graph.node_count) {
+        if (graph.nodes[node_id as usize].index == -1) {
             let component_size: i32 = tarjan_scc_dfs(graph, &mut state, node_id);
             total_component_sizes += component_size;
         }
@@ -201,12 +201,12 @@ fn verify_with_cycle_detection() -> i32 {
     let mut test_node: i32 = 0;
     
     // Simple DFS-based cycle detection for comparison
-    while test_node < 5 {
+    while (test_node < 5) {
         let mut visited: [bool; 10] = [false; 10];
         let mut rec_stack: [bool; 10] = [false; 10];
         
         let has_cycle: bool = dfs_cycle_check(test_node, &mut visited, &mut rec_stack);
-        if has_cycle {
+        if (has_cycle) {
             verification_result += 1;
         }
         
@@ -222,21 +222,21 @@ fn dfs_cycle_check(node: i32, visited: &mut [bool; 10], rec_stack: &mut [bool; 1
     rec_stack[node as usize] = true;
     
     // Check a simple graph structure for testing
-    if node == 0 && !visited[1] {
-        if dfs_cycle_check(1, visited, rec_stack) {
+    if (node == 0 && !visited[1]) {
+        if (dfs_cycle_check(1, visited, rec_stack)) {
             return true;
         }
     }
-    if node == 1 && !visited[2] {
-        if dfs_cycle_check(2, visited, rec_stack) {
+    if (node == 1 && !visited[2]) {
+        if (dfs_cycle_check(2, visited, rec_stack)) {
             return true;
         }
     }
-    if node == 2 && !visited[0] {
-        if rec_stack[0] {
+    if (node == 2 && !visited[0]) {
+        if (rec_stack[0]) {
             return true;  // Back edge found
         }
-        if dfs_cycle_check(0, visited, rec_stack) {
+        if (dfs_cycle_check(0, visited, rec_stack)) {
             return true;
         }
     }

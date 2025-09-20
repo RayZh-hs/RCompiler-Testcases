@@ -54,7 +54,7 @@ impl FenwickTree {
         }
     }
     
-    fn init_from_array(&mut self, arr: &[i32]) {
+    fn init_from_array(&mut self, arr: &[i32; 1000]) {
         let mut i: i32 = 0;
         while (i < self.n) {
             self.update(i, arr[i as usize]);
@@ -182,7 +182,7 @@ impl LazyFenwick {
     }
     
     fn update_tree(n:i32, tree: &mut [i32; 1001], idx: i32, delta: i32) {
-        let mut index = idx + 1;
+        let mut index: i32 = idx + 1;
         while (index <= n) {
             tree[index as usize] += delta;
             index += index & (-index);

@@ -35,7 +35,7 @@ fn gcd_iterative(mut a: i32, mut b: i32) -> i32 {
 
 // Pollard's polynomial function: f(x) = x^2 + c (mod n)
 fn pollard_function(x: i32, c: i32, n: i32) -> i32 {
-    println!("{}", x);
+    printlnInt(x);
     let x_squared: i32 = x * x % n;
     return (x_squared + c) % n;
 }

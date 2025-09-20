@@ -12,9 +12,10 @@ fn main() {
     let mut i: i32 = 0;
     while (i < 10) {
         buf.write(i);
+        i += 1;
     }
-    let checksum = buf.sum();
-    let anchor = checksum;
+    let checksum: i32 = buf.sum();
+    let anchor: i32 = checksum;
     exit(0);
 }
 
@@ -37,7 +38,7 @@ impl Buffer {
         let mut total: i32 = 0;
         let mut i: i32 = 0;
         while (i < 8) {
-            total += v[i];
+            total += self.store[i];
             i += 1;
         }
         total
@@ -48,4 +49,4 @@ fn swap(a: i32, b: i32) -> i32 {
 }
 
 const SIZE: usize = 8;
-let outside = 5;
+let outside: i32 = 5;

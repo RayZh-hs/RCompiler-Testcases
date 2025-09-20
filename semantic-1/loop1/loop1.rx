@@ -18,6 +18,6 @@ fn main() {
         total += n;
         n += 1;
     }
-    let _ = total;
+    let result: u32 = total;
     exit(0);
 }

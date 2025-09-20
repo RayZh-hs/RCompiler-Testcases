@@ -13,7 +13,7 @@ fn merge_sort(a: &mut [i32; LEN], l: usize, r: usize) {
     if (l >= r) {
         return;
     }
-    let m = (l + r) / 2;
+    let m: usize = (l + r) / 2;
     merge_sort(a, l, m);
     merge_sort(a, m + 1, r);
     let mut tmp: [i32; LEN] = [0; LEN];

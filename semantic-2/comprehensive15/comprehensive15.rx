@@ -737,7 +737,7 @@ impl RegexMatcher {
         }
     }
     
-    fn match_text(&mut self, text: &[i32], text_length: i32) -> bool {
+    fn match_text(&mut self, text: &[i32; 5000], text_length: i32) -> bool {
         let mut current_states = [false; 100];
         let mut next_states = [false; 100];
         
