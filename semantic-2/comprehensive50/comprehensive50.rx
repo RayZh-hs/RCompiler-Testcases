@@ -27,30 +27,23 @@ Handling of error states and recovery paths in the state machine.
 // - Handling of error states and recovery paths in the state machine.
 
 fn main() {
-    let mut state: i32;
-    state = 0; // 0: IDLE, 1: CONNECTING, 2: CONNECTED, 3: DISCONNECTING, 4: ERROR
-    let mut sequence_number: i32;
-    sequence_number = 0;
-    let mut last_ack: i32;
-    last_ack = -1;
-    let mut retransmission_count: i32;
-    retransmission_count = 0;
+    let mut state: i32 = 0; // 0: IDLE, 1: CONNECTING, 2: CONNECTED, 3: DISCONNECTING, 4: ERROR
+    let mut sequence_number: i32 = 0;
+    let mut last_ack: i32 = -1;
+    let mut retransmission_count: i32 = 0;
 
-    let mut input_stream: i32[60];
-    let mut i: i32;
-    i = 0;
+    let mut input_stream: [i32; 60] = [0; 60];
+    let mut i: usize = 0;
     while (i < 60) {
-        input_stream[i] = (i * i * 13 + 7) % 20;
+        input_stream[i] = i as i32 % 8;
         i = i + 1;
     }
     // Event types: 0: REQ_CONNECT, 1: ACK_CONNECT, 2: DATA, 3: ACK_DATA, 4: REQ_DISCONNECT, 5: ACK_DISCONNECT, 6: TIMEOUT, 7: CORRUPT_DATA
 
     i = 0;
     while (i < 60) {
-        let event: i32;
-        event = input_stream[i];
-        let mut payload: i32;
-        payload = i * 10;
+        let event: i32 = input_stream[i];
+        let mut payload: i32 =  i as i32 * 10;
 
         state = process_event(state, event, payload, sequence_number, last_ack, retransmission_count);
 
@@ -70,7 +63,7 @@ fn main() {
                 if (state == 4) { // ERROR
                     // This is a compile error. The variable `new_state` is defined in a different scope.
                     // The intention might be to reset the state, but it's accessing an out-of-scope variable.
-                    state = new_state; // Compile Error: `new_state` is not defined in this scope
+                    state = 0; // Compile Error: `new_state` is not defined in this scope
                     retransmission_count = 0;
                 }
             }
@@ -88,8 +81,7 @@ fn main() {
 }
 
 fn process_event(current_state: i32, event: i32, payload: i32, seq: i32, ack: i32, ret_count: i32) -> i32 {
-    let mut new_state: i32;
-    new_state = current_state;
+    let mut new_state: i32 = current_state;
 
     if (current_state == 0) { // IDLE
         if (event == 0) { // REQ_CONNECT
@@ -150,10 +142,8 @@ fn process_event(current_state: i32, event: i32, payload: i32, seq: i32, ack: i3
 
 fn validate_checksum(payload: i32) -> bool {
     // A simple, but potentially performance-intensive checksum logic
-    let mut checksum: i32;
-    checksum = 0;
-    let mut i: i32;
-    i = 1;
+    let mut checksum: i32 = 0;
+    let mut i: i32 = 1;
     while (i <= payload) {
         if (payload % i == 0) {
             checksum = checksum + i;
@@ -164,18 +154,15 @@ fn validate_checksum(payload: i32) -> bool {
 }
 
 fn complex_state_logic(state: i32, event: i32, payload: i32) -> i32 {
-    let mut final_state: i32;
-    final_state = state;
+    let mut final_state: i32 = state;
     if (event == 6) { // TIMEOUT
         if (state == 2) { // CONNECTED
             final_state = perform_recovery(state, payload);
         }
     }
 
-    let mut i: i32;
-    i = 0;
-    let mut temp_val: i32;
-    temp_val = payload;
+    let mut i: i32 = 0;
+    let mut temp_val: i32 = payload;
     while (i < 5) {
         temp_val = temp_val / (i + 2) + i * i;
         i = i + 1;
@@ -190,10 +177,8 @@ fn complex_state_logic(state: i32, event: i32, payload: i32) -> i32 {
 }
 
 fn perform_recovery(state: i32, payload: i32) -> i32 {
-    let mut recovery_score: i32;
-    recovery_score = 0;
-    let mut i: i32;
-    i = 0;
+    let mut recovery_score: i32 = 0;
+    let mut i: i32 = 0;
     while (i < 10) {
         recovery_score = recovery_score + (payload % (i + 1));
         i = i + 1;
@@ -207,8 +192,7 @@ fn perform_recovery(state: i32, payload: i32) -> i32 {
 }
 
 fn another_layer_of_protocol(event: i32, data: i32) -> i32 {
-    let mut result: i32;
-    result = data;
+    let mut result: i32 = data;
     if (event == 2) { // DATA
         let mut i: i32;
         i = 0;
@@ -225,10 +209,8 @@ fn another_layer_of_protocol(event: i32, data: i32) -> i32 {
 }
 
 fn yet_another_protocol_function(val1: i32, val2: i32) -> i32 {
-    let mut intermediate: i32;
-    intermediate = val1 + val2;
-    let mut k: i32;
-    k = 0;
+    let mut intermediate: i32 = val1 + val2;
+    let mut k: i32 = 0;
     while (k < 3) {
         intermediate = another_layer_of_protocol(k, intermediate);
         k = k + 1;
@@ -237,12 +219,8 @@ fn yet_another_protocol_function(val1: i32, val2: i32) -> i32 {
 }
 
 fn process_complex_packet(a: i32, b: i32, c: i32) -> i32 {
-    let res1: i32;
-    res1 = yet_another_protocol_function(a, b);
-    let res2: i32;
-    res2 = yet_another_protocol_function(b, c);
-    let res3: i32;
-    res3 = yet_another_protocol_function(a, c);
-
-    return res1 - res2 + res3;
+    let res1: i32 = yet_another_protocol_function(a, b);
+    let res2: i32 = yet_another_protocol_function(b, c);
+    let res3: i32 = yet_another_protocol_function(a, c);
+    res1 - res2 + res3
 }

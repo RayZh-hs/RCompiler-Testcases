@@ -7,7 +7,7 @@
     "compilememorylimit": 256,
     "compiletimelimit": 15,
     "exitcode": 0,
-    "id": 2549174,
+    "id": 2703350,
     "input_path": "src/type16/type16.in",
     "input_visible": 1,
     "metainfo": {
@@ -27,6 +27,6 @@
     "runtimememorylimit": 256,
     "source_path": "src/type16/type16.rx",
     "source_visible": 1,
-    "stage_id": 29768,
+    "stage_id": 31520,
     "stage_name": "semantic-1"
 }

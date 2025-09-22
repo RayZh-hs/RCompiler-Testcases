@@ -7,7 +7,6 @@ Verdict: Fail
 Comment: Complex expression error: Missing closing parenthesis in expression - Graham scan convex hull algorithm with polar angle sorting, geometric computations, and stress testing
 */
 
-#[derive(Copy, Clone)]
 struct ConvexHullPoint {
     x: i32,
     y: i32,
@@ -161,11 +160,10 @@ fn graham_scan_convex_hull(points: &mut [ConvexHullPoint; 40]) -> [i32; 40] {
     }
     
     let mut hull_stack: [i32; 40] = [-1; 40];
-    let mut stack_top: i32;
+    let mut stack_top: i32 = 2;
     
     hull_stack[0] = 0;
     hull_stack[1] = 1;
-    stack_top = 2;
     
     let mut scan_index: i32 = 2;
     loop {

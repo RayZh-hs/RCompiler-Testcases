@@ -25,7 +25,7 @@ impl Matrix {
     fn get(&self, row: i32, col: i32) -> i32 {
         let index: i32 = row * self.cols + col;
         if (index >= 0 && index < 9) {
-            return self.data[index as usize];
+            self.data[index as usize]
         } else {
             return -1;
         }
@@ -43,18 +43,18 @@ fn matrix_multiply(a: &Matrix, b: &Matrix) -> Matrix {
     let mut result: Matrix = Matrix::new(a.rows, b.cols);
     let mut i: i32 = 0;
     loop {
-        if i >= a.rows {
+        if (i >= a.rows) {
             break;
         }
         let mut j: i32 = 0;
         loop {
-            if j >= b.cols {
+            if (j >= b.cols) {
                 break;
             }
             let mut sum: i32 = 0;
             let mut k: i32 = 0;
             loop {
-                if k >= a.cols {
+                if (k >= a.cols) {
                     break;
                 }
                 let a_val: i32 = a.get(i, k);

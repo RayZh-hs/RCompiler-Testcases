@@ -113,16 +113,16 @@ fn segment_tree_range_update(tree: &mut [SegmentTreeNode; 63], node_idx: i32,
     let right_child_idx: i32 = node_idx * 2 + 2;
     
     if (left_child_idx < 63 && right_child_idx < 63) {
-        let (temp_lazy_add, temp_lazy_set, temp_has_lazy_set): (i32, i32, bool) = {
-            let node: &mut SegmentTreeNode = &mut tree[node_idx as usize];
-            let t_add: i32 = node.lazy_add;
-            let t_set: i32 = node.lazy_set;
-            let t_has: bool = node.has_lazy_set;
-            node.lazy_add = 0;
-            node.lazy_set = 0;
-            node.has_lazy_set = false;
-            (t_add, t_set, t_has)
-        };
+        let node: &mut SegmentTreeNode = &mut tree[node_idx as usize];
+        let t_add: i32 = node.lazy_add;
+        let t_set: i32 = node.lazy_set;
+        let t_has: bool = node.has_lazy_set;
+        node.lazy_add = 0;
+        node.lazy_set = 0;
+        node.has_lazy_set = false;
+        let temp_lazy_add: i32 = t_add;
+        let temp_lazy_set: i32 = t_set;
+        let temp_has_lazy_set: bool = t_has;
         
         if (temp_has_lazy_set) {
             tree[left_child_idx as usize].lazy_set = temp_lazy_set;

@@ -404,7 +404,7 @@ fn list_merge_sorted(manager: &mut LinkedListManager, pool: &mut MemoryPool, lis
     
     // Merge process
     while (ptr1 != NULL_INDEX && ptr2 != NULL_INDEX) {
-        let next_node: i32;
+        let mut next_node: i32 = 0;
         
         if (pool.nodes[ptr1].data <= pool.nodes[ptr2].data) {
             next_node = ptr1;

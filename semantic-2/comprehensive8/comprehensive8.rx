@@ -959,12 +959,11 @@ fn digitDPRecursive(digits: [i32; 10], digit_count: i32, pos: i32,
         return dp[state];
     }
     
-    let limit: i32;
-    if tight {
-        limit = digits[pos];
+    let limit: i32 = if (tight) {
+        digits[pos]
     } else {
-        limit = 9;
-    }
+        9
+    };
     
     let mut result: i32 = 0;
     let mut digit: i32 = 0;
@@ -979,7 +978,7 @@ fn digitDPRecursive(digits: [i32; 10], digit_count: i32, pos: i32,
     if state < 100 {
         dp[state] = result;
     }
-    return result;
+    result
 }
 
 // Bitmask DP - Traveling Salesman Problem
@@ -1028,7 +1027,7 @@ fn bitmaskDP(num_cities: i32) -> i32 {
         mask = mask + 1;
     }
     
-    return min_cost;
+    min_cost
 }
 
 // Count set bits in a number

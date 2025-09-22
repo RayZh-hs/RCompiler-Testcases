@@ -9,7 +9,7 @@ Comment: Trie (Prefix Tree) implementation for string operations
 
 // Trie (Prefix Tree) implementation for string operations
 // Efficient data structure for word storage and prefix searches
-#[derive(Copy, Clone)]
+
 struct TrieNode {
     children: [i32; 26], // Indices to child nodes, -1 for null
     is_end_of_word: bool,

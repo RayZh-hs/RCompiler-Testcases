@@ -30,20 +30,23 @@ fn main() {
         fitness: i32,
     }
 
-    let mut population: [Chromosome; 64] = [Chromosome { genes: [0; 16], fitness: 0 }; 64];
+    let mut population: [Chromosome; 64] = [Chromosome {
+        genes: [0; 16],
+        fitness: 0,
+    }; 64];
     let mut rng_seed: i32 = 12345;
 
-    fn pseudo_rand(mut seed: &mut i32) -> i32 {
-        *seed = (*seed * 1103515245 + 12345) & 2147483647;
+    fn pseudo_rand(seed: &mut i32) -> i32 {
+        *seed = (*seed * 127 + 16777337) & 16777215;
         return *seed;
     }
 
-    fn init_population(mut pop: &mut [Chromosome; 64], mut seed: &mut i32) {
-        let mut i: i32 = 0;
+    fn init_population(pop: &mut [Chromosome; 64], seed: &mut i32) {
+        let mut i: usize = 0;
         while (i < 64) {
-            let mut j: i32 = 0;
+            let mut j: usize = 0;
             while (j < 16) {
-                pop[i].genes[j] = pseudo_rand(&mut *seed) % 200 - 100;
+                pop[i].genes[j] = pseudo_rand(seed) % 200 - 100;
                 j = j + 1;
             }
             i = i + 1;
@@ -51,11 +54,11 @@ fn main() {
     }
 
     // Fitness function: try to make genes sum to a target, with penalties
-    fn calculate_fitness(mut chrom: &mut Chromosome) {
+    fn calculate_fitness(chrom: &mut Chromosome) {
         let target_sum: i32 = 500;
         let mut sum: i32 = 0;
         let mut penalty: i32 = 0;
-        let mut i: i32 = 0;
+        let mut i: usize = 0;
         while (i < 16) {
             sum = sum + chrom.genes[i];
             if (chrom.genes[i] > 90 || chrom.genes[i] < -90) {
@@ -67,35 +70,40 @@ fn main() {
         chrom.fitness = -(diff * diff) - penalty; // Maximize fitness (closer to 0 is better)
     }
 
-    fn evaluate_population(mut pop: &mut [Chromosome; 64]) {
-        let mut i: i32 = 0;
+    fn evaluate_population(pop: &mut [Chromosome; 64]) {
+        let mut i: usize = 0;
         while (i < 64) {
             calculate_fitness(&mut pop[i]);
             i = i + 1;
         }
     }
 
-    fn selection(pop: &[Chromosome; 64], mut seed: &mut i32) -> i32 {
+    fn selection(pop: &[Chromosome; 64], seed: &mut i32) -> i32 {
         let tournament_size: i32 = 5;
         let mut best_index: i32 = -1;
         let mut best_fitness: i32 = -99999999;
         let mut i: i32 = 0;
         while (i < tournament_size) {
-            let idx: i32 = pseudo_rand(&mut *seed) % 64;
+            let idx: usize = pseudo_rand(seed) as usize % 64;
             if (pop[idx].fitness > best_fitness) {
                 best_fitness = pop[idx].fitness;
-                best_index = idx;
+                best_index = idx as i32;
             }
             i = i + 1;
         }
         return best_index;
     }
 
-    fn crossover(parent1: &Chromosome, parent2: &Chromosome, mut child: &mut Chromosome, mut seed: &mut i32) {
-        let crossover_point: i32 = pseudo_rand(&mut *seed) % 16;
-        let mut i: i32 = 0;
+    fn crossover(
+        parent1: &Chromosome,
+        parent2: &Chromosome,
+        child: &mut Chromosome,
+        seed: &mut i32,
+    ) {
+        let crossover_point: i32 = pseudo_rand(seed) % 16;
+        let mut i: usize = 0;
         while (i < 16) {
-            if (i < crossover_point) {
+            if (i < crossover_point as usize) {
                 child.genes[i] = parent1.genes[i];
             } else {
                 child.genes[i] = parent2.genes[i];
@@ -104,12 +112,12 @@ fn main() {
         }
     }
 
-    fn mutate(mut chrom: &mut Chromosome, mut seed: &mut i32) {
+    fn mutate(chrom: &mut Chromosome, seed: &mut i32) {
         let mutation_rate: i32 = 10; // out of 100
-        let mut i: i32 = 0;
+        let mut i: usize = 0;
         while (i < 16) {
-            if (pseudo_rand(&mut *seed) % 100 < mutation_rate) {
-                chrom.genes[i] = chrom.genes[i] + (pseudo_rand(&mut *seed) % 20 - 10);
+            if (pseudo_rand(seed) % 100 < mutation_rate) {
+                chrom.genes[i] = chrom.genes[i] + (pseudo_rand(seed) % 20 - 10);
             }
             i = i + 1;
         }
@@ -120,21 +128,29 @@ fn main() {
     let mut generation: i32 = 0;
     while (generation < 50) {
         evaluate_population(&mut population);
-        let mut new_population: [Chromosome; 64] = [Chromosome { genes: [0; 16], fitness: 0 }; 64];
+        let mut new_population: [Chromosome; 64] = [Chromosome {
+            genes: [0; 16],
+            fitness: 0,
+        }; 64];
 
-        let mut i: i32 = 0;
+        let mut i: usize = 0;
         while (i < 64) {
-            let p1_idx: i32 = selection(&population, &mut rng_seed);
-            let p2_idx: i32 = selection(&population, &mut rng_seed);
-            crossover(&population[p1_idx], &population[p2_idx], &mut new_population[i], &mut rng_seed);
+            let p1_idx: usize = selection(&population, &mut rng_seed) as usize;
+            let p2_idx: usize = selection(&population, &mut rng_seed) as usize;
+            crossover(
+                &population[p1_idx],
+                &population[p2_idx],
+                &mut new_population[i],
+                &mut rng_seed,
+            );
             mutate(&mut new_population[i], &mut rng_seed);
             i = i + 1;
         }
-        
+
         // Hidden Error: The variable `i` is re-declared in this inner scope,
         // shadowing the outer `i`. A compiler should catch this re-declaration
         // in the same function block.
-        let mut i: i32 = 0;
+        let mut i: usize = 0;
         while (i < 64) {
             population[i] = new_population[i];
             i = i + 1;
@@ -144,7 +160,7 @@ fn main() {
 
     evaluate_population(&mut population);
     let mut best_fitness: i32 = -99999999;
-    let mut i: i32 = 0;
+    let mut i: usize = 0;
     while (i < 64) {
         if (population[i].fitness > best_fitness) {
             best_fitness = population[i].fitness;

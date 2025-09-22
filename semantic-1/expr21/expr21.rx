@@ -4,7 +4,7 @@ Test Target: expr
 Author: Wenxin Zheng
 Time: 2025-08-08
 Verdict: Fail
-Comment: Expression error: Missing semicolon after block expression - combines block, operator, if, and literal expressions
+Comment: Expression error: Missing semicolon after let statement - combines block, operator, if, and literal expressions
 */
 
 fn main() {

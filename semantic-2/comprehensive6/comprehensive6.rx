@@ -752,16 +752,15 @@ fn simpleDictionaryCompression(text: [i32; 1500], text_len: i32) -> i32 {
     }
     
     // Calculate compression ratio based on unique characters
-    let bits_per_char: i32;
-    if (unique_chars <= 2) {
-        bits_per_char = 1;
+    let bits_per_char: i32 = if (unique_chars <= 2) {
+        1
     } else if (unique_chars <= 4) {
-        bits_per_char = 2;
+        2
     } else if (unique_chars <= 16) {
-        bits_per_char = 4;
+        4
     } else {
-        bits_per_char = 8;
-    }
+        8
+    };
     
     return (text_len * bits_per_char) / 8; // compressed size in bytes
 }
@@ -917,34 +916,28 @@ fn longestCommonSubsequence(text1: [i32; 800], text2: [i32; 800], len1: i32, len
         i = i + 1;
     }
     
-    let result: i32;
     if (len2 <= 200) {
-        result = prev_row[len2];
+        prev_row[len2]
     } else {
-        result = prev_row[200];
+        prev_row[200]
     }
-    
-    return result;
 }
 
 // Calculate edit distance (Levenshtein distance)
 fn calculateEditDistance(text1: [i32; 800], text2: [i32; 800], len1: i32, len2: i32) -> i32 {
     // Use simplified approach for smaller strings
     let max_len: i32 = 100;
-    let actual_len1: i32;
-    let actual_len2: i32;
-    
-    if (len1 > max_len) {
-        actual_len1 = max_len;
+    let actual_len1: i32 = if (len1 > max_len) {
+        max_len
     } else {
-        actual_len1 = len1;
-    }
-    
-    if (len2 > max_len) {
-        actual_len2 = max_len;
+        len1
+    };
+
+    let actual_len2: i32 = if (len2 > max_len) {
+        max_len
     } else {
-        actual_len2 = len2;
-    }
+        len2
+    };   
     
     let mut prev_row: [i32; 101] = [0; 101];
     let mut curr_row: [i32; 101] = [0; 101];

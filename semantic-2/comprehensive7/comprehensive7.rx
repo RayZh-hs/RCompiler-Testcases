@@ -341,12 +341,11 @@ fn dijkstraShortestPath(graph: [i32; 2500], size: i32, start: i32) -> i32 {
 // Floyd-Warshall all-pairs shortest path
 fn floydWarshallAllPairs(mut graph: [i32; 2500], size: i32) -> i32 {
     // Create distance matrix (limited to 20x20 for performance)
-    let actual_size: i32;
-    if (size > 20) {
-        actual_size = 20;
+    let actual_size: i32 = if (size > 20) {
+        20
     } else {
-        actual_size = size;
-    }
+        size
+    };
     
     let mut distances: [i32; 400] = [9999; 400];
     

@@ -325,14 +325,11 @@ fn calculateTreeDepth(tree: [i32; 127], index: usize) -> i32 {
     let left_depth: i32 = calculateTreeDepth(tree, 2 * index + 1);
     let right_depth: i32 = calculateTreeDepth(tree, 2 * index + 2);
 
-    let max_depth: i32;
     if (left_depth > right_depth) {
-        max_depth = left_depth;
+        left_depth + 1
     } else {
-        max_depth = right_depth;
+        right_depth + 1
     }
-
-    return 1 + max_depth;
 }
 
 // Test 4: Divide and Conquer Algorithms
@@ -658,12 +655,11 @@ fn recursiveArrayMax(arr: [i32; 100], index: usize, size: usize, current_max: i3
         return current_max;
     }
 
-    let new_max: i32;
-    if (arr[index] > current_max) {
-        new_max = arr[index];
+    let new_max: i32 = if (arr[index] > current_max) {
+        arr[index]
     } else {
-        new_max = current_max;
-    }
+        current_max
+    };
 
     return recursiveArrayMax(arr, index + 1, size, new_max);
 }

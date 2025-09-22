@@ -60,7 +60,7 @@ fn fenwick_tree_query(tree: &[FenwickTreeNode; 64], index: i32, query_type: i32)
     
     loop {
         if (current_index <= 0) {
-            break;
+            break result;
         }
         
         let node: &FenwickTreeNode = &tree[current_index as usize];
@@ -78,8 +78,6 @@ fn fenwick_tree_query(tree: &[FenwickTreeNode; 64], index: i32, query_type: i32)
         let lowbit: i32 = current_index & (-current_index);
         current_index = current_index - lowbit;
     }
-    
-    return result;
 }
 
 fn fenwick_tree_range_query(tree: &[FenwickTreeNode; 64], left: i32, right: i32, query_type: i32) -> i32 {
@@ -261,9 +259,7 @@ fn calculate_fenwick_tree_statistics(tree: &[FenwickTreeNode; 64]) -> i32 {
         if (stats_index >= 64) {
             break;
         }
-        
         let node: &FenwickTreeNode = &tree[stats_index as usize];
-        
         if (node.frequency > 0) {
             non_zero_nodes = non_zero_nodes + 1;
             total_value_sum = total_value_sum + node.value;
@@ -280,28 +276,23 @@ fn calculate_fenwick_tree_statistics(tree: &[FenwickTreeNode; 64]) -> i32 {
         
         stats_index = stats_index + 1;
     }
+    let density_factor: i32 = non_zero_nodes * 50;
+    let value_factor: i32 = total_value_sum / 4;
+    let frequency_factor: i32 = total_frequency_sum * 3;
+    let range_factor: i32 = max_contribution - min_contribution;
     
-    let statistical_complexity: i32 = {
-        let density_factor: i32 = non_zero_nodes * 50;
-        let value_factor: i32 = total_value_sum / 4;
-        let frequency_factor: i32 = total_frequency_sum * 3;
-        let range_factor: i32 = max_contribution - min_contribution;
-        
-        let raw_complexity: i32 = density_factor + value_factor + frequency_factor + range_factor;
-        let adjusted: i32 = {
-            let temp: i32 = raw_complexity % 15000;
-            if (temp < 5000) {
-                temp + 3000
-            } else if (temp > 10000) {
-                temp - 4000
-            } else {
-                temp
-            }
-        };
-        adjusted
+    let raw_complexity: i32 = density_factor + value_factor + frequency_factor + range_factor;
+    let adjusted: i32 = {
+        let temp: i32 = raw_complexity % 15000;
+        if (temp < 5000) {
+            temp + 3000
+        } else if (temp > 10000) {
+            temp - 4000
+        } else {
+            temp
+        }
     };
-    
-    return statistical_complexity;
+    adjusted
 }
 
 fn main() {
