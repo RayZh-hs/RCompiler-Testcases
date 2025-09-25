@@ -36,10 +36,10 @@ fn main() {
         let mut i: i32 = 0;
         while (i < num_blocks) {
             let current_addr: i32 = i * block_size;
-            heap[current_addr] = (i + 1) * block_size; // Next pointer
+            heap[current_addr as usize] = (i + 1) * block_size; // Next pointer
             i = i + 1;
         }
-        heap[(num_blocks - 1) * block_size] = -1; // End of list
+        heap[((num_blocks - 1) * block_size) as usize] = -1; // End of list
         *free_list_head = 0;
     }
 
@@ -48,13 +48,13 @@ fn main() {
             return -1; // Out of memory
         }
         let block_addr: i32 = *free_list_head;
-        *free_list_head = heap[block_addr];
-        heap[block_addr] = -2; // Mark as allocated
+        *free_list_head = heap[block_addr as usize];
+        heap[block_addr as usize] = -2; // Mark as allocated
         return block_addr;
     }
 
     fn free(mut heap: &mut [i32; 1024], mut free_list_head: &mut i32, addr: i32) {
-        heap[addr] = *free_list_head;
+        heap[addr as usize] = *free_list_head;
         *free_list_head = addr;
     }
 
@@ -67,7 +67,7 @@ fn main() {
     while (i < 64) {
         let addr: i32 = alloc(&mut heap, &mut free_list_head);
         if (addr != -1) {
-            allocations[i] = addr;
+            allocations[i as usize] = addr;
             successful_allocs = successful_allocs + 1;
         }
         i = i + 1;
@@ -76,8 +76,8 @@ fn main() {
     i = 0;
     while (i < 32) {
         if (i % 2 == 0) {
-            free(&mut heap, &mut free_list_head, allocations[i]);
-            allocations[i] = -1;
+            free(&mut heap, &mut free_list_head, allocations[i as usize]);
+            allocations[i as usize] = -1;
         }
         i = i + 1;
     }
@@ -89,8 +89,8 @@ fn main() {
             let mut j: i32 = 0;
             let mut placed: bool = false;
             while (j < 64) {
-                if (allocations[j] == -1 && !placed) {
-                    allocations[j] = addr;
+                if (allocations[j as usize] == -1 && !placed) {
+                    allocations[j as usize] = addr;
                     placed = true;
                 }
                 j = j + 1;
@@ -102,7 +102,7 @@ fn main() {
     let mut active_blocks: i32 = 0;
     i = 0;
     while (i < 64) {
-        if (allocations[i] != -1) {
+        if (allocations[i as usize] != -1) {
             active_blocks = active_blocks + 1;
         }
         i = i + 1;
@@ -116,7 +116,7 @@ fn main() {
         let mut current_ptr: i32 = free_list_head;
         while (current_ptr != -1) {
             current_contiguous = current_contiguous + 1;
-            let next_ptr: i32 = heap[current_ptr];
+            let next_ptr: i32 = heap[current_ptr as usize];
             if (next_ptr != current_ptr + 16) {
                 if (current_contiguous > max_contiguous_free) {
                     max_contiguous_free = current_contiguous;
@@ -132,9 +132,9 @@ fn main() {
         let mut i: i32 = 32;
         while (i < 64) {
             if (i % 3 == 0) {
-                if (allocations[i] != -1) {
-                    free(&mut heap, &mut free_list_head, allocations[i]);
-                    allocations[i] = -1;
+                if (allocations[i as usize] != -1) {
+                    free(&mut heap, &mut free_list_head, allocations[i as usize]);
+                    allocations[i as usize] = -1;
                 }
             }
             i = i + 1;
@@ -144,7 +144,7 @@ fn main() {
     let mut final_check_sum: i32 = 0;
     i = 0;
     while (i < 1024) {
-        if (heap[i] == -2) {
+        if (heap[i as usize] == -2) {
             final_check_sum = final_check_sum + i;
         }
         i = i + 1;

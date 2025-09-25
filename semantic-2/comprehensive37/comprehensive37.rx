@@ -55,13 +55,13 @@ let DUP: i32 = 15;
 fn push_stack(val: i32) {
     if (sp < STACK_SIZE - 1) {
         sp = sp + 1;
-        stack[sp] = val;
+        stack[sp as usize] = val;
     }
 }
 
 fn pop_stack() -> i32 {
     if (sp > -1) {
-        let val: i32 = stack[sp];
+        let val: i32 = stack[sp as usize];
         sp = sp - 1;
         return val;
     }
@@ -71,137 +71,137 @@ fn pop_stack() -> i32 {
 fn load_program() {
     let mut i: i32 = 0;
 
-    memory[i] = PUSH; i = i + 1;
-    memory[i] = 10; i = i + 1;
-    memory[i] = STORE; i = i + 1;
-    memory[i] = 256; i = i + 1;
+    memory[i as usize] = PUSH; i = i + 1;
+    memory[i as usize] = 10; i = i + 1;
+    memory[i as usize] = STORE; i = i + 1;
+    memory[i as usize] = 256; i = i + 1;
 
-    memory[i] = PUSH; i = i + 1;
-    memory[i] = 1; i = i + 1;
-    memory[i] = STORE; i = i + 1;
-    memory[i] = 257; i = i + 1;
+    memory[i as usize] = PUSH; i = i + 1;
+    memory[i as usize] = 1; i = i + 1;
+    memory[i as usize] = STORE; i = i + 1;
+    memory[i as usize] = 257; i = i + 1;
 
-    memory[i] = PUSH; i = i + 1;
-    memory[i] = 1; i = i + 1;
-    memory[i] = STORE; i = i + 1;
-    memory[i] = 258; i = i + 1;
+    memory[i as usize] = PUSH; i = i + 1;
+    memory[i as usize] = 1; i = i + 1;
+    memory[i as usize] = STORE; i = i + 1;
+    memory[i as usize] = 258; i = i + 1;
 
     let loop_start: i32 = i;
-    memory[i] = LOAD; i = i + 1;
-    memory[i] = 256; i = i + 1;
-    memory[i] = PUSH; i = i + 1;
-    memory[i] = 1; i = i + 1;
-    memory[i] = SUB; i = i + 1;
-    memory[i] = DUP; i = i + 1;
-    memory[i] = STORE; i = i + 1;
-    memory[i] = 256; i = i + 1;
-    memory[i] = JZ; i = i + 1;
-    memory[i] = 50; i = i + 1;
+    memory[i as usize] = LOAD; i = i + 1;
+    memory[i as usize] = 256; i = i + 1;
+    memory[i as usize] = PUSH; i = i + 1;
+    memory[i as usize] = 1; i = i + 1;
+    memory[i as usize] = SUB; i = i + 1;
+    memory[i as usize] = DUP; i = i + 1;
+    memory[i as usize] = STORE; i = i + 1;
+    memory[i as usize] = 256; i = i + 1;
+    memory[i as usize] = JZ; i = i + 1;
+    memory[i as usize] = 50; i = i + 1;
 
-    memory[i] = LOAD; i = i + 1;
-    memory[i] = 257; i = i + 1;
-    memory[i] = LOAD; i = i + 1;
-    memory[i] = 258; i = i + 1;
-    memory[i] = ADD; i = i + 1;
-    memory[i] = DUP; i = i + 1;
-    memory[i] = STORE; i = i + 1;
-    memory[i] = 257; i = i + 1;
-    memory[i] = POP; i = i + 1;
-    memory[i] = LOAD; i = i + 1;
-    memory[i] = 257; i = i + 1;
-    memory[i] = STORE; i = i + 1;
-    memory[i] = 258; i = i + 1;
+    memory[i as usize] = LOAD; i = i + 1;
+    memory[i as usize] = 257; i = i + 1;
+    memory[i as usize] = LOAD; i = i + 1;
+    memory[i as usize] = 258; i = i + 1;
+    memory[i as usize] = ADD; i = i + 1;
+    memory[i as usize] = DUP; i = i + 1;
+    memory[i as usize] = STORE; i = i + 1;
+    memory[i as usize] = 257; i = i + 1;
+    memory[i as usize] = POP; i = i + 1;
+    memory[i as usize] = LOAD; i = i + 1;
+    memory[i as usize] = 257; i = i + 1;
+    memory[i as usize] = STORE; i = i + 1;
+    memory[i as usize] = 258; i = i + 1;
 
-    memory[i] = JMP; i = i + 1;
-    memory[i] = loop_start; i = i + 1;
+    memory[i as usize] = JMP; i = i + 1;
+    memory[i as usize] = loop_start; i = i + 1;
 
-    memory[i] = LOAD; i = i + 1;
-    memory[i] = 258; i = i + 1;
-    memory[i] = PRINT; i = i + 1;
-    memory[i] = HALT; i = i + 1;
+    memory[i as usize] = LOAD; i = i + 1;
+    memory[i as usize] = 258; i = i + 1;
+    memory[i as usize] = PRINT; i = i + 1;
+    memory[i as usize] = HALT; i = i + 1;
 
     let mut j: i32 = 0;
     while (j < 20) {
         let k: i32 = 100 + j * 10;
-        memory[k] = PUSH;
-        memory[k+1] = j;
-        memory[k+2] = PUSH;
-        memory[k+3] = j + 1;
-        memory[k+4] = MUL;
-        memory[k+5] = PRINT;
-        memory[k+6] = POP;
+        memory[k as usize] = PUSH;
+        memory[k as usize+1] = j;
+        memory[k as usize+2] = PUSH;
+        memory[k as usize+3] = j + 1;
+        memory[k as usize+4] = MUL;
+        memory[k as usize+5] = PRINT;
+        memory[k as usize+6] = POP;
         j = j + 1;
     }
     memory[99] = JMP;
     memory[100] = 100;
 
     let mut factorial_addr: i32 = 400;
-    memory[factorial_addr] = STORE; factorial_addr = factorial_addr + 1;
-    memory[factorial_addr] = 500; factorial_addr = factorial_addr + 1;
-    memory[factorial_addr] = LOAD; factorial_addr = factorial_addr + 1;
-    memory[factorial_addr] = 500; factorial_addr = factorial_addr + 1;
-    memory[factorial_addr] = PUSH; factorial_addr = factorial_addr + 1;
-    memory[factorial_addr] = 1; factorial_addr = factorial_addr + 1;
-    memory[factorial_addr] = LT; factorial_addr = factorial_addr + 1;
-    memory[factorial_addr] = JZ; factorial_addr = factorial_addr + 1;
-    memory[factorial_addr] = factorial_addr + 12; factorial_addr = factorial_addr + 1;
-    memory[factorial_addr] = PUSH; factorial_addr = factorial_addr + 1;
-    memory[factorial_addr] = 1; factorial_addr = factorial_addr + 1;
-    memory[factorial_addr] = JMP; factorial_addr = factorial_addr + 1;
-    memory[factorial_addr] = 500;
+    memory[factorial_addr as usize] = STORE; factorial_addr = factorial_addr + 1;
+    memory[factorial_addr as usize] = 500; factorial_addr = factorial_addr + 1;
+    memory[factorial_addr as usize] = LOAD; factorial_addr = factorial_addr + 1;
+    memory[factorial_addr as usize] = 500; factorial_addr = factorial_addr + 1;
+    memory[factorial_addr as usize] = PUSH; factorial_addr = factorial_addr + 1;
+    memory[factorial_addr as usize] = 1; factorial_addr = factorial_addr + 1;
+    memory[factorial_addr as usize] = LT; factorial_addr = factorial_addr + 1;
+    memory[factorial_addr as usize] = JZ; factorial_addr = factorial_addr + 1;
+    memory[factorial_addr as usize] = factorial_addr + 12; factorial_addr = factorial_addr + 1;
+    memory[factorial_addr as usize] = PUSH; factorial_addr = factorial_addr + 1;
+    memory[factorial_addr as usize] = 1; factorial_addr = factorial_addr + 1;
+    memory[factorial_addr as usize] = JMP; factorial_addr = factorial_addr + 1;
+    memory[factorial_addr as usize] = 500;
 
-    memory[factorial_addr] = LOAD; factorial_addr = factorial_addr + 1;
-    memory[factorial_addr] = 500; factorial_addr = factorial_addr + 1;
-    memory[factorial_addr] = PUSH; factorial_addr = factorial_addr + 1;
-    memory[factorial_addr] = 1; factorial_addr = factorial_addr + 1;
-    memory[factorial_addr] = SUB; factorial_addr = factorial_addr + 1;
-    memory[factorial_addr] = JMP;
-    memory[factorial_addr] = 400;
+    memory[factorial_addr as usize] = LOAD; factorial_addr = factorial_addr + 1;
+    memory[factorial_addr as usize] = 500; factorial_addr = factorial_addr + 1;
+    memory[factorial_addr as usize] = PUSH; factorial_addr = factorial_addr + 1;
+    memory[factorial_addr as usize] = 1; factorial_addr = factorial_addr + 1;
+    memory[factorial_addr as usize] = SUB; factorial_addr = factorial_addr + 1;
+    memory[factorial_addr as usize] = JMP;
+    memory[factorial_addr as usize] = 400;
 
     let mut fib_addr: i32 = 600;
-    memory[fib_addr] = STORE; fib_addr = fib_addr + 1;
-    memory[fib_addr] = 700; fib_addr = fib_addr + 1;
-    memory[fib_addr] = LOAD; fib_addr = fib_addr + 1;
-    memory[fib_addr] = 700; fib_addr = fib_addr + 1;
-    memory[fib_addr] = PUSH; fib_addr = fib_addr + 1;
-    memory[fib_addr] = 2; fib_addr = fib_addr + 1;
-    memory[fib_addr] = LT; fib_addr = fib_addr + 1;
-    memory[fib_addr] = JZ; fib_addr = fib_addr + 1;
-    memory[fib_addr] = fib_addr + 4; fib_addr = fib_addr + 1;
-    memory[fib_addr] = LOAD; fib_addr = fib_addr + 1;
-    memory[fib_addr] = 700; fib_addr = fib_addr + 1;
-    memory[fib_addr] = JMP; fib_addr = fib_addr + 1;
-    memory[fib_addr] = 800;
+    memory[fib_addr as usize] = STORE; fib_addr = fib_addr + 1;
+    memory[fib_addr as usize] = 700; fib_addr = fib_addr + 1;
+    memory[fib_addr as usize] = LOAD; fib_addr = fib_addr + 1;
+    memory[fib_addr as usize] = 700; fib_addr = fib_addr + 1;
+    memory[fib_addr as usize] = PUSH; fib_addr = fib_addr + 1;
+    memory[fib_addr as usize] = 2; fib_addr = fib_addr + 1;
+    memory[fib_addr as usize] = LT; fib_addr = fib_addr + 1;
+    memory[fib_addr as usize] = JZ; fib_addr = fib_addr + 1;
+    memory[fib_addr as usize] = fib_addr + 4; fib_addr = fib_addr + 1;
+    memory[fib_addr as usize] = LOAD; fib_addr = fib_addr + 1;
+    memory[fib_addr as usize] = 700; fib_addr = fib_addr + 1;
+    memory[fib_addr as usize] = JMP; fib_addr = fib_addr + 1;
+    memory[fib_addr as usize] = 800;
 
-    memory[fib_addr] = LOAD; fib_addr = fib_addr + 1;
-    memory[fib_addr] = 700; fib_addr = fib_addr + 1;
-    memory[fib_addr] = PUSH; fib_addr = fib_addr + 1;
-    memory[fib_addr] = 1; fib_addr = fib_addr + 1;
-    memory[fib_addr] = SUB; fib_addr = fib_addr + 1;
-    memory[fib_addr] = JMP; fib_addr = fib_addr + 1;
-    memory[fib_addr] = 600; fib_addr = fib_addr + 1;
+    memory[fib_addr as usize] = LOAD; fib_addr = fib_addr + 1;
+    memory[fib_addr as usize] = 700; fib_addr = fib_addr + 1;
+    memory[fib_addr as usize] = PUSH; fib_addr = fib_addr + 1;
+    memory[fib_addr as usize] = 1; fib_addr = fib_addr + 1;
+    memory[fib_addr as usize] = SUB; fib_addr = fib_addr + 1;
+    memory[fib_addr as usize] = JMP; fib_addr = fib_addr + 1;
+    memory[fib_addr as usize] = 600; fib_addr = fib_addr + 1;
 
-    memory[fib_addr] = LOAD; fib_addr = fib_addr + 1;
-    memory[fib_addr] = 700; fib_addr = fib_addr + 1;
-    memory[fib_addr] = PUSH; fib_addr = fib_addr + 1;
-    memory[fib_addr] = 2; fib_addr = fib_addr + 1;
-    memory[fib_addr] = SUB; fib_addr = fib_addr + 1;
-    memory[fib_addr] = JMP; fib_addr = fib_addr + 1;
-    memory[fib_addr] = 600; fib_addr = fib_addr + 1;
+    memory[fib_addr as usize] = LOAD; fib_addr = fib_addr + 1;
+    memory[fib_addr as usize] = 700; fib_addr = fib_addr + 1;
+    memory[fib_addr as usize] = PUSH; fib_addr = fib_addr + 1;
+    memory[fib_addr as usize] = 2; fib_addr = fib_addr + 1;
+    memory[fib_addr as usize] = SUB; fib_addr = fib_addr + 1;
+    memory[fib_addr as usize] = JMP; fib_addr = fib_addr + 1;
+    memory[fib_addr as usize] = 600; fib_addr = fib_addr + 1;
 
-    memory[fib_addr] = ADD; fib_addr = fib_addr + 1;
-    memory[fib_addr] = JMP; fib_addr = fib_addr + 1;
-    memory[fib_addr] = 800;
+    memory[fib_addr as usize] = ADD; fib_addr = fib_addr + 1;
+    memory[fib_addr as usize] = JMP; fib_addr = fib_addr + 1;
+    memory[fib_addr as usize] = 800;
 }
 
 fn execute_cycle() {
-    let instruction: i32 = memory[pc];
+    let instruction: i32 = memory[pc as usize];
     pc = pc + 1;
 
     if (instruction == HALT) {
         running = false;
     } else if instruction == PUSH {
-        let value: i32 = memory[pc];
+        let value: i32 = memory[pc as usize];
         pc = pc + 1;
         push_stack(value);
     } else if instruction == POP {
@@ -230,18 +230,18 @@ fn execute_cycle() {
         let val: i32 = pop_stack();
         printInt(val);
     } else if instruction == JMP {
-        pc = memory[pc];
+        pc = memory[pc as usize];
     } else if instruction == JZ {
         let val: i32 = pop_stack();
         if (val == 0) {
-            pc = memory[pc];
+            pc = memory[pc as usize];
         } else {
             pc = pc + 1;
         }
     } else if instruction == JNZ {
         let val: i32 = pop_stack();
         if (val != 0) {
-            pc = memory[pc];
+            pc = memory[pc as usize];
         } else {
             pc = pc + 1;
         }
@@ -262,17 +262,17 @@ fn execute_cycle() {
             push_stack(0);
         }
     } else if instruction == STORE {
-        let addr: i32 = memory[pc];
+        let addr: i32 = memory[pc as usize];
         pc = pc + 1;
         let val: i32 = pop_stack();
-        memory[addr] = val;
+        memory[addr as usize] = val;
     } else if instruction == LOAD {
-        let addr: i32 = memory[pc];
+        let addr: i32 = memory[pc as usize];
         pc = pc + 1;
-        let val: i32 = memory[addr];
+        let val: i32 = memory[addr as usize];
         push_stack(val);
     } else if instruction == DUP {
-        let val: i32 = stack[sp];
+        let val: i32 = stack[sp as usize];
         push_stack(val);
     }
 }
@@ -297,7 +297,7 @@ fn main() {
     let mut i: i32 = 0;
     let mut checksum: i32 = 0;
     while (i < STACK_SIZE) {
-        checksum = checksum + stack[i];
+        checksum = checksum + stack[i as usize];
         i = i + 1;
     }
     printInt(checksum);

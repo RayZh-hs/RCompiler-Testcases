@@ -82,10 +82,10 @@ fn init_memory_pool() -> MemoryPool {
     // Initialize free list - link all nodes
     let mut i = 0;
     while (i < MEMORY_POOL_SIZE - 1) {
-        pool.nodes[i].next = i + 1;
+        pool.nodes[i as usize].next = i + 1;
         i = i + 1;
     }
-    pool.nodes[MEMORY_POOL_SIZE - 1].next = NULL_INDEX;
+    pool.nodes[MEMORY_POOL_SIZE as usize - 1].next = NULL_INDEX;
     
     pool
 }
@@ -97,10 +97,10 @@ fn allocate_node(pool: &mut MemoryPool, data: i32) -> i32 {
     }
     
     let allocated_index = pool.free_list;
-    pool.free_list = pool.nodes[allocated_index].next;
+    pool.free_list = pool.nodes[allocated_index as usize].next;
     
-    pool.nodes[allocated_index].data = data;
-    pool.nodes[allocated_index].next = NULL_INDEX;
+    pool.nodes[allocated_index as usize].data = data;
+    pool.nodes[allocated_index as usize].next = NULL_INDEX;
     pool.allocated_count = pool.allocated_count + 1;
     
     allocated_index
@@ -112,7 +112,7 @@ fn deallocate_node(pool: &mut MemoryPool, index: i32) {
         return;
     }
     
-    pool.nodes[index].next = pool.free_list;
+    pool.nodes[index as usize].next = pool.free_list;
     pool.free_list = index;
     pool.allocated_count = pool.allocated_count - 1;
 }
@@ -133,7 +133,7 @@ fn stack_push(stack: &mut Stack, value: i32) -> bool {
     }
     
     stack.top = stack.top + 1;
-    stack.data[stack.top] = value;
+    stack.data[(stack.top) as usize] = value;
     true
 }
 
@@ -143,7 +143,7 @@ fn stack_pop(stack: &mut Stack) -> i32 {
         return -999999;  // Stack underflow indicator
     }
     
-    let value = stack.data[stack.top];
+    let value = stack.data[(stack.top) as usize];
     stack.top = stack.top - 1;
     value
 }
@@ -170,7 +170,7 @@ fn queue_enqueue(queue: &mut Queue, value: i32) -> bool {
         return false;  // Queue overflow
     }
     
-    queue.data[queue.rear] = value;
+    queue.data[(queue.rear) as usize] = value;
     queue.rear = (queue.rear + 1) % queue.capacity;
     queue.size = queue.size + 1;
     true
@@ -182,7 +182,7 @@ fn queue_dequeue(queue: &mut Queue) -> i32 {
         return -999999;  // Queue underflow indicator
     }
     
-    let value = queue.data[queue.front];
+    let value = queue.data[(queue.front) as usize];
     queue.front = (queue.front + 1) % queue.capacity;
     queue.size = queue.size - 1;
     value
@@ -215,7 +215,7 @@ fn init_hash_table() -> HashTable {
     // Initialize all entries as unused
     let mut i = 0;
     while (i < MAX_NODES) {
-        table.entries[i].is_used = false;
+        table.entries[i as usize].is_used = false;
         i = i + 1;
     }
     
@@ -231,18 +231,18 @@ fn hash_table_insert(table: &mut HashTable, key: i32, value: i32) -> bool {
     let bucket_index = hash_function(key);
     
     // Check if key already exists
-    let mut current = table.buckets[bucket_index];
+    let mut current = table.buckets[bucket_index as usize];
     while (current != NULL_INDEX) {
-        if table.entries[current].key == key {
-            table.entries[current].value = value;  // Update existing
+        if table.entries[current as usize].key == key {
+            table.entries[current as usize].value = value;  // Update existing
             return true;
         }
-        current = table.entries[current].next;
+        current = table.entries[current as usize].next;
     }
     
     // Find free entry
     let mut entry_index = 0;
-    while (entry_index < MAX_NODES && table.entries[entry_index].is_used) {
+    while (entry_index < MAX_NODES && table.entries[entry_index as usize].is_used) {
         entry_index = entry_index + 1;
     }
     
@@ -251,11 +251,11 @@ fn hash_table_insert(table: &mut HashTable, key: i32, value: i32) -> bool {
     }
     
     // Insert new entry
-    table.entries[entry_index].key = key;
-    table.entries[entry_index].value = value;
-    table.entries[entry_index].next = table.buckets[bucket_index];
-    table.entries[entry_index].is_used = true;
-    table.buckets[bucket_index] = entry_index;
+    table.entries[entry_index as usize].key = key;
+    table.entries[entry_index as usize].value = value;
+    table.entries[entry_index as usize].next = table.buckets[bucket_index as usize];
+    table.entries[entry_index as usize].is_used = true;
+    table.buckets[bucket_index as usize] = entry_index;
     table.entry_count = table.entry_count + 1;
     
     true
@@ -264,13 +264,13 @@ fn hash_table_insert(table: &mut HashTable, key: i32, value: i32) -> bool {
 // Search in hash table
 fn hash_table_search(table: &HashTable, key: i32) -> i32 {
     let bucket_index = hash_function(key);
-    let mut current = table.buckets[bucket_index];
+    let mut current = table.buckets[bucket_index as usize];
     
     while (current != NULL_INDEX) {
-        if table.entries[current].key == key {
-            return table.entries[current].value;
+        if table.entries[current as usize].key == key {
+            return table.entries[current as usize].value;
         }
-        current = table.entries[current].next;
+        current = table.entries[current as usize].next;
     }
     
     -999999  // Not found indicator
@@ -279,24 +279,24 @@ fn hash_table_search(table: &HashTable, key: i32) -> i32 {
 // Delete from hash table
 fn hash_table_delete(table: &mut HashTable, key: i32) -> bool {
     let bucket_index = hash_function(key);
-    let mut current = table.buckets[bucket_index];
+    let mut current = table.buckets[bucket_index as usize];
     let mut prev = NULL_INDEX;
     
     while (current != NULL_INDEX) {
-        if table.entries[current].key == key {
+        if table.entries[current as usize].key == key {
             // Remove from chain
             if (prev == NULL_INDEX) {
-                table.buckets[bucket_index] = table.entries[current].next;
+                table.buckets[bucket_index as usize] = table.entries[current as usize].next;
             } else {
-                table.entries[prev].next = table.entries[current].next;
+                table.entries[prev as usize].next = table.entries[current as usize].next;
             }
             
-            table.entries[current].is_used = false;
+            table.entries[current as usize].is_used = false;
             table.entry_count = table.entry_count - 1;
             return true;
         }
         prev = current;
-        current = table.entries[current].next;
+        current = table.entries[current as usize].next;
     }
     
     false  // Not found
@@ -322,8 +322,8 @@ fn list_insert_head(manager: &mut LinkedListManager, pool: &mut MemoryPool, list
         return false;
     }
     
-    pool.nodes[new_node].next = manager.heads[list_id];
-    manager.heads[list_id] = new_node;
+    pool.nodes[new_node as usize].next = manager.heads[list_id as usize];
+    manager.heads[list_id as usize] = new_node;
     manager.total_nodes = manager.total_nodes + 1;
     
     true
@@ -335,12 +335,12 @@ fn list_search(manager: &LinkedListManager, pool: &MemoryPool, list_id: i32, dat
         return false;
     }
     
-    let mut current = manager.heads[list_id];
+    let mut current = manager.heads[list_id as usize];
     while (current != NULL_INDEX) {
-        if pool.nodes[current].data == data {
+        if pool.nodes[current as usize].data == data {
             return true;
         }
-        current = pool.nodes[current].next;
+        current = pool.nodes[current as usize].next;
     }
     
     false
@@ -352,15 +352,15 @@ fn list_delete(manager: &mut LinkedListManager, pool: &mut MemoryPool, list_id: 
         return false;
     }
     
-    let mut current = manager.heads[list_id];
+    let mut current = manager.heads[list_id as usize];
     let mut prev = NULL_INDEX;
     
     while (current != NULL_INDEX) {
-        if pool.nodes[current].data == data {
+        if pool.nodes[current as usize].data == data {
             if (prev == NULL_INDEX) {
-                manager.heads[list_id] = pool.nodes[current].next;
+                manager.heads[list_id as usize] = pool.nodes[current as usize].next;
             } else {
-                pool.nodes[prev].next = pool.nodes[current].next;
+                pool.nodes[prev as usize].next = pool.nodes[current as usize].next;
             }
             
             deallocate_node(pool, current);
@@ -368,7 +368,7 @@ fn list_delete(manager: &mut LinkedListManager, pool: &mut MemoryPool, list_id: 
             return true;
         }
         prev = current;
-        current = pool.nodes[current].next;
+        current = pool.nodes[current as usize].next;
     }
     
     false
@@ -381,11 +381,11 @@ fn list_length(manager: &LinkedListManager, pool: &MemoryPool, list_id: i32) -> 
     }
     
     let mut count = 0;
-    let mut current = manager.heads[list_id];
+    let mut current = manager.heads[list_id as usize];
     
     while (current != NULL_INDEX) {
         count = count + 1;
-        current = pool.nodes[current].next;
+        current = pool.nodes[current as usize].next;
     }
     
     count
@@ -397,30 +397,30 @@ fn list_merge_sorted(manager: &mut LinkedListManager, pool: &mut MemoryPool, lis
         return false;
     }
     
-    let mut ptr1 = manager.heads[list1_id];
-    let mut ptr2 = manager.heads[list2_id];
-    manager.heads[result_id] = NULL_INDEX;
+    let mut ptr1 = manager.heads[list1_id as usize];
+    let mut ptr2 = manager.heads[list2_id as usize];
+    manager.heads[result_id as usize] = NULL_INDEX;
     let mut result_tail = NULL_INDEX;
     
     // Merge process
     while (ptr1 != NULL_INDEX && ptr2 != NULL_INDEX) {
         let mut next_node: i32 = 0;
         
-        if (pool.nodes[ptr1].data <= pool.nodes[ptr2].data) {
+        if (pool.nodes[ptr1 as usize].data <= pool.nodes[ptr2 as usize].data) {
             next_node = ptr1;
-            ptr1 = pool.nodes[ptr1].next;
+            ptr1 = pool.nodes[ptr1 as usize].next;
         } else {
             next_node = ptr2;
-            ptr2 = pool.nodes[ptr2].next;
+            ptr2 = pool.nodes[ptr2 as usize].next;
         }
         
-        pool.nodes[next_node].next = NULL_INDEX;
+        pool.nodes[next_node as usize].next = NULL_INDEX;
         
-        if (manager.heads[result_id] == NULL_INDEX) {
-            manager.heads[result_id] = next_node;
+        if (manager.heads[result_id as usize] == NULL_INDEX) {
+            manager.heads[result_id as usize] = next_node;
             result_tail = next_node;
         } else {
-            pool.nodes[result_tail].next = next_node;
+            pool.nodes[result_tail as usize].next = next_node;
             result_tail = next_node;
         }
     }
@@ -429,15 +429,15 @@ fn list_merge_sorted(manager: &mut LinkedListManager, pool: &mut MemoryPool, lis
     let remaining = if ptr1 != NULL_INDEX { ptr1 } else { ptr2 };
     if (remaining != NULL_INDEX) {
         if (result_tail != NULL_INDEX) {
-            pool.nodes[result_tail].next = remaining;
+            pool.nodes[result_tail as usize].next = remaining;
         } else {
-            manager.heads[result_id] = remaining;
+            manager.heads[result_id as usize] = remaining;
         }
     }
     
     // Clear source lists
-    manager.heads[list1_id] = NULL_INDEX;
-    manager.heads[list2_id] = NULL_INDEX;
+    manager.heads[list1_id as usize] = NULL_INDEX;
+    manager.heads[list2_id as usize] = NULL_INDEX;
     
     true
 }
@@ -459,8 +459,8 @@ fn test_comprehensive_operations() {
     let mut allocated_nodes: [i32; 100] = [NULL_INDEX; 100];
     let mut i = 0;
     while (i < 100) {
-        allocated_nodes[i] = allocate_node(&mut memory_pool, i * 7 + 13);
-        if (allocated_nodes[i] == NULL_INDEX) {
+        allocated_nodes[i as usize] = allocate_node(&mut memory_pool, i * 7 + 13);
+        if (allocated_nodes[i as usize] == NULL_INDEX) {
             printInt(19901);  // Allocation failure
         }
         i = i + 1;
@@ -562,9 +562,9 @@ fn test_comprehensive_operations() {
     // Deallocate every other node from memory pool
     i = 0;
     while (i < 100) {
-        if (i % 2 == 0 && allocated_nodes[i] != NULL_INDEX) {
-            deallocate_node(&mut memory_pool, allocated_nodes[i]);
-            allocated_nodes[i] = NULL_INDEX;
+        if (i % 2 == 0 && allocated_nodes[i as usize] != NULL_INDEX) {
+            deallocate_node(&mut memory_pool, allocated_nodes[i as usize]);
+            allocated_nodes[i as usize] = NULL_INDEX;
         }
         i = i + 1;
     }

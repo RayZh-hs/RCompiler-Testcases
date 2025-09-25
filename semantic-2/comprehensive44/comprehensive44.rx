@@ -45,7 +45,7 @@ fn main() {
         while (i < 64) {
             let mut j: i32 = 0;
             while (j < 64) {
-                world[i][j] = (i * j + i + j) % 100; // Resource density
+                world[i as usize][j as usize] = (i * j + i + j) % 100; // Resource density
                 j = j + 1;
             }
             i = i + 1;
@@ -53,11 +53,11 @@ fn main() {
 
         i = 0;
         while (i < 32) {
-            agents[i].id = i;
-            agents[i].x = (i * 13) % 64;
-            agents[i].y = (i * 31) % 64;
-            agents[i].energy = 100;
-            agents[i].state = 0;
+            agents[i as usize].id = i;
+            agents[i as usize].x = (i * 13) % 64;
+            agents[i as usize].y = (i * 31) % 64;
+            agents[i as usize].energy = 100;
+            agents[i as usize].state = 0;
             i = i + 1;
         }
     }
@@ -72,8 +72,8 @@ fn main() {
             while (dy <= 5) {
                 let nx: i32 = (agent.x + dx + 64) % 64;
                 let ny: i32 = (agent.y + dy + 64) % 64;
-                if (world[nx][ny] > max_res) {
-                    max_res = world[nx][ny];
+                if (world[nx as usize][ny as usize] > max_res) {
+                    max_res = world[nx as usize][ny as usize];
                     best_x = nx;
                     best_y = ny;
                 }
@@ -106,12 +106,12 @@ fn main() {
                 else if (agent.y > agent.target_y) { agent.y = agent.y - 1; }
             }
         } else if agent.state == 2 { // Collecting
-            let res: i32 = world[agent.x][agent.y];
+            let res: i32 = world[(agent.x) as usize][(agent.y) as usize];
             if (res > 0) {
                 agent.energy = agent.energy + res / 5;
-                world[agent.x][agent.y] = world[agent.x][agent.y] - res / 10 - 1;
-                if (world[agent.x][agent.y] < 0) {
-                    world[agent.x][agent.y] = 0;
+                world[(agent.x) as usize][(agent.y) as usize] = world[(agent.x) as usize][(agent.y) as usize] - res / 10 - 1;
+                if (world[(agent.x) as usize][(agent.y) as usize] < 0) {
+                    world[(agent.x) as usize][(agent.y) as usize] = 0;
                 }
             }
             agent.state = 0;
@@ -124,7 +124,7 @@ fn main() {
     while (time_step < 200) {
         let mut i: i32 = 0;
         while (i < 32) {
-            update_agent(&mut agents[i], &mut world);
+            update_agent(&mut agents[i as usize], &mut world);
             i = i + 1;
         }
 
@@ -134,7 +134,7 @@ fn main() {
             let total_energy: i32 = 0;
             let mut j: i32 = 0;
             while (j < 32) {
-                total_energy = total_energy + agents[j].energy;
+                total_energy = total_energy + agents[j as usize].energy;
                 j = j + 1;
             }
             printInt(total_energy);
@@ -147,7 +147,7 @@ fn main() {
     while (i < 64) {
         let mut j: i32 = 0;
         while (j < 64) {
-            final_world_sum = final_world_sum + world[i][j];
+            final_world_sum = final_world_sum + world[i as usize][j as usize];
             j = j + 1;
         }
         i = i + 1;

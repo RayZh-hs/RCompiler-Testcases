@@ -101,14 +101,14 @@ fn main() {
             let mut hit_color: Vec3 = Vec3 { x: 20, y: 20, z: 40 }; // Background color
             let mut s: i32 = 0;
             while (s < 4) {
-                let dist: i32 = intersect(&ray, &spheres[s]);
+                let dist: i32 = intersect(&ray, &spheres[s as usize]);
                 if (dist > 0 && dist < min_dist) {
                     min_dist = dist;
-                    hit_color = spheres[s].color;
+                    hit_color = spheres[s as usize].color;
                 }
                 s = s + 1;
             }
-            screen[x][y] = (hit_color.x + hit_color.y + hit_color.z) / 3;
+            screen[x as usize][y as usize] = (hit_color.x + hit_color.y + hit_color.z) / 3;
             x = x + 1;
         }
         y = y + 1;
@@ -119,7 +119,7 @@ fn main() {
     while (y < height) {
         let mut x: i32 = 0;
         while (x < width) {
-            checksum = checksum + screen[x][y] * (x + y * width);
+            checksum = checksum + screen[x as usize][y as usize] * (x + y * width);
             x = x + 1;
         }
         y = y + 1;

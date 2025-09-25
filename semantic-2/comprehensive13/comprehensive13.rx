@@ -453,19 +453,19 @@ impl MathEngine {
                     let even_idx = (i + k) as usize;
                     let odd_idx = (i + k + half_length) as usize;
                     
-                    let even_real = self.real_part[even_idx];
-                    let even_imag = self.imag_part[even_idx];
-                    let odd_real = self.real_part[odd_idx];
-                    let odd_imag = self.imag_part[odd_idx];
+                    let even_real = self.real_part[even_idx as usize];
+                    let even_imag = self.imag_part[even_idx as usize];
+                    let odd_real = self.real_part[odd_idx as usize];
+                    let odd_imag = self.imag_part[odd_idx as usize];
                     
                     // Complex multiplication: (odd_real + i*odd_imag) * (cos_val + i*sin_val)
                     let twiddle_real = (odd_real * cos_val - odd_imag * sin_val) / 1000;
                     let twiddle_imag = (odd_real * sin_val + odd_imag * cos_val) / 1000;
                     
-                    self.real_part[even_idx] = even_real + twiddle_real;
-                    self.imag_part[even_idx] = even_imag + twiddle_imag;
-                    self.real_part[odd_idx] = even_real - twiddle_real;
-                    self.imag_part[odd_idx] = even_imag - twiddle_imag;
+                    self.real_part[even_idx as usize] = even_real + twiddle_real;
+                    self.imag_part[even_idx as usize] = even_imag + twiddle_imag;
+                    self.real_part[odd_idx as usize] = even_real - twiddle_real;
+                    self.imag_part[odd_idx as usize] = even_imag - twiddle_imag;
                     
                     k += 1;
                 }

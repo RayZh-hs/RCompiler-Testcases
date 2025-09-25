@@ -148,11 +148,11 @@ fn init_fsm() -> FSM {
     // Initialize state counters
     let mut i = 0;
     while (i < MAX_STATES) {
-        fsm.state_counters[i] = 0;
+        fsm.state_counters[i as usize] = 0;
         i = i + 1;
     }
     
-    fsm.state_counters[STATE_INIT] = 1;  // Start in init state
+    fsm.state_counters[STATE_INIT as usize] = 1;  // Start in init state
     fsm
 }
 
@@ -162,7 +162,7 @@ fn add_transition(fsm: &mut FSM, from: i32, event: i32, to: i32, action: i32, co
         return false;
     }
     
-    fsm.transitions[fsm.transition_count] = Transition {
+    fsm.transitions[(fsm.transition_count) as usize] = Transition {
         from_state: from,
         event: event,
         to_state: to,
@@ -180,7 +180,7 @@ fn fsm_add_event(fsm: &mut FSM, event: i32) -> bool {
         return false;  // Queue full
     }
     
-    fsm.event_queue[fsm.queue_tail] = event;
+    fsm.event_queue[(fsm.queue_tail) as usize] = event;
     fsm.queue_tail = (fsm.queue_tail + 1) % MAX_EVENTS;
     fsm.queue_size = fsm.queue_size + 1;
     true
@@ -192,7 +192,7 @@ fn fsm_get_event(fsm: &mut FSM) -> i32 {
         return INVALID_EVENT;
     }
     
-    let event = fsm.event_queue[fsm.queue_head];
+    let event = fsm.event_queue[(fsm.queue_head) as usize];
     fsm.queue_head = (fsm.queue_head + 1) % MAX_EVENTS;
     fsm.queue_size = fsm.queue_size - 1;
     event
@@ -331,7 +331,7 @@ fn fsm_step(fsm: &mut FSM, context: &mut i32) -> bool {
     // Find matching transition
     let mut i = 0;
     while (i < fsm.transition_count) {
-        let transition = &fsm.transitions[i];
+        let transition = &fsm.transitions[i as usize];
         
         if (transition.from_state == fsm.current_state && transition.event == event) {
             if (evaluate_condition(transition.condition, fsm.current_state, event, *context)) {
@@ -340,7 +340,7 @@ fn fsm_step(fsm: &mut FSM, context: &mut i32) -> bool {
                 fsm.current_state = transition.to_state;
                 
                 // Update state counters
-                fsm.state_counters[fsm.current_state] = fsm.state_counters[fsm.current_state] + 1;
+                fsm.state_counters[(fsm.current_state) as usize] = fsm.state_counters[(fsm.current_state) as usize] + 1;
                 fsm.total_transitions = fsm.total_transitions + 1;
                 
                 // Execute action
@@ -399,7 +399,7 @@ fn parse_packet(parser: &mut ProtocolParser, packet_type: i32, data: i32, seq: i
             if (seq == parser.expected_seq) {
                 // Store data in buffer
                 if (parser.buffer_pos < MAX_PROTOCOL_BUFFER) {
-                    parser.buffer[parser.buffer_pos] = data;
+                    parser.buffer[(parser.buffer_pos) as usize] = data;
                     parser.buffer_pos = parser.buffer_pos + 1;
                 }
                 parser.expected_seq = seq + 1;
@@ -465,7 +465,7 @@ fn add_task(scheduler: &mut TaskScheduler, priority: i32, execution_time: i32) -
     }
     
     let task_id = scheduler.task_count;
-    scheduler.tasks[task_id] = Task {
+    scheduler.tasks[task_id as usize] = Task {
         id: task_id,
         priority: priority,
         state: 0,  // Ready
@@ -478,8 +478,8 @@ fn add_task(scheduler: &mut TaskScheduler, priority: i32, execution_time: i32) -
     // Insert into ready queue based on priority
     let mut i = 0;
     while (i < scheduler.ready_count) {
-        let existing_task = scheduler.ready_queue[i];
-        if (scheduler.tasks[existing_task].priority < priority) {
+        let existing_task = scheduler.ready_queue[i as usize];
+        if (scheduler.tasks[existing_task as usize].priority < priority) {
             break;
         }
         i = i + 1;
@@ -488,11 +488,11 @@ fn add_task(scheduler: &mut TaskScheduler, priority: i32, execution_time: i32) -
     // Shift elements to make space
     let mut j = scheduler.ready_count;
     while (j > i) {
-        scheduler.ready_queue[j] = scheduler.ready_queue[j - 1];
+        scheduler.ready_queue[j as usize] = scheduler.ready_queue[j as usize - 1];
         j = j - 1;
     }
     
-    scheduler.ready_queue[i] = task_id;
+    scheduler.ready_queue[i as usize] = task_id;
     scheduler.ready_count = scheduler.ready_count + 1;
     scheduler.task_count = scheduler.task_count + 1;
     
@@ -506,12 +506,12 @@ fn schedule_next_task(scheduler: &mut TaskScheduler) -> i32 {
     // Check for task completion or preemption
     if (scheduler.current_task != -1) {
         let current = scheduler.current_task;
-        scheduler.tasks[current].remaining_time = scheduler.tasks[current].remaining_time - 1;
-        scheduler.tasks[current].execution_count = scheduler.tasks[current].execution_count + 1;
+        scheduler.tasks[current as usize].remaining_time = scheduler.tasks[current as usize].remaining_time - 1;
+        scheduler.tasks[current as usize].execution_count = scheduler.tasks[current as usize].execution_count + 1;
         
-        if (scheduler.tasks[current].remaining_time <= 0) {
+        if (scheduler.tasks[current as usize].remaining_time <= 0) {
             // Task completed
-            scheduler.tasks[current].state = 2;  // Completed
+            scheduler.tasks[current as usize].state = 2;  // Completed
             scheduler.current_task = -1;
         } else {
             // Check for preemption based on complex logic
@@ -519,15 +519,15 @@ fn schedule_next_task(scheduler: &mut TaskScheduler) -> i32 {
             
             if (scheduler.ready_count > 0) {
                 let next_task = scheduler.ready_queue[0];
-                let current_priority = scheduler.tasks[current].priority;
-                let next_priority = scheduler.tasks[next_task].priority;
+                let current_priority = scheduler.tasks[current as usize].priority;
+                let next_priority = scheduler.tasks[next_task as usize].priority;
                 
                 // Complex preemption logic
                 if (next_priority > current_priority) {
                     should_preempt = true;
                 } else if (next_priority == current_priority) {
                     // Round-robin within same priority
-                    if (scheduler.tasks[current].execution_count % scheduler.time_slice == 0) {
+                    if (scheduler.tasks[current as usize].execution_count % scheduler.time_slice == 0) {
                         should_preempt = true;
                     }
                 } else if (scheduler.current_time % 50 == 0) {
@@ -538,13 +538,13 @@ fn schedule_next_task(scheduler: &mut TaskScheduler) -> i32 {
             
             if (should_preempt) {
                 // Move current task back to ready queue
-                scheduler.tasks[current].state = 0;  // Ready
+                scheduler.tasks[current as usize].state = 0;  // Ready
                 
                 // Insert back into ready queue
                 let mut i = 0;
                 while (i < scheduler.ready_count) {
-                    let existing_task = scheduler.ready_queue[i];
-                    if (scheduler.tasks[existing_task].priority < scheduler.tasks[current].priority) {
+                    let existing_task = scheduler.ready_queue[i as usize];
+                    if (scheduler.tasks[existing_task as usize].priority < scheduler.tasks[current as usize].priority) {
                         break;
                     }
                     i = i + 1;
@@ -553,11 +553,11 @@ fn schedule_next_task(scheduler: &mut TaskScheduler) -> i32 {
                 // Shift and insert
                 let mut j = scheduler.ready_count;
                 while (j > i) {
-                    scheduler.ready_queue[j] = scheduler.ready_queue[j - 1];
+                    scheduler.ready_queue[j as usize] = scheduler.ready_queue[j as usize - 1];
                     j = j - 1;
                 }
                 
-                scheduler.ready_queue[i] = current;
+                scheduler.ready_queue[i as usize] = current;
                 scheduler.ready_count = scheduler.ready_count + 1;
                 scheduler.current_task = -1;
             }
@@ -567,12 +567,12 @@ fn schedule_next_task(scheduler: &mut TaskScheduler) -> i32 {
     // Select next task if no current task
     if (scheduler.current_task == -1 && scheduler.ready_count > 0) {
         scheduler.current_task = scheduler.ready_queue[0];
-        scheduler.tasks[scheduler.current_task].state = 1;  // Running
+        scheduler.tasks[(scheduler.current_task) as usize].state = 1;  // Running
         
         // Remove from ready queue
         let mut i = 0;
         while (i < scheduler.ready_count - 1) {
-            scheduler.ready_queue[i] = scheduler.ready_queue[i + 1];
+            scheduler.ready_queue[i as usize] = scheduler.ready_queue[i as usize + 1];
             i = i + 1;
         }
         scheduler.ready_count = scheduler.ready_count - 1;

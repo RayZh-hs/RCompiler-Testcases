@@ -14,6 +14,20 @@ Correct handling of variable lifetimes across complex scopes.
 Function calls within deeply nested loops.
 */
 
+
+
+// Unified RNG: Park–Miller (a=16807, m=2147483647) using Schrage method to avoid overflow
+fn pm_rand_update(x: i32) -> i32 {
+    let a = 16807;
+    let m = 2147483647;
+    let q = 127773; // m / a
+    let r = 2836;   // m % a
+    let mut k = x / q;
+    let mut new_x = a * (x - k * q) - r * k;
+    if (new_x <= 0) { new_x += m; }
+    return new_x;
+}
+
 // comprehensive35.rx - Advanced Control Flow and Logic Puzzle
 // This test comprehensively evaluates compiler optimizations for:
 // - Deeply nested and complex control flow structures (if, while, for).
@@ -33,11 +47,11 @@ fn main() {
 
     let mut start_x: i32 = 1;
     let mut start_y: i32 = 1;
-    maze[start_y][start_x] = 0;
+    maze[start_y as usize][start_x as usize] = 0;
 
     let mut end_x: i32 = MAZE_SIZE - 2;
     let mut end_y: i32 = MAZE_SIZE - 2;
-    maze[end_y][end_x] = 0;
+    maze[end_y as usize][end_x as usize] = 0;
 
     let mut path_len: i32 = solve_maze(&mut maze, start_x, start_y, end_x, end_y);
     printInt(path_len);
@@ -58,13 +72,13 @@ fn generate_maze(maze: &mut [[i32; MAZE_SIZE]; MAZE_SIZE], seed: i32) {
         let mut j: i32 = 0;
         while (j < MAZE_SIZE) {
             if (i == 0 || j == 0 || i == MAZE_SIZE - 1 || j == MAZE_SIZE - 1) {
-                maze[i][j] = 1;
+                maze[i as usize][j as usize] = 1;
             } else {
-                current_seed = (current_seed * 1103515245 + 12345) / 65536 % 32768;
+                current_seed = (pm_rand_update(current_seed) / 65536) % 32768;
                 if (current_seed % 4 == 0) {
-                    maze[i][j] = 1;
+                    maze[i as usize][j as usize] = 1;
                 } else {
-                    maze[i][j] = 0;
+                    maze[i as usize][j as usize] = 0;
                 }
             }
             j = j + 1;
@@ -96,7 +110,7 @@ fn solve_maze(maze: &mut [[i32; MAZE_SIZE]; MAZE_SIZE], start_x: i32, start_y: i
             else if (next_dir == 2) { next_y = next_y + 1; }
             else { next_x = next_x - 1; }
 
-            if (maze[next_y][next_x] == 0) {
+            if (maze[next_y as usize][next_x as usize] == 0) {
                 x = next_x;
                 y = next_y;
                 dir = next_dir;

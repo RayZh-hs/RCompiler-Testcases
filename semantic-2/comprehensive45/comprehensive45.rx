@@ -33,21 +33,21 @@ fn main() {
         let mut i: i32 = 0;
         while (i < 512) {
             if (i % 20 < 10) {
-                data[i] = (i % 10) + 65; // 'A' through 'J'
+                data[i as usize] = (i % 10) + 65; // 'A' through 'J'
             } else {
-                data[i] = (i * 17 % 15) + 97; // 'a' through 'o'
+                data[i as usize] = (i * 17 % 15) + 97; // 'a' through 'o'
             }
             i = i + 1;
         }
         // Create some long repeating patterns
         i = 100;
         while (i < 120) {
-            data[i] = data[i - 20];
+            data[i as usize] = data[i as usize - 20];
             i = i + 1;
         }
         i = 300;
         while (i < 330) {
-            data[i] = data[i - 30];
+            data[i as usize] = data[i as usize - 30];
             i = i + 1;
         }
     }
@@ -62,7 +62,7 @@ fn main() {
             let mut current_match_len: i32 = 0;
             while (current_pos + current_match_len < 512 &&
                   current_match_len < max_lookahead &&
-                  data[i + current_match_len] == data[current_pos + current_match_len]) {
+                  data[(i + current_match_len) as usize] == data[(current_pos + current_match_len) as usize]) {
                 current_match_len = current_match_len + 1;
             }
 
@@ -98,23 +98,23 @@ fn main() {
             let offset: i32 = match_result / 1000;
             let len: i32 = match_result % 1000;
 
-            compressed_data[compressed_len] = 1; // Type 1: match
+            compressed_data[compressed_len as usize] = 1; // Type 1: match
             compressed_len = compressed_len + 1;
-            compressed_data[compressed_len] = offset;
+            compressed_data[compressed_len as usize] = offset;
             compressed_len = compressed_len + 1;
-            compressed_data[compressed_len] = len;
+            compressed_data[compressed_len as usize] = len;
             compressed_len = compressed_len + 1;
             current_pos = current_pos + len;
         } else {
             // Hidden Error: `literal_value` is defined inside an `if` block
             // but used outside of it, which should cause a scope error.
             if (compressed_len < 510) {
-                 let literal_value: i32 = input_data[current_pos];
-                 compressed_data[compressed_len] = 0; // Type 0: literal
+                 let literal_value: i32 = input_data[current_pos as usize];
+                 compressed_data[compressed_len as usize] = 0; // Type 0: literal
                  compressed_len = compressed_len + 1;
             }
             // The next line will fail because `literal_value` is not in scope.
-            compressed_data[compressed_len] = literal_value;
+            compressed_data[compressed_len as usize] = literal_value;
             compressed_len = compressed_len + 1;
             current_pos = current_pos + 1;
         }
@@ -123,7 +123,7 @@ fn main() {
     let mut checksum: i32 = 0;
     let mut i: i32 = 0;
     while (i < compressed_len) {
-        checksum = checksum + compressed_data[i] * (i + 1);
+        checksum = checksum + compressed_data[i as usize] * (i + 1);
         i = i + 1;
     }
     printInt(checksum);

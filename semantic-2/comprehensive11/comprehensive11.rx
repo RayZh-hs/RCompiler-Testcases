@@ -15,6 +15,20 @@ Boolean function inlining and optimization
 Truth table computation optimization
 */
 
+
+
+// Unified RNG: Park–Miller (a=16807, m=2147483647) using Schrage method to avoid overflow
+fn pm_rand_update(x: i32) -> i32 {
+    let a = 16807;
+    let m = 2147483647;
+    let q = 127773; // m / a
+    let r = 2836;   // m % a
+    let mut k = x / q;
+    let mut new_x = a * (x - k * q) - r * k;
+    if (new_x <= 0) { new_x += m; }
+    return new_x;
+}
+
 // comprehensive11.rx - Comprehensive Test 11: Boolean Logic and Optimization Test
 // This test focuses on compiler optimization of Boolean operations including:
 // - Boolean expression optimization and short-circuiting
@@ -111,7 +125,7 @@ fn testBooleanArrayOperations() {
         while (col < 100) {
             let index: i32 = row * 100 + col;
             // Create checkerboard pattern with modifications
-            bool_grid[index] = ((row + col) % 2 == 0) && (row % 3 != 0);
+            bool_grid[index as usize] = ((row + col) % 2 == 0) && (row % 3 != 0);
             col = col + 1;
         }
         row = row + 1;
@@ -142,11 +156,11 @@ fn performBooleanGridOperations(mut grid: [bool; 10000], pattern_count: &mut i32
             let neighbor_count: i32 = countBooleanNeighbors(grid, row, col);
             
             // Apply Boolean rules based on neighbors
-            if (grid[index] && (neighbor_count < 2 || neighbor_count > 3)) {
-                grid[index] = false;
+            if (grid[index as usize] && (neighbor_count < 2 || neighbor_count > 3)) {
+                grid[index as usize] = false;
                 operations = operations + 1;
-            } else if (!grid[index] && neighbor_count == 3) {
-                grid[index] = true;
+            } else if (!grid[index as usize] && neighbor_count == 3) {
+                grid[index as usize] = true;
                 operations = operations + 1;
             }
             
@@ -171,7 +185,7 @@ fn countBooleanNeighbors(grid: [bool; 10000], row: i32, col: i32) -> i32 {
                 let nc: i32 = col + dc;
                 if (nr >= 0 && nr < 100 && nc >= 0 && nc < 100) {
                     let neighbor_index: i32 = nr * 100 + nc;
-                    if (grid[neighbor_index]) {
+                    if (grid[neighbor_index as usize]) {
                         count = count + 1;
                     }
                 }
@@ -213,10 +227,10 @@ fn countBooleanPatterns(grid: [bool; 10000]) -> i32 {
 
 // Check for specific 2x2 Boolean pattern
 fn checkBooleanPattern2x2(grid: [bool; 10000], row: i32, col: i32) -> bool {
-    let tl: bool = grid[row * 100 + col];
-    let tr: bool = grid[row * 100 + col + 1];
-    let bl: bool = grid[(row + 1) * 100 + col];
-    let br: bool = grid[(row + 1) * 100 + col + 1];
+    let tl: bool = grid[(row * 100 + col) as usize];
+    let tr: bool = grid[(row * 100 + col + 1) as usize];
+    let bl: bool = grid[((row + 1) * 100 + col) as usize];
+    let br: bool = grid[((row + 1) * 100 + col + 1) as usize];
     
     // Look for specific patterns
     return (tl && !tr && !bl && br) || (!tl && tr && bl && !br);
@@ -234,7 +248,7 @@ fn checkBooleanPattern3x3(grid: [bool; 10000], row: i32, col: i32) -> bool {
     while (r < 3) {
         let mut c: i32 = 0;
         while (c < 3) {
-            if (grid[(row + r) * 100 + (col + c)]) {
+            if (grid[((row + r) * 100 + (col + c)) as usize]) {
                 true_count = true_count + 1;
             }
             c = c + 1;
@@ -410,9 +424,9 @@ fn nQueensBacktrack(mut board: [bool; 64], row: i32, n: i32) -> i32 {
     
     while (col < n) {
         if (isSafePosition(board, row, col, n)) {
-            board[row * n + col] = true;
+            board[(row * n + col) as usize] = true;
             solutions = solutions + nQueensBacktrack(board, row + 1, n);
-            board[row * n + col] = false;
+            board[(row * n + col) as usize] = false;
         }
         col = col + 1;
     }
@@ -426,7 +440,7 @@ fn isSafePosition(board: [bool; 64], row: i32, col: i32, n: i32) -> bool {
     
     // Check column
     while (i < row) {
-        if (board[i * n + col]) {
+        if (board[(i * n + col) as usize]) {
             return false;
         }
         i = i + 1;
@@ -436,7 +450,7 @@ fn isSafePosition(board: [bool; 64], row: i32, col: i32, n: i32) -> bool {
     i = row - 1;
     let mut j: i32 = col - 1;
     while (i >= 0 && j >= 0) {
-        if (board[i * n + j]) {
+        if (board[(i * n + j) as usize]) {
             return false;
         }
         i = i - 1;
@@ -447,7 +461,7 @@ fn isSafePosition(board: [bool; 64], row: i32, col: i32, n: i32) -> bool {
     i = row - 1;
     j = col + 1;
     while (i >= 0 && j < n) {
-        if (board[i * n + j]) {
+        if (board[(i * n + j) as usize]) {
             return false;
         }
         i = i - 1;
@@ -495,7 +509,7 @@ fn extractBooleanVariables(assignment: i32) -> [bool; 16] {
     let mut temp: i32 = assignment;
     
     while i < 16 {
-        vars[i] = (temp & 1) != 0;
+        vars[i as usize] = (temp & 1) != 0;
         temp = temp / 2;
         i = i + 1;
     }
@@ -528,11 +542,11 @@ fn initializeSearchData(mut data: [i32; 5000]) {
     let mut seed: i32 = 54321;
     
     while i < 5000 {
-        seed = (seed * 1664525 + 1013904223) % 2147483647;
+        seed = pm_rand_update(seed);
         if (seed < 0) {
             seed = -seed;
         }
-        data[i] = seed % 10000;
+        data[i as usize] = seed % 10000;
         i = i + 1;
     }
 }
@@ -543,10 +557,10 @@ fn performBooleanFilter(data: [i32; 5000]) -> i32 {
     let mut i: i32 = 0;
     
     while i < 5000 {
-        let condition1: bool = data[i] > 1000;
-        let condition2: bool = data[i] % 2 == 0;
-        let condition3: bool = data[i] < 8000;
-        let condition4: bool = isPrime(data[i] % 100);
+        let condition1: bool = data[i as usize] > 1000;
+        let condition2: bool = data[i as usize] % 2 == 0;
+        let condition3: bool = data[i as usize] < 8000;
+        let condition4: bool = isPrime(data[i as usize] % 100);
         
         // Complex Boolean filter condition
         if (condition1 && condition2) || (condition3 && condition4) {
@@ -565,7 +579,7 @@ fn performMultiCriteriaSearch(data: [i32; 5000]) -> i32 {
     let mut i: i32 = 0;
     
     while i < 5000 {
-        let criteria_met: i32 = countCriteriaMet(data[i]);
+        let criteria_met: i32 = countCriteriaMet(data[i as usize]);
         
         // Boolean condition based on number of criteria met
         if (criteria_met >= 3) {
@@ -607,12 +621,12 @@ fn performBooleanRangeSearch(data: [i32; 5000]) -> i32 {
     let mut i: i32 = 0;
     
     while i < 5000 {
-        let in_range1: bool = (data[i] >= 1000) && (data[i] <= 3000);
-        let in_range2: bool = (data[i] >= 6000) && (data[i] <= 8000);
-        let in_range3: bool = (data[i] >= 500) && (data[i] <= 1500);
+        let in_range1: bool = (data[i as usize] >= 1000) && (data[i as usize] <= 3000);
+        let in_range2: bool = (data[i as usize] >= 6000) && (data[i as usize] <= 8000);
+        let in_range3: bool = (data[i as usize] >= 500) && (data[i as usize] <= 1500);
         
         // Boolean combination of range conditions
-        if (in_range1 || in_range2 || (in_range3 && (data[i] % 2 == 0))) {
+        if (in_range1 || in_range2 || (in_range3 && (data[i as usize] % 2 == 0))) {
             range_matches = range_matches + 1;
         }
         
@@ -751,17 +765,17 @@ fn simulateBooleanAutomaton() -> i32 {
         
         // Apply Boolean automaton rules
         while i < 99 {
-            let left: bool = cells[i - 1];
-            let center: bool = cells[i];
-            let right: bool = cells[i + 1];
+            let left: bool = cells[i as usize - 1];
+            let center: bool = cells[i as usize];
+            let right: bool = cells[i as usize + 1];
             
             // Rule 30: Boolean rule for cellular automaton
-            new_cells[i] = (left && !center && !right) || 
+            new_cells[i as usize] = (left && !center && !right) || 
                           (!left && center && !right) ||
                           (!left && !center && right) ||
                           (!left && center && right);
             
-            if (new_cells[i] != cells[i]) {
+            if (new_cells[i as usize] != cells[i as usize]) {
                 changes = changes + 1;
             }
             
@@ -771,7 +785,7 @@ fn simulateBooleanAutomaton() -> i32 {
         // Copy new generation
         i = 0;
         while i < 100 {
-            cells[i] = new_cells[i];
+            cells[i as usize] = new_cells[i as usize];
             i = i + 1;
         }
         

@@ -171,12 +171,12 @@ fn simulate_cache_access(address: i32, l1_cache: [i32; 256], l2_cache: [i32; 409
     let way: i32 = 0;
     while (way < get_associativity()) {
         let cache_entry_base: i32 = (l1_index * get_associativity() + way) * 4;
-        let stored_tag: i32 = l1_cache[cache_entry_base];
-        let valid_bit: i32 = l1_cache[cache_entry_base + 1];
+        let stored_tag: i32 = l1_cache[cache_entry_base as usize];
+        let valid_bit: i32 = l1_cache[cache_entry_base as usize + 1];
         
         if valid_bit == 1 && stored_tag == l1_tag {
             // L1 cache hit
-            l1_cache[cache_entry_base + 2] = get_current_timestamp(); // Update LRU
+            l1_cache[cache_entry_base as usize + 2] = get_current_timestamp(); // Update LRU
             return 1; // L1 hit
         }
         way = way + 1;
@@ -189,12 +189,12 @@ fn simulate_cache_access(address: i32, l1_cache: [i32; 256], l2_cache: [i32; 409
     way = 0;
     while (way < 8) {
         let cache_entry_base: i32 = (l2_index * 8 + way) * 4;
-        let stored_tag: i32 = l2_cache[cache_entry_base];
-        let valid_bit: i32 = l2_cache[cache_entry_base + 1];
+        let stored_tag: i32 = l2_cache[cache_entry_base as usize];
+        let valid_bit: i32 = l2_cache[cache_entry_base as usize + 1];
         
         if valid_bit == 1 && stored_tag == l2_tag {
             // L2 cache hit
-            l2_cache[cache_entry_base + 2] = get_current_timestamp(); // Update LRU
+            l2_cache[cache_entry_base as usize + 2] = get_current_timestamp(); // Update LRU
             return 2; // L2 hit
         }
         way = way + 1;
@@ -213,10 +213,10 @@ fn simulate_cache_fill(address: i32, l1_cache: [i32; 256], l2_cache: [i32; 4096]
     let lru_way: i32 = find_lru_way_l1(l1_cache, l1_index);
     let cache_entry_base: i32 = (l1_index * get_associativity() + lru_way) * 4;
     
-    l1_cache[cache_entry_base] = l1_tag;
-    l1_cache[cache_entry_base + 1] = 1; // Set valid
-    l1_cache[cache_entry_base + 2] = get_current_timestamp(); // Set LRU timestamp
-    l1_cache[cache_entry_base + 3] = simulate_memory_read(address); // Load data
+    l1_cache[cache_entry_base as usize] = l1_tag;
+    l1_cache[cache_entry_base as usize + 1] = 1; // Set valid
+    l1_cache[cache_entry_base as usize + 2] = get_current_timestamp(); // Set LRU timestamp
+    l1_cache[cache_entry_base as usize + 3] = simulate_memory_read(address); // Load data
     
     // Fill L2 cache
     let l2_index: i32 = (address / get_cache_line_size()) % 64;
@@ -225,10 +225,10 @@ fn simulate_cache_fill(address: i32, l1_cache: [i32; 256], l2_cache: [i32; 4096]
     let l2_lru_way: i32 = find_lru_way_l2(l2_cache, l2_index);
     let l2_entry_base: i32 = (l2_index * 8 + l2_lru_way) * 4;
     
-    l2_cache[l2_entry_base] = l2_tag;
-    l2_cache[l2_entry_base + 1] = 1; // Set valid
-    l2_cache[l2_entry_base + 2] = get_current_timestamp(); // Set LRU timestamp
-    l2_cache[l2_entry_base + 3] = simulate_memory_read(address); // Load data
+    l2_cache[l2_entry_base as usize] = l2_tag;
+    l2_cache[l2_entry_base as usize + 1] = 1; // Set valid
+    l2_cache[l2_entry_base as usize + 2] = get_current_timestamp(); // Set LRU timestamp
+    l2_cache[l2_entry_base as usize + 3] = simulate_memory_read(address); // Load data
     
     return 1;
 }
@@ -241,8 +241,8 @@ fn find_lru_way_l1(l1_cache: [i32; 256], set_index: i32) -> i32 {
     let way: i32 = 0;
     while (way < get_associativity()) {
         let cache_entry_base: i32 = (set_index * get_associativity() + way) * 4;
-        let timestamp: i32 = l1_cache[cache_entry_base + 2];
-        let valid: i32 = l1_cache[cache_entry_base + 1];
+        let timestamp: i32 = l1_cache[cache_entry_base as usize + 2];
+        let valid: i32 = l1_cache[cache_entry_base as usize + 1];
         
         if valid == 0 {
             return way; // Found invalid entry
@@ -266,8 +266,8 @@ fn find_lru_way_l2(l2_cache: [i32; 4096], set_index: i32) -> i32 {
     let way: i32 = 0;
     while (way < 8) {
         let cache_entry_base: i32 = (set_index * 8 + way) * 4;
-        let timestamp: i32 = l2_cache[cache_entry_base + 2];
-        let valid: i32 = l2_cache[cache_entry_base + 1];
+        let timestamp: i32 = l2_cache[cache_entry_base as usize + 2];
+        let valid: i32 = l2_cache[cache_entry_base as usize + 1];
         
         if valid == 0 {
             return way; // Found invalid entry
@@ -331,7 +331,7 @@ fn run_memory_manager() -> i32 {
     
     while (allocation_index < total_allocations) {
         let size_index: i32 = allocation_index % 16;
-        let allocation_size: i32 = allocation_sizes[size_index];
+        let allocation_size: i32 = allocation_sizes[size_index as usize];
         
         // Try to allocate memory
         let allocated_address: i32 = allocate_memory(heap, free_blocks, allocated_blocks, 
@@ -388,27 +388,27 @@ fn allocate_memory(heap: [i32; 16384], free_blocks: [i32; 1024], allocated_block
     let block_index: i32 = 0;
     
     while (block_index < free_count) {
-        let block_start: i32 = free_blocks[block_index * 2];
-        let block_size: i32 = free_blocks[block_index * 2 + 1];
+        let block_start: i32 = free_blocks[block_index as usize * 2];
+        let block_size: i32 = free_blocks[block_index as usize * 2 + 1];
         
         if block_size >= size {
             // Allocate from this block
-            allocated_blocks[allocated_count * 2] = block_start;
-            allocated_blocks[allocated_count * 2 + 1] = size;
+            allocated_blocks[allocated_count as usize * 2] = block_start;
+            allocated_blocks[allocated_count as usize * 2 + 1] = size;
             
             // Update free block
             if block_size == size {
                 // Remove entire block
                 let move_index: i32 = block_index;
                 while (move_index < free_count - 1) {
-                    free_blocks[move_index * 2] = free_blocks[(move_index + 1) * 2];
-                    free_blocks[move_index * 2 + 1] = free_blocks[(move_index + 1) * 2 + 1];
+                    free_blocks[move_index as usize * 2] = free_blocks[(move_index as usize + 1) * 2];
+                    free_blocks[move_index as usize * 2 + 1] = free_blocks[(move_index as usize + 1) * 2 + 1];
                     move_index = move_index + 1;
                 }
             } else {
                 // Split block
-                free_blocks[block_index * 2] = block_start + size;
-                free_blocks[block_index * 2 + 1] = block_size - size;
+                free_blocks[block_index as usize * 2] = block_start + size;
+                free_blocks[block_index as usize * 2 + 1] = block_size - size;
             }
             
             return block_start;
@@ -541,13 +541,13 @@ fn run_garbage_collection(heap: [i32; 16384], free_blocks: [i32; 1024], allocate
     // Sweep unreachable blocks
     let block_index: i32 = 0;
     while (block_index < allocated_count) {
-        if !reachable_blocks[block_index] {
-            let block_start: i32 = allocated_blocks[block_index * 2];
-            let block_size: i32 = allocated_blocks[block_index * 2 + 1];
+        if !reachable_blocks[block_index as usize] {
+            let block_start: i32 = allocated_blocks[block_index as usize * 2];
+            let block_size: i32 = allocated_blocks[block_index as usize * 2 + 1];
             
             // Add to free list
-            free_blocks[free_count * 2] = block_start;
-            free_blocks[free_count * 2 + 1] = block_size;
+            free_blocks[free_count as usize * 2] = block_start;
+            free_blocks[free_count as usize * 2 + 1] = block_size;
             
             reclaimed_memory = reclaimed_memory + block_size;
             blocks_freed = blocks_freed + 1;
@@ -567,14 +567,14 @@ fn mark_reachable_blocks(allocated_blocks: [i32; 1024], allocated_count: i32, re
     let block_index: i32 = 0;
     
     while (block_index < allocated_count) {
-        let block_start: i32 = allocated_blocks[block_index * 2];
-        let block_size: i32 = allocated_blocks[block_index * 2 + 1];
+        let block_start: i32 = allocated_blocks[block_index as usize * 2];
+        let block_size: i32 = allocated_blocks[block_index as usize * 2 + 1];
         
         // Simplified reachability test based on block characteristics
         let reachability_score: i32 = compute_reachability_score(block_start, block_size, block_index);
         
         if reachability_score > 50 {
-            reachable[block_index] = true;
+            reachable[block_index as usize] = true;
             reachable_count = reachable_count + 1;
         }
         
@@ -617,19 +617,19 @@ fn coalesce_free_blocks(free_blocks: [i32; 1024], block_count: i32) -> i32 {
     while (i < block_count - 1) {
         let j: i32 = 0;
         while (j < block_count - 1 - i) {
-            let addr1: i32 = free_blocks[j * 2];
-            let addr2: i32 = free_blocks[(j + 1) * 2];
+            let addr1: i32 = free_blocks[j as usize * 2];
+            let addr2: i32 = free_blocks[(j as usize + 1) * 2];
             
             if addr1 > addr2 {
                 // Swap blocks
-                let temp_addr: i32 = free_blocks[j * 2];
-                let temp_size: i32 = free_blocks[j * 2 + 1];
+                let temp_addr: i32 = free_blocks[j as usize * 2];
+                let temp_size: i32 = free_blocks[j as usize * 2 + 1];
                 
-                free_blocks[j * 2] = free_blocks[(j + 1) * 2];
-                free_blocks[j * 2 + 1] = free_blocks[(j + 1) * 2 + 1];
+                free_blocks[j as usize * 2] = free_blocks[(j as usize + 1) * 2];
+                free_blocks[j as usize * 2 + 1] = free_blocks[(j as usize + 1) * 2 + 1];
                 
-                free_blocks[(j + 1) * 2] = temp_addr;
-                free_blocks[(j + 1) * 2 + 1] = temp_size;
+                free_blocks[(j as usize + 1) * 2] = temp_addr;
+                free_blocks[(j as usize + 1) * 2 + 1] = temp_size;
             }
             j = j + 1;
         }
@@ -639,19 +639,19 @@ fn coalesce_free_blocks(free_blocks: [i32; 1024], block_count: i32) -> i32 {
     // Coalesce adjacent blocks
     i = 0;
     while i < block_count - 1 {
-        let curr_addr: i32 = free_blocks[i * 2];
-        let curr_size: i32 = free_blocks[i * 2 + 1];
-        let next_addr: i32 = free_blocks[(i + 1) * 2];
+        let curr_addr: i32 = free_blocks[i as usize * 2];
+        let curr_size: i32 = free_blocks[i as usize * 2 + 1];
+        let next_addr: i32 = free_blocks[(i as usize + 1) * 2];
         
         if curr_addr + curr_size == next_addr {
             // Coalesce blocks
-            free_blocks[i * 2 + 1] = curr_size + free_blocks[(i + 1) * 2 + 1];
+            free_blocks[i as usize * 2 + 1] = curr_size + free_blocks[(i as usize + 1) * 2 + 1];
             
             // Remove next block
             let move_index: i32 = i + 1;
             while move_index < block_count - 1 {
-                free_blocks[move_index * 2] = free_blocks[(move_index + 1) * 2];
-                free_blocks[move_index * 2 + 1] = free_blocks[(move_index + 1) * 2 + 1];
+                free_blocks[move_index as usize * 2] = free_blocks[(move_index as usize + 1) * 2];
+                free_blocks[move_index as usize * 2 + 1] = free_blocks[(move_index as usize + 1) * 2 + 1];
                 move_index = move_index + 1;
             }
             
@@ -672,18 +672,18 @@ fn free_random_block(heap: [i32; 16384], free_blocks: [i32; 1024], allocated_blo
     }
     
     let random_index: i32 = hash_function(allocated_count) % allocated_count;
-    let block_start: i32 = allocated_blocks[random_index * 2];
-    let block_size: i32 = allocated_blocks[random_index * 2 + 1];
+    let block_start: i32 = allocated_blocks[random_index as usize * 2];
+    let block_size: i32 = allocated_blocks[random_index as usize * 2 + 1];
     
     // Add to free list
-    free_blocks[free_count * 2] = block_start;
-    free_blocks[free_count * 2 + 1] = block_size;
+    free_blocks[free_count as usize * 2] = block_start;
+    free_blocks[free_count as usize * 2 + 1] = block_size;
     
     // Remove from allocated list
     let move_index: i32 = random_index;
     while move_index < allocated_count - 1 {
-        allocated_blocks[move_index * 2] = allocated_blocks[(move_index + 1) * 2];
-        allocated_blocks[move_index * 2 + 1] = allocated_blocks[(move_index + 1) * 2 + 1];
+        allocated_blocks[move_index as usize * 2] = allocated_blocks[(move_index as usize + 1) * 2];
+        allocated_blocks[move_index as usize * 2 + 1] = allocated_blocks[(move_index as usize + 1) * 2 + 1];
         move_index = move_index + 1;
     }
     
@@ -806,18 +806,18 @@ fn hash_table_insert(table: [i32; 2048], occupied: [bool; 1024], deleted: [bool;
     while probe_count < get_max_probe_distance() {
         let index: i32 = (original_hash + probe_count * probe_count) % size;
         
-        if !occupied[index] || deleted[index] {
+        if !occupied[index as usize] || deleted[index as usize] {
             // Found empty or deleted slot
-            table[index * 2] = key;
-            table[index * 2 + 1] = value;
-            occupied[index] = true;
-            deleted[index] = false;
+            table[index as usize * 2] = key;
+            table[index as usize * 2 + 1] = value;
+            occupied[index as usize] = true;
+            deleted[index as usize] = false;
             return probe_count; // Return number of probes
         }
         
-        if table[index * 2] == key {
+        if table[index as usize * 2] == key {
             // Key already exists, update value
-            table[index * 2 + 1] = value;
+            table[index as usize * 2 + 1] = value;
             return 0; // No probing needed
         }
         
@@ -837,12 +837,12 @@ fn hash_table_lookup(table: [i32; 2048], occupied: [bool; 1024], deleted: [bool;
     while probe_count < get_max_probe_distance() {
         let index: i32 = (original_hash + probe_count * probe_count) % size;
         
-        if !occupied[index] && !deleted[index] {
+        if !occupied[index as usize] && !deleted[index as usize] {
             return -1; // Key not found
         }
         
-        if occupied[index] && !deleted[index] && table[index * 2] == key {
-            return table[index * 2 + 1]; // Found key, return value
+        if occupied[index as usize] && !deleted[index as usize] && table[index as usize * 2] == key {
+            return table[index as usize * 2 + 1]; // Found key, return value
         }
         
         probe_count = probe_count + 1;
@@ -861,12 +861,12 @@ fn hash_table_delete(table: [i32; 2048], occupied: [bool; 1024], deleted: [bool;
     while probe_count < get_max_probe_distance() {
         let index: i32 = (original_hash + probe_count * probe_count) % size;
         
-        if !occupied[index] && !deleted[index] {
+        if !occupied[index as usize] && !deleted[index as usize] {
             return 0; // Key not found
         }
         
-        if occupied[index] && !deleted[index] && table[index * 2] == key {
-            deleted[index] = true; // Mark as deleted
+        if occupied[index as usize] && !deleted[index as usize] && table[index as usize * 2] == key {
+            deleted[index as usize] = true; // Mark as deleted
             return 1; // Successfully deleted
         }
         
@@ -959,27 +959,27 @@ fn priority_queue_insert(heap: [i32; 512], size: i32, priority: i32, data: i32) 
     let index: i32 = size;
     
     // Insert at the end
-    heap[index * 2] = priority;
-    heap[index * 2 + 1] = data;
+    heap[index as usize * 2] = priority;
+    heap[index as usize * 2 + 1] = data;
     
     // Bubble up to maintain heap property
     while index > 0 {
         let parent_index: i32 = (index - 1) / 2;
-        let parent_priority: i32 = heap[parent_index * 2];
+        let parent_priority: i32 = heap[parent_index as usize * 2];
         
-        if heap[index * 2] <= parent_priority {
+        if heap[index as usize * 2] <= parent_priority {
             break; // Heap property satisfied
         }
         
         // Swap with parent
-        let temp_priority: i32 = heap[index * 2];
-        let temp_data: i32 = heap[index * 2 + 1];
+        let temp_priority: i32 = heap[index as usize * 2];
+        let temp_data: i32 = heap[index as usize * 2 + 1];
         
-        heap[index * 2] = heap[parent_index * 2];
-        heap[index * 2 + 1] = heap[parent_index * 2 + 1];
+        heap[index as usize * 2] = heap[parent_index as usize * 2];
+        heap[index as usize * 2 + 1] = heap[parent_index as usize * 2 + 1];
         
-        heap[parent_index * 2] = temp_priority;
-        heap[parent_index * 2 + 1] = temp_data;
+        heap[parent_index as usize * 2] = temp_priority;
+        heap[parent_index as usize * 2 + 1] = temp_data;
         
         index = parent_index;
     }
@@ -996,8 +996,8 @@ fn priority_queue_extract_max(heap: [i32; 512], size: i32) -> i32 {
     let max_priority: i32 = heap[0];
     
     // Move last element to root
-    heap[0] = heap[(size - 1) * 2];
-    heap[1] = heap[(size - 1) * 2 + 1];
+    heap[0] = heap[(size as usize - 1) * 2];
+    heap[1] = heap[(size as usize - 1) * 2 + 1];
     
     // Bubble down to maintain heap property
     let index: i32 = 0;
@@ -1009,11 +1009,11 @@ fn priority_queue_extract_max(heap: [i32; 512], size: i32) -> i32 {
         let largest: i32 = index;
         
         // Find largest among node and its children
-        if left_child < new_size && heap[left_child * 2] > heap[largest * 2] {
+        if left_child < new_size && heap[left_child as usize * 2] > heap[largest as usize * 2] {
             largest = left_child;
         }
         
-        if right_child < new_size && heap[right_child * 2] > heap[largest * 2] {
+        if right_child < new_size && heap[right_child as usize * 2] > heap[largest as usize * 2] {
             largest = right_child;
         }
         
@@ -1022,14 +1022,14 @@ fn priority_queue_extract_max(heap: [i32; 512], size: i32) -> i32 {
         }
         
         // Swap with largest child
-        let temp_priority: i32 = heap[index * 2];
-        let temp_data: i32 = heap[index * 2 + 1];
+        let temp_priority: i32 = heap[index as usize * 2];
+        let temp_data: i32 = heap[index as usize * 2 + 1];
         
-        heap[index * 2] = heap[largest * 2];
-        heap[index * 2 + 1] = heap[largest * 2 + 1];
+        heap[index as usize * 2] = heap[largest as usize * 2];
+        heap[index as usize * 2 + 1] = heap[largest as usize * 2 + 1];
         
-        heap[largest * 2] = temp_priority;
-        heap[largest * 2 + 1] = temp_data;
+        heap[largest as usize * 2] = temp_priority;
+        heap[largest as usize * 2 + 1] = temp_data;
         
         index = largest;
     }
@@ -1050,11 +1050,11 @@ fn validate_heap_property(heap: [i32; 512], size: i32) -> i32 {
         let left_child: i32 = 2 * index + 1;
         let right_child: i32 = 2 * index + 2;
         
-        if left_child < size && heap[index * 2] < heap[left_child * 2] {
+        if left_child < size && heap[index as usize * 2] < heap[left_child as usize * 2] {
             return 0; // Heap property violated
         }
         
-        if right_child < size && heap[index * 2] < heap[right_child * 2] {
+        if right_child < size && heap[index as usize * 2] < heap[right_child as usize * 2] {
             return 0; // Heap property violated
         }
         

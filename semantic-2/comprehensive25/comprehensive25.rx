@@ -110,7 +110,7 @@ fn conductLeaderElection(node_count: i32, mut node_states: [i32; 7], mut node_te
     // Reset votes for new term
     let mut i: i32 = 0;
     while (i < node_count) {
-        node_votes[i] = -1;
+        node_votes[i as usize] = -1;
         i = i + 1;
     }
     
@@ -121,10 +121,10 @@ fn conductLeaderElection(node_count: i32, mut node_states: [i32; 7], mut node_te
     i = 0;
     while (i < node_count) {
         // Complex condition for becoming candidate
-        if (shouldBecomeCandidate(i, node_states[i], node_terms[i], current_term)) {
-            candidates[i] = true;
-            node_states[i] = 1; // Become candidate
-            node_terms[i] = current_term;
+        if (shouldBecomeCandidate(i, node_states[i as usize], node_terms[i as usize], current_term)) {
+            candidates[i as usize] = true;
+            node_states[i as usize] = 1; // Become candidate
+            node_terms[i as usize] = current_term;
             candidate_count = candidate_count + 1;
         }
         i = i + 1;
@@ -134,11 +134,11 @@ fn conductLeaderElection(node_count: i32, mut node_states: [i32; 7], mut node_te
     let mut vote_counts: [i32; 7] = [0; 7];
     let mut voter: i32 = 0;
     while (voter < node_count) {
-        if (node_states[voter] != 1) { // Non-candidates can vote
+        if (node_states[voter as usize] != 1) { // Non-candidates can vote
             let vote_choice: i32 = decideVote(voter, node_count, candidates, node_terms, current_term);
             if (vote_choice >= 0 && vote_choice < node_count) {
-                node_votes[voter] = vote_choice;
-                vote_counts[vote_choice] = vote_counts[vote_choice] + 1;
+                node_votes[voter as usize] = vote_choice;
+                vote_counts[vote_choice as usize] = vote_counts[vote_choice as usize] + 1;
             }
         }
         voter = voter + 1;
@@ -147,9 +147,9 @@ fn conductLeaderElection(node_count: i32, mut node_states: [i32; 7], mut node_te
     // Self-voting by candidates
     let mut candidate_id: i32 = 0;
     while (candidate_id < node_count) {
-        if (candidates[candidate_id]) {
-            node_votes[candidate_id] = candidate_id;
-            vote_counts[candidate_id] = vote_counts[candidate_id] + 1;
+        if (candidates[candidate_id as usize]) {
+            node_votes[candidate_id as usize] = candidate_id;
+            vote_counts[candidate_id as usize] = vote_counts[candidate_id as usize] + 1;
         }
         candidate_id = candidate_id + 1;
     }
@@ -159,9 +159,9 @@ fn conductLeaderElection(node_count: i32, mut node_states: [i32; 7], mut node_te
     let mut winner: i32 = -1;
     let mut check_candidate: i32 = 0;
     while (check_candidate < node_count) {
-        if (vote_counts[check_candidate] >= majority_threshold) {
+        if (vote_counts[check_candidate as usize] >= majority_threshold) {
             winner = check_candidate;
-            node_states[check_candidate] = 2; // Become leader
+            node_states[check_candidate as usize] = 2; // Become leader
             break;
         }
         check_candidate = check_candidate + 1;
@@ -177,9 +177,9 @@ fn decideVote(voter_id: i32, node_count: i32, candidates: [bool; 7], node_terms:
     
     let mut candidate_id: i32 = 0;
     while (candidate_id < node_count) {
-        if (candidates[candidate_id]) {
+        if (candidates[candidate_id as usize]) {
             // Complex voting criteria
-            let candidate_score: i32 = calculateCandidateScore(candidate_id, voter_id, node_terms[candidate_id], current_term);
+            let candidate_score: i32 = calculateCandidateScore(candidate_id, voter_id, node_terms[candidate_id as usize], current_term);
             
             if (candidate_score > best_term) {
                 best_term = candidate_score;
@@ -213,12 +213,12 @@ fn calculateCandidateScore(candidate_id: i32, voter_id: i32, candidate_term: i32
 // Log replication with complex consistency checks
 fn performLogReplication(leader_id: i32, node_count: i32, mut node_logs: [[i32; 100]; 7], mut log_lengths: [i32; 7]) -> bool {
     // Leader proposes new log entry
-    let new_entry: i32 = generateLogEntry(leader_id, log_lengths[leader_id]);
+    let new_entry: i32 = generateLogEntry(leader_id, log_lengths[leader_id as usize]);
     
     // Add to leader's log
-    if (log_lengths[leader_id] < 100) {
-        node_logs[leader_id][log_lengths[leader_id]] = new_entry;
-        log_lengths[leader_id] = log_lengths[leader_id] + 1;
+    if (log_lengths[leader_id as usize] < 100) {
+        node_logs[leader_id as usize][(log_lengths[leader_id as usize]) as usize] = new_entry;
+        log_lengths[leader_id as usize] = log_lengths[leader_id as usize] + 1;
     }
     
     // Replicate to followers with complex acknowledgment logic
@@ -251,9 +251,9 @@ fn replicateToFollower(leader_id: i32, follower_id: i32, entry: i32, mut node_lo
     // Check log consistency before appending
     let consistency_ok: bool = checkLogConsistency(leader_id, follower_id, node_logs, log_lengths);
     
-    if (consistency_ok && log_lengths[follower_id] < 100) {
-        node_logs[follower_id][log_lengths[follower_id]] = entry;
-        log_lengths[follower_id] = log_lengths[follower_id] + 1;
+    if (consistency_ok && log_lengths[follower_id as usize] < 100) {
+        node_logs[follower_id as usize][(log_lengths[follower_id as usize]) as usize] = entry;
+        log_lengths[follower_id as usize] = log_lengths[follower_id as usize] + 1;
         return true;
     }
     
@@ -270,7 +270,7 @@ fn performByzantineFaultToleranceTest(node_count: i32, byzantine_tolerance: i32)
     let mut i: i32 = 0;
     while (i < node_count && byzantine_count < byzantine_tolerance) {
         if (shouldBeByzantine(i)) {
-            byzantine_nodes[i] = true;
+            byzantine_nodes[i as usize] = true;
             byzantine_count = byzantine_count + 1;
         }
         i = i + 1;
@@ -328,25 +328,25 @@ fn conductByzantineValueProposal(
     
     let mut node_id: i32 = 0;
     while (node_id < node_count) {
-        if (byzantine_nodes[node_id]) {
+        if (byzantine_nodes[node_id as usize]) {
             // Byzantine nodes propose conflicting values
             let malicious_value1: i32 = generateMaliciousValue(node_id, round, 1);
             let malicious_value2: i32 = generateMaliciousValue(node_id, round, 2);
             let malicious_value3: i32 = generateMaliciousValue(node_id, round, 3);
             
-            consensus_proposals[node_id][0] = malicious_value1;
-            consensus_proposals[node_id][1] = malicious_value2;
-            consensus_proposals[node_id][2] = malicious_value3;
+            consensus_proposals[node_id as usize][0] = malicious_value1;
+            consensus_proposals[node_id as usize][1] = malicious_value2;
+            consensus_proposals[node_id as usize][2] = malicious_value3;
             
-            node_values[node_id] = malicious_value1; // Primary malicious value
+            node_values[node_id as usize] = malicious_value1; // Primary malicious value
         } else {
             // Honest nodes propose consistent values
             let honest_value: i32 = generateHonestValue(node_id, round);
-            consensus_proposals[node_id][0] = honest_value;
-            consensus_proposals[node_id][1] = honest_value;
-            consensus_proposals[node_id][2] = honest_value;
+            consensus_proposals[node_id as usize][0] = honest_value;
+            consensus_proposals[node_id as usize][1] = honest_value;
+            consensus_proposals[node_id as usize][2] = honest_value;
             
-            node_values[node_id] = honest_value;
+            node_values[node_id as usize] = honest_value;
         }
         
         proposal_count = proposal_count + 1;
@@ -371,13 +371,13 @@ fn performByzantineAgreement(
     while (signer < node_count) {
         let mut proposal_owner: i32 = 0;
         while (proposal_owner < node_count) {
-            let signature: i32 = generateSignature(signer, proposal_owner, consensus_proposals[proposal_owner][0], round);
+            let signature: i32 = generateSignature(signer, proposal_owner, consensus_proposals[proposal_owner as usize][0], round);
             
-            if (byzantine_nodes[signer]) {
+            if (byzantine_nodes[signer as usize]) {
                 // Byzantine nodes may forge signatures or sign multiple conflicting values
-                signature_matrix[signer][proposal_owner] = corruptSignature(signature, signer, proposal_owner);
+                signature_matrix[signer as usize][proposal_owner as usize] = corruptSignature(signature, signer, proposal_owner);
             } else {
-                signature_matrix[signer][proposal_owner] = signature;
+                signature_matrix[signer as usize][proposal_owner as usize] = signature;
             }
             
             proposal_owner = proposal_owner + 1;
@@ -399,7 +399,7 @@ fn performByzantineAgreement(
         let required_signatures: i32 = (node_count - ((node_count - 1) / 3)) ;
         
         if (signature_count >= required_signatures) {
-            valid_proposals[proposal_id] = true;
+            valid_proposals[proposal_id as usize] = true;
             valid_count = valid_count + 1;
         }
         
@@ -461,7 +461,7 @@ fn createNetworkPartition(
     while (i < node_count) {
         let mut j: i32 = 0;
         while (j < node_count) {
-            network_connectivity[i][j] = false;
+            network_connectivity[i as usize][j as usize] = false;
             j = j + 1;
         }
         i = i + 1;
@@ -493,7 +493,7 @@ fn performLeaderElectionTest(node_count: i32) {
     // Generate initial priorities
     let mut i: i32 = 0;
     while (i < node_count) {
-        node_priorities[i] = generateNodePriority(i);
+        node_priorities[i as usize] = generateNodePriority(i);
         i = i + 1;
     }
     
@@ -577,7 +577,7 @@ fn performAsynchronousConsensusTest(node_count: i32, max_rounds: i32) {
             
             if (consensus_reached) {
                 let consensus_value: i32 = extractConsensusValue(node_count, node_decisions);
-                consensus_values[consensus_count] = consensus_value;
+                consensus_values[consensus_count as usize] = consensus_value;
                 consensus_count = consensus_count + 1;
                 
                 printInt(25500 + consensus_count);
@@ -605,8 +605,8 @@ fn findMaxTerm(terms: [i32; 7], count: i32) -> i32 {
     let mut max_term: i32 = 0;
     let mut i: i32 = 0;
     while (i < count) {
-        if (terms[i] > max_term) {
-            max_term = terms[i];
+        if (terms[i as usize] > max_term) {
+            max_term = terms[i as usize];
         }
         i = i + 1;
     }
@@ -640,13 +640,13 @@ fn simulateNetworkReliability(from_node: i32, to_node: i32) -> bool {
 }
 
 fn checkLogConsistency(leader_id: i32, follower_id: i32, node_logs: [[i32; 100]; 7], log_lengths: [i32; 7]) -> bool {
-    if (log_lengths[follower_id] > log_lengths[leader_id]) {
+    if (log_lengths[follower_id as usize] > log_lengths[leader_id as usize]) {
         return false;
     }
     
     let mut i: i32 = 0;
-    while (i < log_lengths[follower_id]) {
-        if (node_logs[leader_id][i] != node_logs[follower_id][i]) {
+    while (i < log_lengths[follower_id as usize]) {
+        if (node_logs[leader_id as usize][i as usize] != node_logs[follower_id as usize][i as usize]) {
             return false;
         }
         i = i + 1;
@@ -663,7 +663,7 @@ fn verifyLogConsistency(node_count: i32, node_logs: [[i32; 100]; 7], log_lengths
     let reference_length: i32 = log_lengths[0];
     let mut i: i32 = 1;
     while (i < node_count) {
-        if (log_lengths[i] != reference_length) {
+        if (log_lengths[i as usize] != reference_length) {
             return false;
         }
         i = i + 1;
@@ -672,10 +672,10 @@ fn verifyLogConsistency(node_count: i32, node_logs: [[i32; 100]; 7], log_lengths
     // Check log content consistency
     let mut log_pos: i32 = 0;
     while (log_pos < reference_length) {
-        let reference_entry: i32 = node_logs[0][log_pos];
+        let reference_entry: i32 = node_logs[0][log_pos as usize];
         let mut node_id: i32 = 1;
         while (node_id < node_count) {
-            if (node_logs[node_id][log_pos] != reference_entry) {
+            if (node_logs[node_id as usize][log_pos as usize] != reference_entry) {
                 return false;
             }
             node_id = node_id + 1;
@@ -725,14 +725,14 @@ fn countValidSignatures(
     
     let mut signer: i32 = 0;
     while (signer < node_count) {
-        if (!byzantine_nodes[signer]) { // Only count signatures from honest nodes
+        if (!byzantine_nodes[signer as usize]) { // Only count signatures from honest nodes
             let expected_signature: i32 = generateSignature(
-                signer, proposal_id, consensus_proposals[proposal_id][0], 0
+                signer, proposal_id, consensus_proposals[proposal_id as usize][0], 0
             );
             
             // Simplified signature verification
             let signature_valid: bool = verifySignature(
-                signature_matrix[signer][proposal_id], expected_signature
+                signature_matrix[signer as usize][proposal_id as usize], expected_signature
             );
             
             if (signature_valid) {
@@ -761,12 +761,12 @@ fn checkProposalAgreement(
     
     let mut i: i32 = 0;
     while (i < node_count) {
-        if (valid_proposals[i]) {
+        if (valid_proposals[i as usize]) {
             if (!found_first) {
-                first_valid_value = consensus_proposals[i][0];
+                first_valid_value = consensus_proposals[i as usize][0];
                 found_first = true;
             } else {
-                if (consensus_proposals[i][0] != first_valid_value) {
+                if (consensus_proposals[i as usize][0] != first_valid_value) {
                     return false; // Disagreement found
                 }
             }
@@ -787,12 +787,12 @@ fn verifyHonestNodeAgreement(
     
     let mut i: i32 = 0;
     while (i < node_count) {
-        if (!byzantine_nodes[i]) {
+        if (!byzantine_nodes[i as usize]) {
             if (!found_honest_value) {
-                honest_value = consensus_proposals[i][0];
+                honest_value = consensus_proposals[i as usize][0];
                 found_honest_value = true;
             } else {
-                if (consensus_proposals[i][0] != honest_value) {
+                if (consensus_proposals[i as usize][0] != honest_value) {
                     return false;
                 }
             }
@@ -815,9 +815,9 @@ fn createBinaryPartition(
     let mut i: i32 = 0;
     while (i < node_count) {
         if (i < partition_size) {
-            partition_groups[i] = 0;
+            partition_groups[i as usize] = 0;
         } else {
-            partition_groups[i] = 1;
+            partition_groups[i as usize] = 1;
         }
         i = i + 1;
     }
@@ -836,9 +836,9 @@ fn createAsymmetricPartition(
     let mut i: i32 = 0;
     while (i < node_count) {
         if (i < majority_size) {
-            partition_groups[i] = 0; // Majority partition
+            partition_groups[i as usize] = 0; // Majority partition
         } else {
-            partition_groups[i] = 1; // Minority partition
+            partition_groups[i as usize] = 1; // Minority partition
         }
         i = i + 1;
     }
@@ -854,7 +854,7 @@ fn createMultiwayPartition(
     // Create 3-way partition
     let mut i: i32 = 0;
     while (i < node_count) {
-        partition_groups[i] = i % 3;
+        partition_groups[i as usize] = i % 3;
         i = i + 1;
     }
     
@@ -871,9 +871,9 @@ fn updateConnectivityMatrix(
         let mut j: i32 = 0;
         while (j < node_count) {
             if (i == j) {
-                network_connectivity[i][j] = true; // Node can always talk to itself
+                network_connectivity[i as usize][j as usize] = true; // Node can always talk to itself
             } else {
-                network_connectivity[i][j] = partition_groups[i] == partition_groups[j];
+                network_connectivity[i as usize][j as usize] = partition_groups[i as usize] == partition_groups[j as usize];
             }
             j = j + 1;
         }
@@ -917,11 +917,11 @@ fn healNetworkPartition(
     // Restore full connectivity
     let mut i: i32 = 0;
     while (i < node_count) {
-        partition_groups[i] = 0; // All nodes in same partition
+        partition_groups[i as usize] = 0; // All nodes in same partition
         
         let mut j: i32 = 0;
         while (j < node_count) {
-            network_connectivity[i][j] = true;
+            network_connectivity[i as usize][j as usize] = true;
             j = j + 1;
         }
         i = i + 1;
@@ -934,7 +934,7 @@ fn testPartitionRecovery(node_count: i32, network_connectivity: [[bool; 7]; 7]) 
     while (i < node_count) {
         let mut j: i32 = 0;
         while (j < node_count) {
-            if (!network_connectivity[i][j]) {
+            if (!network_connectivity[i as usize][j as usize]) {
                 return false;
             }
             j = j + 1;
@@ -958,9 +958,9 @@ fn simulateNodeFailures(node_count: i32, mut node_health_status: [i32; 7], round
         let failure_probability: i32 = (i * 19 + round * 7) % 100;
         
         if (failure_probability < 20) { // 20% chance of health degradation
-            node_health_status[i] = node_health_status[i] - 25;
-            if (node_health_status[i] < 0) {
-                node_health_status[i] = 0;
+            node_health_status[i as usize] = node_health_status[i as usize] - 25;
+            if (node_health_status[i as usize] < 0) {
+                node_health_status[i as usize] = 0;
             }
         }
         i = i + 1;
@@ -978,7 +978,7 @@ fn updateFailureDetectors(
         while (target < node_count) {
             if (detector != target) {
                 // Failure detected if target health is below threshold
-                failure_detectors[detector][target] = node_health_status[target] < 30;
+                failure_detectors[detector as usize][target as usize] = node_health_status[target as usize] < 30;
             }
             target = target + 1;
         }
@@ -998,12 +998,12 @@ fn conductFailureAwareElection(
     
     let mut candidate: i32 = 0;
     while (candidate < node_count) {
-        if (node_health_status[candidate] > 30) { // Healthy enough to be leader
+        if (node_health_status[candidate as usize] > 30) { // Healthy enough to be leader
             let failure_count: i32 = countDetectedFailures(candidate, node_count, failure_detectors);
             
             // Calculate composite score
-            let health_score: i32 = node_health_status[candidate] * 10;
-            let priority_score: i32 = node_priorities[candidate];
+            let health_score: i32 = node_health_status[candidate as usize] * 10;
+            let priority_score: i32 = node_priorities[candidate as usize];
             let reliability_score: i32 = (node_count - failure_count) * 100;
             
             let total_score: i32 = health_score + priority_score + reliability_score;
@@ -1030,8 +1030,8 @@ fn testLeadershipStability(
     
     let mut voter: i32 = 0;
     while (voter < node_count) {
-        if (voter != leader_id && node_health_status[voter] > 30) {
-            if (!failure_detectors[voter][leader_id]) {
+        if (voter != leader_id && node_health_status[voter as usize] > 30) {
+            if (!failure_detectors[voter as usize][leader_id as usize]) {
                 support_count = support_count + 1;
             }
         }
@@ -1045,10 +1045,10 @@ fn testLeadershipStability(
 fn simulateNodeRecovery(node_count: i32, mut node_health_status: [i32; 7]) {
     let mut i: i32 = 0;
     while (i < node_count) {
-        if (node_health_status[i] < 100) {
-            node_health_status[i] = node_health_status[i] + 15; // Gradual recovery
-            if (node_health_status[i] > 100) {
-                node_health_status[i] = 100;
+        if (node_health_status[i as usize] < 100) {
+            node_health_status[i as usize] = node_health_status[i as usize] + 15; // Gradual recovery
+            if (node_health_status[i as usize] > 100) {
+                node_health_status[i as usize] = 100;
             }
         }
         i = i + 1;
@@ -1060,7 +1060,7 @@ fn simulateNodeRecovery(node_count: i32, mut node_health_status: [i32; 7]) {
 fn generateAsyncProposals(node_count: i32, mut node_proposals: [i32; 7], round: i32) {
     let mut i: i32 = 0;
     while (i < node_count) {
-        node_proposals[i] = (round * 100) + (i * 10) + ((round + i) % 7);
+        node_proposals[i as usize] = (round * 100) + (i * 10) + ((round + i) % 7);
         i = i + 1;
     }
 }
@@ -1080,9 +1080,9 @@ fn enqueueProposalsWithDelays(
     while (i < node_count && queue_size < 1000) {
         let delay: i32 = (i * 13 + current_time * 7) % 20; // 0-19 time units delay
         
-        message_queue[queue_tail] = node_proposals[i];
-        message_delays[queue_tail] = delay;
-        message_timestamps[queue_tail] = current_time;
+        message_queue[queue_tail as usize] = node_proposals[i as usize];
+        message_delays[queue_tail as usize] = delay;
+        message_timestamps[queue_tail as usize] = current_time;
         
         queue_tail = (queue_tail + 1) % 1000;
         queue_size = queue_size + 1;
@@ -1105,11 +1105,11 @@ fn processAsyncMessages(
     // Process messages whose delay has expired
     let mut checked: i32 = 0;
     while (checked < queue_size && queue_size > 0) {
-        let message_ready_time: i32 = message_timestamps[queue_head] + message_delays[queue_head];
+        let message_ready_time: i32 = message_timestamps[queue_head as usize] + message_delays[queue_head as usize];
         
         if (current_time >= message_ready_time) {
             // Process this message
-            let message_value: i32 = message_queue[queue_head];
+            let message_value: i32 = message_queue[queue_head as usize];
             processAsyncMessage(message_value, node_decisions, current_time);
             
             // Remove from queue
@@ -1122,9 +1122,9 @@ fn processAsyncMessages(
             queue_size = queue_size - 1;
             
             // Re-enqueue at tail
-            message_queue[queue_tail] = message_queue[queue_head - 1];
-            message_delays[queue_tail] = message_delays[queue_head - 1];
-            message_timestamps[queue_tail] = message_timestamps[queue_head - 1];
+            message_queue[queue_tail as usize] = message_queue[queue_head as usize - 1];
+            message_delays[queue_tail as usize] = message_delays[queue_head as usize - 1];
+            message_timestamps[queue_tail as usize] = message_timestamps[queue_head as usize - 1];
             queue_tail = (queue_tail + 1) % 1000;
             queue_size = queue_size + 1;
         }
@@ -1140,8 +1140,8 @@ fn processAsyncMessage(message_value: i32, mut node_decisions: [i32; 7], current
     let sender_id: i32 = (message_value / 10) % 7;
     
     if (sender_id >= 0 && sender_id < 7) {
-        if (node_decisions[sender_id] == -1) {
-            node_decisions[sender_id] = message_value;
+        if (node_decisions[sender_id as usize] == -1) {
+            node_decisions[sender_id as usize] = message_value;
         }
     }
 }
@@ -1153,12 +1153,12 @@ fn checkAsyncConsensus(node_count: i32, node_decisions: [i32; 7]) -> bool {
     
     let mut i: i32 = 0;
     while (i < node_count) {
-        if (node_decisions[i] != -1) {
+        if (node_decisions[i as usize] != -1) {
             decided_nodes = decided_nodes + 1;
             
             if (consensus_value == -1) {
-                consensus_value = node_decisions[i];
-            } else if (node_decisions[i] != consensus_value) {
+                consensus_value = node_decisions[i as usize];
+            } else if (node_decisions[i as usize] != consensus_value) {
                 consensus_found = false;
             }
         }
@@ -1173,8 +1173,8 @@ fn checkAsyncConsensus(node_count: i32, node_decisions: [i32; 7]) -> bool {
 fn extractConsensusValue(node_count: i32, node_decisions: [i32; 7]) -> i32 {
     let mut i: i32 = 0;
     while (i < node_count) {
-        if (node_decisions[i] != -1) {
-            return node_decisions[i];
+        if (node_decisions[i as usize] != -1) {
+            return node_decisions[i as usize];
         }
         i = i + 1;
     }
@@ -1184,7 +1184,7 @@ fn extractConsensusValue(node_count: i32, node_decisions: [i32; 7]) -> i32 {
 fn resetNodeDecisions(node_count: i32, mut node_decisions: [i32; 7]) {
     let mut i: i32 = 0;
     while (i < node_count) {
-        node_decisions[i] = -1;
+        node_decisions[i as usize] = -1;
         i = i + 1;
     }
 }
@@ -1198,7 +1198,7 @@ fn verifyConsensusHistory(consensus_values: [i32; 100], consensus_count: i32) ->
     let mut i: i32 = 1;
     while (i < consensus_count) {
         // Consensus values should be increasing or follow some pattern
-        if (consensus_values[i] <= consensus_values[i - 1]) {
+        if (consensus_values[i as usize] <= consensus_values[i as usize - 1]) {
             return false;
         }
         i = i + 1;
@@ -1213,8 +1213,8 @@ fn findMaxPartitionId(node_count: i32, partition_groups: [i32; 7]) -> i32 {
     let mut max_id: i32 = 0;
     let mut i: i32 = 0;
     while (i < node_count) {
-        if (partition_groups[i] > max_id) {
-            max_id = partition_groups[i];
+        if (partition_groups[i as usize] > max_id) {
+            max_id = partition_groups[i as usize];
         }
         i = i + 1;
     }
@@ -1225,7 +1225,7 @@ fn countPartitionSize(node_count: i32, partition_groups: [i32; 7], target_partit
     let mut size: i32 = 0;
     let mut i: i32 = 0;
     while (i < node_count) {
-        if (partition_groups[i] == target_partition) {
+        if (partition_groups[i as usize] == target_partition) {
             size = size + 1;
         }
         i = i + 1;
@@ -1250,11 +1250,11 @@ fn testPartitionInternalConsensus(
     let mut first_node: i32 = -1;
     let mut i: i32 = 0;
     while (i < node_count) {
-        if (partition_groups[i] == target_partition) {
+        if (partition_groups[i as usize] == target_partition) {
             if (first_node == -1) {
                 first_node = i;
             } else {
-                if (!network_connectivity[first_node][i]) {
+                if (!network_connectivity[first_node as usize][i as usize]) {
                     return false;
                 }
             }
@@ -1269,7 +1269,7 @@ fn countDetectedFailures(node_id: i32, node_count: i32, failure_detectors: [[boo
     let mut failure_count: i32 = 0;
     let mut i: i32 = 0;
     while (i < node_count) {
-        if (i != node_id && failure_detectors[node_id][i]) {
+        if (i != node_id && failure_detectors[node_id as usize][i as usize]) {
             failure_count = failure_count + 1;
         }
         i = i + 1;

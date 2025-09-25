@@ -35,7 +35,7 @@ fn init_matrix(mat: [[i32; 40]; 40], seed: i32) -> [[i32; 40]; 40] {
     while (i < SIZE) {
         let mut j: i32 = 0;
         while (j < SIZE) {
-            new_mat[i][j] = (i * SIZE + j + seed) % 100;
+            new_mat[i as usize][j as usize] = (i * SIZE + j + seed) % 100;
             j = j + 1;
         }
         i = i + 1;
@@ -52,10 +52,10 @@ fn matrix_multiply(a: [[i32; 40]; 40], b: [[i32; 40]; 40]) -> [[i32; 40]; 40] {
             let mut sum: i32 = 0;
             let mut k: i32 = 0;
             while (k < SIZE) {
-                sum = sum + a[i][k] * b[k][j];
+                sum = sum + a[i as usize][k as usize] * b[k as usize][j as usize];
                 k = k + 1;
             }
-            result[i][j] = sum;
+            result[i as usize][j as usize] = sum;
             j = j + 1;
         }
         i = i + 1;
@@ -70,16 +70,16 @@ fn apply_stencil(mat: [[i32; 40]; 40]) -> [[i32; 40]; 40] {
         let mut j: i32 = 1;
         while (j < SIZE - 1) {
             let mut sum: i32 = 0;
-            sum = sum + mat[i-1][j-1];
-            sum = sum + mat[i-1][j];
-            sum = sum + mat[i-1][j+1];
-            sum = sum + mat[i][j-1];
-            sum = sum + mat[i][j] * -8;
-            sum = sum + mat[i][j+1];
-            sum = sum + mat[i+1][j-1];
-            sum = sum + mat[i+1][j];
-            sum = sum + mat[i+1][j+1];
-            result[i][j] = sum / 3;
+            sum = sum + mat[i as usize-1][j as usize-1];
+            sum = sum + mat[i as usize-1][j as usize];
+            sum = sum + mat[i as usize-1][j as usize+1];
+            sum = sum + mat[i as usize][j as usize-1];
+            sum = sum + mat[i as usize][j as usize] * -8;
+            sum = sum + mat[i as usize][j as usize+1];
+            sum = sum + mat[i as usize+1][j as usize-1];
+            sum = sum + mat[i as usize+1][j as usize];
+            sum = sum + mat[i as usize+1][j as usize+1];
+            result[i as usize][j as usize] = sum / 3;
             j = j + 1;
         }
         i = i + 1;
@@ -93,9 +93,9 @@ fn transpose_and_add(mat: [[i32; 40]; 40]) -> [[i32; 40]; 40] {
     while (i < SIZE) {
         let mut j: i32 = i;
         while (j < SIZE) {
-            let temp: i32 = result[i][j];
-            result[i][j] = result[j][i] + temp;
-            result[j][i] = temp + result[j][i];
+            let temp: i32 = result[i as usize][j as usize];
+            result[i as usize][j as usize] = result[j as usize][i as usize] + temp;
+            result[j as usize][i as usize] = temp + result[j as usize][i as usize];
             j = j + 1;
         }
         i = i + 1;
@@ -109,7 +109,7 @@ fn sub_matrix_sum(mat: [[i32; 40]; 40]) -> i32 {
     while (i < HALF_SIZE) {
         let mut j: i32 = 0;
         while (j < HALF_SIZE) {
-            total_sum = total_sum + mat[i][j];
+            total_sum = total_sum + mat[i as usize][j as usize];
             j = j + 1;
         }
         i = i + 1;
@@ -118,7 +118,7 @@ fn sub_matrix_sum(mat: [[i32; 40]; 40]) -> i32 {
     while (i < SIZE) {
         let mut j: i32 = HALF_SIZE;
         while (j < SIZE) {
-            total_sum = total_sum + mat[i][j];
+            total_sum = total_sum + mat[i as usize][j as usize];
             j = j + 1;
         }
         i = i + 1;
@@ -130,10 +130,10 @@ fn diagonal_processing(mat: [[i32; 40]; 40]) -> i32 {
     let mut result: i32 = 0;
     let mut i: i32 = 0;
     while (i < SIZE) {
-        if (mat[i][i] > 50) {
-            result = result + mat[i][SIZE - 1 - i];
+        if (mat[i as usize][i as usize] > 50) {
+            result = result + mat[i as usize][(SIZE - 1 - i) as usize];
         } else {
-            result = result - mat[i][i];
+            result = result - mat[i as usize][i as usize];
         }
         i = i + 1;
     }
@@ -180,9 +180,9 @@ fn main() {
         let mut k: i32 = 0;
         while (k < SIZE) {
             if ((j + k) % 2 == 0) {
-                checksum = checksum + matrix_e[j][k];
+                checksum = checksum + matrix_e[j as usize][k as usize];
             } else {
-                checksum = checksum - matrix_e[j][k];
+                checksum = checksum - matrix_e[j as usize][k as usize];
             }
             k = k + 1;
         }
@@ -195,8 +195,8 @@ fn main() {
         let mut row_max: i32 = -999999;
         let mut n: i32 = 0;
         while (n < SIZE) {
-            if (matrix_e[m][n] > row_max) {
-                row_max = matrix_e[m][n];
+            if (matrix_e[m as usize][n as usize] > row_max) {
+                row_max = matrix_e[m as usize][n as usize];
             }
             n = n + 1;
         }
@@ -209,8 +209,8 @@ fn main() {
         let mut col_min: i32 = 999999;
         let mut q: i32 = 0;
         while (q < SIZE) {
-            if (matrix_e[q][p] < col_min) {
-                col_min = matrix_e[q][p];
+            if (matrix_e[q as usize][p as usize] < col_min) {
+                col_min = matrix_e[q as usize][p as usize];
             }
             q = q + 1;
         }
@@ -223,9 +223,9 @@ fn main() {
     while (r < SIZE) {
         let mut s: i32 = 0;
         while (s < SIZE) {
-            let temp_val: i32 = temp_mat[r][s];
-            temp_mat[r][s] = temp_mat[s][r];
-            temp_mat[s][r] = temp_val;
+            let temp_val: i32 = temp_mat[r as usize][s as usize];
+            temp_mat[r as usize][s as usize] = temp_mat[s as usize][r as usize];
+            temp_mat[s as usize][r as usize] = temp_val;
             s = s + 1;
         }
         r = r + 1;
@@ -236,7 +236,7 @@ fn main() {
     while (t < SIZE) {
         let mut u: i32 = 0;
         while (u < SIZE) {
-            final_sum = final_sum + temp_mat[t][u];
+            final_sum = final_sum + temp_mat[t as usize][u as usize];
             u = u + 1;
         }
         t = t + 1;

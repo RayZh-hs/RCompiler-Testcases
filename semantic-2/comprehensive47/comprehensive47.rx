@@ -46,7 +46,7 @@ fn main() {
         while (i < 64) {
             let mut j: usize = 0;
             while (j < 16) {
-                pop[i].genes[j] = pseudo_rand(seed) % 200 - 100;
+                pop[i as usize].genes[j as usize] = pseudo_rand(seed) % 200 - 100;
                 j = j + 1;
             }
             i = i + 1;
@@ -60,9 +60,9 @@ fn main() {
         let mut penalty: i32 = 0;
         let mut i: usize = 0;
         while (i < 16) {
-            sum = sum + chrom.genes[i];
-            if (chrom.genes[i] > 90 || chrom.genes[i] < -90) {
-                penalty = penalty + (chrom.genes[i] * chrom.genes[i]);
+            sum = sum + chrom.genes[i as usize];
+            if (chrom.genes[i as usize] > 90 || chrom.genes[i as usize] < -90) {
+                penalty = penalty + (chrom.genes[i as usize] * chrom.genes[i as usize]);
             }
             i = i + 1;
         }
@@ -73,7 +73,7 @@ fn main() {
     fn evaluate_population(pop: &mut [Chromosome; 64]) {
         let mut i: usize = 0;
         while (i < 64) {
-            calculate_fitness(&mut pop[i]);
+            calculate_fitness(&mut pop[i as usize]);
             i = i + 1;
         }
     }
@@ -85,8 +85,8 @@ fn main() {
         let mut i: i32 = 0;
         while (i < tournament_size) {
             let idx: usize = pseudo_rand(seed) as usize % 64;
-            if (pop[idx].fitness > best_fitness) {
-                best_fitness = pop[idx].fitness;
+            if (pop[idx as usize].fitness > best_fitness) {
+                best_fitness = pop[idx as usize].fitness;
                 best_index = idx as i32;
             }
             i = i + 1;
@@ -104,9 +104,9 @@ fn main() {
         let mut i: usize = 0;
         while (i < 16) {
             if (i < crossover_point as usize) {
-                child.genes[i] = parent1.genes[i];
+                child.genes[i as usize] = parent1.genes[i as usize];
             } else {
-                child.genes[i] = parent2.genes[i];
+                child.genes[i as usize] = parent2.genes[i as usize];
             }
             i = i + 1;
         }
@@ -117,7 +117,7 @@ fn main() {
         let mut i: usize = 0;
         while (i < 16) {
             if (pseudo_rand(seed) % 100 < mutation_rate) {
-                chrom.genes[i] = chrom.genes[i] + (pseudo_rand(seed) % 20 - 10);
+                chrom.genes[i as usize] = chrom.genes[i as usize] + (pseudo_rand(seed) % 20 - 10);
             }
             i = i + 1;
         }
@@ -138,12 +138,12 @@ fn main() {
             let p1_idx: usize = selection(&population, &mut rng_seed) as usize;
             let p2_idx: usize = selection(&population, &mut rng_seed) as usize;
             crossover(
-                &population[p1_idx],
-                &population[p2_idx],
-                &mut new_population[i],
+                &population[p1_idx as usize],
+                &population[p2_idx as usize],
+                &mut new_population[i as usize],
                 &mut rng_seed,
             );
-            mutate(&mut new_population[i], &mut rng_seed);
+            mutate(&mut new_population[i as usize], &mut rng_seed);
             i = i + 1;
         }
 
@@ -152,7 +152,7 @@ fn main() {
         // in the same function block.
         let mut i: usize = 0;
         while (i < 64) {
-            population[i] = new_population[i];
+            population[i as usize] = new_population[i as usize];
             i = i + 1;
         }
         generation = generation + 1;
@@ -162,8 +162,8 @@ fn main() {
     let mut best_fitness: i32 = -99999999;
     let mut i: usize = 0;
     while (i < 64) {
-        if (population[i].fitness > best_fitness) {
-            best_fitness = population[i].fitness;
+        if (population[i as usize].fitness > best_fitness) {
+            best_fitness = population[i as usize].fitness;
         }
         i = i + 1;
     }

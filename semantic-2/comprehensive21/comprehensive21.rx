@@ -106,7 +106,7 @@ fn init_dataset_pattern(pattern: i32, size: i32) -> DataSet {
             value = (i * i + i * 7 + 17) % 1000;
         }
         
-        dataset.data[i] = value;
+        dataset.data[i as usize] = value;
         dataset.sum = dataset.sum + value;
         
         if (value < dataset.min_value) {
@@ -147,11 +147,11 @@ fn bubble_sort(data: &mut [i32; MAX_ARRAY_SIZE], size: i32, counter: &mut Perfor
             counter.comparisons = counter.comparisons + 1;
             counter.memory_accesses = counter.memory_accesses + 2;
             
-            if (data[j] > data[j + 1]) {
+            if (data[j as usize] > data[j as usize + 1]) {
                 // Swap elements
-                let temp = data[j];
-                data[j] = data[j + 1];
-                data[j + 1] = temp;
+                let temp = data[j as usize];
+                data[j as usize] = data[j as usize + 1];
+                data[j as usize + 1] = temp;
                 
                 counter.swaps = counter.swaps + 1;
                 counter.memory_accesses = counter.memory_accesses + 4;
@@ -183,16 +183,16 @@ fn selection_sort(data: &mut [i32; MAX_ARRAY_SIZE], size: i32, counter: &mut Per
             counter.comparisons = counter.comparisons + 1;
             counter.memory_accesses = counter.memory_accesses + 2;
             
-            if (data[j] < data[min_idx]) {
+            if (data[j as usize] < data[min_idx as usize]) {
                 min_idx = j;
             }
             j = j + 1;
         }
         
         if (min_idx != i) {
-            let temp = data[i];
-            data[i] = data[min_idx];
-            data[min_idx] = temp;
+            let temp = data[i as usize];
+            data[i as usize] = data[min_idx as usize];
+            data[min_idx as usize] = temp;
             
             counter.swaps = counter.swaps + 1;
             counter.memory_accesses = counter.memory_accesses + 4;
@@ -210,21 +210,21 @@ fn insertion_sort(data: &mut [i32; MAX_ARRAY_SIZE], size: i32, counter: &mut Per
     
     let mut i = 1;
     while (i < size) {
-        let key = data[i];
+        let key = data[i as usize];
         let mut j = i - 1;
         
         counter.memory_accesses = counter.memory_accesses + 1;
         
-        while (j >= 0 && data[j] > key) {
+        while (j >= 0 && data[j as usize] > key) {
             counter.comparisons = counter.comparisons + 1;
             counter.memory_accesses = counter.memory_accesses + 2;
             
-            data[j + 1] = data[j];
+            data[j as usize + 1] = data[j as usize];
             counter.memory_accesses = counter.memory_accesses + 2;
             j = j - 1;
         }
         
-        data[j + 1] = key;
+        data[j as usize + 1] = key;
         counter.memory_accesses = counter.memory_accesses + 1;
         i = i + 1;
     }
@@ -234,7 +234,7 @@ fn insertion_sort(data: &mut [i32; MAX_ARRAY_SIZE], size: i32, counter: &mut Per
 
 // Quick sort partition function
 fn partition(data: &mut [i32; MAX_ARRAY_SIZE], low: i32, high: i32, counter: &mut PerformanceCounter) -> i32 {
-    let pivot = data[high];
+    let pivot = data[high as usize];
     let mut i = low - 1;
     
     counter.memory_accesses = counter.memory_accesses + 1;
@@ -244,12 +244,12 @@ fn partition(data: &mut [i32; MAX_ARRAY_SIZE], low: i32, high: i32, counter: &mu
         counter.comparisons = counter.comparisons + 1;
         counter.memory_accesses = counter.memory_accesses + 1;
         
-        if (data[j] <= pivot) {
+        if (data[j as usize] <= pivot) {
             i = i + 1;
             
-            let temp = data[i];
-            data[i] = data[j];
-            data[j] = temp;
+            let temp = data[i as usize];
+            data[i as usize] = data[j as usize];
+            data[j as usize] = temp;
             
             counter.swaps = counter.swaps + 1;
             counter.memory_accesses = counter.memory_accesses + 4;
@@ -257,9 +257,9 @@ fn partition(data: &mut [i32; MAX_ARRAY_SIZE], low: i32, high: i32, counter: &mu
         j = j + 1;
     }
     
-    let temp = data[i + 1];
-    data[i + 1] = data[high];
-    data[high] = temp;
+    let temp = data[i as usize + 1];
+    data[i as usize + 1] = data[high as usize];
+    data[high as usize] = temp;
     
     counter.swaps = counter.swaps + 1;
     counter.memory_accesses = counter.memory_accesses + 4;
@@ -302,7 +302,7 @@ fn merge(data: &mut [i32; MAX_ARRAY_SIZE], left: i32, mid: i32, right: i32, coun
     let temp_start = MAX_ARRAY_SIZE - n1;
     i = 0;
     while (i < n1) {
-        data[temp_start + i] = data[left + i];
+        data[(temp_start + i) as usize] = data[(left + i) as usize];
         counter.memory_accesses = counter.memory_accesses + 2;
         i = i + 1;
     }
@@ -315,11 +315,11 @@ fn merge(data: &mut [i32; MAX_ARRAY_SIZE], left: i32, mid: i32, right: i32, coun
         counter.comparisons = counter.comparisons + 1;
         counter.memory_accesses = counter.memory_accesses + 2;
         
-        if (data[temp_start + i] <= data[mid + 1 + j]) {
-            data[k] = data[temp_start + i];
+        if (data[(temp_start + i) as usize] <= data[(mid + 1 + j) as usize]) {
+            data[k as usize] = data[(temp_start + i) as usize];
             i = i + 1;
         } else {
-            data[k] = data[mid + 1 + j];
+            data[k as usize] = data[(mid + 1 + j) as usize];
             j = j + 1;
         }
         
@@ -328,14 +328,14 @@ fn merge(data: &mut [i32; MAX_ARRAY_SIZE], left: i32, mid: i32, right: i32, coun
     }
     
     while (i < n1) {
-        data[k] = data[temp_start + i];
+        data[k as usize] = data[(temp_start + i) as usize];
         counter.memory_accesses = counter.memory_accesses + 2;
         i = i + 1;
         k = k + 1;
     }
     
     while (j < n2) {
-        data[k] = data[mid + 1 + j];
+        data[k as usize] = data[(mid + 1 + j) as usize];
         counter.memory_accesses = counter.memory_accesses + 2;
         j = j + 1;
         k = k + 1;
@@ -375,7 +375,7 @@ fn heapify(data: &mut [i32; MAX_ARRAY_SIZE], n: i32, i: i32, counter: &mut Perfo
         counter.comparisons = counter.comparisons + 1;
         counter.memory_accesses = counter.memory_accesses + 2;
         
-        if (data[left] > data[largest]) {
+        if (data[left as usize] > data[largest as usize]) {
             largest = left;
         }
     }
@@ -384,15 +384,15 @@ fn heapify(data: &mut [i32; MAX_ARRAY_SIZE], n: i32, i: i32, counter: &mut Perfo
         counter.comparisons = counter.comparisons + 1;
         counter.memory_accesses = counter.memory_accesses + 2;
         
-        if (data[right] > data[largest]) {
+        if (data[right as usize] > data[largest as usize]) {
             largest = right;
         }
     }
     
     if (largest != i) {
-        let temp = data[i];
-        data[i] = data[largest];
-        data[largest] = temp;
+        let temp = data[i as usize];
+        data[i as usize] = data[largest as usize];
+        data[largest as usize] = temp;
         
         counter.swaps = counter.swaps + 1;
         counter.memory_accesses = counter.memory_accesses + 4;
@@ -416,8 +416,8 @@ fn heap_sort(data: &mut [i32; MAX_ARRAY_SIZE], size: i32, counter: &mut Performa
     i = size - 1;
     while (i > 0) {
         let temp = data[0];
-        data[0] = data[i];
-        data[i] = temp;
+        data[0] = data[i as usize];
+        data[i as usize] = temp;
         
         counter.swaps = counter.swaps + 1;
         counter.memory_accesses = counter.memory_accesses + 4;
@@ -442,10 +442,10 @@ fn binary_search(data: &[i32; MAX_ARRAY_SIZE], size: i32, target: i32, counter: 
         counter.comparisons = counter.comparisons + 1;
         counter.memory_accesses = counter.memory_accesses + 1;
         
-        if (data[mid] == target) {
+        if (data[mid as usize] == target) {
             counter.operations = counter.operations + 1;
             return mid;
-        } else if (data[mid] < target) {
+        } else if (data[mid as usize] < target) {
             left = mid + 1;
         } else {
             right = mid - 1;
@@ -466,7 +466,7 @@ fn linear_search(data: &[i32; MAX_ARRAY_SIZE], size: i32, target: i32, counter: 
         counter.comparisons = counter.comparisons + 1;
         counter.memory_accesses = counter.memory_accesses + 1;
         
-        if (data[i] == target) {
+        if (data[i as usize] == target) {
             counter.operations = counter.operations + i + 1;
             return i;
         }
@@ -483,7 +483,7 @@ fn compute_variance(data: &[i32; MAX_ARRAY_SIZE], size: i32, mean: i32) -> i32 {
     let mut i = 0;
     
     while (i < size) {
-        let diff = data[i] - mean;
+        let diff = data[i as usize] - mean;
         sum_squared_diff = sum_squared_diff + diff * diff;
         i = i + 1;
     }
@@ -497,9 +497,9 @@ fn compute_median(data: &mut [i32; MAX_ARRAY_SIZE], size: i32) -> i32 {
     quick_sort(data, size, &mut counter);
     
     if (size % 2 == 0) {
-        (data[size / 2 - 1] + data[size / 2]) / 2
+        (data[size as usize / 2 - 1] + data[size as usize / 2]) / 2
     } else {
-        data[size / 2]
+        data[size as usize / 2]
     }
 }
 
@@ -517,16 +517,16 @@ fn init_matrix(rows: i32, cols: i32, pattern: i32) -> Matrix {
         while (j < cols) {
             if (pattern == 0) {
                 // Identity matrix
-                matrix.data[i][j] = if (i == j) { 1 } else { 0 };
+                matrix.data[i as usize][j as usize] = if (i == j) { 1 } else { 0 };
             } else if (pattern == 1) {
                 // Random-like values
-                matrix.data[i][j] = (i * 17 + j * 23 + 13) % 100;
+                matrix.data[i as usize][j as usize] = (i * 17 + j * 23 + 13) % 100;
             } else if (pattern == 2) {
                 // Increasing values
-                matrix.data[i][j] = i * cols + j + 1;
+                matrix.data[i as usize][j as usize] = i * cols + j + 1;
             } else {
                 // Complex pattern
-                matrix.data[i][j] = (i * i + j * j + i * j) % 50;
+                matrix.data[i as usize][j as usize] = (i * i + j * j + i * j) % 50;
             }
             j = j + 1;
         }
@@ -549,11 +549,11 @@ fn matrix_multiply(a: &Matrix, b: &Matrix, result: &mut Matrix) -> bool {
     while (i < a.rows) {
         let mut j = 0;
         while (j < b.cols) {
-            result.data[i][j] = 0;
+            result.data[i as usize][j as usize] = 0;
             
             let mut k = 0;
             while (k < a.cols) {
-                result.data[i][j] = result.data[i][j] + a.data[i][k] * b.data[k][j];
+                result.data[i as usize][j as usize] = result.data[i as usize][j as usize] + a.data[i as usize][k as usize] * b.data[k as usize][j as usize];
                 k = k + 1;
             }
             j = j + 1;
@@ -568,7 +568,7 @@ fn matrix_multiply(a: &Matrix, b: &Matrix, result: &mut Matrix) -> bool {
 fn copy_array(source: &[i32; MAX_ARRAY_SIZE], dest: &mut [i32; MAX_ARRAY_SIZE], size: i32) {
     let mut i = 0;
     while (i < size) {
-        dest[i] = source[i];
+        dest[i as usize] = source[i as usize];
         i = i + 1;
     }
 }
@@ -577,7 +577,7 @@ fn copy_array(source: &[i32; MAX_ARRAY_SIZE], dest: &mut [i32; MAX_ARRAY_SIZE], 
 fn is_sorted(data: &[i32; MAX_ARRAY_SIZE], size: i32) -> bool {
     let mut i = 0;
     while (i < size - 1) {
-        if (data[i] > data[i + 1]) {
+        if (data[i as usize] > data[i as usize + 1]) {
             return false;
         }
         i = i + 1;
@@ -594,7 +594,7 @@ fn test_large_scale_performance() {
     let mut size_idx = 0;
     
     while (size_idx < 4) {
-        let size = test_sizes[size_idx];
+        let size = test_sizes[size_idx as usize];
         printInt(21000 + size_idx * 100 + 10);  // Size marker
         
         // Test different data patterns
@@ -706,7 +706,7 @@ fn test_large_scale_performance() {
         while (i < 50) {
             let mut j = 0;
             while (j < 50) {
-                matrix_sum = matrix_sum + result_matrix.data[i][j];
+                matrix_sum = matrix_sum + result_matrix.data[i as usize][j as usize];
                 j = j + 1;
             }
             i = i + 1;
@@ -721,7 +721,7 @@ fn test_large_scale_performance() {
     let mut sequential_sum = 0;
     i = 0;
     while (i < 5000) {
-        sequential_sum = sequential_sum + search_data.data[i];
+        sequential_sum = sequential_sum + search_data.data[i as usize];
         access_counter.memory_accesses = access_counter.memory_accesses + 1;
         i = i + 1;
     }
@@ -731,7 +731,7 @@ fn test_large_scale_performance() {
     i = 0;
     while (i < 5000) {
         let index = (i * 1103515245 + 12345) % 5000;
-        random_sum = random_sum + search_data.data[index];
+        random_sum = random_sum + search_data.data[index as usize];
         access_counter.memory_accesses = access_counter.memory_accesses + 1;
         i = i + 1;
     }
@@ -741,7 +741,7 @@ fn test_large_scale_performance() {
     i = 0;
     while (i < 1000) {
         let index = (i * 5) % 5000;
-        strided_sum = strided_sum + search_data.data[index];
+        strided_sum = strided_sum + search_data.data[index as usize];
         access_counter.memory_accesses = access_counter.memory_accesses + 1;
         i = i + 1;
     }
@@ -763,7 +763,7 @@ fn test_large_scale_performance() {
     let mut alternating_data = [0; MAX_ARRAY_SIZE];
     i = 0;
     while (i < 1000) {
-        alternating_data[i] = if (i % 2 == 0) { 1 } else { 2 };
+        alternating_data[i as usize] = if (i % 2 == 0) { 1 } else { 2 };
         i = i + 1;
     }
     

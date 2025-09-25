@@ -55,8 +55,8 @@ fn custom_alloc(size: i32) -> i32 {
     let mut best_fit_size: i32 = HEAP_SIZE + 1;
 
     while (current_block_ptr < HEAP_SIZE) {
-        let block_size: i32 = heap[current_block_ptr];
-        let block_status: i32 = heap[current_block_ptr + 1];
+        let block_size: i32 = heap[current_block_ptr as usize];
+        let block_status: i32 = heap[current_block_ptr as usize + 1];
 
         if (block_status == BLOCK_STATUS_FREE) {
             if (block_size >= required_size) {
@@ -74,18 +74,18 @@ fn custom_alloc(size: i32) -> i32 {
     }
 
     if (best_fit_ptr != -1) {
-        let original_size: i32 = heap[best_fit_ptr];
+        let original_size: i32 = heap[best_fit_ptr as usize];
         let remaining_size: i32 = original_size - required_size - BLOCK_HEADER_SIZE;
 
         if (remaining_size > BLOCK_HEADER_SIZE) {
-            heap[best_fit_ptr] = required_size;
-            heap[best_fit_ptr + 1] = BLOCK_STATUS_USED;
+            heap[best_fit_ptr as usize] = required_size;
+            heap[best_fit_ptr as usize + 1] = BLOCK_STATUS_USED;
 
             let new_block_ptr: i32 = best_fit_ptr + required_size + BLOCK_HEADER_SIZE;
-            heap[new_block_ptr] = remaining_size;
-            heap[new_block_ptr + 1] = BLOCK_STATUS_FREE;
+            heap[new_block_ptr as usize] = remaining_size;
+            heap[new_block_ptr as usize + 1] = BLOCK_STATUS_FREE;
         } else {
-            heap[best_fit_ptr + 1] = BLOCK_STATUS_USED;
+            heap[best_fit_ptr as usize + 1] = BLOCK_STATUS_USED;
         }
         return best_fit_ptr + BLOCK_HEADER_SIZE;
     }
@@ -98,20 +98,20 @@ fn custom_free(ptr: i32) {
         return;
     }
     let block_ptr: i32 = ptr - BLOCK_HEADER_SIZE;
-    heap[block_ptr + 1] = BLOCK_STATUS_FREE;
+    heap[block_ptr as usize + 1] = BLOCK_STATUS_FREE;
 
     let mut current_ptr: i32 = 0;
     while (current_ptr < HEAP_SIZE) {
-        let current_size: i32 = heap[current_ptr];
+        let current_size: i32 = heap[current_ptr as usize];
         if (current_size <= 0) {
             break;
         }
         let next_ptr: i32 = current_ptr + current_size + BLOCK_HEADER_SIZE;
         if (next_ptr < HEAP_SIZE) {
-            if (heap[current_ptr + 1] == BLOCK_STATUS_FREE) {
-                if (heap[next_ptr + 1] == BLOCK_STATUS_FREE) {
-                    let next_size: i32 = heap[next_ptr];
-                    heap[current_ptr] = current_size + next_size + BLOCK_HEADER_SIZE;
+            if (heap[current_ptr as usize + 1] == BLOCK_STATUS_FREE) {
+                if (heap[next_ptr as usize + 1] == BLOCK_STATUS_FREE) {
+                    let next_size: i32 = heap[next_ptr as usize];
+                    heap[current_ptr as usize] = current_size + next_size + BLOCK_HEADER_SIZE;
                     continue;
                 }
             }
@@ -156,13 +156,13 @@ fn main() {
         let ptr: i32 = custom_alloc(alloc_size);
         if (ptr != -1) {
             if (allocation_count < 100) {
-                allocations[allocation_count] = ptr;
+                allocations[allocation_count as usize] = ptr;
                 allocation_count = allocation_count + 1;
             }
             total_allocations = total_allocations + 1;
             let mut j: i32 = 0;
             while (j < alloc_size) {
-                heap[ptr + j] = (ptr + j) % 128;
+                heap[(ptr + j) as usize] = (ptr + j) % 128;
                 j = j + 1;
             }
         } else {
@@ -173,10 +173,10 @@ fn main() {
             let mut free_idx: i32 = 0;
             if (allocation_count > 0) {
                 free_idx = (i * 17) % allocation_count;
-                let free_ptr: i32 = allocations[free_idx];
+                let free_ptr: i32 = allocations[free_idx as usize];
                 if (free_ptr != 0) {
                     custom_free(free_ptr);
-                    allocations[free_idx] = 0;
+                    allocations[free_idx as usize] = 0;
                 }
             }
         }
@@ -186,13 +186,13 @@ fn main() {
     let mut final_sum: i32 = 0;
     let mut k: i32 = 0;
     while (k < allocation_count) {
-        let ptr: i32 = allocations[k];
+        let ptr: i32 = allocations[k as usize];
         if (ptr != 0) {
             let block_ptr: i32 = ptr - BLOCK_HEADER_SIZE;
-            let size: i32 = heap[block_ptr];
+            let size: i32 = heap[block_ptr as usize];
             let mut l: i32 = 0;
             while (l < size) {
-                final_sum = final_sum + heap[ptr + l];
+                final_sum = final_sum + heap[(ptr + l) as usize];
                 l = l + 1;
             }
         }
@@ -202,8 +202,8 @@ fn main() {
     let mut total_free_space: i32 = 0;
     let mut current_block_ptr: i32 = 0;
     while (current_block_ptr < HEAP_SIZE) {
-        let block_size: i32 = heap[current_block_ptr];
-        let block_status: i32 = heap[current_block_ptr + 1];
+        let block_size: i32 = heap[current_block_ptr as usize];
+        let block_status: i32 = heap[current_block_ptr as usize + 1];
         if (block_status == BLOCK_STATUS_FREE) {
             total_free_space = total_free_space + block_size;
         }
@@ -231,8 +231,8 @@ fn main() {
 
     let mut m: i32 = 0;
     while (m < 100) {
-        if (allocations[m] != 0) {
-            custom_free(allocations[m]);
+        if (allocations[m as usize] != 0) {
+            custom_free(allocations[m as usize]);
         }
         m = m + 1;
     }
@@ -262,7 +262,7 @@ fn main() {
     let mut final_check_sum: i32 = 0;
     let mut p: i32 = 0;
     while (p < HEAP_SIZE) {
-        final_check_sum = final_check_sum + heap[p];
+        final_check_sum = final_check_sum + heap[p as usize];
         p = p + 1;
     }
     printInt(final_check_sum % 1000);

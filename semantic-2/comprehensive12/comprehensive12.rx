@@ -697,7 +697,7 @@ impl DataProcessor {
                 
                 if idx1 < self.size as usize && idx2 < self.size as usize {
                     self.transformation_matrix[i as usize][j as usize] = 
-                        (self.primary_data[idx1] + self.secondary_data[idx2]) % 1000;
+                        (self.primary_data[idx1 as usize] + self.secondary_data[idx2 as usize]) % 1000;
                 }
                 j += 1;
             }

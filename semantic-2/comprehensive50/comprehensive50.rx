@@ -35,14 +35,14 @@ fn main() {
     let mut input_stream: [i32; 60] = [0; 60];
     let mut i: usize = 0;
     while (i < 60) {
-        input_stream[i] = i as i32 % 8;
+        input_stream[i as usize] = i as i32 % 8;
         i = i + 1;
     }
     // Event types: 0: REQ_CONNECT, 1: ACK_CONNECT, 2: DATA, 3: ACK_DATA, 4: REQ_DISCONNECT, 5: ACK_DISCONNECT, 6: TIMEOUT, 7: CORRUPT_DATA
 
     i = 0;
     while (i < 60) {
-        let event: i32 = input_stream[i];
+        let event: i32 = input_stream[i as usize];
         let mut payload: i32 =  i as i32 * 10;
 
         state = process_event(state, event, payload, sequence_number, last_ack, retransmission_count);

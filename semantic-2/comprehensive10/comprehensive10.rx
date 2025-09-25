@@ -14,6 +14,20 @@ Details:
 5. Minimum spanning tree using Kruskal's algorithm
 */
 
+
+
+// Unified RNG: Park–Miller (a=16807, m=2147483647) using Schrage method to avoid overflow
+fn pm_rand_update(x: i32) -> i32 {
+    let a = 16807;
+    let m = 2147483647;
+    let q = 127773; // m / a
+    let r = 2836;   // m % a
+    let mut k = x / q;
+    let mut new_x = a * (x - k * q) - r * k;
+    if (new_x <= 0) { new_x += m; }
+    return new_x;
+}
+
 // Comprehensive Test 9: Advanced Graph Algorithms and Network Analysis
 // This test implements a complex graph processing system with multiple algorithms:
 // 1. Dijkstra's shortest path algorithm
@@ -460,7 +474,7 @@ impl GraphGenerator {
     
     // Linear congruential generator for pseudo-random numbers
     fn next_random(&mut self) -> i32 {
-        self.seed = (self.seed * 1103515245 + 12345) % 2147483647;
+        self.seed = pm_rand_update(self.seed);
         if (self.seed < 0) {
             self.seed = -self.seed;
         }

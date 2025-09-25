@@ -88,8 +88,8 @@ fn main() {
     // Initialize free frame list
     let mut i: i32 = 0;
     while (i < num_physical_frames) {
-        free_frame_list[i] = i;
-        frame_allocation_table[i] = 0; // 0 = free, 1 = allocated
+        free_frame_list[i as usize] = i;
+        frame_allocation_table[i as usize] = 0; // 0 = free, 1 = allocated
         i = i + 1;
     }
     
@@ -109,7 +109,7 @@ fn main() {
         total_accesses = total_accesses + 1;
         
         // Record access in history for working set calculation
-        access_history[history_head] = virtual_page;
+        access_history[history_head as usize] = virtual_page;
         history_head = (history_head + 1) % 1000;
         
         // TLB Lookup
@@ -124,14 +124,14 @@ fn main() {
             let page_table_index: i32 = virtual_page % 16;
             
             let mut physical_frame: i32 = -1;
-            let page_table_entry: i32 = page_tables[page_dir_index][page_table_index];
+            let page_table_entry: i32 = page_tables[page_dir_index as usize][page_table_index as usize];
             
             if (page_table_entry > 0) { // Page is mapped
                 physical_frame = page_table_entry - 1; // Convert from 1-based to 0-based
                 
                 // Update page access information
-                reference_bits[virtual_page] = true;
-                lru_counter[virtual_page] = current_time;
+                reference_bits[virtual_page as usize] = true;
+                lru_counter[virtual_page as usize] = current_time;
                 
                 // Update TLB
                 update_tlb(virtual_page, physical_frame, &mut tlb_virtual_tags,
@@ -156,11 +156,11 @@ fn main() {
                 
                 if (physical_frame >= 0) {
                     // Map the page to the frame
-                    page_tables[page_dir_index][page_table_index] = physical_frame + 1; // 1-based
-                    reverse_mapping[physical_frame] = virtual_page;
-                    reference_bits[virtual_page] = true;
-                    lru_counter[virtual_page] = current_time;
-                    frame_allocation_table[physical_frame] = 1; // Mark as allocated
+                    page_tables[page_dir_index as usize][page_table_index as usize] = physical_frame + 1; // 1-based
+                    reverse_mapping[physical_frame as usize] = virtual_page;
+                    reference_bits[virtual_page as usize] = true;
+                    lru_counter[virtual_page as usize] = current_time;
+                    frame_allocation_table[physical_frame as usize] = 1; // Mark as allocated
                     
                     // Update TLB
                     update_tlb(virtual_page, physical_frame, &mut tlb_virtual_tags,
@@ -198,7 +198,7 @@ fn main() {
         
         // Simulate write operations (mark pages as dirty)
         if (access_count % 4 == 0 && virtual_page < 256) {
-            modify_bits[virtual_page] = true;
+            modify_bits[virtual_page as usize] = true;
         }
         
         // Periodic memory compaction and defragmentation
@@ -295,7 +295,7 @@ fn generate_memory_access_pattern(access_num: i32, total_accesses: i32) -> i32 {
 fn lookup_tlb(virtual_page: i32, tlb_tags: &[i32; 16], tlb_valid: &[bool; 16]) -> bool {
     let mut i: i32 = 0;
     while (i < 16) {
-        if (tlb_valid[i] && tlb_tags[i] == virtual_page) {
+        if (tlb_valid[i as usize] && tlb_tags[i as usize] == virtual_page) {
             return true;
         }
         i = i + 1;
@@ -313,25 +313,25 @@ fn update_tlb(virtual_page: i32, physical_frame: i32, tlb_tags: &mut [i32; 16],
     
     let mut i: i32 = 1;
     while (i < 16) {
-        if (tlb_lru[i] < min_counter) {
-            min_counter = tlb_lru[i];
+        if (tlb_lru[i as usize] < min_counter) {
+            min_counter = tlb_lru[i as usize];
             lru_index = i;
         }
         i = i + 1;
     }
     
     // Update the LRU entry
-    tlb_tags[lru_index] = virtual_page;
-    tlb_frames[lru_index] = physical_frame;
-    tlb_valid[lru_index] = true;
+    tlb_tags[lru_index as usize] = virtual_page;
+    tlb_frames[lru_index as usize] = physical_frame;
+    tlb_valid[lru_index as usize] = true;
     
     // Update all LRU counters
     i = 0;
     while (i < 16) {
         if (i == lru_index) {
-            tlb_lru[i] = 1000; // High priority
+            tlb_lru[i as usize] = 1000; // High priority
         } else {
-            tlb_lru[i] = tlb_lru[i] - 1;
+            tlb_lru[i as usize] = tlb_lru[i as usize] - 1;
         }
         i = i + 1;
     }
@@ -345,8 +345,8 @@ fn allocate_free_frame(free_list: &mut [i32; 64], free_count: &mut i32,
     }
     
     *free_count = *free_count - 1;
-    let frame: i32 = free_list[*free_count];
-    allocation_table[frame] = 1; // Mark as allocated
+    let frame: i32 = free_list[*free_count as usize];
+    allocation_table[frame as usize] = 1; // Mark as allocated
     frame
 }
 
@@ -383,17 +383,17 @@ fn enhanced_clock_replacement(reverse_mapping: &mut [i32; 64], reference_bits: &
     
     while (passes < 3) { // Maximum 3 passes to avoid infinite loop
         let frame: i32 = *clock_hand;
-        let virtual_page: i32 = reverse_mapping[frame];
+        let virtual_page: i32 = reverse_mapping[frame as usize];
         
         if (virtual_page >= 0 && virtual_page < 256) {
-            if !reference_bits[virtual_page] {
-                if !modify_bits[virtual_page] || passes >= 2 {
+            if !reference_bits[virtual_page as usize] {
+                if !modify_bits[virtual_page as usize] || passes >= 2 {
                     // Found victim: clean page or dirty page after 2 passes
                     *clock_hand = (*clock_hand + 1) % 64;
                     return frame;
                 }
             } else {
-                reference_bits[virtual_page] = false; // Give second chance
+                reference_bits[virtual_page as usize] = false; // Give second chance
             }
         }
         
@@ -416,10 +416,10 @@ fn lru_replacement(reverse_mapping: &[i32; 64], lru_counter: &[i32; 256], curren
     
     let mut i: i32 = 0;
     while (i < 64) {
-        let virtual_page: i32 = reverse_mapping[i];
+        let virtual_page: i32 = reverse_mapping[i as usize];
         if (virtual_page >= 0 && virtual_page < 256) {
-            if (lru_counter[virtual_page] < oldest_time) {
-                oldest_time = lru_counter[virtual_page];
+            if (lru_counter[virtual_page as usize] < oldest_time) {
+                oldest_time = lru_counter[virtual_page as usize];
                 victim_frame = i;
             }
         }
@@ -444,9 +444,9 @@ fn working_set_replacement(reverse_mapping: &[i32; 64], access_history: &[i32; 1
     let mut pos: i32 = start_pos;
     while (i < window_size) {
         if (pos >= 0 && pos < 1000) {
-            let page: i32 = access_history[pos];
+            let page: i32 = access_history[pos as usize];
             if (page >= 0 && page < 256) {
-                working_set[page] = true;
+                working_set[page as usize] = true;
             }
         }
         pos = (pos + 1) % 1000;
@@ -456,8 +456,8 @@ fn working_set_replacement(reverse_mapping: &[i32; 64], access_history: &[i32; 1
     // Find frame with page not in working set
     i = 0;
     while (i < 64) {
-        let virtual_page: i32 = reverse_mapping[i];
-        if (virtual_page >= 0 && virtual_page < 256 && !working_set[virtual_page]) {
+        let virtual_page: i32 = reverse_mapping[i as usize];
+        if (virtual_page >= 0 && virtual_page < 256 && !working_set[virtual_page as usize]) {
             return i;
         }
         i = i + 1;
@@ -477,21 +477,21 @@ fn adaptive_replacement(reverse_mapping: &[i32; 64], reference_bits: &[bool; 256
     
     let mut i: i32 = 0;
     while (i < 64) {
-        let virtual_page: i32 = reverse_mapping[i];
+        let virtual_page: i32 = reverse_mapping[i as usize];
         if (virtual_page >= 0 && virtual_page < 256) {
             let mut score: i32 = 0;
             
             // Factor 1: Age (older is better for replacement)
-            let age: i32 = current_time - lru_counter[virtual_page];
+            let age: i32 = current_time - lru_counter[virtual_page as usize];
             score = score + age / 10;
             
             // Factor 2: Reference bit (unreferenced is better)
-            if !reference_bits[virtual_page] {
+            if !reference_bits[virtual_page as usize] {
                 score = score + 50;
             }
             
             // Factor 3: Dirty bit (clean is better)
-            if !modify_bits[virtual_page] {
+            if !modify_bits[virtual_page as usize] {
                 score = score + 30;
             }
             
@@ -525,7 +525,7 @@ fn check_working_set_membership(page: i32, access_history: &[i32; 1000],
     
     let mut pos: i32 = start_pos;
     while (i < window_size) {
-        if (pos >= 0 && pos < 1000 && access_history[pos] == page) {
+        if (pos >= 0 && pos < 1000 && access_history[pos as usize] == page) {
             return true;
         }
         pos = (pos + 1) % 1000;
@@ -543,7 +543,7 @@ fn access_l1_cache(address: i32, cache: &mut [[i32; 4]; 64], tags: &mut [[i32; 4
     // Check for hit
     let mut i: i32 = 0;
     while (i < 4) {
-        if (valid[set_index][i] && tags[set_index][i] == tag) {
+        if (valid[set_index as usize][i as usize] && tags[set_index as usize][i as usize] == tag) {
             // Cache hit - update LRU
             update_cache_lru(lru_bits, set_index, i, time, 4);
             return true;
@@ -553,8 +553,8 @@ fn access_l1_cache(address: i32, cache: &mut [[i32; 4]; 64], tags: &mut [[i32; 4
     
     // Cache miss - find LRU way to replace
     let victim_way: i32 = find_lru_way(lru_bits, set_index, 4);
-    tags[set_index][victim_way] = tag;
-    valid[set_index][victim_way] = true;
+    tags[set_index as usize][victim_way as usize] = tag;
+    valid[set_index as usize][victim_way as usize] = true;
     update_cache_lru(lru_bits, set_index, victim_way, time, 4);
     
     false
@@ -569,7 +569,7 @@ fn access_l2_cache(address: i32, cache: &mut [[i32; 8]; 128], tags: &mut [[i32; 
     // Check for hit
     let mut i: i32 = 0;
     while (i < 8) {
-        if (valid[set_index][i] && tags[set_index][i] == tag) {
+        if (valid[set_index as usize][i as usize] && tags[set_index as usize][i as usize] == tag) {
             // Cache hit - update LRU
             update_cache_lru_8way(lru_bits, set_index, i, time);
             return true;
@@ -579,8 +579,8 @@ fn access_l2_cache(address: i32, cache: &mut [[i32; 8]; 128], tags: &mut [[i32; 
     
     // Cache miss - find LRU way to replace
     let victim_way: i32 = find_lru_way_8(lru_bits, set_index);
-    tags[set_index][victim_way] = tag;
-    valid[set_index][victim_way] = true;
+    tags[set_index as usize][victim_way as usize] = tag;
+    valid[set_index as usize][victim_way as usize] = true;
     update_cache_lru_8way(lru_bits, set_index, victim_way, time);
     
     false
@@ -588,23 +588,23 @@ fn access_l2_cache(address: i32, cache: &mut [[i32; 8]; 128], tags: &mut [[i32; 
 
 // Update cache LRU for 4-way cache
 fn update_cache_lru(lru_bits: &mut [[i32; 4]; 64], set_index: i32, way: i32, time: i32, ways: i32) {
-    lru_bits[set_index][way] = time;
+    lru_bits[set_index as usize][way as usize] = time;
 }
 
 // Update cache LRU for 8-way cache
 fn update_cache_lru_8way(lru_bits: &mut [[i32; 8]; 128], set_index: i32, way: i32, time: i32) {
-    lru_bits[set_index][way] = time;
+    lru_bits[set_index as usize][way as usize] = time;
 }
 
 // Find LRU way in 4-way cache
 fn find_lru_way(lru_bits: &[[i32; 4]; 64], set_index: i32, ways: i32) -> i32 {
     let mut lru_way: i32 = 0;
-    let mut min_time: i32 = lru_bits[set_index][0];
+    let mut min_time: i32 = lru_bits[set_index as usize][0];
     
     let mut i: i32 = 1;
     while (i < ways) {
-        if (lru_bits[set_index][i] < min_time) {
-            min_time = lru_bits[set_index][i];
+        if (lru_bits[set_index as usize][i as usize] < min_time) {
+            min_time = lru_bits[set_index as usize][i as usize];
             lru_way = i;
         }
         i = i + 1;
@@ -616,12 +616,12 @@ fn find_lru_way(lru_bits: &[[i32; 4]; 64], set_index: i32, ways: i32) -> i32 {
 // Find LRU way in 8-way cache
 fn find_lru_way_8(lru_bits: &[[i32; 8]; 128], set_index: i32) -> i32 {
     let mut lru_way: i32 = 0;
-    let mut min_time: i32 = lru_bits[set_index][0];
+    let mut min_time: i32 = lru_bits[set_index as usize][0];
     
     let mut i: i32 = 1;
     while (i < 8) {
-        if (lru_bits[set_index][i] < min_time) {
-            min_time = lru_bits[set_index][i];
+        if (lru_bits[set_index as usize][i as usize] < min_time) {
+            min_time = lru_bits[set_index as usize][i as usize];
             lru_way = i;
         }
         i = i + 1;
@@ -639,7 +639,7 @@ fn analyze_memory_fragmentation(allocation_table: &[i32; 64], num_frames: i32) -
     
     let mut i: i32 = 0;
     while (i < num_frames) {
-        if (allocation_table[i] == 0) { // Free frame
+        if (allocation_table[i as usize] == 0) { // Free frame
             current_free_block = current_free_block + 1;
             total_free = total_free + 1;
         } else { // Allocated frame
@@ -679,20 +679,20 @@ fn compact_memory(page_tables: &mut [[i32; 16]; 16], reverse_mapping: &mut [i32;
     
     // Move all allocated frames to the beginning
     while (i < num_frames) {
-        if (allocation_table[i] == 1) { // Allocated frame
+        if (allocation_table[i as usize] == 1) { // Allocated frame
             if i != compacted_pos {
                 // Move frame from position i to compacted_pos
-                let virtual_page: i32 = reverse_mapping[i];
-                reverse_mapping[compacted_pos] = virtual_page;
-                reverse_mapping[i] = -1;
-                allocation_table[compacted_pos] = 1;
-                allocation_table[i] = 0;
+                let virtual_page: i32 = reverse_mapping[i as usize];
+                reverse_mapping[compacted_pos as usize] = virtual_page;
+                reverse_mapping[i as usize] = -1;
+                allocation_table[compacted_pos as usize] = 1;
+                allocation_table[i as usize] = 0;
                 
                 // Update page table entry
                 if virtual_page >= 0 && virtual_page < 256 {
                     let page_dir_index: i32 = virtual_page / 16;
                     let page_table_index: i32 = virtual_page % 16;
-                    page_tables[page_dir_index][page_table_index] = compacted_pos + 1;
+                    page_tables[page_dir_index as usize][page_table_index as usize] = compacted_pos + 1;
                 }
             }
             compacted_pos = compacted_pos + 1;
@@ -704,7 +704,7 @@ fn compact_memory(page_tables: &mut [[i32; 16]; 16], reverse_mapping: &mut [i32;
     *free_count = num_frames - compacted_pos;
     i = 0;
     while (i < *free_count) {
-        free_list[i] = compacted_pos + i;
+        free_list[i as usize] = compacted_pos + i;
         i = i + 1;
     }
 }
@@ -725,9 +725,9 @@ fn calculate_working_set_size(access_history: &[i32; 1000], history_head: i32,
     let mut pos: i32 = start_pos;
     while (i < window_size) {
         if (pos >= 0 && pos < 1000) {
-            let page: i32 = access_history[pos];
-            if (page >= 0 && page < 256 && !unique_pages[page]) {
-                unique_pages[page] = true;
+            let page: i32 = access_history[pos as usize];
+            if (page >= 0 && page < 256 && !unique_pages[page as usize]) {
+                unique_pages[page as usize] = true;
                 working_set_size = working_set_size + 1;
             }
         }
@@ -760,7 +760,7 @@ fn adjust_cache_policies(l1_lru: &mut [[i32; 4]; 64], l2_lru: &mut [[i32; 8]; 12
         while (i < 64) {
             let mut j: i32 = 0;
             while (j < 4) {
-                l1_lru[i][j] = l1_lru[i][j] - 10;
+                l1_lru[i as usize][j as usize] = l1_lru[i as usize][j as usize] - 10;
                 j = j + 1;
             }
             i = i + 1;
@@ -773,7 +773,7 @@ fn adjust_cache_policies(l1_lru: &mut [[i32; 4]; 64], l2_lru: &mut [[i32; 8]; 12
         while (i < 128) {
             let mut j: i32 = 0;
             while (j < 8) {
-                l2_lru[i][j] = l2_lru[i][j] - 15;
+                l2_lru[i as usize][j as usize] = l2_lru[i as usize][j as usize] - 15;
                 j = j + 1;
             }
             i = i + 1;

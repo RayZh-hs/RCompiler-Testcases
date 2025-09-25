@@ -101,15 +101,15 @@ fn initializeMatrices(mut matrix_a: [i32; 400], mut matrix_b: [i32; 400], size: 
             
             // Matrix A: Identity-like pattern with variations
             if (row == col) {
-                matrix_a[index] = row + col + 10;
+                matrix_a[index as usize] = row + col + 10;
             } else {
-                matrix_a[index] = (row * 2 + col * 3) % 7;
+                matrix_a[index as usize] = (row * 2 + col * 3) % 7;
             }
             
             // Matrix B: Symmetric pattern
             if (row <= col) {
-                matrix_b[index] = row * col + 5;
-                matrix_b[col * size + row] = row * col + 5; // Ensure symmetry
+                matrix_b[index as usize] = row * col + 5;
+                matrix_b[(col * size + row) as usize] = row * col + 5; // Ensure symmetry
             }
             
             col = col + 1;
@@ -124,7 +124,7 @@ fn matrixAddition(matrix_a: [i32; 400], matrix_b: [i32; 400], mut result: [i32; 
     let total_elements: i32 = size * size;
     
     while (i < total_elements) {
-        result[i] = matrix_a[i] + matrix_b[i];
+        result[i as usize] = matrix_a[i as usize] + matrix_b[i as usize];
         i = i + 1;
     }
 }
@@ -136,7 +136,7 @@ fn matrixSubtraction(matrix_a: [i32; 400], matrix_b: [i32; 400], mut result: [i3
         let mut col: i32 = 0;
         while (col < size) {
             let index: i32 = row * size + col;
-            result[index] = matrix_a[index] - matrix_b[index];
+            result[index as usize] = matrix_a[index as usize] - matrix_b[index as usize];
             col = col + 1;
         }
         row = row + 1;
@@ -148,7 +148,7 @@ fn matrixMultiplication(matrix_a: [i32; 400], matrix_b: [i32; 400], mut result: 
     // Initialize result matrix to zero
     let mut i: i32 = 0;
     while (i < size * size) {
-        result[i] = 0;
+        result[i as usize] = 0;
         i = i + 1;
     }
     
@@ -188,8 +188,8 @@ fn processMatrixBlock(matrix_a: [i32; 400], matrix_b: [i32; 400], mut result: [i
                 let result_index: i32 = i * size + j;
                 let a_index: i32 = i * size + k;
                 let b_index: i32 = k * size + j;
-                result[result_index] = result[result_index] + 
-                                     matrix_a[a_index] * matrix_b[b_index];
+                result[result_index as usize] = result[result_index as usize] + 
+                                     matrix_a[a_index as usize] * matrix_b[b_index as usize];
                 k = k + 1;
             }
             j = j + 1;
@@ -215,7 +215,7 @@ fn matrixTranspose(matrix: [i32; 400], mut result: [i32; 400], size: i32) {
         while (col < size) {
             let original_index: i32 = row * size + col;
             let transposed_index: i32 = col * size + row;
-            result[transposed_index] = matrix[original_index];
+            result[transposed_index as usize] = matrix[original_index as usize];
             col = col + 1;
         }
         row = row + 1;
@@ -229,7 +229,7 @@ fn calculateMatrixSum(matrix: [i32; 400], size: i32) -> i32 {
     let total_elements: i32 = size * size;
     
     while (i < total_elements) {
-        sum = sum + matrix[i];
+        sum = sum + matrix[i as usize];
         i = i + 1;
     }
     
@@ -254,9 +254,9 @@ fn calculateDeterminant4x4(matrix: [i32; 16]) -> i32 {
     while (col < 4) {
         let cofactor: i32 = calculateCofactor4x4(matrix, 0, col);
         if (col % 2 == 0) {
-            determinant = determinant + matrix[col] * cofactor;
+            determinant = determinant + matrix[col as usize] * cofactor;
         } else {
-            determinant = determinant - matrix[col] * cofactor;
+            determinant = determinant - matrix[col as usize] * cofactor;
         }
         col = col + 1;
     }
@@ -275,7 +275,7 @@ fn calculateCofactor4x4(matrix: [i32; 16], exclude_row: i32, exclude_col: i32) -
             let mut col: i32 = 0;
             while (col < 4) {
                 if (col != exclude_col) {
-                    minor_matrix[minor_index] = matrix[row * 4 + col];
+                    minor_matrix[minor_index as usize] = matrix[(row * 4 + col) as usize];
                     minor_index = minor_index + 1;
                 }
                 col = col + 1;
@@ -340,11 +340,11 @@ fn initializeMatrixForPower(mut matrix: [i32; 100], size: i32) {
         while (col < size) {
             let index: i32 = row * size + col;
             if (row == col) {
-                matrix[index] = 2; // Diagonal elements
+                matrix[index as usize] = 2; // Diagonal elements
             } else if (absValue(row - col) == 1) {
-                matrix[index] = 1; // Adjacent to diagonal
+                matrix[index as usize] = 1; // Adjacent to diagonal
             } else {
-                matrix[index] = 0;
+                matrix[index as usize] = 0;
             }
             col = col + 1;
         }
@@ -372,13 +372,13 @@ fn matrixPower(base: [i32; 100], mut result: [i32; 100], size: i32, power: i32) 
 fn initializeIdentityMatrix(mut matrix: [i32; 100], size: i32) {
     let mut i: i32 = 0;
     while (i < size * size) {
-        matrix[i] = 0;
+        matrix[i as usize] = 0;
         i = i + 1;
     }
     
     let mut diag: i32 = 0;
     while (diag < size) {
-        matrix[diag * size + diag] = 1;
+        matrix[(diag * size + diag) as usize] = 1;
         diag = diag + 1;
     }
 }
@@ -389,11 +389,11 @@ fn matrixMultiplication100(matrix_a: [i32; 100], matrix_b: [i32; 100], mut resul
     while (i < size) {
         let mut j: i32 = 0;
         while (j < size) {
-            result[i * size + j] = 0;
+            result[(i * size + j) as usize] = 0;
             let mut k: i32 = 0;
             while (k < size) {
-                result[i * size + j] = result[i * size + j] + 
-                                     matrix_a[i * size + k] * matrix_b[k * size + j];
+                result[(i * size + j) as usize] = result[(i * size + j) as usize] + 
+                                     matrix_a[(i * size + k) as usize] * matrix_b[(k * size + j) as usize];
                 k = k + 1;
             }
             j = j + 1;
@@ -406,7 +406,7 @@ fn matrixMultiplication100(matrix_a: [i32; 100], matrix_b: [i32; 100], mut resul
 fn copyMatrix100(source: [i32; 100], mut dest: [i32; 100], size: i32) {
     let mut i: i32 = 0;
     while (i < size * size) {
-        dest[i] = source[i];
+        dest[i as usize] = source[i as usize];
         i = i + 1;
     }
 }
@@ -416,7 +416,7 @@ fn calculateMatrixSum100(matrix: [i32; 100], size: i32) -> i32 {
     let mut sum: i32 = 0;
     let mut i: i32 = 0;
     while (i < size * size) {
-        sum = sum + matrix[i];
+        sum = sum + matrix[i as usize];
         i = i + 1;
     }
     return sum % 100000;
@@ -428,7 +428,7 @@ fn initializeRotationMatrix(mut matrix: [i32; 64]) {
     while (i < 8) {
         let mut j: i32 = 0;
         while (j < 8) {
-            matrix[i * 8 + j] = i * 10 + j + 1;
+            matrix[(i * 8 + j) as usize] = i * 10 + j + 1;
             j = j + 1;
         }
         i = i + 1;
@@ -442,7 +442,7 @@ fn rotateMatrix90Degrees(mut matrix: [i32; 64], size: i32) {
     // Copy to temp
     let mut i: i32 = 0;
     while (i < size * size) {
-        temp_matrix[i] = matrix[i];
+        temp_matrix[i as usize] = matrix[i as usize];
         i = i + 1;
     }
     
@@ -453,7 +453,7 @@ fn rotateMatrix90Degrees(mut matrix: [i32; 64], size: i32) {
         while (j < size) {
             let old_index: i32 = i * size + j;
             let new_index: i32 = j * size + (size - 1 - i);
-            matrix[new_index] = temp_matrix[old_index];
+            matrix[new_index as usize] = temp_matrix[old_index as usize];
             j = j + 1;
         }
         i = i + 1;
@@ -465,7 +465,7 @@ fn calculateMatrixSum64(matrix: [i32; 64]) -> i32 {
     let mut sum: i32 = 0;
     let mut i: i32 = 0;
     while (i < 64) {
-        sum = sum + matrix[i];
+        sum = sum + matrix[i as usize];
         i = i + 1;
     }
     return sum % 100000;
@@ -478,8 +478,8 @@ fn calculateDiagonalSums(matrix: [i32; 100], size: i32) -> i32 {
     
     let mut i: i32 = 0;
     while (i < size) {
-        main_diagonal_sum = main_diagonal_sum + matrix[i * size + i];
-        anti_diagonal_sum = anti_diagonal_sum + matrix[i * size + (size - 1 - i)];
+        main_diagonal_sum = main_diagonal_sum + matrix[(i * size + i) as usize];
+        anti_diagonal_sum = anti_diagonal_sum + matrix[(i * size + (size - 1 - i)) as usize];
         i = i + 1;
     }
     
@@ -491,7 +491,7 @@ fn calculateMatrixTrace(matrix: [i32; 100], size: i32) -> i32 {
     let mut trace: i32 = 0;
     let mut i: i32 = 0;
     while (i < size) {
-        trace = trace + matrix[i * size + i];
+        trace = trace + matrix[(i * size + i) as usize];
         i = i + 1;
     }
     return trace;
@@ -502,7 +502,7 @@ fn calculateMatrixNorm(matrix: [i32; 100], size: i32) -> i32 {
     let mut norm_squared: i32 = 0;
     let mut i: i32 = 0;
     while (i < size * size) {
-        norm_squared = norm_squared + matrix[i] * matrix[i];
+        norm_squared = norm_squared + matrix[i as usize] * matrix[i as usize];
         i = i + 1;
     }
     
@@ -604,24 +604,24 @@ fn createSparseMatrix(mut rows: [i32; 200], mut cols: [i32; 200], mut values: [i
     let mut i: i32 = 0;
     while (i < matrix_size && count < 200) {
         // Main diagonal
-        rows[count] = i;
-        cols[count] = i;
-        values[count] = i + 10;
+        rows[count as usize] = i;
+        cols[count as usize] = i;
+        values[count as usize] = i + 10;
         count = count + 1;
         
         // Super diagonal (if exists)
         if (i + 1 < matrix_size && count < 200) {
-            rows[count] = i;
-            cols[count] = i + 1;
-            values[count] = i + 5;
+            rows[count as usize] = i;
+            cols[count as usize] = i + 1;
+            values[count as usize] = i + 5;
             count = count + 1;
         }
         
         // Some scattered elements
         if (i % 3 == 0 && i + 5 < matrix_size && count < 200) {
-            rows[count] = i;
-            cols[count] = i + 5;
-            values[count] = i * 2;
+            rows[count as usize] = i;
+            cols[count as usize] = i + 5;
+            values[count as usize] = i * 2;
             count = count + 1;
         }
         
@@ -640,17 +640,17 @@ fn createSparseMatrix2(mut rows: [i32; 200], mut cols: [i32; 200], mut values: [
     while (i < matrix_size && count < 200) {
         // Anti-diagonal pattern
         if (i + i < matrix_size && count < 200) {
-            rows[count] = i;
-            cols[count] = matrix_size - 1 - i;
-            values[count] = i + 3;
+            rows[count as usize] = i;
+            cols[count as usize] = matrix_size - 1 - i;
+            values[count as usize] = i + 3;
             count = count + 1;
         }
         
         // Some other pattern
         if (i % 4 == 0 && count < 200) {
-            rows[count] = i;
-            cols[count] = i / 2;
-            values[count] = i * 3;
+            rows[count as usize] = i;
+            cols[count as usize] = i / 2;
+            values[count as usize] = i * 3;
             count = count + 1;
         }
         
@@ -672,26 +672,26 @@ fn sparseMatrixAddition(
     
     // Merge the two sparse matrices
     while (i1 < count1 && i2 < count2 && result_count < 400) {
-        let pos1: i32 = rows1[i1] * 100 + cols1[i1]; // Linearize position
-        let pos2: i32 = rows2[i2] * 100 + cols2[i2];
+        let pos1: i32 = rows1[i1 as usize] * 100 + cols1[i1 as usize]; // Linearize position
+        let pos2: i32 = rows2[i2 as usize] * 100 + cols2[i2 as usize];
         
         if (pos1 < pos2) {
-            result_rows[result_count] = rows1[i1];
-            result_cols[result_count] = cols1[i1];
-            result_values[result_count] = values1[i1];
+            result_rows[result_count as usize] = rows1[i1 as usize];
+            result_cols[result_count as usize] = cols1[i1 as usize];
+            result_values[result_count as usize] = values1[i1 as usize];
             result_count = result_count + 1;
             i1 = i1 + 1;
         } else if pos1 > pos2 {
-            result_rows[result_count] = rows2[i2];
-            result_cols[result_count] = cols2[i2];
-            result_values[result_count] = values2[i2];
+            result_rows[result_count as usize] = rows2[i2 as usize];
+            result_cols[result_count as usize] = cols2[i2 as usize];
+            result_values[result_count as usize] = values2[i2 as usize];
             result_count = result_count + 1;
             i2 = i2 + 1;
         } else {
             // Same position - add values
-            result_rows[result_count] = rows1[i1];
-            result_cols[result_count] = cols1[i1];
-            result_values[result_count] = values1[i1] + values2[i2];
+            result_rows[result_count as usize] = rows1[i1 as usize];
+            result_cols[result_count as usize] = cols1[i1 as usize];
+            result_values[result_count as usize] = values1[i1 as usize] + values2[i2 as usize];
             result_count = result_count + 1;
             i1 = i1 + 1;
             i2 = i2 + 1;
@@ -700,18 +700,18 @@ fn sparseMatrixAddition(
     
     // Add remaining elements from first matrix
     while (i1 < count1 && result_count < 400) {
-        result_rows[result_count] = rows1[i1];
-        result_cols[result_count] = cols1[i1];
-        result_values[result_count] = values1[i1];
+        result_rows[result_count as usize] = rows1[i1 as usize];
+        result_cols[result_count as usize] = cols1[i1 as usize];
+        result_values[result_count as usize] = values1[i1 as usize];
         result_count = result_count + 1;
         i1 = i1 + 1;
     }
     
     // Add remaining elements from second matrix
     while (i2 < count2 && result_count < 400) {
-        result_rows[result_count] = rows2[i2];
-        result_cols[result_count] = cols2[i2];
-        result_values[result_count] = values2[i2];
+        result_rows[result_count as usize] = rows2[i2 as usize];
+        result_cols[result_count as usize] = cols2[i2 as usize];
+        result_values[result_count as usize] = values2[i2 as usize];
         result_count = result_count + 1;
         i2 = i2 + 1;
     }
@@ -726,9 +726,9 @@ fn sparseMatrixTranspose(
 ) {
     let mut i: i32 = 0;
     while (i < count) {
-        trans_rows[i] = cols[i];    // Swap row and column
-        trans_cols[i] = rows[i];
-        trans_values[i] = values[i];
+        trans_rows[i as usize] = cols[i as usize];    // Swap row and column
+        trans_cols[i as usize] = rows[i as usize];
+        trans_values[i as usize] = values[i as usize];
         i = i + 1;
     }
     
@@ -738,22 +738,22 @@ fn sparseMatrixTranspose(
         swapped = 0;
         i = 0;
         while (i < count - 1) {
-            let pos1: i32 = trans_rows[i] * 100 + trans_cols[i];
-            let pos2: i32 = trans_rows[i + 1] * 100 + trans_cols[i + 1];
+            let pos1: i32 = trans_rows[i as usize] * 100 + trans_cols[i as usize];
+            let pos2: i32 = trans_rows[i as usize + 1] * 100 + trans_cols[i as usize + 1];
             
             if (pos1 > pos2) {
                 // Swap elements
-                let temp_row: i32 = trans_rows[i];
-                let temp_col: i32 = trans_cols[i];
-                let temp_val: i32 = trans_values[i];
+                let temp_row: i32 = trans_rows[i as usize];
+                let temp_col: i32 = trans_cols[i as usize];
+                let temp_val: i32 = trans_values[i as usize];
                 
-                trans_rows[i] = trans_rows[i + 1];
-                trans_cols[i] = trans_cols[i + 1];
-                trans_values[i] = trans_values[i + 1];
+                trans_rows[i as usize] = trans_rows[i as usize + 1];
+                trans_cols[i as usize] = trans_cols[i as usize + 1];
+                trans_values[i as usize] = trans_values[i as usize + 1];
                 
-                trans_rows[i + 1] = temp_row;
-                trans_cols[i + 1] = temp_col;
-                trans_values[i + 1] = temp_val;
+                trans_rows[i as usize + 1] = temp_row;
+                trans_cols[i as usize + 1] = temp_col;
+                trans_values[i as usize + 1] = temp_val;
                 
                 swapped = 1;
             }
@@ -767,7 +767,7 @@ fn calculateSparseSum(values: [i32; 200], count: i32) -> i32 {
     let mut sum: i32 = 0;
     let mut i: i32 = 0;
     while (i < count) {
-        sum = sum + values[i];
+        sum = sum + values[i as usize];
         i = i + 1;
     }
     return sum % 100000;
@@ -783,16 +783,16 @@ fn sparseMatrixMultiplication(
     // For each non-zero element in first matrix
     let mut i: i32 = 0;
     while (i < count1) {
-        let row: i32 = rows1[i];
-        let mid_col: i32 = cols1[i];
-        let val1: i32 = values1[i];
+        let row: i32 = rows1[i as usize];
+        let mid_col: i32 = cols1[i as usize];
+        let val1: i32 = values1[i as usize];
         
         // Find matching elements in second matrix
         let mut j: i32 = 0;
         while (j < count2) {
-            if (rows2[j] == mid_col) {
-                let col: i32 = cols2[j];
-                let val2: i32 = values2[j];
+            if (rows2[j as usize] == mid_col) {
+                let col: i32 = cols2[j as usize];
+                let val2: i32 = values2[j as usize];
                 result_sum = result_sum + val1 * val2;
             }
             j = j + 1;
@@ -853,8 +853,8 @@ fn initializeLargeMatrices(mut matrix_a: [i32; 625], mut matrix_b: [i32; 625], s
         let mut j: i32 = 0;
         while (j < size) {
             let index: i32 = i * size + j;
-            matrix_a[index] = (i + j) % 10 + 1;
-            matrix_b[index] = (i * j) % 7 + 1;
+            matrix_a[index as usize] = (i + j) % 10 + 1;
+            matrix_b[index as usize] = (i * j) % 7 + 1;
             j = j + 1;
         }
         i = i + 1;
@@ -867,11 +867,11 @@ fn matrixMultiplication625(matrix_a: [i32; 625], matrix_b: [i32; 625], mut resul
     while (i < size) {
         let mut j: i32 = 0;
         while (j < size) {
-            result[i * size + j] = 0;
+            result[(i * size + j) as usize] = 0;
             let mut k: i32 = 0;
             while (k < size) {
-                result[i * size + j] = result[i * size + j] + 
-                                     matrix_a[i * size + k] * matrix_b[k * size + j];
+                result[(i * size + j) as usize] = result[(i * size + j) as usize] + 
+                                     matrix_a[(i * size + k) as usize] * matrix_b[(k * size + j) as usize];
                 k = k + 1;
             }
             j = j + 1;
@@ -884,7 +884,7 @@ fn matrixMultiplication625(matrix_a: [i32; 625], matrix_b: [i32; 625], mut resul
 fn copyMatrix625(source: [i32; 625], mut dest: [i32; 625], size: i32) {
     let mut i: i32 = 0;
     while (i < size * size) {
-        dest[i] = source[i];
+        dest[i as usize] = source[i as usize];
         i = i + 1;
     }
 }
@@ -894,7 +894,7 @@ fn calculateMatrixSum625(matrix: [i32; 625], size: i32) -> i32 {
     let mut sum: i32 = 0;
     let mut i: i32 = 0;
     while (i < size * size) {
-        sum = sum + matrix[i];
+        sum = sum + matrix[i as usize];
         i = i + 1;
     }
     return sum % 1000000;
@@ -909,7 +909,7 @@ fn performRepeatedOperationsBenchmark() {
     // Initialize
     let mut i: i32 = 0;
     while (i < size * size) {
-        test_matrix[i] = (i * 3 + 7) % 20;
+        test_matrix[i as usize] = (i * 3 + 7) % 20;
         i = i + 1;
     }
     
@@ -931,7 +931,7 @@ fn matrixTranspose144(matrix: [i32; 144], mut result: [i32; 144], size: i32) {
     while (i < size) {
         let mut j: i32 = 0;
         while (j < size) {
-            result[j * size + i] = matrix[i * size + j];
+            result[(j * size + i) as usize] = matrix[(i * size + j) as usize];
             j = j + 1;
         }
         i = i + 1;
@@ -942,7 +942,7 @@ fn matrixTranspose144(matrix: [i32; 144], mut result: [i32; 144], size: i32) {
 fn copyMatrix144(source: [i32; 144], mut dest: [i32; 144], size: i32) {
     let mut i: i32 = 0;
     while (i < 144) {
-        dest[i] = source[i];
+        dest[i as usize] = source[i as usize];
         i = i + 1;
     }
 }
@@ -952,7 +952,7 @@ fn calculateMatrixSum144(matrix: [i32; 144], size: i32) -> i32 {
     let mut sum: i32 = 0;
     let mut i: i32 = 0;
     while (i < 144) {
-        sum = sum + matrix[i];
+        sum = sum + matrix[i as usize];
         i = i + 1;
     }
     return sum % 100000;
@@ -966,7 +966,7 @@ fn performMemoryAccessBenchmark() {
     // Initialize matrix
     let mut i: i32 = 0;
     while (i < 256) {
-        access_matrix[i] = i + 1;
+        access_matrix[i as usize] = i + 1;
         i = i + 1;
     }
     
@@ -986,7 +986,7 @@ fn testRowMajorAccess(matrix: [i32; 256], size: i32) -> i32 {
     while (i < size) {
         let mut j: i32 = 0;
         while (j < size) {
-            sum = sum + matrix[i * size + j];
+            sum = sum + matrix[(i * size + j) as usize];
             j = j + 1;
         }
         i = i + 1;
@@ -1001,7 +1001,7 @@ fn testColumnMajorAccess(matrix: [i32; 256], size: i32) -> i32 {
     while (j < size) {
         let mut i: i32 = 0;
         while (i < size) {
-            sum = sum + matrix[i * size + j];
+            sum = sum + matrix[(i * size + j) as usize];
             i = i + 1;
         }
         j = j + 1;
@@ -1020,7 +1020,7 @@ fn testDiagonalAccess(matrix: [i32; 256], size: i32) -> i32 {
         while (i < size) {
             let j: i32 = i + k;
             if (j >= 0 && j < size) {
-                sum = sum + matrix[i * size + j];
+                sum = sum + matrix[(i * size + j) as usize];
             }
             i = i + 1;
         }
@@ -1043,7 +1043,7 @@ fn testRandomAccess(matrix: [i32; 256], size: i32) -> i32 {
         seed = (seed * 13 + 11) % 251;
         let col: i32 = seed % size;
         
-        sum = sum + matrix[row * size + col];
+        sum = sum + matrix[(row * size + col) as usize];
         access_count = access_count + 1;
     }
     
@@ -1124,7 +1124,7 @@ fn testBoundaryValueMatrices() {
     let mut sum: i32 = 0;
     let mut i: i32 = 0;
     while (i < 9) {
-        sum = sum + large_value_matrix[i];
+        sum = sum + large_value_matrix[i as usize];
         i = i + 1;
     }
     printInt(sum);
@@ -1145,7 +1145,7 @@ fn calculateMatrixSum16(matrix: [i32; 16]) -> i32 {
     let mut sum: i32 = 0;
     let mut i: i32 = 0;
     while (i < 16) {
-        sum = sum + matrix[i];
+        sum = sum + matrix[i as usize];
         i = i + 1;
     }
     return sum;

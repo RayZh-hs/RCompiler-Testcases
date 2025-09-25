@@ -65,12 +65,12 @@ fn performLinkedListOperations() {
         let new_node: i32 = allocateNode(memory_pool, free_list_head);
         if (new_node != 0) {
             // Set node data
-            memory_pool[new_node] = i * 7 + 13; // Some computed value
+            memory_pool[new_node as usize] = i * 7 + 13; // Some computed value
             // Insert at head
-            memory_pool[new_node + 1] = list_head;
+            memory_pool[new_node as usize + 1] = list_head;
             list_head = new_node;
             allocated_count = allocated_count + 1;
-            free_list_head = memory_pool[free_list_head + 1];
+            free_list_head = memory_pool[free_list_head as usize + 1];
         }
         i = i + 1;
     }
@@ -106,8 +106,8 @@ fn performLinkedListOperations() {
 fn initializeFreeList(mut memory_pool: [i32; 2000], start_index: i32) {
     let mut current: i32 = start_index;
     while (current < 1998) { // Leave space for data+next pairs
-        memory_pool[current] = 0;           // Data slot (unused in free list)
-        memory_pool[current + 1] = current + 2; // Next free slot
+        memory_pool[current as usize] = 0;           // Data slot (unused in free list)
+        memory_pool[current as usize + 1] = current + 2; // Next free slot
         current = current + 2;
     }
     // Last free node points to NULL
@@ -123,11 +123,11 @@ fn allocateNode(memory_pool: [i32; 2000], mut free_head: i32) -> i32 {
     
     let allocated_node: i32 = free_head;
     // Update free list head to next free node
-    let next_free: i32 = memory_pool[free_head + 1];
+    let next_free: i32 = memory_pool[free_head as usize + 1];
     
     // Clear allocated node
-    memory_pool[allocated_node] = 0;
-    memory_pool[allocated_node + 1] = 0;
+    memory_pool[allocated_node as usize] = 0;
+    memory_pool[allocated_node as usize + 1] = 0;
     
     return allocated_node;
 }
@@ -139,8 +139,8 @@ fn calculateListSum(memory_pool: [i32; 2000], head: i32) -> i32 {
     let mut node_count: i32 = 0;
     
     while (current != 0 && node_count < 1000) { // Prevent infinite loops
-        sum = sum + memory_pool[current];
-        current = memory_pool[current + 1];
+        sum = sum + memory_pool[current as usize];
+        current = memory_pool[current as usize + 1];
         node_count = node_count + 1;
     }
     
@@ -155,8 +155,8 @@ fn reverseList(mut memory_pool: [i32; 2000], head: i32) -> i32 {
     let mut step_count: i32 = 0;
     
     while (current != 0 && step_count < 1000) {
-        next = memory_pool[current + 1];  // Save next
-        memory_pool[current + 1] = prev;  // Reverse link
+        next = memory_pool[current as usize + 1];  // Save next
+        memory_pool[current as usize + 1] = prev;  // Reverse link
         prev = current;                   // Move prev forward
         current = next;                   // Move current forward
         step_count = step_count + 1;
@@ -176,7 +176,7 @@ fn complexListSearch(memory_pool: [i32; 2000], head: i32) -> i32 {
     let mut position: i32 = 0;
     
     while (current != 0 && position < 1000) {
-        let value: i32 = memory_pool[current];
+        let value: i32 = memory_pool[current as usize];
         
         // Track min/max values
         if (value > max_value) {
@@ -198,7 +198,7 @@ fn complexListSearch(memory_pool: [i32; 2000], head: i32) -> i32 {
             found_count = found_count + 1;
         }
         
-        current = memory_pool[current + 1];
+        current = memory_pool[current as usize + 1];
         position = position + 1;
     }
     
@@ -208,7 +208,7 @@ fn complexListSearch(memory_pool: [i32; 2000], head: i32) -> i32 {
 
 // Merge sort implementation for linked list
 fn mergeSort(mut memory_pool: [i32; 2000], head: i32, length: i32) -> i32 {
-    if (head == 0 || memory_pool[head + 1] == 0) {
+    if (head == 0 || memory_pool[head as usize + 1] == 0) {
         return head; // Single node or empty list
     }
     
@@ -234,7 +234,7 @@ fn splitList(mut memory_pool: [i32; 2000], head: i32, split_pos: i32) -> i32 {
     let mut count: i32 = 1;
     
     while (count < split_pos - 1 && current != 0) {
-        current = memory_pool[current + 1];
+        current = memory_pool[current as usize + 1];
         count = count + 1;
     }
     
@@ -242,8 +242,8 @@ fn splitList(mut memory_pool: [i32; 2000], head: i32, split_pos: i32) -> i32 {
         return 0;
     }
     
-    let second_half: i32 = memory_pool[current + 1];
-    memory_pool[current + 1] = 0; // Break the link
+    let second_half: i32 = memory_pool[current as usize + 1];
+    memory_pool[current as usize + 1] = 0; // Break the link
     
     return second_half;
 }
@@ -261,36 +261,36 @@ fn mergeLists(mut memory_pool: [i32; 2000], list1: i32, list2: i32) -> i32 {
     let mut current: i32 = -1;
     
     // Choose the smaller head as the result head
-    if (memory_pool[list1] <= memory_pool[list2]) {
+    if (memory_pool[list1 as usize] <= memory_pool[list2 as usize]) {
         result_head = list1;
         current = list1;
-        list1 = memory_pool[list1 + 1];
+        list1 = memory_pool[list1 as usize + 1];
     } else {
         result_head = list2;
         current = list2;
-        list2 = memory_pool[list2 + 1];
+        list2 = memory_pool[list2 as usize + 1];
     }
     
     // Merge remaining nodes
     let mut merge_count: i32 = 0;
     while (list1 != 0 && list2 != 0 && merge_count < 500) {
-        if (memory_pool[list1] <= memory_pool[list2]) {
-            memory_pool[current + 1] = list1;
+        if (memory_pool[list1 as usize] <= memory_pool[list2 as usize]) {
+            memory_pool[current as usize + 1] = list1;
             current = list1;
-            list1 = memory_pool[list1 + 1];
+            list1 = memory_pool[list1 as usize + 1];
         } else {
-            memory_pool[current + 1] = list2;
+            memory_pool[current as usize + 1] = list2;
             current = list2;
-            list2 = memory_pool[list2 + 1];
+            list2 = memory_pool[list2 as usize + 1];
         }
         merge_count = merge_count + 1;
     }
     
     // Attach remaining nodes
     if (list1 != 0) {
-        memory_pool[current + 1] = list1;
+        memory_pool[current as usize + 1] = list1;
     } else {
-        memory_pool[current + 1] = list2;
+        memory_pool[current as usize + 1] = list2;
     }
     
     return result_head;
@@ -302,12 +302,12 @@ fn verifySorted(memory_pool: [i32; 2000], head: i32) -> i32 {
     let mut is_sorted: i32 = 1; // true
     let mut check_count: i32 = 0;
     
-    while (current != 0 && memory_pool[current + 1] != 0 && check_count < 999) {
-        if (memory_pool[current] > memory_pool[memory_pool[current + 1]]) {
+    while (current != 0 && memory_pool[current as usize + 1] != 0 && check_count < 999) {
+        if (memory_pool[current as usize] > memory_pool[(memory_pool[current as usize + 1]) as usize]) {
             is_sorted = 0; // false
             break;
         }
-        current = memory_pool[current + 1];
+        current = memory_pool[current as usize + 1];
         check_count = check_count + 1;
     }
     
@@ -345,8 +345,8 @@ fn testAdvancedListOperations() {
 fn initializeAdvancedMemory(mut memory_pool: [i32; 1000]) {
     let mut i: i32 = 1;
     while (i < 998) {
-        memory_pool[i] = 0;
-        memory_pool[i + 1] = i + 2;
+        memory_pool[i as usize] = 0;
+        memory_pool[i as usize + 1] = i + 2;
         i = i + 2;
     }
     memory_pool[998] = 0;
@@ -363,13 +363,13 @@ fn createMultipleLists(mut memory_pool: [i32; 1000], mut list_heads: [i32; 10], 
         
         while (node_count < list_size && free_head != 0 && free_head < 998) {
             let new_node: i32 = free_head;
-            free_head = memory_pool[free_head + 1];
+            free_head = memory_pool[free_head as usize + 1];
             
             // Create pattern-based data
             let data_value: i32 = list_index * 100 + node_count * (list_index + 1);
-            memory_pool[new_node] = data_value;
-            memory_pool[new_node + 1] = list_heads[list_index];
-            list_heads[list_index] = new_node;
+            memory_pool[new_node as usize] = data_value;
+            memory_pool[new_node as usize + 1] = list_heads[list_index as usize];
+            list_heads[list_index as usize] = new_node;
             
             node_count = node_count + 1;
         }
@@ -387,7 +387,7 @@ fn findListIntersections(memory_pool: [i32; 1000], list_heads: [i32; 10]) -> i32
         let mut list_j: i32 = list_i + 1;
         while (list_j < 10) {
             // Check for common values between list_i and list_j
-            let common_values: i32 = countCommonValues(memory_pool, list_heads[list_i], list_heads[list_j]);
+            let common_values: i32 = countCommonValues(memory_pool, list_heads[list_i as usize], list_heads[list_j as usize]);
             intersection_count = intersection_count + common_values;
             list_j = list_j + 1;
         }
@@ -404,20 +404,20 @@ fn countCommonValues(memory_pool: [i32; 1000], head1: i32, head2: i32) -> i32 {
     let mut iter_count: i32 = 0;
     
     while (current1 != 0 && iter_count < 100) {
-        let value1: i32 = memory_pool[current1];
+        let value1: i32 = memory_pool[current1 as usize];
         let mut current2: i32 = head2;
         let mut inner_iter: i32 = 0;
         
         while (current2 != 0 && inner_iter < 100) {
-            if (memory_pool[current2] == value1) {
+            if (memory_pool[current2 as usize] == value1) {
                 common_count = common_count + 1;
                 break;
             }
-            current2 = memory_pool[current2 + 1];
+            current2 = memory_pool[current2 as usize + 1];
             inner_iter = inner_iter + 1;
         }
         
-        current1 = memory_pool[current1 + 1];
+        current1 = memory_pool[current1 as usize + 1];
         iter_count = iter_count + 1;
     }
     
@@ -432,17 +432,17 @@ fn performListUnions(mut memory_pool: [i32; 1000], list_heads: [i32; 10]) -> i32
     
     let mut list_index: i32 = 0;
     while (list_index < 10) {
-        let mut current: i32 = list_heads[list_index];
+        let mut current: i32 = list_heads[list_index as usize];
         let mut node_count: i32 = 0;
         
         while (current != 0 && node_count < 50) {
-            let value: i32 = memory_pool[current];
+            let value: i32 = memory_pool[current as usize];
             
             // Check if value is already in unique_values
             let mut found: i32 = 0;
             let mut check_index: i32 = 0;
             while (check_index < unique_count) {
-                if (unique_values[check_index] == value) {
+                if (unique_values[check_index as usize] == value) {
                     found = 1;
                     break;
                 }
@@ -450,11 +450,11 @@ fn performListUnions(mut memory_pool: [i32; 1000], list_heads: [i32; 10]) -> i32
             }
             
             if (found == 0 && unique_count < 500) {
-                unique_values[unique_count] = value;
+                unique_values[unique_count as usize] = value;
                 unique_count = unique_count + 1;
             }
             
-            current = memory_pool[current + 1];
+            current = memory_pool[current as usize + 1];
             node_count = node_count + 1;
         }
         
@@ -472,7 +472,7 @@ fn complexListManipulations(mut memory_pool: [i32; 1000], mut list_heads: [i32; 
     let mut list_index: i32 = 0;
     while (list_index < 10) {
         let rotate_amount: i32 = list_index + 1;
-        list_heads[list_index] = rotateList(memory_pool, list_heads[list_index], rotate_amount);
+        list_heads[list_index as usize] = rotateList(memory_pool, list_heads[list_index as usize], rotate_amount);
         list_index = list_index + 1;
     }
     manipulation_score = manipulation_score + 10;
@@ -480,7 +480,7 @@ fn complexListManipulations(mut memory_pool: [i32; 1000], mut list_heads: [i32; 
     // Operation 2: Remove duplicates from each list
     list_index = 0;
     while (list_index < 10) {
-        let removed_count: i32 = removeDuplicates(memory_pool, list_heads[list_index]);
+        let removed_count: i32 = removeDuplicates(memory_pool, list_heads[list_index as usize]);
         manipulation_score = manipulation_score + removed_count;
         list_index = list_index + 1;
     }
@@ -501,8 +501,8 @@ fn rotateList(mut memory_pool: [i32; 1000], head: i32, k: i32) -> i32 {
     // Find length and last node
     let mut length: i32 = 1;
     let mut last: i32 = head;
-    while (memory_pool[last + 1] != 0 && length < 100) {
-        last = memory_pool[last + 1];
+    while (memory_pool[last as usize + 1] != 0 && length < 100) {
+        last = memory_pool[last as usize + 1];
         length = length + 1;
     }
     
@@ -514,14 +514,14 @@ fn rotateList(mut memory_pool: [i32; 1000], head: i32, k: i32) -> i32 {
     // Find the new tail (length - k - 1 steps from head)
     let mut new_tail: i32 = head;
     let mut steps: i32 = 0;
-    while (steps < length - effective_k - 1 && memory_pool[new_tail + 1] != 0) {
-        new_tail = memory_pool[new_tail + 1];
+    while (steps < length - effective_k - 1 && memory_pool[new_tail as usize + 1] != 0) {
+        new_tail = memory_pool[new_tail as usize + 1];
         steps = steps + 1;
     }
     
-    let new_head: i32 = memory_pool[new_tail + 1];
-    memory_pool[new_tail + 1] = 0;  // Break the list
-    memory_pool[last + 1] = head;   // Connect end to old head
+    let new_head: i32 = memory_pool[new_tail as usize + 1];
+    memory_pool[new_tail as usize + 1] = 0;  // Break the list
+    memory_pool[last as usize + 1] = head;   // Connect end to old head
     
     return new_head;
 }
@@ -532,15 +532,15 @@ fn removeDuplicates(mut memory_pool: [i32; 1000], head: i32) -> i32 {
     let mut current: i32 = head;
     let mut iter_count: i32 = 0;
     
-    while (current != 0 && memory_pool[current + 1] != 0 && iter_count < 100) {
-        let mut next_node: i32 = memory_pool[current + 1];
+    while (current != 0 && memory_pool[current as usize + 1] != 0 && iter_count < 100) {
+        let mut next_node: i32 = memory_pool[current as usize + 1];
         
-        if (memory_pool[current] == memory_pool[next_node]) {
+        if (memory_pool[current as usize] == memory_pool[next_node as usize]) {
             // Remove the duplicate
-            memory_pool[current + 1] = memory_pool[next_node + 1];
+            memory_pool[current as usize + 1] = memory_pool[next_node as usize + 1];
             removed_count = removed_count + 1;
         } else {
-            current = memory_pool[current + 1];
+            current = memory_pool[current as usize + 1];
         }
         
         iter_count = iter_count + 1;
@@ -558,8 +558,8 @@ fn interleaveLists(mut memory_pool: [i32; 1000], list_heads: [i32; 10]) -> i32 {
     // Initialize active lists
     let mut i: i32 = 0;
     while (i < 10) {
-        if (list_heads[i] != 0) {
-            active_lists[active_count] = list_heads[i];
+        if (list_heads[i as usize] != 0) {
+            active_lists[active_count as usize] = list_heads[i as usize];
             active_count = active_count + 1;
         }
         i = i + 1;
@@ -571,12 +571,12 @@ fn interleaveLists(mut memory_pool: [i32; 1000], list_heads: [i32; 10]) -> i32 {
         i = 0;
         
         while (i < active_count) {
-            if (active_lists[i] != 0) {
+            if (active_lists[i as usize] != 0) {
                 interleave_count = interleave_count + 1;
-                active_lists[i] = memory_pool[active_lists[i] + 1];
+                active_lists[i as usize] = memory_pool[(active_lists[i as usize] + 1) as usize];
                 
-                if (active_lists[i] != 0) {
-                    active_lists[new_active_count] = active_lists[i];
+                if (active_lists[i as usize] != 0) {
+                    active_lists[new_active_count as usize] = active_lists[i as usize];
                     new_active_count = new_active_count + 1;
                 }
             }
@@ -601,8 +601,8 @@ fn performListPerformanceTest() {
     let mut value: i32 = 1;
     while (value <= 800 && (value * 2) < 1800) {
         let node_index: i32 = value * 2;
-        large_memory[node_index] = value * value % 10000; // Computed values
-        large_memory[node_index + 1] = stress_head;
+        large_memory[node_index as usize] = value * value % 10000; // Computed values
+        large_memory[node_index as usize + 1] = stress_head;
         stress_head = node_index;
         allocated_nodes = allocated_nodes + 1;
         value = value + 1;
@@ -635,9 +635,9 @@ fn stressTraversal(memory_pool: [i32; 1800], head: i32, pattern: i32) -> i32 {
     
     while (current != 0 && step_count < 800) {
         if (step_count % skip_count == 0) {
-            sum = sum + memory_pool[current];
+            sum = sum + memory_pool[current as usize];
         }
-        current = memory_pool[current + 1];
+        current = memory_pool[current as usize + 1];
         step_count = step_count + 1;
     }
     
@@ -652,15 +652,15 @@ fn stressModifications(mut memory_pool: [i32; 1800], head: i32) -> i32 {
     
     while (current != 0 && position < 400) {
         // Complex modification based on position and value
-        let old_value: i32 = memory_pool[current];
+        let old_value: i32 = memory_pool[current as usize];
         let new_value: i32 = (old_value * 3 + position * 7) % 1000;
-        memory_pool[current] = new_value;
+        memory_pool[current as usize] = new_value;
         
         if (new_value > old_value) {
             modification_count = modification_count + 1;
         }
         
-        current = memory_pool[current + 1];
+        current = memory_pool[current as usize + 1];
         position = position + 1;
     }
     
@@ -674,7 +674,7 @@ fn stressPatternSearch(memory_pool: [i32; 1800], head: i32) -> i32 {
     let mut position: i32 = 0;
     
     while (current != 0 && position < 600) {
-        let value: i32 = memory_pool[current];
+        let value: i32 = memory_pool[current as usize];
         
         // Multiple pattern checks
         if (value % 7 == 3) {
@@ -687,7 +687,7 @@ fn stressPatternSearch(memory_pool: [i32; 1800], head: i32) -> i32 {
             pattern_matches = pattern_matches + 3;
         }
         
-        current = memory_pool[current + 1];
+        current = memory_pool[current as usize + 1];
         position = position + 1;
     }
     
@@ -799,8 +799,8 @@ fn safeTraverseWithLimit(memory_pool: [i32; 20], head: i32, max_steps: i32) -> i
     let mut steps: i32 = 0;
     
     while (current != 0 && steps < max_steps) {
-        sum = sum + memory_pool[current];
-        current = memory_pool[current + 1];
+        sum = sum + memory_pool[current as usize];
+        current = memory_pool[current as usize + 1];
         steps = steps + 1;
     }
     
@@ -820,14 +820,14 @@ fn detectCycle(memory_pool: [i32; 20], head: i32) -> i32 {
     while (step_count < 15) {
         // Move slow pointer one step
         if (slow != 0) {
-            slow = memory_pool[slow + 1];
+            slow = memory_pool[slow as usize + 1];
         }
         
         // Move fast pointer two steps
         if (fast != 0) {
-            fast = memory_pool[fast + 1];
+            fast = memory_pool[fast as usize + 1];
             if (fast != 0) {
-                fast = memory_pool[fast + 1];
+                fast = memory_pool[fast as usize + 1];
             }
         }
         

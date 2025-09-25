@@ -68,7 +68,7 @@ fn performMemoryPoolOperations() {
     while (alloc_size <= 64 && allocated_count < 100) {
         let allocated_block: i32 = allocateBlock(memory_pool, free_list_head, alloc_size);
         if (allocated_block != -1) {
-            allocated_blocks[allocated_count] = allocated_block;
+            allocated_blocks[allocated_count as usize] = allocated_block;
             allocated_count = allocated_count + 1;
             free_list_head = findFreeListHead(memory_pool, pool_size);
         }
@@ -83,10 +83,10 @@ fn performMemoryPoolOperations() {
     while (i < allocated_count) {
         // Deallocate every 3rd block to create fragmentation
         if (i % 3 == 0) {
-            let block_start: i32 = allocated_blocks[i];
+            let block_start: i32 = allocated_blocks[i as usize];
             deallocateBlock(memory_pool, block_start);
             deallocated_count = deallocated_count + 1;
-            allocated_blocks[i] = -1; // Mark as deallocated
+            allocated_blocks[i as usize] = -1; // Mark as deallocated
         }
         i = i + 1;
     }
@@ -128,7 +128,7 @@ fn initializeMemoryPool(mut memory_pool: [i32; 2000], pool_size: i32) {
     // Clear the rest of the memory
     let mut i: i32 = 4;
     while (i < pool_size) {
-        memory_pool[i] = 0;
+        memory_pool[i as usize] = 0;
         i = i + 1;
     }
 }
@@ -140,8 +140,8 @@ fn allocateBlock(mut memory_pool: [i32; 2000], free_head: i32, requested_size: i
     
     let mut current: i32 = free_head;
     while (current != -1 && current < 1996) {
-        if (memory_pool[current + 1] == 0) { // Status is free
-            let available_size: i32 = memory_pool[current];
+        if (memory_pool[current as usize + 1] == 0) { // Status is free
+            let available_size: i32 = memory_pool[current as usize];
             
             if (available_size >= total_needed) {
                 // Found a suitable block
@@ -150,14 +150,14 @@ fn allocateBlock(mut memory_pool: [i32; 2000], free_head: i32, requested_size: i
                 }
                 
                 // Mark as allocated
-                memory_pool[current] = aligned_size;
-                memory_pool[current + 1] = 1; // Status: allocated
+                memory_pool[current as usize] = aligned_size;
+                memory_pool[current as usize + 1] = 1; // Status: allocated
                 return current;
             }
         }
         
         // Move to next free block
-        current = memory_pool[current + 2];
+        current = memory_pool[current as usize + 2];
     }
     
     return -1; // Allocation failed
@@ -170,26 +170,26 @@ fn alignSize(size: i32, alignment: i32) -> i32 {
 
 // Split a block if it's large enough
 fn splitBlock(mut memory_pool: [i32; 2000], block_start: i32, needed_size: i32) {
-    let original_size: i32 = memory_pool[block_start];
+    let original_size: i32 = memory_pool[block_start as usize];
     let remaining_size: i32 = original_size - needed_size;
     
     if (remaining_size >= 8) { // Minimum block size including header
         let new_block_start: i32 = block_start + needed_size;
         
         // Create new free block header
-        memory_pool[new_block_start] = remaining_size - 4;
-        memory_pool[new_block_start + 1] = 0; // Status: free
-        memory_pool[new_block_start + 2] = memory_pool[block_start + 2]; // Next
-        memory_pool[new_block_start + 3] = block_start; // Prev
+        memory_pool[new_block_start as usize] = remaining_size - 4;
+        memory_pool[new_block_start as usize + 1] = 0; // Status: free
+        memory_pool[new_block_start as usize + 2] = memory_pool[block_start as usize + 2]; // Next
+        memory_pool[new_block_start as usize + 3] = block_start; // Prev
         
         // Update original block
-        memory_pool[block_start] = needed_size - 4;
-        memory_pool[block_start + 2] = new_block_start; // Next points to new block
+        memory_pool[block_start as usize] = needed_size - 4;
+        memory_pool[block_start as usize + 2] = new_block_start; // Next points to new block
         
         // Update next block's prev pointer if it exists
-        if (memory_pool[new_block_start + 2] != -1) {
-            let next_block: i32 = memory_pool[new_block_start + 2];
-            memory_pool[next_block + 3] = new_block_start;
+        if (memory_pool[new_block_start as usize + 2] != -1) {
+            let next_block: i32 = memory_pool[new_block_start as usize + 2];
+            memory_pool[next_block as usize + 3] = new_block_start;
         }
     }
 }
@@ -197,9 +197,9 @@ fn splitBlock(mut memory_pool: [i32; 2000], block_start: i32, needed_size: i32) 
 // Deallocate a block
 fn deallocateBlock(mut memory_pool: [i32; 2000], block_start: i32) {
     if (block_start >= 0 && block_start < 1996) {
-        memory_pool[block_start + 1] = 0; // Status: free
-        memory_pool[block_start + 2] = -1; // Clear next pointer
-        memory_pool[block_start + 3] = -1; // Clear prev pointer
+        memory_pool[block_start as usize + 1] = 0; // Status: free
+        memory_pool[block_start as usize + 2] = -1; // Clear next pointer
+        memory_pool[block_start as usize + 3] = -1; // Clear prev pointer
     }
 }
 
@@ -207,11 +207,11 @@ fn deallocateBlock(mut memory_pool: [i32; 2000], block_start: i32) {
 fn findFreeListHead(memory_pool: [i32; 2000], pool_size: i32) -> i32 {
     let mut i: i32 = 0;
     while (i < pool_size - 4) {
-        if (memory_pool[i + 1] == 0) { // Found free block
+        if (memory_pool[i as usize + 1] == 0) { // Found free block
             return i;
         }
         // Skip to next block
-        let block_size: i32 = memory_pool[i] + 4;
+        let block_size: i32 = memory_pool[i as usize] + 4;
         i = i + block_size;
     }
     return -1;
@@ -223,22 +223,22 @@ fn coalesceAdjacentBlocks(mut memory_pool: [i32; 2000], pool_size: i32) -> i32 {
     let mut current: i32 = 0;
     
     while (current < pool_size - 8) {
-        if (memory_pool[current + 1] == 0) { // Current block is free
-            let current_size: i32 = memory_pool[current] + 4;
+        if (memory_pool[current as usize + 1] == 0) { // Current block is free
+            let current_size: i32 = memory_pool[current as usize] + 4;
             let next_block: i32 = current + current_size;
             
             // Check if next block exists and is free
-            if (next_block < pool_size - 4 && memory_pool[next_block + 1] == 0) {
-                let next_size: i32 = memory_pool[next_block] + 4;
+            if (next_block < pool_size - 4 && memory_pool[next_block as usize + 1] == 0) {
+                let next_size: i32 = memory_pool[next_block as usize] + 4;
                 
                 // Coalesce blocks
-                memory_pool[current] = memory_pool[current] + next_size;
+                memory_pool[current as usize] = memory_pool[current as usize] + next_size;
                 
                 // Clear the merged block header
-                memory_pool[next_block] = 0;
-                memory_pool[next_block + 1] = -1; // Mark as invalid
-                memory_pool[next_block + 2] = 0;
-                memory_pool[next_block + 3] = 0;
+                memory_pool[next_block as usize] = 0;
+                memory_pool[next_block as usize + 1] = -1; // Mark as invalid
+                memory_pool[next_block as usize + 2] = 0;
+                memory_pool[next_block as usize + 3] = 0;
                 
                 coalesced_count = coalesced_count + 1;
                 // Don't advance current to check for further coalescing
@@ -247,7 +247,7 @@ fn coalesceAdjacentBlocks(mut memory_pool: [i32; 2000], pool_size: i32) -> i32 {
             }
         } else {
             // Skip allocated block
-            let block_size: i32 = memory_pool[current] + 4;
+            let block_size: i32 = memory_pool[current as usize] + 4;
             current = current + block_size;
         }
     }
@@ -264,13 +264,13 @@ fn analyzeMemoryUtilization(memory_pool: [i32; 2000], pool_size: i32) -> i32 {
     let mut current: i32 = 0;
     
     while (current < pool_size - 4) {
-        let block_size: i32 = memory_pool[current] + 4;
+        let block_size: i32 = memory_pool[current as usize] + 4;
         
-        if (memory_pool[current + 1] == 0) { // Free block
-            free_bytes = free_bytes + memory_pool[current];
+        if (memory_pool[current as usize + 1] == 0) { // Free block
+            free_bytes = free_bytes + memory_pool[current as usize];
             free_blocks = free_blocks + 1;
-        } else if (memory_pool[current + 1] == 1) { // Allocated block
-            allocated_bytes = allocated_bytes + memory_pool[current];
+        } else if (memory_pool[current as usize + 1] == 1) { // Allocated block
+            allocated_bytes = allocated_bytes + memory_pool[current as usize];
             allocated_blocks = allocated_blocks + 1;
         }
         
@@ -306,7 +306,7 @@ fn performBuddyAllocationTest() {
     while (size <= 64 && allocation_count < 100) {
         let allocated_node: i32 = buddyAllocate(buddy_tree, tree_depth, size);
         if (allocated_node != -1) {
-            allocation_map[allocation_count] = allocated_node;
+            allocation_map[allocation_count as usize] = allocated_node;
             allocation_count = allocation_count + 1;
         }
         size = size * 2; // Power of 2 sizes
@@ -319,9 +319,9 @@ fn performBuddyAllocationTest() {
     let mut i: i32 = 0;
     while (i < allocation_count) {
         if (i % 2 == 0) { // Deallocate every other block
-            buddyDeallocate(buddy_tree, tree_depth, allocation_map[i]);
+            buddyDeallocate(buddy_tree, tree_depth, allocation_map[i as usize]);
             deallocated = deallocated + 1;
-            allocation_map[i] = -1;
+            allocation_map[i as usize] = -1;
         }
         i = i + 1;
     }
@@ -353,7 +353,7 @@ fn initializeBuddySystem(mut buddy_tree: [i32; 512], depth: i32) {
     // Initialize all nodes as free (0 = free, 1 = allocated, 2 = split)
     let mut i: i32 = 0;
     while (i < tree_size) {
-        buddy_tree[i] = 0;
+        buddy_tree[i as usize] = 0;
         i = i + 1;
     }
 }
@@ -394,14 +394,14 @@ fn calculateRequiredLevel(size: i32, max_depth: i32) -> i32 {
 // Find free node at required level
 fn findFreeNode(buddy_tree: [i32; 512], node: i32, current_level: i32, target_level: i32, max_depth: i32) -> i32 {
     if (current_level == target_level) {
-        if (buddy_tree[node] == 0) { // Free node
+        if (buddy_tree[node as usize] == 0) { // Free node
             return node;
         } else {
             return -1;
         }
     }
     
-    if (buddy_tree[node] == 1) { // Allocated node
+    if (buddy_tree[node as usize] == 1) { // Allocated node
         return -1;
     }
     
@@ -429,13 +429,13 @@ fn findFreeNode(buddy_tree: [i32; 512], node: i32, current_level: i32, target_le
 
 // Mark node and its ancestors as allocated/split
 fn markNodeAsAllocated(mut buddy_tree: [i32; 512], node: i32, level: i32, max_depth: i32) {
-    buddy_tree[node] = 1; // Mark as allocated
+    buddy_tree[node as usize] = 1; // Mark as allocated
     
     // Mark ancestors as split
     let mut parent: i32 = (node - 1) / 2;
     while (parent >= 0 && node > 0) {
-        if (buddy_tree[parent] != 1) {
-            buddy_tree[parent] = 2; // Mark as split
+        if (buddy_tree[parent as usize] != 1) {
+            buddy_tree[parent as usize] = 2; // Mark as split
         }
         if (parent == 0) {
             break;
@@ -448,7 +448,7 @@ fn markNodeAsAllocated(mut buddy_tree: [i32; 512], node: i32, level: i32, max_de
 // Buddy deallocation
 fn buddyDeallocate(mut buddy_tree: [i32; 512], depth: i32, node: i32) {
     if (node >= 0 && node < 511) {
-        buddy_tree[node] = 0; // Mark as free
+        buddy_tree[node as usize] = 0; // Mark as free
         
         // Try to coalesce with buddy
         coalesceBuddies(buddy_tree, node);
@@ -466,10 +466,10 @@ fn coalesceBuddies(mut buddy_tree: [i32; 512], node: i32) {
     let right_child: i32 = 2 * parent + 2;
     
     // Check if both children are free
-    if (buddy_tree[left_child] == 0 && buddy_tree[right_child] == 0) {
-        buddy_tree[parent] = 0; // Mark parent as free
-        buddy_tree[left_child] = -1; // Mark children as invalid
-        buddy_tree[right_child] = -1;
+    if (buddy_tree[left_child as usize] == 0 && buddy_tree[right_child as usize] == 0) {
+        buddy_tree[parent as usize] = 0; // Mark parent as free
+        buddy_tree[left_child as usize] = -1; // Mark children as invalid
+        buddy_tree[right_child as usize] = -1;
         
         // Recursively coalesce up the tree
         coalesceBuddies(buddy_tree, parent);
@@ -485,11 +485,11 @@ fn analyzeBuddyFragmentation(buddy_tree: [i32; 512], depth: i32) -> i32 {
     let tree_size: i32 = (1 << depth) - 1;
     let mut i: i32 = 0;
     while (i < tree_size) {
-        if (buddy_tree[i] == 0) {
+        if (buddy_tree[i as usize] == 0) {
             free_nodes = free_nodes + 1;
-        } else if (buddy_tree[i] == 1) {
+        } else if (buddy_tree[i as usize] == 1) {
             allocated_nodes = allocated_nodes + 1;
-        } else if (buddy_tree[i] == 2) {
+        } else if (buddy_tree[i as usize] == 2) {
             split_nodes = split_nodes + 1;
         }
         i = i + 1;
@@ -545,10 +545,10 @@ fn initializeObjectGraph(mut object_pool: [i32; 1000], mut object_refs: [i32; 50
     root_count = 5;
     let mut i: i32 = 0;
     while (i < root_count) {
-        root_set[i] = i * 20; // Root points to objects at regular intervals
-        object_pool[i * 20] = 1;     // Type
-        object_pool[i * 20 + 1] = 16; // Size
-        object_pool[i * 20 + 2] = 1;  // Reference count
+        root_set[i as usize] = i * 20; // Root points to objects at regular intervals
+        object_pool[i as usize * 20] = 1;     // Type
+        object_pool[i as usize * 20 + 1] = 16; // Size
+        object_pool[i as usize * 20 + 2] = 1;  // Reference count
         i = i + 1;
     }
     
@@ -558,18 +558,18 @@ fn initializeObjectGraph(mut object_pool: [i32; 1000], mut object_refs: [i32; 50
     while (i < object_count) {
         let object_start: i32 = i * 20;
         if (object_start + 10 < 1000) {
-            object_pool[object_start] = i % 3 + 1;        // Type (1-3)
-            object_pool[object_start + 1] = 12 + i % 8;   // Size
-            object_pool[object_start + 2] = 0;            // Reference count
+            object_pool[object_start as usize] = i % 3 + 1;        // Type (1-3)
+            object_pool[object_start as usize + 1] = 12 + i % 8;   // Size
+            object_pool[object_start as usize + 2] = 0;            // Reference count
             
             // Add some references
             if (i + 1 < object_count) {
-                object_pool[object_start + 3] = (i + 1) * 20; // Ref to next object
-                object_refs[i * 2] = object_start + 3;
+                object_pool[object_start as usize + 3] = (i + 1) * 20; // Ref to next object
+                object_refs[i as usize * 2] = object_start + 3;
             }
             if (i + 2 < object_count && i % 3 == 0) {
-                object_pool[object_start + 4] = (i + 2) * 20; // Some objects have 2 refs
-                object_refs[i * 2 + 1] = object_start + 4;
+                object_pool[object_start as usize + 4] = (i + 2) * 20; // Some objects have 2 refs
+                object_refs[i as usize * 2 + 1] = object_start + 4;
             }
         }
         i = i + 1;
@@ -582,7 +582,7 @@ fn performMarkPhase(object_pool: [i32; 1000], object_refs: [i32; 500],
     // Clear all marks
     let mut i: i32 = 0;
     while i < 200 {
-        gc_marks[i] = 0;
+        gc_marks[i as usize] = 0;
         i = i + 1;
     }
     
@@ -590,7 +590,7 @@ fn performMarkPhase(object_pool: [i32; 1000], object_refs: [i32; 500],
     let mut marked_count: i32 = 0;
     i = 0;
     while i < root_count {
-        let root_object: i32 = root_set[i];
+        let root_object: i32 = root_set[i as usize];
         marked_count = marked_count + markObject(object_pool, object_refs, gc_marks, root_object, 0);
         i = i + 1;
     }
@@ -606,18 +606,18 @@ fn markObject(object_pool: [i32; 1000], object_refs: [i32; 500],
     }
     
     let object_index: i32 = object_addr / 20;
-    if object_index >= 200 || gc_marks[object_index] == 1 {
+    if object_index >= 200 || gc_marks[object_index as usize] == 1 {
         return 0; // Already marked or invalid
     }
     
     // Mark this object
-    gc_marks[object_index] = 1;
+    gc_marks[object_index as usize] = 1;
     let mut marked_count: i32 = 1;
     
     // Mark referenced objects
     if object_addr + 5 < 1000 {
-        let ref1: i32 = object_pool[object_addr + 3];
-        let ref2: i32 = object_pool[object_addr + 4];
+        let ref1: i32 = object_pool[object_addr as usize + 3];
+        let ref2: i32 = object_pool[object_addr as usize + 4];
         
         if ref1 > 0 && ref1 < 1000 {
             marked_count = marked_count + markObject(object_pool, object_refs, gc_marks, ref1, depth + 1);
@@ -636,13 +636,13 @@ fn performSweepPhase(mut object_pool: [i32; 1000], gc_marks: [i32; 200], object_
     let mut i: i32 = 0;
     
     while i < object_count {
-        if gc_marks[i] == 0 { // Unmarked object - collect it
+        if gc_marks[i as usize] == 0 { // Unmarked object - collect it
             let object_start: i32 = i * 20;
             if object_start + 10 < 1000 {
                 // Clear object data
                 let mut j: i32 = 0;
                 while j < 20 {
-                    object_pool[object_start + j] = 0;
+                    object_pool[(object_start + j) as usize] = 0;
                     j = j + 1;
                 }
                 collected_count = collected_count + 1;
@@ -663,13 +663,13 @@ fn performCompactionPhase(mut object_pool: [i32; 1000], mut object_refs: [i32; 5
     // Compact live objects to the beginning of the pool
     while i < object_count {
         let read_pos: i32 = i * 20;
-        if read_pos < 1000 && object_pool[read_pos] != 0 { // Live object
+        if read_pos < 1000 && object_pool[read_pos as usize] != 0 { // Live object
             if read_pos != write_pos {
                 // Move object data
                 let mut j: i32 = 0;
                 while j < 20 && write_pos + j < 1000 && read_pos + j < 1000 {
-                    object_pool[write_pos + j] = object_pool[read_pos + j];
-                    object_pool[read_pos + j] = 0; // Clear old location
+                    object_pool[(write_pos + j) as usize] = object_pool[(read_pos + j) as usize];
+                    object_pool[(read_pos + j) as usize] = 0; // Clear old location
                     j = j + 1;
                 }
                 
@@ -690,10 +690,10 @@ fn updateReferencesAfterCompaction(mut object_pool: [i32; 1000], mut object_refs
                                   old_addr: i32, new_addr: i32, ref_count: i32) {
     let mut i: i32 = 0;
     while i < ref_count {
-        if object_refs[i] > 0 && object_refs[i] < 1000 {
-            let ref_location: i32 = object_refs[i];
-            if object_pool[ref_location] == old_addr {
-                object_pool[ref_location] = new_addr;
+        if object_refs[i as usize] > 0 && object_refs[i as usize] < 1000 {
+            let ref_location: i32 = object_refs[i as usize];
+            if object_pool[ref_location as usize] == old_addr {
+                object_pool[ref_location as usize] = new_addr;
             }
         }
         i = i + 1;
@@ -711,13 +711,13 @@ fn simulateReferenceCounting(mut object_pool: [i32; 1000], object_refs: [i32; 50
     let mut i: i32 = 0;
     while i < object_count {
         let object_start: i32 = i * 20;
-        if object_start + 5 < 1000 && object_pool[object_start] != 0 {
+        if object_start + 5 < 1000 && object_pool[object_start as usize] != 0 {
             // Simulate removing a reference
-            if object_pool[object_start + 2] > 0 {
-                object_pool[object_start + 2] = object_pool[object_start + 2] - 1;
+            if object_pool[object_start as usize + 2] > 0 {
+                object_pool[object_start as usize + 2] = object_pool[object_start as usize + 2] - 1;
                 
                 // If ref count reaches zero, collect the object
-                if object_pool[object_start + 2] == 0 {
+                if object_pool[object_start as usize + 2] == 0 {
                     decrementReferencedObjects(object_pool, object_start);
                     collected_by_refcount = collected_by_refcount + 1;
                 }
@@ -736,7 +736,7 @@ fn calculateReferenceCounts(mut object_pool: [i32; 1000], object_refs: [i32; 500
     while i < object_count {
         let object_start: i32 = i * 20;
         if object_start + 2 < 1000 {
-            object_pool[object_start + 2] = 0;
+            object_pool[object_start as usize + 2] = 0;
         }
         i = i + 1;
     }
@@ -745,15 +745,15 @@ fn calculateReferenceCounts(mut object_pool: [i32; 1000], object_refs: [i32; 500
     i = 0;
     while i < object_count {
         let object_start: i32 = i * 20;
-        if object_start + 5 < 1000 && object_pool[object_start] != 0 {
-            let ref1: i32 = object_pool[object_start + 3];
-            let ref2: i32 = object_pool[object_start + 4];
+        if object_start + 5 < 1000 && object_pool[object_start as usize] != 0 {
+            let ref1: i32 = object_pool[object_start as usize + 3];
+            let ref2: i32 = object_pool[object_start as usize + 4];
             
             if ref1 > 0 && ref1 < 1000 && ref1 + 2 < 1000 {
-                object_pool[ref1 + 2] = object_pool[ref1 + 2] + 1;
+                object_pool[ref1 as usize + 2] = object_pool[ref1 as usize + 2] + 1;
             }
             if ref2 > 0 && ref2 < 1000 && ref2 + 2 < 1000 {
-                object_pool[ref2 + 2] = object_pool[ref2 + 2] + 1;
+                object_pool[ref2 as usize + 2] = object_pool[ref2 as usize + 2] + 1;
             }
         }
         i = i + 1;
@@ -763,14 +763,14 @@ fn calculateReferenceCounts(mut object_pool: [i32; 1000], object_refs: [i32; 500
 // Decrement reference counts of objects referenced by a collected object
 fn decrementReferencedObjects(mut object_pool: [i32; 1000], object_start: i32) {
     if object_start + 5 < 1000 {
-        let ref1: i32 = object_pool[object_start + 3];
-        let ref2: i32 = object_pool[object_start + 4];
+        let ref1: i32 = object_pool[object_start as usize + 3];
+        let ref2: i32 = object_pool[object_start as usize + 4];
         
-        if ref1 > 0 && ref1 + 2 < 1000 && object_pool[ref1 + 2] > 0 {
-            object_pool[ref1 + 2] = object_pool[ref1 + 2] - 1;
+        if ref1 > 0 && ref1 + 2 < 1000 && object_pool[ref1 as usize + 2] > 0 {
+            object_pool[ref1 as usize + 2] = object_pool[ref1 as usize + 2] - 1;
         }
-        if ref2 > 0 && ref2 + 2 < 1000 && object_pool[ref2 + 2] > 0 {
-            object_pool[ref2 + 2] = object_pool[ref2 + 2] - 1;
+        if ref2 > 0 && ref2 + 2 < 1000 && object_pool[ref2 as usize + 2] > 0 {
+            object_pool[ref2 as usize + 2] = object_pool[ref2 as usize + 2] - 1;
         }
     }
 }
@@ -824,16 +824,16 @@ fn createFragmentationPattern(mut memory: [i32; 1000], mut free_list: [i32; 200]
         if pattern % 3 == 0 { // Allocate this block
             let mut i: i32 = 0;
             while i < block_size && pos + i < 1000 {
-                memory[pos + i] = 1; // Mark as allocated
+                memory[(pos + i) as usize] = 1; // Mark as allocated
                 i = i + 1;
             }
             if allocated_count < 200 {
-                allocated_list[allocated_count] = pos;
+                allocated_list[allocated_count as usize] = pos;
                 allocated_count = allocated_count + 1;
             }
         } else { // Leave as free
             if free_count < 200 {
-                free_list[free_count] = pos;
+                free_list[free_count as usize] = pos;
                 free_count = free_count + 1;
             }
         }
@@ -846,11 +846,11 @@ fn createFragmentationPattern(mut memory: [i32; 1000], mut free_list: [i32; 200]
     let mut i: i32 = 0;
     while i < allocated_count {
         if i % 3 == 0 {
-            let dealloc_pos: i32 = allocated_list[i];
+            let dealloc_pos: i32 = allocated_list[i as usize];
             let dealloc_size: i32 = 16; // Assume average size
             let mut j: i32 = 0;
             while j < dealloc_size && dealloc_pos + j < 1000 {
-                memory[dealloc_pos + j] = 0; // Mark as free
+                memory[(dealloc_pos + j) as usize] = 0; // Mark as free
                 j = j + 1;
             }
         }
@@ -868,7 +868,7 @@ fn measureFragmentation(memory: [i32; 1000], size: i32) -> i32 {
     
     let mut i: i32 = 0;
     while i < size {
-        if memory[i] == 0 { // Free space
+        if memory[i as usize] == 0 { // Free space
             if in_hole == 0 {
                 free_holes = free_holes + 1;
                 in_hole = 1;
@@ -903,14 +903,14 @@ fn attemptFragmentedAllocations(mut memory: [i32; 1000], size: i32) -> i32 {
     
     let mut attempt: i32 = 0;
     while attempt < 10 {
-        let requested_size: i32 = attempt_sizes[attempt];
+        let requested_size: i32 = attempt_sizes[attempt as usize];
         let allocated_pos: i32 = findFreeSpace(memory, size, requested_size);
         
         if allocated_pos != -1 {
             // Mark space as allocated
             let mut i: i32 = 0;
             while i < requested_size && allocated_pos + i < size {
-                memory[allocated_pos + i] = 1;
+                memory[(allocated_pos + i) as usize] = 1;
                 i = i + 1;
             }
             successful_allocations = successful_allocations + 1;
@@ -929,7 +929,7 @@ fn findFreeSpace(memory: [i32; 1000], pool_size: i32, requested_size: i32) -> i3
         let mut found_space: i32 = 1;
         let mut j: i32 = 0;
         while j < requested_size {
-            if memory[i + j] != 0 {
+            if memory[(i + j) as usize] != 0 {
                 found_space = 0;
                 break;
             }
@@ -953,10 +953,10 @@ fn performMemoryCompaction(mut memory: [i32; 1000], size: i32) -> i32 {
     
     let mut read_pos: i32 = 0;
     while read_pos < size {
-        if memory[read_pos] == 1 { // Allocated block
+        if memory[read_pos as usize] == 1 { // Allocated block
             // Find the size of this allocated block
             let mut block_size: i32 = 0;
-            while read_pos + block_size < size && memory[read_pos + block_size] == 1 {
+            while read_pos + block_size < size && memory[(read_pos + block_size) as usize] == 1 {
                 block_size = block_size + 1;
             }
             
@@ -964,8 +964,8 @@ fn performMemoryCompaction(mut memory: [i32; 1000], size: i32) -> i32 {
             if read_pos != write_pos {
                 let mut i: i32 = 0;
                 while i < block_size {
-                    memory[write_pos + i] = 1;
-                    memory[read_pos + i] = 0;
+                    memory[(write_pos + i) as usize] = 1;
+                    memory[(read_pos + i) as usize] = 0;
                     i = i + 1;
                 }
             }
@@ -980,7 +980,7 @@ fn performMemoryCompaction(mut memory: [i32; 1000], size: i32) -> i32 {
     
     // Clear remaining space
     while write_pos < size {
-        memory[write_pos] = 0;
+        memory[write_pos as usize] = 0;
         write_pos = write_pos + 1;
     }
     
@@ -1058,7 +1058,7 @@ fn testAllocationFailures() {
         if alloc_result == -1 {
             break;
         }
-        allocations[alloc_count] = alloc_result;
+        allocations[alloc_count as usize] = alloc_result;
         alloc_count = alloc_count + 1;
         size = size + 2;
     }
@@ -1083,12 +1083,12 @@ fn testDoubleFreeDetection() {
     
     // Free it once
     deallocateBlock100(test_memory, allocated_block);
-    let status_after_first_free: i32 = test_memory[allocated_block + 1];
+    let status_after_first_free: i32 = test_memory[allocated_block as usize + 1];
     printInt(status_after_first_free); // Should be 0 (free)
     
     // Try to free it again (double free)
     deallocateBlock100(test_memory, allocated_block);
-    let status_after_double_free: i32 = test_memory[allocated_block + 1];
+    let status_after_double_free: i32 = test_memory[allocated_block as usize + 1];
     printInt(status_after_double_free); // Should still be 0, but this is a bug
 }
 
@@ -1106,7 +1106,7 @@ fn testMemoryCorruption() {
     
     // Simulate corruption by writing past block boundary
     if block1 >= 0 && block1 + 30 < 200 {
-        test_memory[block1 + 25] = 99999; // Write past allocated boundary
+        test_memory[block1 as usize + 25] = 99999; // Write past allocated boundary
     }
     
     // Try to detect corruption
@@ -1128,7 +1128,7 @@ fn initializeMemoryPool100(mut memory: [i32; 100]) {
     
     let mut i: i32 = 4;
     while i < 100 {
-        memory[i] = 0;
+        memory[i as usize] = 0;
         i = i + 1;
     }
 }
@@ -1141,7 +1141,7 @@ fn initializeMemoryPool50(mut memory: [i32; 50]) {
     
     let mut i: i32 = 4;
     while i < 50 {
-        memory[i] = 0;
+        memory[i as usize] = 0;
         i = i + 1;
     }
 }
@@ -1154,7 +1154,7 @@ fn initializeMemoryPool200(mut memory: [i32; 200]) {
     
     let mut i: i32 = 4;
     while i < 200 {
-        memory[i] = 0;
+        memory[i as usize] = 0;
         i = i + 1;
     }
 }
@@ -1181,15 +1181,15 @@ fn allocateBlock50(mut memory: [i32; 50], free_head: i32, size: i32) -> i32 {
     // Simple allocation - find first fit
     let mut pos: i32 = 0;
     while pos <= 46 - size {
-        if memory[pos + 1] == 0 { // Free block
-            let available_size: i32 = memory[pos];
+        if memory[pos as usize + 1] == 0 { // Free block
+            let available_size: i32 = memory[pos as usize];
             if available_size >= size {
-                memory[pos] = size;
-                memory[pos + 1] = 1; // Allocated
+                memory[pos as usize] = size;
+                memory[pos as usize + 1] = 1; // Allocated
                 return pos;
             }
         }
-        pos = pos + memory[pos] + 4; // Move to next block
+        pos = pos + memory[pos as usize] + 4; // Move to next block
     }
     
     return -1;
@@ -1211,7 +1211,7 @@ fn allocateBlock200(mut memory: [i32; 200], free_head: i32, size: i32) -> i32 {
 
 fn deallocateBlock100(mut memory: [i32; 100], block_start: i32) {
     if block_start >= 0 && block_start + 1 < 100 {
-        memory[block_start + 1] = 0; // Status: free
+        memory[block_start as usize + 1] = 0; // Status: free
     }
 }
 
@@ -1221,7 +1221,7 @@ fn detectMemoryCorruption(memory: [i32; 200], size: i32) -> i32 {
     // Look for suspicious values or patterns
     let mut i: i32 = 0;
     while i < size {
-        if memory[i] > 10000 || memory[i] < -1000 {
+        if memory[i as usize] > 10000 || memory[i as usize] < -1000 {
             corruption_count = corruption_count + 1;
         }
         i = i + 1;
@@ -1235,12 +1235,12 @@ fn validateMemoryIntegrity(memory: [i32; 200], size: i32) -> i32 {
     let mut i: i32 = 0;
     
     while i < size - 4 {
-        if memory[i] > 0 && memory[i] <= 100 && 
-           (memory[i + 1] == 0 || memory[i + 1] == 1) {
+        if memory[i as usize] > 0 && memory[i as usize] <= 100 && 
+           (memory[i as usize + 1] == 0 || memory[i as usize + 1] == 1) {
             valid_blocks = valid_blocks + 1;
         }
         
-        let block_size: i32 = memory[i] + 4;
+        let block_size: i32 = memory[i as usize] + 4;
         if block_size > 0 && block_size < 50 {
             i = i + block_size;
         } else {
