@@ -1,0 +1,32 @@
+/*
+Test Package: Semantic-1
+Test Target: autoref
+Author: Ruitian Wang
+Time: 2025-09-25
+Verdict: Pass
+Comment: Auto deref then re-ref: calling method on reference
+*/
+
+struct Calculator {
+    result: i32
+}
+
+impl Calculator {
+    fn get_result(&self) -> i32 {
+        return self.result;
+    }
+}
+
+// Test calling method on reference (auto deref then re-ref)
+fn main() {
+    let calc: Calculator = Calculator { result: 100 };
+    let calc_ref: &Calculator = &calc;
+    
+    // calc_ref.get_result() should work: compiler "sees through" the reference
+    // to find the method, then creates proper reference for method call
+    // Equivalent to (&*calc_ref).get_result()
+    let value: i32 = calc_ref.get_result();
+    
+    printInt(value);
+    exit(0);
+}

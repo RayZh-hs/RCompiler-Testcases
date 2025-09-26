@@ -1,0 +1,32 @@
+{
+    "active": 1,
+    "cmp": [
+        "compileexitcode"
+    ],
+    "compileexitcode": 0,
+    "compilememorylimit": 256,
+    "compiletimelimit": 15,
+    "exitcode": 0,
+    "id": 3009255,
+    "input_path": "src/autoref9/autoref9.in",
+    "input_visible": 1,
+    "metainfo": {
+        "caseauthor": "Ruitian Wang",
+        "comment": "Mixed auto ref/deref: multiple method calls with different self types",
+        "lastmodified": "2025-09-25"
+    },
+    "name": "autoref9",
+    "name_visible": 1,
+    "output_path": "src/autoref9/autoref9.out",
+    "output_visible": 1,
+    "provide": [
+        "compilestderr",
+        "compileexitcode"
+    ],
+    "runtimelimit": -1,
+    "runtimememorylimit": 256,
+    "source_path": "src/autoref9/autoref9.rx",
+    "source_visible": 1,
+    "stage_id": 34976,
+    "stage_name": "semantic-1"
+}

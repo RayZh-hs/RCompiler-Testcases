@@ -1,0 +1,30 @@
+/*
+Test Package: Semantic-1
+Test Target: autoref
+Author: Ruitian Wang
+Time: 2025-09-25
+Verdict: Pass
+Comment: Auto referencing: calling method requiring &self on value
+*/
+
+struct Counter {
+    value: i32
+}
+
+impl Counter {
+    fn get_value(&self) -> i32 {
+        return self.value;
+    }
+}
+
+// Test auto referencing when calling methods on values
+fn main() {
+    let counter: Counter = Counter { value: 42 };
+    
+    // counter is a value (Counter), but .get_value() needs &self (&Counter)
+    // Compiler should auto convert counter to &counter
+    let result: i32 = counter.get_value();
+    
+    printInt(result);
+    exit(0);
+}

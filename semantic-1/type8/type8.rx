@@ -4,13 +4,13 @@ Test Target: type
 Author: Wenxin Zheng
 Time: 2025-08-08
 Verdict: Fail
-Comment: Type error: unit type cannot be used in comparison
+Comment: Type error: boolean type cannot be compared with integer
 */
 
-// Type error: unit type cannot be used in comparison
+// Type error: boolean type cannot be compared with integer
 fn main() {
-    let unit_val: () = ();
-    if (unit_val == 5) {
+    let bool_val: bool = true;
+    if (bool_val == 42) {
         printInt(1);
     }
     exit(0);

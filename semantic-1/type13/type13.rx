@@ -50,7 +50,7 @@ fn main() {
     pool.nodes[node1 as usize].next = node2;
     
     // Type error: trying to assign string to i32 field
-    let invalid_node = Node { value: 30, next: "not an i32" };
+    let invalid_node: Node = Node { value: 30, next: "not an i32" };
     traverse_list(&pool, node1);
     exit(0);
 }

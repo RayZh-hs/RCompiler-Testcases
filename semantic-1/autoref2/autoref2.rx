@@ -1,0 +1,45 @@
+/*
+Test Package: Semantic-1
+Test Target: autoref
+Author: Ruitian Wang
+Time: 2025-09-25
+Verdict: Pass
+Comment: Auto referencing: calling method requiring &mut self on mutable value
+*/
+
+struct Counter {
+    value: i32
+}
+
+impl Counter {
+    fn increment(&mut self) {
+        self.value = self.value + 1;
+    }
+    
+    fn get_value(&self) -> i32 {
+        return self.value;
+    }
+    
+    fn consume_and_double(self) -> i32 {
+        return self.value * 2;
+    }
+}
+
+// Test auto referencing when calling methods requiring &mut self on mutable values
+fn main() {
+    let mut counter: Counter = Counter { value: 10 };
+    
+    // counter is a mutable value, .increment() needs &mut self
+    // Compiler should auto convert counter to &mut counter
+    counter.increment();
+    
+    let result: i32 = counter.get_value();
+    
+    // Finally, test method consuming ownership: counter -> self
+    // consume_and_double takes ownership (self), no auto-conversion needed
+    // This must be last since it consumes the value
+    let final_result: i32 = counter.consume_and_double();
+    
+    printInt(final_result);
+    exit(0);
+}

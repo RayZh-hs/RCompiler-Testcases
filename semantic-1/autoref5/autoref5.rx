@@ -1,0 +1,21 @@
+/*
+Test Package: Semantic-1
+Test Target: autoref
+Author: Ruitian Wang
+Time: 2025-09-25
+Verdict: Pass
+Comment: Auto deref for array indexing: using [] on array reference
+*/
+
+// Test auto dereferencing for array indexing
+fn main() {
+    let numbers: [i32; 5] = [10, 20, 30, 40, 50];
+    let numbers_ref: &[i32; 5] = &numbers;
+    
+    // numbers_ref[2] should work: compiler auto handles the reference
+    // Equivalent to (*numbers_ref)[2] or (&*numbers_ref).index(2)
+    let third_item: i32 = numbers_ref[2];
+    
+    printInt(third_item);
+    exit(0);
+}

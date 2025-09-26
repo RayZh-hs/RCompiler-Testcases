@@ -14,6 +14,6 @@ struct Person {
 }
 
 fn main() {
-    let p = Person { age: "twenty", name: "John" };
+    let p: Person = Person { age: "twenty", name: "John" };
     exit(0);
 }

@@ -1,0 +1,47 @@
+/*
+Test Package: Semantic-1
+Test Target: autoref
+Author: Ruitian Wang
+Time: 2025-09-25
+Verdict: Pass
+Comment: Mixed auto ref/deref: multiple method calls with different self types
+*/
+
+struct Account {
+    balance: i32,
+    id: i32
+}
+
+impl Account {
+    fn get_balance(&self) -> i32 {
+        return self.balance;
+    }
+    
+    fn deposit(&mut self, amount: i32) {
+        self.balance = self.balance + amount;
+    }
+    
+    fn get_id(&self) -> i32 {
+        return self.id;
+    }
+}
+
+// Test mixed auto referencing with different method signatures
+fn main() {
+    let mut account: Account = Account { balance: 100, id: 12345 };
+    
+    // Auto ref: account -> &account for get_balance(&self)
+    let initial_balance: i32 = account.get_balance();
+    
+    // Auto ref: account -> &mut account for deposit(&mut self)
+    account.deposit(50);
+    
+    // Auto ref: account -> &account for get_balance(&self) again
+    let new_balance: i32 = account.get_balance();
+    
+    // Auto ref: account -> &account for get_id(&self)
+    let account_id: i32 = account.get_id();
+    
+    printInt(new_balance + account_id);
+    exit(0);
+}

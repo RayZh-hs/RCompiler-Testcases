@@ -1,0 +1,33 @@
+/*
+Test Package: Semantic-1
+Test Target: autoref
+Author: Ruitian Wang
+Time: 2025-09-25
+Verdict: Pass  
+Comment: Complex auto ref/deref: nested struct field access through reference
+*/
+
+struct Inner {
+    value: i32
+}
+
+struct Outer {
+    inner: Inner,
+    count: i32
+}
+
+// Test complex auto dereferencing with nested structures
+fn main() {
+    let outer: Outer = Outer { 
+        inner: Inner { value: 42 }, 
+        count: 5 
+    };
+    let outer_ref: &Outer = &outer;
+    
+    // Both field accesses should work with auto dereferencing
+    let inner_value: i32 = outer_ref.inner.value;
+    let count_value: i32 = outer_ref.count;
+    
+    printInt(inner_value + count_value);
+    exit(0);
+}

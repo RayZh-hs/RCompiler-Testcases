@@ -1,0 +1,32 @@
+{
+    "active": 1,
+    "cmp": [
+        "compileexitcode"
+    ],
+    "compileexitcode": 0,
+    "compilememorylimit": 256,
+    "compiletimelimit": 15,
+    "exitcode": 0,
+    "id": 3009251,
+    "input_path": "src/autoref5/autoref5.in",
+    "input_visible": 1,
+    "metainfo": {
+        "caseauthor": "Ruitian Wang",
+        "comment": "Auto deref for array indexing: using [] on array reference",
+        "lastmodified": "2025-09-25"
+    },
+    "name": "autoref5",
+    "name_visible": 1,
+    "output_path": "src/autoref5/autoref5.out",
+    "output_visible": 1,
+    "provide": [
+        "compilestderr",
+        "compileexitcode"
+    ],
+    "runtimelimit": -1,
+    "runtimememorylimit": 256,
+    "source_path": "src/autoref5/autoref5.rx",
+    "source_visible": 1,
+    "stage_id": 34976,
+    "stage_name": "semantic-1"
+}

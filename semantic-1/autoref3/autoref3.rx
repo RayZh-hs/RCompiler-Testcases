@@ -1,0 +1,26 @@
+/*
+Test Package: Semantic-1
+Test Target: autoref
+Author: Ruitian Wang
+Time: 2025-09-25
+Verdict: Pass
+Comment: Auto dereferencing: accessing field through reference
+*/
+
+struct Point {
+    x: i32,
+    y: i32
+}
+
+// Test auto dereferencing when accessing fields through references
+fn main() {
+    let p: Point = Point { x: 10, y: 20 };
+    let p_ref: &Point = &p;
+    
+    // p_ref.x should be auto converted to (*p_ref).x
+    let x_value: i32 = p_ref.x;
+    let y_value: i32 = p_ref.y;
+    
+    printInt(x_value + y_value);
+    exit(0);
+}

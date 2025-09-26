@@ -1,0 +1,30 @@
+/*
+Test Package: Semantic-1
+Test Target: autoref
+Author: Ruitian Wang
+Time: 2025-09-25
+Verdict: Fail
+Comment: Invalid auto ref: cannot convert immutable reference to mutable reference
+*/
+
+struct Counter {
+    value: i32
+}
+
+impl Counter {
+    fn increment(&mut self) {
+        self.value = self.value + 1;
+    }
+}
+
+// Test invalid auto referencing: trying to call &mut self method on immutable reference
+fn main() {
+    let counter: Counter = Counter { value: 5 };
+    let counter_ref: &Counter = &counter;
+    
+    // This should fail: counter_ref is &Counter, but increment needs &mut Counter
+    // Cannot auto-convert from lower permission to higher permission
+    counter_ref.increment();
+    
+    exit(0);
+}

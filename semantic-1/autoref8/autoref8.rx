@@ -1,0 +1,29 @@
+/*
+Test Package: Semantic-1
+Test Target: autoref
+Author: Ruitian Wang
+Time: 2025-09-25
+Verdict: Fail
+Comment: Invalid auto ref: cannot convert immutable value to mutable reference
+*/
+
+struct Counter {
+    value: i32
+}
+
+impl Counter {
+    fn increment(&mut self) {
+        self.value = self.value + 1;
+    }
+}
+
+// Test invalid auto referencing: trying to call &mut self method on immutable value
+fn main() {
+    let counter: Counter = Counter { value: 3 };  // immutable value
+    
+    // This should fail: counter is immutable, but increment needs &mut self
+    // Cannot auto-convert immutable value to mutable reference
+    counter.increment();
+    
+    exit(0);
+}
