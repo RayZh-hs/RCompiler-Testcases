@@ -31,7 +31,7 @@ fn initialize_tasks() -> [Task; 3] {
 fn process_task_queue(tasks: &mut [Task; 3]) {
     let mut i: usize = 0;
     while (i < 3) {
-        if !tasks[i].completed {
+        if (!tasks[i].completed) {
             // Process incomplete task
         }
         i = i + 1;

@@ -7,7 +7,7 @@
     "compilememorylimit": 256,
     "compiletimelimit": 15,
     "exitcode": 0,
-    "id": 3009249,
+    "id": 3087600,
     "input_path": "src/autoref3/autoref3.in",
     "input_visible": 1,
     "metainfo": {
@@ -27,6 +27,6 @@
     "runtimememorylimit": 256,
     "source_path": "src/autoref3/autoref3.rx",
     "source_visible": 1,
-    "stage_id": 34976,
+    "stage_id": 35837,
     "stage_name": "semantic-1"
 }
