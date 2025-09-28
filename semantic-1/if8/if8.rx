@@ -12,6 +12,5 @@ fn main() {
     let grade: char = if (score >= 90) { 'A' } 
                 else if (score >= 80) { 'B' } 
                 else { 'C' };
-    let _: char = grade;
     exit(0);
 }

@@ -9,6 +9,8 @@ Comment: Stack implementation with dynamic resizing simulation
 
 // Stack implementation with dynamic resizing simulation
 // LIFO (Last In First Out) data structure
+const MAXN: usize = 10;
+
 struct Stack {
     data: [i32; 1000],
     top: i32,
@@ -158,8 +160,6 @@ impl Stack {
         }
     }
 }
-
-const MAXN: usize = 10;
 
 fn main() {
     let mut stack: Stack = Stack::new();

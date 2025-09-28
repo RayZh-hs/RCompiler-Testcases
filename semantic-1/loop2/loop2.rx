@@ -24,6 +24,5 @@ fn main() -> () {
         }
         x += 1;
     }
-    let _: u32 = combos;
     exit(0);
 }

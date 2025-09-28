@@ -24,6 +24,5 @@ fn main() {
         }
         p += 1;
     }
-    let _: [bool; N] = is_prime;
     exit(0);
 }

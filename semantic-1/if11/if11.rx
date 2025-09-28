@@ -10,7 +10,7 @@ Comment: if statement test, undefined variable in condition
 
 fn main() {
     if (some_condition) {
-        let _: i32 = 0; // Wildcard Pattern
+        printInt(0);
     }
     exit(0);
 }

@@ -61,5 +61,5 @@ impl Render for Board {
 
 fn analysis(b: &Board) {
     let x: i32 = b.grid[3][3];
-    let _: i32 = x;
+    printInt(x);
 }
