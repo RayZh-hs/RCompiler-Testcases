@@ -64,6 +64,7 @@ fn main() {
     
     // Performance test marker - end
     printInt(1199);
+    exit(0);
 }
 
 // Test 1: Boolean Expression Optimization
@@ -508,7 +509,7 @@ fn extractBooleanVariables(assignment: i32) -> [bool; 16] {
     let mut i: i32 = 0;
     let mut temp: i32 = assignment;
     
-    while i < 16 {
+    while (i < 16) {
         vars[i as usize] = (temp & 1) != 0;
         temp = temp / 2;
         i = i + 1;
@@ -657,7 +658,7 @@ fn simulateTrafficLightController() -> i32 {
     let mut transitions: i32 = 0;
     let mut time: i32 = 0;
     
-    while time < 10000 {
+    while (time < 10000) {
         let pedestrian_button: bool = (time % 100) < 10;
         let emergency_vehicle: bool = (time % 500) < 5;
         let traffic_sensor: bool = (time % 50) < 25;
@@ -678,19 +679,19 @@ fn simulateTrafficLightController() -> i32 {
 // Get next traffic light state based on Boolean inputs
 fn getNextTrafficState(current_state: i32, pedestrian: bool, emergency: bool, traffic: bool, time: i32) -> i32 {
     if (emergency) {
-        return 1; // Emergency override to green
+            return 1; // Emergency override to green
     }
     
     if (current_state == 0) { // Red
         if (time % 60) > 30 || (pedestrian && !traffic) {
             return 1; // Change to green
         }
-    } else if current_state == 1 { // Green
-        if (time % 60) > 50 || (pedestrian && (time % 120) > 60) {
+    } else if (current_state == 1) { // Green
+            if ((time % 60) > 50 || (pedestrian && (time % 120) > 60)) {
             return 2; // Change to yellow
         }
-    } else if current_state == 2 { // Yellow
-        if (time % 60) > 55 {
+    } else if (current_state == 2) { // Yellow
+        if ((time % 60) > 55) {
             return 0; // Change to red
         }
     }
@@ -709,7 +710,7 @@ fn simulateDigitalCircuit() -> i32 {
     let mut reg_c: bool = false;
     let mut reg_d: bool = false;
     
-    while clock_cycle < 1000 {
+    while (clock_cycle < 1000) {
         // Generate Boolean inputs
         let input1: bool = (clock_cycle % 4) < 2;
         let input2: bool = (clock_cycle % 8) < 4;
@@ -758,13 +759,13 @@ fn simulateBooleanAutomaton() -> i32 {
     cells[50] = true;
     cells[51] = true;
     
-    while generation < 500 {
+    while (generation < 500) {
         let mut new_cells: [bool; 100] = [false; 100];
         let mut changes: i32 = 0;
         let mut i: i32 = 1;
         
         // Apply Boolean automaton rules
-        while i < 99 {
+    while (i < 99) {
             let left: bool = cells[i as usize - 1];
             let center: bool = cells[i as usize];
             let right: bool = cells[i as usize + 1];
@@ -784,7 +785,7 @@ fn simulateBooleanAutomaton() -> i32 {
         
         // Copy new generation
         i = 0;
-        while i < 100 {
+    while (i < 100) {
             cells[i as usize] = new_cells[i as usize];
             i = i + 1;
         }

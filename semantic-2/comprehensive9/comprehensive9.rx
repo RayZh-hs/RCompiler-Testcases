@@ -18,12 +18,12 @@ Details:
 
 // Unified RNG: Park–Miller (a=16807, m=2147483647) using Schrage method to avoid overflow
 fn pm_rand_update(x: i32) -> i32 {
-    let a = 16807;
-    let m = 2147483647;
-    let q = 127773; // m / a
-    let r = 2836;   // m % a
-    let mut k = x / q;
-    let mut new_x = a * (x - k * q) - r * k;
+    let a: i32 = 16807;
+    let m: i32 = 2147483647;
+    let q: i32 = 127773; // m / a
+    let r: i32 = 2836;   // m % a
+    let mut k: i32 = x / q;
+    let mut new_x: i32 = a * (x - k * q) - r * k;
     if (new_x <= 0) { new_x += m; }
     return new_x;
 }
@@ -89,7 +89,7 @@ impl Edge {
 
 impl Graph {
     fn new(vertices: i32) -> Graph {
-        let mut graph = Graph {
+        let mut graph: Graph = Graph {
             vertices: vertices,
             edges: [Edge::new(0, 0, 0, 0); 2000],
             edge_count: 0,
@@ -111,9 +111,9 @@ impl Graph {
         };
         
         // Initialize Floyd-Warshall distance matrix
-        let mut i = 0;
+        let mut i: i32 = 0;
         while (i < vertices) {
-            let mut j = 0;
+            let mut j: i32 = 0;
             while (j < vertices) {
                 if (i == j) {
                     graph.floyd_dist[i as usize][j as usize] = 0;
@@ -151,7 +151,7 @@ impl Graph {
     // Dijkstra's shortest path algorithm from a source vertex
     fn dijkstra(&mut self, source: i32) {
         // Initialize distances and visited array
-        let mut i = 0;
+        let mut i: i32 = 0;
         while (i < self.vertices) {
             self.dist[i as usize] = 2147483647;
             self.visited[i as usize] = false;
@@ -161,12 +161,12 @@ impl Graph {
         self.dist[source as usize] = 0;
         
         // Main Dijkstra loop
-        let mut processed = 0;
+        let mut processed: i32 = 0;
         while (processed < self.vertices) {
             // Find minimum distance unvisited vertex
-            let mut min_dist = 2147483647;
-            let mut u = -1;
-            let mut v = 0;
+            let mut min_dist: i32 = 2147483647;
+            let mut u: i32 = -1;
+            let mut v: i32 = 0;
             while (v < self.vertices) {
                 if (!self.visited[v as usize] && self.dist[v as usize] < min_dist) {
                     min_dist = self.dist[v as usize];
@@ -183,11 +183,11 @@ impl Graph {
             processed += 1;
             
             // Update distances to adjacent vertices
-            let mut edge_idx = 0;
+            let mut edge_idx: i32 = 0;
             while (edge_idx < self.edge_count) {
                 let edge = &self.edges[edge_idx as usize];
                 if (edge.from == u) {
-                    let new_dist = self.dist[u as usize] + edge.weight;
+                    let new_dist: i32 = self.dist[u as usize] + edge.weight;
                     if (new_dist < self.dist[edge.to as usize]) {
                         self.dist[edge.to as usize] = new_dist;
                     }
@@ -200,13 +200,13 @@ impl Graph {
     // Floyd-Warshall all-pairs shortest paths algorithm
     fn floyd_warshall(&mut self) {
         // Main Floyd-Warshall triple loop
-        let mut k = 0;
+        let mut k: i32 = 0;
         while (k < self.vertices) {
-            let mut i = 0;
+            let mut i: i32 = 0;
             while (i < self.vertices) {
-                let mut j = 0;
+                let mut j: i32 = 0;
                 while (j < self.vertices) {
-                    let via_k = self.floyd_dist[i as usize][k as usize] + self.floyd_dist[k as usize][j as usize];
+                    let via_k: i32 = self.floyd_dist[i as usize][k as usize] + self.floyd_dist[k as usize][j as usize];
                     if (self.floyd_dist[i as usize][k as usize] != 2147483647 && 
                        self.floyd_dist[k as usize][j as usize] != 2147483647 &&
                        via_k < self.floyd_dist[i as usize][j as usize]) {
@@ -274,7 +274,7 @@ impl Graph {
     // Find all strongly connected components
     fn find_all_scc(&mut self) {
         // Initialize all vertices as not visited
-        let mut i = 0;
+        let mut i: i32 = 0;
         while (i < self.vertices) {
             self.disc[i as usize] = -1;
             self.low[i as usize] = -1;
@@ -287,7 +287,7 @@ impl Graph {
         self.scc_count = 0;
         
         // Call the recursive helper function for all vertices
-        let mut v = 0;
+        let mut v: i32 = 0;
         while (v < self.vertices) {
             if (self.disc[v as usize] == -1) {
                 self.tarjan_scc(v);
@@ -323,7 +323,7 @@ impl Graph {
     // Kruskal's algorithm for Minimum Spanning Tree
     fn kruskal_mst(&mut self) {
         // Initialize Union-Find structure
-        let mut i = 0;
+        let mut i: i32 = 0;
         while (i < self.vertices) {
             self.parent[i as usize] = i;
             self.rank[i as usize] = 0;
@@ -331,14 +331,14 @@ impl Graph {
         }
         
         // Sort edges by weight using bubble sort
-        let mut sorted = false;
+        let mut sorted: bool = false;
         while (!sorted) {
             sorted = true;
-            let mut j = 0;
+            let mut j: i32 = 0;
             while (j < self.edge_count - 1) {
                 if (self.edges[j as usize].weight > self.edges[(j + 1) as usize].weight) {
                     // Swap edges
-                    let temp = self.edges[j as usize];
+                    let temp: Edge = self.edges[j as usize];
                     self.edges[j as usize] = self.edges[(j + 1) as usize];
                     self.edges[(j + 1) as usize] = temp;
                     sorted = false;
@@ -348,8 +348,8 @@ impl Graph {
         }
         
         self.mst_weight = 0;
-        let mut edges_added = 0;
-        let mut edge_idx = 0;
+        let mut edges_added: i32 = 0;
+        let mut edge_idx: i32 = 0;
         
         // Process edges in sorted order
         while (edge_idx < self.edge_count && edges_added < self.vertices - 1) {
@@ -377,21 +377,21 @@ impl Graph {
         visited[current as usize] = true;
         
         // Try all outgoing edges
-        let mut edge_idx = 0;
+        let mut edge_idx: i32 = 0;
         while (edge_idx < self.edge_count) {
             let edge = &self.edges[edge_idx as usize];
             if (edge.from == current && !visited[edge.to as usize]) {
-                let residual_capacity = edge.capacity - edge.flow;
+                let residual_capacity: i32 = edge.capacity - edge.flow;
                 if (residual_capacity > 0) {
-                    let bottleneck = if (min_flow < residual_capacity) { min_flow } else { residual_capacity };
-                    let flow_sent = self.dfs_flow(source, sink, edge.to, bottleneck, visited);
+                    let bottleneck: i32 = if (min_flow < residual_capacity) { min_flow } else { residual_capacity };
+                    let flow_sent: i32 = self.dfs_flow(source, sink, edge.to, bottleneck, visited);
                     
                     if (flow_sent > 0) {
                         // Update forward and backward flows
                         self.edges[edge_idx as usize].flow += flow_sent;
                         
                         // Find reverse edge and update its flow
-                        let mut rev_idx = 0;
+                        let mut rev_idx: i32 = 0;
                         while (rev_idx < self.edge_count) {
                             let rev_edge = &self.edges[rev_idx as usize];
                             if (rev_edge.from == edge.to && rev_edge.to == edge.from) {
@@ -412,20 +412,20 @@ impl Graph {
     }
     
     fn max_flow(&mut self, source: i32, sink: i32) -> i32 {
-        let mut total_flow = 0;
+        let mut total_flow: i32 = 0;
         
         // Reset all flows
-        let mut i = 0;
+        let mut i: i32 = 0;
         while (i < self.edge_count) {
             self.edges[i as usize].flow = 0;
             i += 1;
         }
         
         // Continue until no augmenting path can be found
-        let mut iterations = 0;
+        let mut iterations: i32 = 0;
         while (iterations < 1000) { // Prevent infinite loops
-            let mut visited = [false; 100];
-            let flow_sent = self.dfs_flow(source, sink, source, 2147483647, &mut visited);
+            let mut visited: [bool; 100] = [false; 100];
+            let flow_sent: i32 = self.dfs_flow(source, sink, source, 2147483647, &mut visited);
             
             if (flow_sent == 0) {
                 break;
@@ -483,19 +483,19 @@ impl GraphGenerator {
     
     // Generate a complex graph with specific properties
     fn generate_complex_graph(&mut self, graph: &mut Graph, density: i32) {
-        let vertices = graph.vertices;
+        let vertices: i32 = graph.vertices;
         
         // Generate random edges with varying weights and capacities
-        let target_edges = (vertices * vertices * density) / 100;
-        let mut edges_added = 0;
+        let target_edges: i32 = (vertices * vertices * density) / 100;
+        let mut edges_added: i32 = 0;
         
         while (edges_added < target_edges && edges_added < 1800) {
-            let from = self.next_random() % vertices;
-            let to = self.next_random() % vertices;
+            let from: i32 = self.next_random() % vertices;
+            let to: i32 = self.next_random() % vertices;
             
             if (from != to) {
-                let weight = (self.next_random() % 100) + 1;
-                let capacity = (self.next_random() % 50) + 1;
+                let weight: i32 = (self.next_random() % 100) + 1;
+                let capacity: i32 = (self.next_random() % 50) + 1;
                 
                 graph.add_edge(from, to, weight, capacity);
                 edges_added += 1;
@@ -503,10 +503,10 @@ impl GraphGenerator {
         }
         
         // Add some guaranteed paths to ensure connectivity
-        let mut i = 0;
+        let mut i: i32 = 0;
         while (i < vertices - 1) {
-            let weight = (self.next_random() % 20) + 1;
-            let capacity = (self.next_random() % 30) + 1;
+            let weight: i32 = (self.next_random() % 20) + 1;
+            let capacity: i32 = (self.next_random() % 30) + 1;
             graph.add_edge(i, i + 1, weight, capacity);
             i += 1;
         }
@@ -515,15 +515,15 @@ impl GraphGenerator {
 
 fn main() {
     // Read input parameters
-    let vertices = readInt();
-    let density = readInt();
-    let source = readInt();
-    let sink = readInt();
-    let seed = readInt();
+    let vertices: i32 = readInt();
+    let density: i32 = readInt();
+    let source: i32 = readInt();
+    let sink: i32 = readInt();
+    let seed: i32 = readInt();
     
     // Create and initialize graph
-    let mut graph = Graph::new(vertices);
-    let mut generator = GraphGenerator::new(seed);
+    let mut graph: Graph = Graph::new(vertices);
+    let mut generator: GraphGenerator = GraphGenerator::new(seed);
     
     // Generate complex graph structure
     generator.generate_complex_graph(&mut graph, density);
@@ -534,10 +534,10 @@ fn main() {
     // Additional complex operations for stress testing
     
     // Test multiple shortest path queries
-    let mut query_count = 0;
+    let mut query_count: i32 = 0;
     while (query_count < 10) {
-        let start = (generator.next_random() % vertices);
-        let end = (generator.next_random() % vertices);
+        let start: i32 = (generator.next_random() % vertices);
+        let end: i32 = (generator.next_random() % vertices);
         
         if (start != end) {
             graph.dijkstra(start);
@@ -548,8 +548,8 @@ fn main() {
     }
     
     // Analyze graph connectivity and structure
-    let mut component_analysis = 0;
-    let mut round = 0;
+    let mut component_analysis: i32 = 0;
+    let mut round: i32 = 0;
     while (round < 5) {
         graph.find_all_scc();
         component_analysis += graph.scc_count;
@@ -558,16 +558,16 @@ fn main() {
     printInt(component_analysis);
     
     // Multiple MST calculations with edge modifications
-    let mut total_mst_weight = 0;
-    let mut mst_round = 0;
+    let mut total_mst_weight: i32 = 0;
+    let mut mst_round: i32 = 0;
     while (mst_round < 3) {
         graph.kruskal_mst();
         total_mst_weight += graph.mst_weight;
         
         // Modify some edge weights for next iteration
-        let mut mod_count = 0;
+        let mut mod_count: i32 = 0;
         while (mod_count < 10 && mod_count < graph.edge_count) {
-            let new_weight = (generator.next_random() % 50) + 1;
+            let new_weight: i32 = (generator.next_random() % 50) + 1;
             graph.edges[mod_count as usize].weight = new_weight;
             mod_count += 1;
         }
@@ -577,6 +577,7 @@ fn main() {
     printInt(total_mst_weight);
     
     // Final comprehensive metric
-    let final_metric = (component_analysis * total_mst_weight) / (vertices + 1);
+    let final_metric: i32 = (component_analysis * total_mst_weight) / (vertices + 1);
     printInt(final_metric);
+    exit(0);
 }

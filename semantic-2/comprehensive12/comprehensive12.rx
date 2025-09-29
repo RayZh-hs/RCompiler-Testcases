@@ -115,7 +115,7 @@ impl SortingAnalyzer {
     // Enhanced merge sort with detailed tracking
     fn merge_sort(&mut self, left: i32, right: i32) {
         if (left < right) {
-            let mid = left + (right - left) / 2;
+            let mid: i32 = left + (right - left) / 2;
             
             // Recursive calls
             self.merge_sort(left, mid);
@@ -127,21 +127,21 @@ impl SortingAnalyzer {
     }
     
     fn merge(&mut self, left: i32, mid: i32, right: i32) {
-        let n1 = mid - left + 1;
-        let n2 = right - mid;
+    let n1: i32 = mid - left + 1;
+    let n2: i32 = right - mid;
         
         // Create temporary arrays for merging
-        let mut left_arr = [0; 1000];
-        let mut right_arr = [0; 1000];
+    let mut left_arr: [i32; 1000] = [0; 1000];
+    let mut right_arr: [i32; 1000] = [0; 1000];
         
         // Copy data to temporary arrays
-        let mut i = 0;
+    let mut i: i32 = 0;
         while (i < n1) {
             left_arr[i as usize] = self.data[(left + i) as usize];
             i += 1;
         }
         
-        let mut j = 0;
+    let mut j: i32 = 0;
         while (j < n2) {
             right_arr[j as usize] = self.data[(mid + 1 + j) as usize];
             j += 1;
@@ -152,7 +152,7 @@ impl SortingAnalyzer {
         // Merge the temporary arrays back
         i = 0;
         j = 0;
-        let mut k = left;
+    let mut k: i32 = left;
         
         while (i < n1 && j < n2) {
             self.comparisons += 1;
@@ -186,10 +186,10 @@ impl SortingAnalyzer {
     // Advanced quick sort with 3-way partitioning
     fn quick_sort_3way(&mut self, low: i32, high: i32) {
         if (low < high) {
-            let mut lt = low;
-            let mut gt = high;
-            let mut i = low + 1;
-            let pivot = self.data[low as usize];
+            let mut lt: i32 = low;
+            let mut gt: i32 = high;
+            let mut i: i32 = low + 1;
+            let pivot: i32 = self.data[low as usize];
             
             // 3-way partitioning
             while (i <= gt) {
@@ -214,7 +214,7 @@ impl SortingAnalyzer {
     
     // Swap two elements in the array
     fn swap_elements(&mut self, i: i32, j: i32) {
-        let temp = self.data[i as usize];
+    let temp: i32 = self.data[i as usize];
         self.data[i as usize] = self.data[j as usize];
         self.data[j as usize] = temp;
         self.swaps += 1;
@@ -227,7 +227,7 @@ impl SortingAnalyzer {
         self.build_max_heap();
         
         // Extract elements from heap one by one
-        let mut heap_end = self.size - 1;
+        let mut heap_end: i32 = self.size - 1;
         while (heap_end > 0) {
             self.swap_elements(0, heap_end);
             heap_end -= 1;
@@ -236,7 +236,7 @@ impl SortingAnalyzer {
     }
     
     fn build_max_heap(&mut self) {
-        let mut i = self.size / 2 - 1;
+        let mut i: i32 = self.size / 2 - 1;
         while (i >= 0) {
             self.max_heapify(i, self.size);
             i -= 1;
@@ -244,9 +244,9 @@ impl SortingAnalyzer {
     }
     
     fn max_heapify(&mut self, root: i32, heap_size: i32) {
-        let left = 2 * root + 1;
-        let right = 2 * root + 2;
-        let mut largest = root;
+        let left: i32 = 2 * root + 1;
+        let right: i32 = 2 * root + 2;
+        let mut largest: i32 = root;
         
         self.comparisons += 1;
         if (left < heap_size && self.data[left as usize] > self.data[largest as usize]) {
@@ -267,10 +267,10 @@ impl SortingAnalyzer {
     // Radix sort implementation
     fn radix_sort(&mut self) {
         // Find maximum number to know number of digits
-        let max_val = self.find_maximum();
+    let max_val: i32 = self.find_maximum();
         
         // Do counting sort for every digit
-        let mut exp = 1;
+        let mut exp: i32 = 1;
         while (max_val / exp > 0) {
             self.counting_sort_by_digit(exp);
             exp *= 10;
@@ -278,8 +278,8 @@ impl SortingAnalyzer {
     }
     
     fn find_maximum(&self) -> i32 {
-        let mut max_val = self.data[0];
-        let mut i = 1;
+        let mut max_val: i32 = self.data[0];
+        let mut i: i32 = 1;
         while (i < self.size) {
             if (self.data[i as usize] > max_val) {
                 max_val = self.data[i as usize];
@@ -290,13 +290,13 @@ impl SortingAnalyzer {
     }
     
     fn counting_sort_by_digit(&mut self, exp: i32) {
-        let mut output = [0; 2000];
-        let mut count = [0; 10];
+        let mut output: [i32; 2000] = [0; 2000];
+        let mut count: [i32; 10] = [0; 10];
         
         // Count occurrences of each digit
-        let mut i = 0;
+        let mut i: i32 = 0;
         while (i < self.size) {
-            let digit = (self.data[i as usize] / exp) % 10;
+            let digit: i32 = (self.data[i as usize] / exp) % 10;
             count[digit as usize] += 1;
             i += 1;
         }
@@ -311,7 +311,7 @@ impl SortingAnalyzer {
         // Build the output array
         i = self.size - 1;
         while (i >= 0) {
-            let digit = (self.data[i as usize] / exp) % 10;
+            let digit: i32 = (self.data[i as usize] / exp) % 10;
             count[digit as usize] -= 1;
             output[count[digit as usize] as usize] = self.data[i as usize];
             i -= 1;
@@ -334,9 +334,9 @@ impl SortingAnalyzer {
         }
         
         // Find min and max values for bucket range calculation
-        let mut min_val = self.data[0];
-        let mut max_val = self.data[0];
-        let mut i = 1;
+        let mut min_val: i32 = self.data[0];
+        let mut max_val: i32 = self.data[0];
+        let mut i: i32 = 1;
         while (i < self.size) {
             if (self.data[i as usize] < min_val) {
                 min_val = self.data[i as usize];
@@ -356,8 +356,8 @@ impl SortingAnalyzer {
             self.num_buckets = 1;
         }
         
-        let range = max_val - min_val + 1;
-        let bucket_range = range / self.num_buckets + 1;
+        let range: i32 = max_val - min_val + 1;
+        let bucket_range: i32 = range / self.num_buckets + 1;
         
         // Initialize buckets
         i = 0;
@@ -369,10 +369,10 @@ impl SortingAnalyzer {
         // Distribute elements into buckets
         i = 0;
         while (i < self.size) {
-            let bucket_index = (self.data[i as usize] - min_val) / bucket_range;
+            let bucket_index: i32 = (self.data[i as usize] - min_val) / bucket_range;
             if (bucket_index >= self.num_buckets) {
                 // Handle edge case for maximum value
-                let adjusted_index = self.num_buckets - 1;
+                let adjusted_index: i32 = self.num_buckets - 1;
                 self.bucket_data[adjusted_index as usize][self.bucket_counts[adjusted_index as usize] as usize] = self.data[i as usize];
                 self.bucket_counts[adjusted_index as usize] += 1;
             } else {
@@ -390,11 +390,11 @@ impl SortingAnalyzer {
         }
         
         // Concatenate all buckets back to main array
-        let mut index = 0;
+        let mut index: i32 = 0;
         i = 0;
-        while i < self.num_buckets {
-            let mut j = 0;
-            while j < self.bucket_counts[i as usize] {
+        while (i < self.num_buckets) {
+            let mut j: i32 = 0;
+            while (j < self.bucket_counts[i as usize]) {
                 self.data[index as usize] = self.bucket_data[i as usize][j as usize];
                 index += 1;
                 j += 1;
@@ -406,13 +406,13 @@ impl SortingAnalyzer {
     }
     
     fn insertion_sort_bucket(&mut self, bucket_index: i32) {
-        let count = self.bucket_counts[bucket_index as usize];
-        let mut i = 1;
-        while i < count {
-            let key = self.bucket_data[bucket_index as usize][i as usize];
-            let mut j = i - 1;
+        let count: i32 = self.bucket_counts[bucket_index as usize];
+        let mut i: i32 = 1;
+        while (i < count) {
+            let key: i32 = self.bucket_data[bucket_index as usize][i as usize];
+            let mut j: i32 = i - 1;
             
-            while j >= 0 && self.bucket_data[bucket_index as usize][j as usize] > key {
+            while (j >= 0 && self.bucket_data[bucket_index as usize][j as usize] > key) {
                 self.bucket_data[bucket_index as usize][(j + 1) as usize] = self.bucket_data[bucket_index as usize][j as usize];
                 j -= 1;
                 self.comparisons += 1;
@@ -427,12 +427,12 @@ impl SortingAnalyzer {
     
     // Advanced array analysis functions
     fn analyze_sorted_array(&mut self) -> i32 {
-        let mut analysis_score = 0;
+        let mut analysis_score: i32 = 0;
         
         // Check if array is properly sorted
-        let mut is_sorted = true;
-        let mut i = 1;
-        while i < self.size {
+        let mut is_sorted: bool = true;
+        let mut i: i32 = 1;
+        while (i < self.size) {
             if (self.data[i as usize] < self.data[(i - 1) as usize]) {
                 is_sorted = false;
                 break;
@@ -445,12 +445,12 @@ impl SortingAnalyzer {
         }
         
         // Calculate various metrics
-        let mut sum = 0;
-        let mut unique_count = 0;
-        let mut duplicates = 0;
+        let mut sum: i32 = 0;
+        let mut unique_count: i32 = 0;
+        let mut duplicates: i32 = 0;
         
         i = 0;
-        while i < self.size {
+        while (i < self.size) {
             sum += self.data[i as usize];
             
             // Count unique elements and duplicates
@@ -465,7 +465,7 @@ impl SortingAnalyzer {
         analysis_score += unique_count * 10 + duplicates * 5;
         
         // Calculate median and other statistical measures
-        let median = if self.size % 2 == 0 {
+        let median: i32 = if (self.size % 2 == 0) {
             (self.data[(self.size / 2 - 1) as usize] + self.data[(self.size / 2) as usize]) / 2
         } else {
             self.data[(self.size / 2) as usize]
@@ -521,10 +521,10 @@ impl SortingAnalyzer {
         printInt(self.algorithm_efficiency[4]);
         
         // Performance comparison analysis
-        let mut best_algorithm = 0;
-        let mut best_efficiency = self.algorithm_efficiency[0];
-        let mut i = 1;
-        while i < 5 {
+        let mut best_algorithm: i32 = 0;
+        let mut best_efficiency: i32 = self.algorithm_efficiency[0];
+        let mut i: i32 = 1;
+        while (i < 5) {
             if (self.algorithm_efficiency[i as usize] > best_efficiency) {
                 best_efficiency = self.algorithm_efficiency[i as usize];
                 best_algorithm = i;
@@ -572,8 +572,8 @@ impl DataProcessor {
         self.size = analyzer.size;
         
         // Copy sorted data for processing
-        let mut i = 0;
-        while i < self.size {
+        let mut i: i32 = 0;
+        while (i < self.size) {
             self.primary_data[i as usize] = analyzer.data[i as usize];
             i += 1;
         }
@@ -590,14 +590,14 @@ impl DataProcessor {
     
     fn generate_fibonacci_transform(&mut self) {
         // Apply Fibonacci-based transformation to data
-        let mut fib_prev = 1;
-        let mut fib_curr = 1;
+        let mut fib_prev: i32 = 1;
+        let mut fib_curr: i32 = 1;
         
-        let mut i = 0;
-        while i < self.size {
+        let mut i: i32 = 0;
+        while (i < self.size) {
             self.secondary_data[i as usize] = (self.primary_data[i as usize] * fib_curr) % 1000000;
             
-            let fib_next = fib_prev + fib_curr;
+            let fib_next: i32 = fib_prev + fib_curr;
             fib_prev = fib_curr;
             fib_curr = fib_next;
             
@@ -612,10 +612,10 @@ impl DataProcessor {
     
     fn apply_mathematical_operations(&mut self) {
         // Combine primary and secondary data with complex operations
-        let mut i = 0;
-        while i < self.size {
-            let primary = self.primary_data[i as usize];
-            let secondary = self.secondary_data[i as usize];
+        let mut i: i32 = 0;
+        while (i < self.size) {
+            let primary: i32 = self.primary_data[i as usize];
+            let secondary: i32 = self.secondary_data[i as usize];
             
             // Apply various mathematical transformations
             self.result_data[i as usize] = (primary * primary + secondary) % 100000;
@@ -627,21 +627,21 @@ impl DataProcessor {
     
     fn perform_statistical_analysis(&mut self) {
         // Clear frequency map
-        let mut i = 0;
-        while i < 10000 {
+        let mut i: i32 = 0;
+        while (i < 10000) {
             self.frequency_map[i as usize] = 0;
             i += 1;
         }
         
         // Calculate frequencies and various statistics
-        let mut sum = 0;
-        let mut sum_squares = 0;
-        let mut min_val = self.primary_data[0];
-        let mut max_val = self.primary_data[0];
+        let mut sum: i32 = 0;
+        let mut sum_squares: i32 = 0;
+        let mut min_val: i32 = self.primary_data[0];
+        let mut max_val: i32 = self.primary_data[0];
         
         i = 0;
-        while i < self.size {
-            let value = self.primary_data[i as usize];
+        while (i < self.size) {
+            let value: i32 = self.primary_data[i as usize];
             sum += value;
             sum_squares += value * value;
             
@@ -653,7 +653,7 @@ impl DataProcessor {
             }
             
             // Update frequency map (handle large values)
-            if value >= 0 && value < 10000 {
+            if (value >= 0 && value < 10000) {
                 self.frequency_map[value as usize] += 1;
             }
             
@@ -668,11 +668,11 @@ impl DataProcessor {
         self.statistics[5] = max_val - min_val; // Range
         
         // Calculate mode and median from sorted data
-        let mut max_frequency = 0;
-        let mut mode = min_val;
+        let mut max_frequency: i32 = 0;
+        let mut mode: i32 = min_val;
         i = 0;
-        while i < 10000 {
-            if self.frequency_map[i as usize] > max_frequency {
+        while (i < 10000) {
+            if (self.frequency_map[i as usize] > max_frequency) {
                 max_frequency = self.frequency_map[i as usize];
                 mode = i;
             }
@@ -688,14 +688,14 @@ impl DataProcessor {
         // Create transformation matrix based on data patterns
         self.matrix_size = if self.size < 100 { self.size } else { 100 };
         
-        let mut i = 0;
-        while i < self.matrix_size {
-            let mut j = 0;
-            while j < self.matrix_size {
-                let idx1 = (i * self.size / self.matrix_size) as usize;
-                let idx2 = (j * self.size / self.matrix_size) as usize;
+        let mut i: i32 = 0;
+        while (i < self.matrix_size) {
+            let mut j: i32 = 0;
+            while (j < self.matrix_size) {
+                let idx1: usize = (i * self.size / self.matrix_size) as usize;
+                let idx2: usize = (j * self.size / self.matrix_size) as usize;
                 
-                if idx1 < self.size as usize && idx2 < self.size as usize {
+                if (idx1 < self.size as usize && idx2 < self.size as usize) {
                     self.transformation_matrix[i as usize][j as usize] = 
                         (self.primary_data[idx1 as usize] + self.secondary_data[idx2 as usize]) % 1000;
                 }
@@ -705,15 +705,15 @@ impl DataProcessor {
         }
         
         // Perform matrix calculations (simplified)
-        let mut matrix_sum = 0;
-        let mut diagonal_sum = 0;
+        let mut matrix_sum: i32 = 0;
+        let mut diagonal_sum: i32 = 0;
         
         i = 0;
-        while i < self.matrix_size {
-            let mut j = 0;
-            while j < self.matrix_size {
+        while (i < self.matrix_size) {
+            let mut j: i32 = 0;
+            while (j < self.matrix_size) {
                 matrix_sum += self.transformation_matrix[i as usize][j as usize];
-                if i == j {
+                if (i == j) {
                     diagonal_sum += self.transformation_matrix[i as usize][j as usize];
                 }
                 j += 1;
@@ -727,16 +727,16 @@ impl DataProcessor {
     
     fn output_analysis_results(&self) {
         // Output comprehensive statistical analysis
-        let mut i = 0;
-        while i < 11 {
+        let mut i: i32 = 0;
+        while (i < 11) {
             printInt(self.statistics[i as usize]);
             i += 1;
         }
         
         // Output summary metrics
-        let complexity_metric = (self.statistics[0] + self.statistics[9]) / (self.size + 1);
-        let efficiency_metric = self.statistics[10] * self.statistics[4] / 1000;
-        let final_score = complexity_metric + efficiency_metric;
+        let complexity_metric: i32 = (self.statistics[0] + self.statistics[9]) / (self.size + 1);
+        let efficiency_metric: i32 = self.statistics[10] * self.statistics[4] / 1000;
+        let final_score: i32 = complexity_metric + efficiency_metric;
         
         printInt(complexity_metric);
         printInt(efficiency_metric);
@@ -746,30 +746,30 @@ impl DataProcessor {
 
 fn main() {
     // Read input parameters
-    let data_size = readInt();
+    let data_size: i32 = readInt();
     
     // Initialize sorting analyzer
-    let mut analyzer = SortingAnalyzer::new();
+    let mut analyzer: SortingAnalyzer = SortingAnalyzer::new();
     analyzer.initialize_data(data_size);
     
     // Run comprehensive sorting tests
     analyzer.run_comprehensive_tests();
     
     // Initialize data processor for advanced operations
-    let mut processor = DataProcessor::new();
+    let mut processor: DataProcessor = DataProcessor::new();
     processor.perform_advanced_operations(&analyzer);
     
     // Additional stress testing with multiple iterations
-    let iterations = readInt();
-    let mut total_performance = 0;
+    let iterations: i32 = readInt();
+    let mut total_performance: i32 = 0;
     
-    let mut iter = 0;
-    while iter < iterations {
+    let mut iter: i32 = 0;
+    while (iter < iterations) {
         // Re-run tests with modified data
-        let modifier = (iter * 17 + 23) % 100;
+        let modifier: i32 = (iter * 17 + 23) % 100;
         
-        let mut i = 0;
-        while i < analyzer.size {
+        let mut i: i32 = 0;
+        while (i < analyzer.size) {
             analyzer.data[i as usize] = (analyzer.temp_array[i as usize] + modifier) % 10000;
             i += 1;
         }
@@ -785,6 +785,7 @@ fn main() {
     printInt(total_performance);
     
     // Final comprehensive analysis
-    let final_metric = (total_performance * processor.statistics[4]) / (iterations + 1);
+    let final_metric: i32 = (total_performance * processor.statistics[4]) / (iterations + 1);
     printInt(final_metric);
+    exit(0);
 }
