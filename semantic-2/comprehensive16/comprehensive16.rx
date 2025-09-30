@@ -41,6 +41,7 @@ fn main() {
     testEdgeCases();
     
     printInt(1699); // Test end marker
+    exit(0);
 }
 
 // Simulated linked list implementation using array-based memory management

@@ -26,49 +26,43 @@ Mutability tracking and potential conflicts in VM state management.
 // - Branch prediction in the context of a VM's conditional jumps.
 // - Mutability tracking and potential conflicts in VM state management.
 
-let MEMORY_SIZE: i32 = 1024;
-let STACK_SIZE: i32 = 256;
+const MEMORY_SIZE: i32 = 1024;
+const STACK_SIZE: i32 = 256;
 
-let memory: [i32; 1024] = [0; 1024];
-let stack: [i32; 256] = [0; 256];
-let mut pc: i32 = 0;
-let mut sp: i32 = -1;
-let mut running: bool = true;
+const HALT: i32 = 0;
+const PUSH: i32 = 1;
+const POP: i32 = 2;
+const ADD: i32 = 3;
+const SUB: i32 = 4;
+const MUL: i32 = 5;
+const DIV: i32 = 6;
+const PRINT: i32 = 7;
+const JMP: i32 = 8;
+const JZ: i32 = 9;
+const JNZ: i32 = 10;
+const EQ: i32 = 11;
+const LT: i32 = 12;
+const STORE: i32 = 13;
+const LOAD: i32 = 14;
+const DUP: i32 = 15;
 
-let HALT: i32 = 0;
-let PUSH: i32 = 1;
-let POP: i32 = 2;
-let ADD: i32 = 3;
-let SUB: i32 = 4;
-let MUL: i32 = 5;
-let DIV: i32 = 6;
-let PRINT: i32 = 7;
-let JMP: i32 = 8;
-let JZ: i32 = 9;
-let JNZ: i32 = 10;
-let EQ: i32 = 11;
-let LT: i32 = 12;
-let STORE: i32 = 13;
-let LOAD: i32 = 14;
-let DUP: i32 = 15;
-
-fn push_stack(val: i32) {
-    if (sp < STACK_SIZE - 1) {
-        sp = sp + 1;
-        stack[sp as usize] = val;
+fn push_stack(stack: &mut [i32; 256], sp: &mut i32, val: i32) {
+    if (*sp < STACK_SIZE - 1) {
+        *sp = *sp + 1;
+        stack[*sp as usize] = val;
     }
 }
 
-fn pop_stack() -> i32 {
-    if (sp > -1) {
-        let val: i32 = stack[sp as usize];
-        sp = sp - 1;
+fn pop_stack(stack: &[i32; 256], sp: &mut i32) -> i32 {
+    if (*sp > -1) {
+        let val: i32 = stack[*sp as usize];
+        *sp = *sp - 1;
         return val;
     }
     return 0;
 }
 
-fn load_program() {
+fn load_program(memory: &mut [i32; 1024]) {
     let mut i: i32 = 0;
 
     memory[i as usize] = PUSH; i = i + 1;
@@ -194,91 +188,96 @@ fn load_program() {
     memory[fib_addr as usize] = 800;
 }
 
-fn execute_cycle() {
-    let instruction: i32 = memory[pc as usize];
-    pc = pc + 1;
+fn execute_cycle(memory: &mut [i32; 1024], pc: &mut i32, stack: &mut [i32; 256], sp: &mut i32, running: &mut bool) {
+    let instruction: i32 = memory[*pc as usize];
+    *pc = *pc + 1;
 
     if (instruction == HALT) {
-        running = false;
+        *running = false;
     } else if instruction == PUSH {
-        let value: i32 = memory[pc as usize];
-        pc = pc + 1;
-        push_stack(value);
+        let value: i32 = memory[*pc as usize];
+        *pc = *pc + 1;
+        push_stack(stack, sp, value);
     } else if instruction == POP {
-        pop_stack();
+        pop_stack(stack, sp);
     } else if instruction == ADD {
-        let b: i32 = pop_stack();
-        let a: i32 = pop_stack();
-        push_stack(a + b);
+        let b: i32 = pop_stack(stack, sp);
+        let a: i32 = pop_stack(stack, sp);
+        push_stack(stack, sp, a + b);
     } else if instruction == SUB {
-        let b: i32 = pop_stack();
-        let a: i32 = pop_stack();
-        push_stack(a - b);
+        let b: i32 = pop_stack(stack, sp);
+        let a: i32 = pop_stack(stack, sp);
+        push_stack(stack, sp, a - b);
     } else if instruction == MUL {
-        let b: i32 = pop_stack();
-        let a: i32 = pop_stack();
-        push_stack(a * b);
+        let b: i32 = pop_stack(stack, sp);
+        let a: i32 = pop_stack(stack, sp);
+        push_stack(stack, sp, a * b);
     } else if instruction == DIV {
-        let b: i32 = pop_stack();
-        let a: i32 = pop_stack();
+        let b: i32 = pop_stack(stack, sp);
+        let a: i32 = pop_stack(stack, sp);
         if (b != 0) {
-            push_stack(a / b);
+            push_stack(stack, sp, a / b);
         } else {
-            running = false;
+            *running = false;
         }
     } else if instruction == PRINT {
-        let val: i32 = pop_stack();
-        printInt(val);
+        let val: i32 = pop_stack(stack, sp);
+        printlnInt(val);
     } else if instruction == JMP {
-        pc = memory[pc as usize];
+        *pc = memory[*pc as usize];
     } else if instruction == JZ {
-        let val: i32 = pop_stack();
+        let val: i32 = pop_stack(stack, sp);
         if (val == 0) {
-            pc = memory[pc as usize];
+            *pc = memory[*pc as usize];
         } else {
-            pc = pc + 1;
+            *pc = *pc + 1;
         }
     } else if instruction == JNZ {
-        let val: i32 = pop_stack();
+        let val: i32 = pop_stack(stack, sp);
         if (val != 0) {
-            pc = memory[pc as usize];
+            *pc = memory[*pc as usize];
         } else {
-            pc = pc + 1;
+            *pc = *pc + 1;
         }
     } else if instruction == EQ {
-        let b: i32 = pop_stack();
-        let a: i32 = pop_stack();
+        let b: i32 = pop_stack(stack, sp);
+        let a: i32 = pop_stack(stack, sp);
         if (a == b) {
-            push_stack(1);
+            push_stack(stack, sp, 1);
         } else {
-            push_stack(0);
+            push_stack(stack, sp, 0);
         }
     } else if instruction == LT {
-        let b: i32 = pop_stack();
-        let a: i32 = pop_stack();
+        let b: i32 = pop_stack(stack, sp);
+        let a: i32 = pop_stack(stack, sp);
         if (a < b) {
-            push_stack(1);
+            push_stack(stack, sp, 1);
         } else {
-            push_stack(0);
+            push_stack(stack, sp, 0);
         }
     } else if instruction == STORE {
-        let addr: i32 = memory[pc as usize];
-        pc = pc + 1;
-        let val: i32 = pop_stack();
+        let addr: i32 = memory[*pc as usize];
+        *pc = *pc + 1;
+        let val: i32 = pop_stack(stack, sp);
         memory[addr as usize] = val;
     } else if instruction == LOAD {
-        let addr: i32 = memory[pc as usize];
-        pc = pc + 1;
+        let addr: i32 = memory[*pc as usize];
+        *pc = *pc + 1;
         let val: i32 = memory[addr as usize];
-        push_stack(val);
+        push_stack(stack, sp, val);
     } else if instruction == DUP {
-        let val: i32 = stack[sp as usize];
-        push_stack(val);
+        let val: i32 = stack[*sp as usize];
+        push_stack(stack, sp, val);
     }
 }
 
 fn main() {
-    load_program();
+    let mut memory: [i32; 1024] = [0; 1024];
+    let mut stack: [i32; 256] = [0; 256];
+    let mut pc: i32 = 0;
+    let mut sp: i32 = -1;
+    let mut running: bool = true;
+    load_program(&mut memory);
 
     let mut cycle_count: i32 = 0;
     let max_cycles: i32 = 5000;
@@ -287,12 +286,12 @@ fn main() {
         if (cycle_count > max_cycles) {
             break;
         }
-        execute_cycle();
+        execute_cycle(&mut memory, &mut pc, &mut stack, &mut sp, &mut running);
         cycle_count = cycle_count + 1;
     }
 
-    printInt(cycle_count);
-    printInt(sp);
+    printlnInt(cycle_count);
+    printlnInt(sp);
 
     let mut i: i32 = 0;
     let mut checksum: i32 = 0;
@@ -300,7 +299,7 @@ fn main() {
         checksum = checksum + stack[i as usize];
         i = i + 1;
     }
-    printInt(checksum);
+    printlnInt(checksum);
 
     pc = 100;
     sp = -1;
@@ -310,7 +309,7 @@ fn main() {
         if (cycle_count > 100) {
             break;
         }
-        execute_cycle();
+        execute_cycle(&mut memory, &mut pc, &mut stack, &mut sp, &mut running);
         cycle_count = cycle_count + 1;
     }
 
@@ -320,5 +319,5 @@ fn main() {
         let vm_state: i32 = vm_state + i;
         i = i + 1;
     }
-    printInt(vm_state);
+    printlnInt(vm_state);
 }

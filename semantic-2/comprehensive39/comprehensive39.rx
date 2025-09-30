@@ -49,25 +49,22 @@ fn pm_rand_update(x: i32) -> i32 {
 // - Branch prediction accuracy for irregular, data-driven control flow.
 // - Correct handling of variable shadowing and mutability in nested scopes.
 
-let STATE_A: i32 = 0;
-let STATE_B: i32 = 1;
-let STATE_C: i32 = 2;
-let STATE_D: i32 = 3;
-let STATE_E: i32 = 4;
-let STATE_F: i32 = 5;
-let STATE_G: i32 = 6;
-let STATE_H: i32 = 7;
-let NUM_STATES: i32 = 8;
+const STATE_A: i32 = 0;
+const STATE_B: i32 = 1;
+const STATE_C: i32 = 2;
+const STATE_D: i32 = 3;
+const STATE_E: i32 = 4;
+const STATE_F: i32 = 5;
+const STATE_G: i32 = 6;
+const STATE_H: i32 = 7;
+const NUM_STATES: i32 = 8;
 
-let INPUT_X: i32 = 0;
-let INPUT_Y: i32 = 1;
-let INPUT_Z: i32 = 2;
-let NUM_INPUTS: i32 = 3;
+const INPUT_X: i32 = 0;
+const INPUT_Y: i32 = 1;
+const INPUT_Z: i32 = 2;
+const NUM_INPUTS: i32 = 3;
 
-let mut transition_table: [[i32; 3]; 8] = [[0; 3]; 8];
-let mut output_table: [[i32; 3]; 8] = [[0; 3]; 8];
-
-fn setup_fsm() {
+fn setup_fsm(transition_table: &mut [[i32; 3]; 8], output_table: &mut [[i32; 3]; 8]) {
     transition_table[STATE_A as usize][INPUT_X as usize] = STATE_B;
     transition_table[STATE_A as usize][INPUT_Y as usize] = STATE_C;
     transition_table[STATE_A as usize][INPUT_Z as usize] = STATE_A;
@@ -125,7 +122,7 @@ fn setup_fsm() {
     output_table[STATE_H as usize][INPUT_Z as usize] = 90;
 }
 
-fn run_fsm(inputs: [i32; 100], len: i32) -> i32 {
+fn run_fsm(transition_table: &mut [[i32; 3]; 8], output_table: &mut [[i32; 3]; 8], inputs: [i32; 100], len: i32) -> i32 {
     let mut current_state: i32 = STATE_A;
     let mut accumulated_output: i32 = 0;
     let mut i: i32 = 0;
@@ -184,15 +181,17 @@ fn generate_inputs(seed: i32, len: i32) -> [i32; 100] {
 }
 
 fn main() {
-    setup_fsm();
+    let mut transition_table: [[i32; 3]; 8] = [[0; 3]; 8];
+    let mut output_table: [[i32; 3]; 8] = [[0; 3]; 8];
+    setup_fsm(&mut transition_table, &mut output_table);
 
     let inputs1: [i32; 100] = generate_inputs(42, 100);
-    let result1: i32 = run_fsm(inputs1, 100);
-    printInt(result1);
+    let result1: i32 = run_fsm(&mut transition_table, &mut output_table, inputs1, 100);
+    printlnInt(result1);
 
     let inputs2: [i32; 100] = generate_inputs(1337, 80);
-    let result2: i32 = run_fsm(inputs2, 80);
-    printInt(result2);
+    let result2: i32 = run_fsm(&mut transition_table, &mut output_table, inputs2, 80);
+    printlnInt(result2);
 
     let mut custom_inputs: [i32; 100] = [0; 100];
     let mut i: i32 = 0;
@@ -200,8 +199,8 @@ fn main() {
         custom_inputs[i as usize] = (i * i) % NUM_INPUTS;
         i = i + 1;
     }
-    let result3: i32 = run_fsm(custom_inputs, 50);
-    printInt(result3);
+    let result3: i32 = run_fsm(&mut transition_table, &mut output_table, custom_inputs, 50);
+    printlnInt(result3);
 
     let mut counter: i32 = 0;
     let mut outer_loop: i32 = 0;
@@ -225,7 +224,7 @@ fn main() {
         }
         outer_loop = outer_loop + 1;
     }
-    printInt(counter);
+    printlnInt(counter);
 
     let mut a: i32 = 10;
     let mut b: i32 = 20;
@@ -233,19 +232,19 @@ fn main() {
 
     if (a > b) {
         if (b > c) {
-            printInt(1);
+            printlnInt(1);
         } else {
-            printInt(2);
+            printlnInt(2);
         }
     } else {
         if (b < c) {
             if (a < c) {
-                printInt(3);
+                printlnInt(3);
             } else {
-                printInt(4);
+                printlnInt(4);
             }
         } else {
-            printInt(5);
+            printlnInt(5);
         }
     }
 
@@ -270,9 +269,9 @@ fn main() {
         }
         i = i + 1;
     }
-    printInt(x);
-    printInt(y);
-    printInt(z);
+    printlnInt(x);
+    printlnInt(y);
+    printlnInt(z);
 
     let mut shadow: i32 = 100;
     if (shadow > 50) {
@@ -280,13 +279,13 @@ fn main() {
         if (shadow > 150) {
             let mut shadow: i32 = 300;
             shadow = shadow + 1;
-            printInt(shadow);
+            printlnInt(shadow);
         }
         shadow = shadow + 1;
-        printInt(shadow);
+        printlnInt(shadow);
     }
     shadow = shadow + 1;
-    printInt(shadow);
+    printlnInt(shadow);
 
     let mut k: i32 = 0;
     while (k < 1) {
@@ -301,9 +300,9 @@ fn main() {
         if (m == 0) {
             let mut another_loop_var: i32 = 789;
             another_loop_var = another_loop_var + 1;
-            printInt(another_loop_var);
+            printlnInt(another_loop_var);
         }
-        printInt(another_loop_var);
+        printlnInt(another_loop_var);
         m = m + 1;
     }
 
@@ -318,5 +317,5 @@ fn main() {
         final_val = final_val + temp;
         p = p + 1;
     }
-    printInt(final_val);
+    printlnInt(final_val);
 }

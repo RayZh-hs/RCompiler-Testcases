@@ -26,25 +26,22 @@ Scope and lifetime challenges with memory state variables.
 // - Handling of memory fragmentation and coalescing scenarios.
 // - Scope and lifetime challenges with memory state variables.
 
-let HEAP_SIZE: i32 = 2048;
-let BLOCK_HEADER_SIZE: i32 = 2;
-let BLOCK_STATUS_FREE: i32 = 0;
-let BLOCK_STATUS_USED: i32 = 1;
+const HEAP_SIZE: i32 = 2048;
+const BLOCK_HEADER_SIZE: i32 = 2;
+const BLOCK_STATUS_FREE: i32 = 0;
+const BLOCK_STATUS_USED: i32 = 1;
 
-let heap: [i32; 2048] = [0; 2048];
-let is_initialized: bool = false;
-
-fn init_allocator() {
-    if (is_initialized) {
+fn init_allocator(heap: &mut [i32; 2048], is_initialized: &mut bool) {
+    if (*is_initialized) {
         return;
     }
     heap[0] = HEAP_SIZE - BLOCK_HEADER_SIZE;
     heap[1] = BLOCK_STATUS_FREE;
     heap[2] = -1;
-    is_initialized = true;
+    *is_initialized = true;
 }
 
-fn custom_alloc(size: i32) -> i32 {
+fn custom_alloc(heap: &mut [i32; 2048], size: i32) -> i32 {
     let required_size: i32 = size;
     if (required_size <= 0) {
         return -1;
@@ -93,7 +90,7 @@ fn custom_alloc(size: i32) -> i32 {
     return -1;
 }
 
-fn custom_free(ptr: i32) {
+fn custom_free(heap: &mut [i32; 2048], ptr: i32) {
     if (ptr <= BLOCK_HEADER_SIZE) {
         return;
     }
@@ -121,7 +118,9 @@ fn custom_free(ptr: i32) {
 }
 
 fn main() {
-    init_allocator();
+    let mut heap: [i32; 2048] = [0; 2048];
+    let mut is_initialized: bool = false;
+    init_allocator(&mut heap, &mut is_initialized);
     let mut total_allocations: i32 = 0;
     let mut failed_allocations: i32 = 0;
     let mut i: i32 = 0;
@@ -153,7 +152,7 @@ fn main() {
             alloc_size = 60;
         }
 
-        let ptr: i32 = custom_alloc(alloc_size);
+        let ptr: i32 = custom_alloc(&mut heap, alloc_size);
         if (ptr != -1) {
             if (allocation_count < 100) {
                 allocations[allocation_count as usize] = ptr;
@@ -175,7 +174,7 @@ fn main() {
                 free_idx = (i * 17) % allocation_count;
                 let free_ptr: i32 = allocations[free_idx as usize];
                 if (free_ptr != 0) {
-                    custom_free(free_ptr);
+                    custom_free(&mut heap, free_ptr);
                     allocations[free_idx as usize] = 0;
                 }
             }
@@ -224,39 +223,39 @@ fn main() {
         }
     }
 
-    printInt(total_allocations);
-    printInt(failed_allocations);
-    printInt(final_sum);
-    printInt(total_free_space);
+    printlnInt(total_allocations);
+    printlnInt(failed_allocations);
+    printlnInt(final_sum);
+    printlnInt(total_free_space);
 
     let mut m: i32 = 0;
     while (m < 100) {
         if (allocations[m as usize] != 0) {
-            custom_free(allocations[m as usize]);
+            custom_free(&mut heap, allocations[m as usize]);
         }
         m = m + 1;
     }
 
-    let final_ptr: i32 = custom_alloc(1024);
+    let final_ptr: i32 = custom_alloc(&mut heap, 1024);
     if (final_ptr != -1) {
-        printInt(1);
+        printlnInt(1);
     } else {
-        printInt(0);
+        printlnInt(0);
     }
 
-    let another_ptr: i32 = custom_alloc(1024);
+    let another_ptr: i32 = custom_alloc(&mut heap, 1024);
     if (another_ptr != -1) {
-        printInt(1);
+        printlnInt(1);
     } else {
-        printInt(0);
+        printlnInt(0);
     }
 
-    custom_free(final_ptr);
-    let last_ptr: i32 = custom_alloc(2000);
+    custom_free(&mut heap, final_ptr);
+    let last_ptr: i32 = custom_alloc(&mut heap, 2000);
     if (last_ptr != -1) {
-        printInt(1);
+        printlnInt(1);
     } else {
-        printInt(0);
+        printlnInt(0);
     }
 
     let mut final_check_sum: i32 = 0;
@@ -265,7 +264,7 @@ fn main() {
         final_check_sum = final_check_sum + heap[p as usize];
         p = p + 1;
     }
-    printInt(final_check_sum % 1000);
+    printlnInt(final_check_sum % 1000);
 
     if (false) {
         let mut dead_code_val: i32 = 0;
@@ -274,7 +273,7 @@ fn main() {
             dead_code_val = dead_code_val + q;
             q = q + 1;
         }
-        printInt(dead_code_val);
+        printlnInt(dead_code_val);
     }
 
     let mut r: i32 = 0;
@@ -291,7 +290,7 @@ fn main() {
         }
         r = r + 1;
     }
-    printInt(complex_calc);
+    printlnInt(complex_calc);
 
     let mut a: i32 = 10;
     let b: i32 = 20;
@@ -306,12 +305,12 @@ fn main() {
     if (true) {
         let a: bool = false;
         if (a) {
-            printInt(100);
+            printlnInt(100);
         } else {
-            printInt(200);
+            printlnInt(200);
         }
     }
-    printInt(a);
+    printlnInt(a);
 
     let mut outer_var: i32 = 1;
     while (outer_var < 3) {
@@ -320,14 +319,14 @@ fn main() {
             let mut temp_var: i32 = 100;
             inner_var = inner_var + temp_var;
         }
-        printInt(inner_var);
+        printlnInt(inner_var);
         outer_var = outer_var + 1;
     }
 
     let mut x: i32 = 5;
     let y: i32 = x;
     x = 10;
-    printInt(y);
+    printlnInt(y);
 
     let mut z: i32 = 0;
     while (z < 1) {
@@ -335,16 +334,16 @@ fn main() {
         if (true) {
             loop_scoped = 456;
         }
-        printInt(loop_scoped);
+        printlnInt(loop_scoped);
         z = z + 1;
     }
 
     if (true) {
         let mut shadow_var: i32 = 111;
-        printInt(shadow_var);
+        printlnInt(shadow_var);
     }
     let mut shadow_var: i32 = 222;
-    printInt(shadow_var);
+    printlnInt(shadow_var);
 
     let mut check: i32 = 0;
     if (check == 0) {
@@ -372,16 +371,14 @@ fn main() {
         let mut_outer: i32 = 60;
         if (true) {
             let mut_outer: i32 = 70;
-            printInt(mut_outer);
+            printlnInt(mut_outer);
         }
-        printInt(mut_outer);
+        printlnInt(mut_outer);
     }
-    printInt(mut_outer);
+    printlnInt(mut_outer);
 
     let mut error_var: i32 = 0;
-    if (true) {
-        let mut inner_error_var: i32 = 1;
-        error_var = inner_error_var;
-    }
+    let mut inner_error_var: i32 = 1;
+    error_var = inner_error_var;
     inner_error_var = 2;
 }

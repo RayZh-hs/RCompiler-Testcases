@@ -22,10 +22,8 @@ Function call simulation and stack frame management.
 // - Integer arithmetic and logical operations within the VM.
 // - Function call simulation and stack frame management.
 
-fn printInt(n: i32) {}
-
-const STACK_SIZE: i32 = 256;
-const PROG_MEM_SIZE: i32 = 1024;
+const STACK_SIZE: usize = 256;
+const PROG_MEM_SIZE: usize = 1024;
 
 const PUSH: i32 = 1;
 const POP: i32 = 2;
@@ -54,14 +52,14 @@ struct VM {
 fn main() {
     let mut vm: VM = VM {
         pc: 0,
-        sp: -1,
+        sp: STACK_SIZE as i32 - 1,
         stack: [0; STACK_SIZE],
         program: [0; PROG_MEM_SIZE],
     };
 
     load_program(&mut vm);
     execute(&mut vm);
-    printInt(9999);
+    printlnInt(9999);
 }
 
 fn load_program(vm: &mut VM) {
@@ -124,7 +122,9 @@ fn load_program(vm: &mut VM) {
     prog[i as usize] = vm.stack[(vm.sp - 2) as usize]; i = i + 1;
     prog[i as usize] = ADD; i = i + 1;
     prog[i as usize] = POP; i = i + 1;
-    prog[i as usize] = vm.stack[(vm.sp - 2) as usize] = vm.stack[(vm.sp) as usize]; i = i + 1;
+    vm.stack[(vm.sp - 2) as usize] = vm.stack[(vm.sp) as usize];
+    prog[i as usize] = vm.stack[(vm.sp - 2) as usize];
+    i = i + 1;
     prog[i as usize] = POP; i = i + 1;
     prog[i as usize] = PUSH; i = i + 1;
     prog[i as usize] = vm.stack[(vm.sp - 1) as usize]; i = i + 1;
@@ -132,7 +132,9 @@ fn load_program(vm: &mut VM) {
     prog[i as usize] = 1; i = i + 1;
     prog[i as usize] = ADD; i = i + 1;
     prog[i as usize] = POP; i = i + 1;
-    prog[i as usize] = vm.stack[(vm.sp - 1) as usize] = vm.stack[(vm.sp) as usize]; i = i + 1;
+    prog[i as usize] = vm.stack[(vm.sp - 1) as usize];
+    vm.stack[(vm.sp - 1) as usize] = vm.stack[(vm.sp) as usize];
+    i = i + 1;
     prog[i as usize] = POP; i = i + 1;
     prog[i as usize] = PUSH; i = i + 1;
     prog[i as usize] = vm.stack[(vm.sp) as usize]; i = i + 1;
@@ -177,7 +179,7 @@ fn execute(vm: &mut VM) {
             if (b != 0) {
                 push(vm, a / b);
             } else {
-                printInt(-1);
+                printlnInt(-1);
                 running = false;
             }
         } else if (op == EQ) {
@@ -211,9 +213,9 @@ fn execute(vm: &mut VM) {
         } else if (op == RET) {
             vm.pc = pop(vm);
         } else if (op == PRINT) {
-            printInt(vm.stack[(vm.sp) as usize]);
+            printlnInt(vm.stack[(vm.sp) as usize]);
         } else {
-            printInt(-2);
+            printlnInt(-2);
             running = false;
         }
     }
@@ -226,13 +228,16 @@ fn fetch(vm: &mut VM) -> i32 {
 }
 
 fn push(vm: &mut VM, val: i32) {
-    vm.sp = vm.sp + 1;
+    vm.sp = (vm.sp + 1) % (STACK_SIZE as i32);
     vm.stack[(vm.sp) as usize] = val;
 }
 
 fn pop(vm: &mut VM) -> i32 {
     let val: i32 = vm.stack[(vm.sp) as usize];
     vm.sp = vm.sp - 1;
+    if (vm.sp < 0) {
+        vm.sp += STACK_SIZE as i32;
+    }
     return val;
 }
 
@@ -259,7 +264,7 @@ fn complex_stack_manipulation(vm: &mut VM) {
         push(vm, a + b);
         i = i + 1;
     }
-    printInt(pop(vm));
+    printlnInt(pop(vm));
 }
 
 fn run_fibonacci_in_vm(vm: &mut VM, n: i32) {
@@ -314,7 +319,7 @@ fn run_fibonacci_in_vm(vm: &mut VM, n: i32) {
 
     vm.program = prog;
     vm.pc = 0;
-    vm.sp = -1;
+    vm.sp = STACK_SIZE as i32 - 1;
     execute(vm);
 
     vm.program = old_prog;
@@ -325,18 +330,18 @@ fn run_fibonacci_in_vm(vm: &mut VM, n: i32) {
 fn error_case_test(vm: VM) {
     let mut local_vm: VM = vm;
     local_vm.sp = local_vm.sp + 10;
-    if (local_vm.sp > STACK_SIZE) {
-        printInt(-100);
+    if (local_vm.sp > STACK_SIZE as i32) {
+        printlnInt(-100);
     }
-    local_vm.sp = -10;
+    local_vm.sp = STACK_SIZE as i32 - 10;
     let val: i32 = pop(&mut local_vm);
-    printInt(val);
+    printlnInt(val);
 }
 
 fn another_test_scenario() {
     let mut vm: VM = VM {
         pc: 0,
-        sp: -1,
+        sp: STACK_SIZE as i32 - 1,
         stack: [0; STACK_SIZE],
         program: [0; PROG_MEM_SIZE],
     };

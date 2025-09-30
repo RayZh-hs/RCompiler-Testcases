@@ -36,13 +36,11 @@ fn pm_rand_update(x: i32) -> i32 {
 // - Correct handling of variable lifetimes across complex scopes.
 // - Function calls within deeply nested loops.
 
-fn printInt(n: i32) {}
-
 const MAZE_SIZE: i32 = 20;
 const MAX_STEPS: i32 = 1000;
 
 fn main() {
-    let mut maze: [[i32; MAZE_SIZE]; MAZE_SIZE] = [[0; MAZE_SIZE]; MAZE_SIZE];
+    let mut maze: [[i32; MAZE_SIZE as usize]; MAZE_SIZE as usize] = [[0; MAZE_SIZE as usize]; MAZE_SIZE as usize];
     generate_maze(&mut maze, 54321);
 
     let mut start_x: i32 = 1;
@@ -54,18 +52,18 @@ fn main() {
     maze[end_y as usize][end_x as usize] = 0;
 
     let mut path_len: i32 = solve_maze(&mut maze, start_x, start_y, end_x, end_y);
-    printInt(path_len);
+    printlnInt(path_len);
 
     let mut puzzle_result: i32 = solve_logic_puzzle();
-    printInt(puzzle_result);
+    printlnInt(puzzle_result);
 
     let mut error_val: i32 = run_control_flow_puzzle();
-    printInt(error_val);
+    printlnInt(error_val);
 
-    printInt(9999);
+    printlnInt(9999);
 }
 
-fn generate_maze(maze: &mut [[i32; MAZE_SIZE]; MAZE_SIZE], seed: i32) {
+fn generate_maze(maze: &mut [[i32; MAZE_SIZE as usize]; MAZE_SIZE as usize], seed: i32) {
     let mut current_seed: i32 = seed;
     let mut i: i32 = 0;
     while (i < MAZE_SIZE) {
@@ -87,7 +85,7 @@ fn generate_maze(maze: &mut [[i32; MAZE_SIZE]; MAZE_SIZE], seed: i32) {
     }
 }
 
-fn solve_maze(maze: &mut [[i32; MAZE_SIZE]; MAZE_SIZE], start_x: i32, start_y: i32, end_x: i32, end_y: i32) -> i32 {
+fn solve_maze(maze: &mut [[i32; MAZE_SIZE as usize]; MAZE_SIZE as usize], start_x: i32, start_y: i32, end_x: i32, end_y: i32) -> i32 {
     let mut x: i32 = start_x;
     let mut y: i32 = start_y;
     let mut steps: i32 = 0;
@@ -205,7 +203,7 @@ fn run_control_flow_puzzle() -> i32 {
         if (i % 10 == 0) {
             let temp_val: i32 = x + y + z;
             if (temp_val % 7 == 0) {
-                let immutable_val: i32 = i;
+                let mut immutable_val: i32 = i;
                 if (i > 50) {
                     immutable_val = i + 1;
                 }
@@ -244,7 +242,7 @@ fn another_puzzle() {
         }
         i = i + 1;
     }
-    printInt(counter);
+    printlnInt(counter);
 }
 
 fn yet_another_control_flow() {
@@ -272,5 +270,5 @@ fn yet_another_control_flow() {
         }
         i = i + 1;
     }
-    printInt(a * 1000 + b);
+    printlnInt(a * 1000 + b);
 }

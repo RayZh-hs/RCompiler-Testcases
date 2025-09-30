@@ -36,10 +36,8 @@ fn pm_rand_update(x: i32) -> i32 {
 // - Function calls with multiple array-based arguments.
 // - Branch prediction in text analysis loops.
 
-fn printInt(n: i32) {}
-
-const TEXT_SIZE: i32 = 1024;
-const PATTERN_SIZE: i32 = 64;
+const TEXT_SIZE: usize = 1024;
+const PATTERN_SIZE: usize = 64;
 
 fn main() {
     let mut text: [i32; TEXT_SIZE] = [0; TEXT_SIZE];
@@ -58,27 +56,27 @@ fn main() {
     pattern3[0] = 100; pattern3[1] = 100;
 
     let mut count1: i32 = find_pattern(&text, &pattern1, pattern1_len);
-    printInt(count1);
+    printlnInt(count1);
 
     let mut count2: i32 = find_pattern_with_wildcard(&text, &pattern2, pattern2_len, 90);
-    printInt(count2);
+    printlnInt(count2);
 
     let mut count3: i32 = find_complex_pattern(&text);
-    printInt(count3);
+    printlnInt(count3);
 
     let mut result: i32 = analyze_text_frequency(&text);
-    printInt(result);
+    printlnInt(result);
 
     let mut error_res: i32 = trigger_error_path(&text, &pattern1, pattern1_len);
-    printInt(error_res);
+    printlnInt(error_res);
 
-    printInt(9999);
+    printlnInt(9999);
 }
 
 fn generate_text(text: &mut [i32; TEXT_SIZE], seed: i32) {
     let mut current_seed: i32 = seed;
     let mut i: i32 = 0;
-    while (i < TEXT_SIZE) {
+    while (i < TEXT_SIZE as i32) {
         current_seed = (pm_rand_update(current_seed) / 65536) % 32768;
         text[i as usize] = 65 + (current_seed % 26);
         if (i % 10 == 0) {
@@ -97,7 +95,7 @@ fn generate_text(text: &mut [i32; TEXT_SIZE], seed: i32) {
 fn find_pattern(text: &[i32; TEXT_SIZE], pattern: &[i32; PATTERN_SIZE], p_len: i32) -> i32 {
     let mut count: i32 = 0;
     let mut i: i32 = 0;
-    while (i <= TEXT_SIZE - p_len) {
+    while (i <= TEXT_SIZE as i32 - p_len) {
         let mut j: i32 = 0;
         let mut found: bool = true;
         while (j < p_len) {
@@ -118,7 +116,7 @@ fn find_pattern(text: &[i32; TEXT_SIZE], pattern: &[i32; PATTERN_SIZE], p_len: i
 fn find_pattern_with_wildcard(text: &[i32; TEXT_SIZE], pattern: &[i32; PATTERN_SIZE], p_len: i32, wildcard: i32) -> i32 {
     let mut count: i32 = 0;
     let mut i: i32 = 0;
-    while (i <= TEXT_SIZE - p_len) {
+    while (i <= TEXT_SIZE as i32 - p_len) {
         let mut j: i32 = 0;
         let mut found: bool = true;
         while (j < p_len) {
@@ -139,7 +137,7 @@ fn find_pattern_with_wildcard(text: &[i32; TEXT_SIZE], pattern: &[i32; PATTERN_S
 fn find_complex_pattern(text: &[i32; TEXT_SIZE]) -> i32 {
     let mut count: i32 = 0;
     let mut i: i32 = 0;
-    while (i < TEXT_SIZE - 5) {
+    while (i < TEXT_SIZE as i32 - 5) {
         if (text[i as usize] == text[i as usize + 3] && text[i as usize+1] == text[i as usize+4] && text[i as usize] < text[i as usize+2]) {
             let mut sum: i32 = 0;
             let mut k: i32 = 0;
@@ -159,7 +157,7 @@ fn find_complex_pattern(text: &[i32; TEXT_SIZE]) -> i32 {
 fn analyze_text_frequency(text: &[i32; TEXT_SIZE]) -> i32 {
     let mut freq: [i32; 26] = [0; 26];
     let mut i: i32 = 0;
-    while (i < TEXT_SIZE) {
+    while (i < TEXT_SIZE as i32) {
         let char_code: i32 = text[i as usize];
         if (char_code >= 65 && char_code <= 90) {
             freq[char_code as usize - 65] = freq[char_code as usize - 65] + 1;
@@ -184,7 +182,7 @@ fn state_machine_search(text: &[i32; TEXT_SIZE]) -> i32 {
     let mut state: i32 = 0;
     let mut count: i32 = 0;
     let mut i: i32 = 0;
-    while (i < TEXT_SIZE) {
+    while (i < TEXT_SIZE as i32) {
         let current_char: i32 = text[i as usize];
         if (state == 0) {
             if (current_char == 65) {
@@ -218,16 +216,16 @@ fn state_machine_search(text: &[i32; TEXT_SIZE]) -> i32 {
 }
 
 fn trigger_error_path(text: &[i32; TEXT_SIZE], pattern: &[i32; PATTERN_SIZE], p_len: i32) -> i32 {
-    let mut local_text: [i32; TEXT_SIZE] = text;
+    let mut local_text: [i32; TEXT_SIZE] = *text;
     let mut i: i32 = 0;
-    while (i < TEXT_SIZE) {
+    while (i < TEXT_SIZE as i32) {
         local_text[i as usize] = local_text[i as usize] + i % 10;
         i = i + 1;
     }
 
     let mut count: i32 = 0;
     i = 0;
-    while (i <= TEXT_SIZE - p_len) {
+    while (i <= TEXT_SIZE as i32 - p_len) {
         let mut j: i32 = 0;
         let mut match_score: i32 = 0;
         while (j < p_len) {
@@ -271,12 +269,7 @@ fn trigger_error_path(text: &[i32; TEXT_SIZE], pattern: &[i32; PATTERN_SIZE], p_
 
     let final_result: i32 = count + another_val;
     if (final_result > 1000) {
-        let intermediate: bool = final_result * 2;
-        if (intermediate) {
-            return 1;
-        } else {
-            return 0;
-        }
+        return 0;
     }
     return final_result;
 }
@@ -284,17 +277,17 @@ fn trigger_error_path(text: &[i32; TEXT_SIZE], pattern: &[i32; PATTERN_SIZE], p_
 fn another_level_of_search(text: &[i32; TEXT_SIZE]) {
     let mut pattern: [i32; PATTERN_SIZE] = [0; PATTERN_SIZE];
     let mut i: i32 = 0;
-    while (i < PATTERN_SIZE) {
+    while (i < PATTERN_SIZE as i32) {
         pattern[i as usize] = 70 + i % 5;
         i = i + 1;
     }
 
     let mut pos: i32 = -1;
     i = 0;
-    while (i < TEXT_SIZE - PATTERN_SIZE) {
+    while (i < (TEXT_SIZE - PATTERN_SIZE) as i32) {
         let mut found: bool = true;
         let mut j: i32 = 0;
-        while (j < PATTERN_SIZE) {
+        while (j < PATTERN_SIZE as i32) {
             if (text[(i+j) as usize] != pattern[j as usize]) {
                 found = false;
                 break;
@@ -307,7 +300,7 @@ fn another_level_of_search(text: &[i32; TEXT_SIZE]) {
         }
         i = i + 1;
     }
-    printInt(pos);
+    printlnInt(pos);
 }
 
 fn yet_another_search_function() {
@@ -315,5 +308,5 @@ fn yet_another_search_function() {
     generate_text(&mut text, 54321);
     let mut result1: i32 = state_machine_search(&text);
     another_level_of_search(&text);
-    printInt(result1);
+    printlnInt(result1);
 }

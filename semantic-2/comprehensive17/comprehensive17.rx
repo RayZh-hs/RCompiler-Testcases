@@ -43,6 +43,7 @@ fn main() {
     testMatrixEdgeCases();
     
     printInt(1799); // Test end marker
+    exit(0);
 }
 
 // Basic matrix operations testing

@@ -26,8 +26,8 @@ Correct handling of array bounds and memory access.
 // - Branch prediction within loop bodies for data-dependent operations.
 // - Correct handling of array bounds and memory access.
 
-let SIZE: i32 = 40;
-let HALF_SIZE: i32 = 20;
+const SIZE: i32 = 40;
+const HALF_SIZE: i32 = 20;
 
 fn init_matrix(mat: [[i32; 40]; 40], seed: i32) -> [[i32; 40]; 40] {
     let mut i: i32 = 0;
@@ -49,13 +49,18 @@ fn matrix_multiply(a: [[i32; 40]; 40], b: [[i32; 40]; 40]) -> [[i32; 40]; 40] {
     while (i < SIZE) {
         let mut j: i32 = 0;
         while (j < SIZE) {
-            let mut sum: i32 = 0;
+            // Use u32 for intermediate multiply-add to emulate two's-complement wrapping
+            // without changing the array element types (still i32). This avoids panic
+            // from signed overflow in debug while preserving bitwise wrapping semantics.
+            let mut sum_u: u32 = 0u32;
             let mut k: i32 = 0;
             while (k < SIZE) {
-                sum = sum + a[i as usize][k as usize] * b[k as usize][j as usize];
+                let a_u: u32 = a[i as usize][k as usize] as u32;
+                let b_u: u32 = b[k as usize][j as usize] as u32;
+                sum_u = sum_u + (a_u * b_u);
                 k = k + 1;
             }
-            result[i as usize][j as usize] = sum;
+            result[i as usize][j as usize] = sum_u as i32;
             j = j + 1;
         }
         i = i + 1;
@@ -156,23 +161,23 @@ fn main() {
     }
 
     let sum1: i32 = sub_matrix_sum(matrix_c);
-    printInt(sum1);
+    printlnInt(sum1);
 
     let diag_res1: i32 = diagonal_processing(matrix_c);
-    printInt(diag_res1);
+    printlnInt(diag_res1);
 
     let mut matrix_d: [[i32; 40]; 40] = transpose_and_add(matrix_c);
 
     let sum2: i32 = sub_matrix_sum(matrix_d);
-    printInt(sum2);
+    printlnInt(sum2);
 
     let diag_res2: i32 = diagonal_processing(matrix_d);
-    printInt(diag_res2);
+    printlnInt(diag_res2);
 
     let mut matrix_e: [[i32; 40]; 40] = matrix_multiply(matrix_d, matrix_a);
 
     let sum3: i32 = sub_matrix_sum(matrix_e);
-    printInt(sum3);
+    printlnInt(sum3);
 
     let mut checksum: i32 = 0;
     let mut j: i32 = 0;
@@ -188,7 +193,7 @@ fn main() {
         }
         j = j + 1;
     }
-    printInt(checksum);
+    printlnInt(checksum);
 
     let mut m: i32 = 0;
     while (m < SIZE) {
@@ -200,7 +205,7 @@ fn main() {
             }
             n = n + 1;
         }
-        printInt(row_max);
+        printlnInt(row_max);
         m = m + 1;
     }
 
@@ -214,7 +219,7 @@ fn main() {
             }
             q = q + 1;
         }
-        printInt(col_min);
+        printlnInt(col_min);
         p = p + 1;
     }
 
@@ -241,5 +246,5 @@ fn main() {
         }
         t = t + 1;
     }
-    printInt(final_sum);
+    printlnInt(final_sum);
 }

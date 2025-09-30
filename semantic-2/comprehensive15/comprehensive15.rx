@@ -114,7 +114,7 @@ impl StringProcessor {
     // Initialize text data from input
     fn initialize_text(&mut self, length: i32) {
         self.text_length = length;
-        let mut i = 0;
+        let mut i: i32 = 0;
         while (i < length) {
             self.text[i as usize] = readInt();
             i += 1;
@@ -132,10 +132,10 @@ impl StringProcessor {
             return;
         }
         
-        let pattern_index = self.pattern_count;
+        let pattern_index: i32 = self.pattern_count;
         self.pattern_lengths[pattern_index as usize] = length;
         
-        let mut i = 0;
+        let mut i: i32 = 0;
         while (i < length) {
             self.patterns[pattern_index as usize][i as usize] = readInt();
             i += 1;
@@ -156,7 +156,7 @@ impl StringProcessor {
         self.unique_chars = 0;
         
         // Clear frequency array
-        let mut i = 0;
+        let mut i: i32 = 0;
         while (i < 256) {
             self.char_frequency[i as usize] = 0;
             i += 1;
@@ -206,14 +206,14 @@ impl StringProcessor {
     // Build suffix array using simple O(n^2 log n) algorithm
     fn build_suffix_array(&mut self) {
         // Initialize suffix array with indices
-        let mut i = 0;
+        let mut i: i32 = 0;
         while (i < self.text_length) {
             self.suffix_array[i as usize] = i;
             i += 1;
         }
         
         // Sort suffixes using bubble sort (simplified for this implementation)
-        let mut sorted = false;
+        let mut sorted: bool = false;
         while (!sorted) {
             sorted = true;
             i = 0;
@@ -238,12 +238,12 @@ impl StringProcessor {
     
     // Compare two suffixes lexicographically
     fn compare_suffixes(&mut self, i: i32, j: i32) -> i32 {
-        let mut k = 0;
+        let mut k: i32 = 0;
         while (i + k < self.text_length && j + k < self.text_length) {
             self.comparison_count += 1;
             if (self.text[(i + k) as usize] < self.text[(j + k) as usize]) {
                 return -1;
-            } else if self.text[(i + k) as usize] > self.text[(j + k) as usize] {
+            } else if (self.text[(i + k) as usize] > self.text[(j + k) as usize]) {
                 return 1;
             }
             k += 1;
@@ -251,7 +251,7 @@ impl StringProcessor {
         
         if (i + k >= self.text_length && j + k >= self.text_length) {
             return 0;
-        } else if i + k >= self.text_length {
+        } else if (i + k >= self.text_length) {
             return -1;
         } else {
             return 1;
@@ -260,8 +260,8 @@ impl StringProcessor {
     
     // Compute LCP (Longest Common Prefix) array
     fn compute_lcp_array(&mut self) {
-        let mut k = 0;
-        let mut i = 0;
+        let mut k: i32 = 0;
+        let mut i: i32 = 0;
         
         while (i < self.text_length) {
             if (self.rank_array[i as usize] == self.text_length - 1) {
@@ -289,9 +289,9 @@ impl StringProcessor {
     
     // KMP preprocessing - compute LPS array
     fn preprocess_kmp(&mut self, pattern_index: i32) {
-        let pattern_len = self.pattern_lengths[pattern_index as usize];
-        let mut length = 0;
-        let mut i = 1;
+        let pattern_len: i32 = self.pattern_lengths[pattern_index as usize];
+        let mut length: i32 = 0;
+        let mut i: i32 = 1;
         
         self.lps[0] = 0;
         
@@ -314,10 +314,10 @@ impl StringProcessor {
     
     // Boyer-Moore preprocessing
     fn preprocess_boyer_moore(&mut self, pattern_index: i32) {
-        let pattern_len = self.pattern_lengths[pattern_index as usize];
+        let pattern_len: i32 = self.pattern_lengths[pattern_index as usize];
         
         // Initialize bad character array
-        let mut i = 0;
+        let mut i: i32 = 0;
         while (i < 256) {
             self.bad_char[i as usize] = -1;
             i += 1;
@@ -343,11 +343,11 @@ impl StringProcessor {
     
     // Rabin-Karp hash computation
     fn compute_pattern_hash(&mut self, pattern_index: i32) {
-        let pattern_len = self.pattern_lengths[pattern_index as usize];
-        let mut hash_value = 0;
-        let mut power = 1;
+        let pattern_len: i32 = self.pattern_lengths[pattern_index as usize];
+        let mut hash_value: i32 = 0;
+        let mut power: i32 = 1;
         
-        let mut i = 0;
+        let mut i: i32 = 0;
         while (i < pattern_len) {
             hash_value = (hash_value + (self.patterns[pattern_index as usize][i as usize] * power) % self.mod_value) % self.mod_value;
             if (i < pattern_len - 1) {
@@ -368,7 +368,7 @@ impl StringProcessor {
         // Compute hash for first window
         self.text_hash[0] = self.text[0] % self.mod_value;
         
-        let mut i = 1;
+        let mut i: i32 = 1;
         while (i < self.text_length) {
             self.text_hash[i as usize] = (self.text_hash[(i - 1) as usize] * self.base + self.text[i as usize]) % self.mod_value;
             i += 1;
@@ -377,15 +377,15 @@ impl StringProcessor {
     
     // KMP string matching
     fn kmp_search(&mut self, pattern_index: i32) {
-        let pattern_len = self.pattern_lengths[pattern_index as usize];
+        let pattern_len: i32 = self.pattern_lengths[pattern_index as usize];
         self.match_counts[pattern_index as usize] = 0;
         
         if (pattern_len > self.text_length) {
             return;
         }
         
-        let mut i = 0; // index for text
-        let mut j = 0; // index for pattern
+        let mut i: i32 = 0; // index for text
+        let mut j: i32 = 0; // index for pattern
         
         while (i < self.text_length) {
             self.comparison_count += 1;
@@ -414,16 +414,16 @@ impl StringProcessor {
     
     // Boyer-Moore string matching
     fn boyer_moore_search(&mut self, pattern_index: i32) {
-        let pattern_len = self.pattern_lengths[pattern_index as usize];
-        let mut matches_found = 0;
+        let pattern_len: i32 = self.pattern_lengths[pattern_index as usize];
+        let mut matches_found: i32 = 0;
         
         if (pattern_len > self.text_length) {
             return;
         }
         
-        let mut shift = 0;
+        let mut shift: i32 = 0;
         while (shift <= self.text_length - pattern_len) {
-            let mut j = pattern_len - 1;
+            let mut j: i32 = pattern_len - 1;
             
             // Check pattern from right to left
             while (j >= 0 && self.patterns[pattern_index as usize][j as usize] == self.text[(shift + j) as usize]) {
@@ -434,11 +434,11 @@ impl StringProcessor {
             if (j < 0) {
                 // Found a match
                 matches_found += 1;
-                shift += if shift + pattern_len < self.text_length { pattern_len } else { 1 };
+                shift += if (shift + pattern_len < self.text_length) { pattern_len } else { 1 };
             } else {
                 // Calculate shift using bad character rule
-                let bad_char_shift = j - self.bad_char[self.text[(shift + j) as usize] as usize];
-                shift += if bad_char_shift > 1 { bad_char_shift } else { 1 };
+                let bad_char_shift: i32 = j - self.bad_char[self.text[(shift + j) as usize] as usize];
+                shift += if (bad_char_shift > 1) { bad_char_shift } else { 1 };
                 self.comparison_count += 1;
             }
         }
@@ -449,18 +449,18 @@ impl StringProcessor {
     
     // Rabin-Karp string matching with rolling hash
     fn rabin_karp_search(&mut self, pattern_index: i32) {
-        let pattern_len = self.pattern_lengths[pattern_index as usize];
-        let pattern_hash = self.pattern_hash[pattern_index as usize];
-        let mut matches_found = 0;
+        let pattern_len: i32 = self.pattern_lengths[pattern_index as usize];
+        let pattern_hash: i32 = self.pattern_hash[pattern_index as usize];
+        let mut matches_found: i32 = 0;
         
         if (pattern_len > self.text_length) {
             return;
         }
         
         // Calculate hash for first window
-        let mut window_hash = 0;
-        let mut power = 1;
-        let mut i = 0;
+        let mut window_hash: i32 = 0;
+        let mut power: i32 = 1;
+        let mut i: i32 = 0;
         while (i < pattern_len) {
             window_hash = (window_hash + (self.text[i as usize] * power) % self.mod_value) % self.mod_value;
             if (i < pattern_len - 1) {
@@ -500,8 +500,8 @@ impl StringProcessor {
     
     // Verify potential match found by hash
     fn verify_match(&mut self, text_pos: i32, pattern_index: i32) -> bool {
-        let pattern_len = self.pattern_lengths[pattern_index as usize];
-        let mut i = 0;
+        let pattern_len: i32 = self.pattern_lengths[pattern_index as usize];
+        let mut i: i32 = 0;
         while (i < pattern_len) {
             self.comparison_count += 1;
             if (self.text[(text_pos + i) as usize] != self.patterns[pattern_index as usize][i as usize]) {
@@ -515,10 +515,10 @@ impl StringProcessor {
     // Edit distance computation using dynamic programming
     fn compute_edit_distance(&mut self, str1_len: i32, str2_len: i32) -> i32 {
         // Read the two strings
-        let mut str1 = [0; 500];
-        let mut str2 = [0; 500];
+        let mut str1: [i32; 500] = [0; 500];
+        let mut str2: [i32; 500] = [0; 500];
         
-        let mut i = 0;
+        let mut i: i32 = 0;
         while (i < str1_len) {
             str1[i as usize] = readInt();
             i += 1;
@@ -551,11 +551,11 @@ impl StringProcessor {
                 if (str1[(i - 1) as usize] == str2[(j - 1) as usize]) {
                     self.dp_matrix[i as usize][j as usize] = self.dp_matrix[(i - 1) as usize][(j - 1) as usize];
                 } else {
-                    let insert_cost = self.dp_matrix[i as usize][(j - 1) as usize] + 1;
-                    let delete_cost = self.dp_matrix[(i - 1) as usize][j as usize] + 1;
-                    let substitute_cost = self.dp_matrix[(i - 1) as usize][(j - 1) as usize] + 1;
+                    let insert_cost: i32 = self.dp_matrix[i as usize][(j - 1) as usize] + 1;
+                    let delete_cost: i32 = self.dp_matrix[(i - 1) as usize][j as usize] + 1;
+                    let substitute_cost: i32 = self.dp_matrix[(i - 1) as usize][(j - 1) as usize] + 1;
                     
-                    let min_cost = if (insert_cost < delete_cost) {
+                    let min_cost: i32 = if (insert_cost < delete_cost) {
                         if (insert_cost < substitute_cost) { insert_cost } else { substitute_cost }
                     } else {
                         if (delete_cost < substitute_cost) { delete_cost } else { substitute_cost }
@@ -574,16 +574,16 @@ impl StringProcessor {
     // Simplified Huffman coding frequency analysis
     fn analyze_compression_potential(&mut self) -> i32 {
         // Calculate entropy based on character frequencies
-        let mut total_entropy = 0;
-        let mut i = 0;
+        let mut total_entropy: i32 = 0;
+        let mut i: i32 = 0;
         while (i < 256) {
             if (self.char_frequency[i as usize] > 0) {
-                let frequency = self.char_frequency[i as usize];
-                let probability = (frequency * 1000) / self.text_length; // Scale by 1000 for integer arithmetic
+                let frequency: i32 = self.char_frequency[i as usize];
+                let probability: i32 = (frequency * 1000) / self.text_length; // Scale by 1000 for integer arithmetic
                 
                 // Simplified log calculation (approximation)
-                let mut log_approx = 0;
-                let mut temp = probability;
+                let mut log_approx: i32 = 0;
+                let mut temp: i32 = probability;
                 while (temp > 1) {
                     log_approx += 1;
                     temp /= 2;
@@ -600,8 +600,8 @@ impl StringProcessor {
     
     // Longest repeated substring using suffix array
     fn find_longest_repeated_substring(&self) -> i32 {
-        let mut max_lcp = 0;
-        let mut i = 0;
+        let mut max_lcp: i32 = 0;
+        let mut i: i32 = 0;
         while (i < self.text_length - 1) {
             if (self.lcp_array[i as usize] > max_lcp) {
                 max_lcp = self.lcp_array[i as usize];
@@ -614,7 +614,7 @@ impl StringProcessor {
     // Complex text analysis combining multiple algorithms
     fn perform_comprehensive_analysis(&mut self) {
         // Perform all pattern matching algorithms
-        let mut pattern_idx = 0;
+        let mut pattern_idx: i32 = 0;
         while (pattern_idx < self.pattern_count) {
             self.kmp_search(pattern_idx);
             self.boyer_moore_search(pattern_idx);
@@ -623,16 +623,16 @@ impl StringProcessor {
         }
         
         // Compression analysis
-        let compression_potential = self.analyze_compression_potential();
+        let compression_potential: i32 = self.analyze_compression_potential();
         self.algorithm_times[3] = compression_potential;
         
         // Longest repeated substring
-        let longest_repeat = self.find_longest_repeated_substring();
+        let longest_repeat: i32 = self.find_longest_repeated_substring();
         self.algorithm_times[4] = longest_repeat;
         
         // Additional text metrics
-        let avg_word_length = if self.word_count > 0 { self.text_length / self.word_count } else { 0 };
-        let text_complexity = (self.unique_chars * 100) / 256;
+        let avg_word_length: i32 = if (self.word_count > 0) { self.text_length / self.word_count } else { 0 };
+        let text_complexity: i32 = (self.unique_chars * 100) / 256;
         
         self.algorithm_times[5] = avg_word_length;
         self.algorithm_times[6] = text_complexity;
@@ -648,7 +648,7 @@ impl StringProcessor {
         printInt(self.unique_chars);
         
         // Pattern matching results
-        let mut i = 0;
+        let mut i: i32 = 0;
         while (i < self.pattern_count) {
             printInt(self.match_counts[i as usize]);
             i += 1;
@@ -673,9 +673,9 @@ impl StringProcessor {
         }
         
         // Final complexity score
-        let pattern_complexity = self.comparison_count / (self.pattern_count + 1);
-        let text_complexity = (self.unique_chars * self.word_count) / 100;
-        let final_score = pattern_complexity + text_complexity + self.algorithm_times[3];
+        let pattern_complexity: i32 = self.comparison_count / (self.pattern_count + 1);
+        let text_complexity: i32 = (self.unique_chars * self.word_count) / 100;
+        let final_score: i32 = pattern_complexity + text_complexity + self.algorithm_times[3];
         printInt(final_score);
     }
 }
@@ -702,7 +702,7 @@ impl RegexMatcher {
     
     fn compile_pattern(&mut self, length: i32) {
         self.pattern_length = length;
-        let mut i = 0;
+        let mut i: i32 = 0;
         while (i < length) {
             self.pattern[i as usize] = readInt();
             i += 1;
@@ -716,9 +716,9 @@ impl RegexMatcher {
         self.state_count = self.pattern_length + 1;
         
         // Initialize NFA states
-        let mut i = 0;
+        let mut i: i32 = 0;
         while (i < self.state_count) {
-            let mut j = 0;
+            let mut j: i32 = 0;
             while (j < 100) {
                 self.nfa_states[i as usize][j as usize] = false;
                 j += 1;
@@ -729,7 +729,7 @@ impl RegexMatcher {
         // Build transitions for literal characters
         i = 0;
         while (i < self.pattern_length) {
-            let ch = self.pattern[i as usize];
+            let ch: i32 = self.pattern[i as usize];
             if (ch >= 0 && ch < 100) {
                 self.nfa_states[i as usize][ch as usize] = true;
             }
@@ -738,17 +738,17 @@ impl RegexMatcher {
     }
     
     fn match_text(&mut self, text: &[i32; 5000], text_length: i32) -> bool {
-        let mut current_states = [false; 100];
-        let mut next_states = [false; 100];
+        let mut current_states: [bool; 100] = [false; 100];
+        let mut next_states: [bool; 100] = [false; 100];
         
         current_states[0] = true;
         
-        let mut i = 0;
+        let mut i: i32 = 0;
         while (i < text_length) {
-            let ch = text[i as usize];
+            let ch: i32 = text[i as usize];
             
             // Clear next states
-            let mut j = 0;
+            let mut j: i32 = 0;
             while (j < 100) {
                 next_states[j as usize] = false;
                 j += 1;
@@ -781,17 +781,17 @@ impl RegexMatcher {
 
 fn main() {
     // Initialize string processor
-    let mut processor = StringProcessor::new();
+    let mut processor: StringProcessor = StringProcessor::new();
     
     // Read text
-    let text_length = readInt();
+    let text_length: i32 = readInt();
     processor.initialize_text(text_length);
     
     // Read patterns
-    let pattern_count = readInt();
-    let mut i = 0;
+    let pattern_count: i32 = readInt();
+    let mut i: i32 = 0;
     while (i < pattern_count) {
-        let pattern_length = readInt();
+        let pattern_length: i32 = readInt();
         processor.add_pattern(pattern_length);
         i += 1;
     }
@@ -800,33 +800,33 @@ fn main() {
     processor.perform_comprehensive_analysis();
     
     // Edit distance computation
-    let str1_len = readInt();
-    let str2_len = readInt();
-    let edit_distance = processor.compute_edit_distance(str1_len, str2_len);
+    let str1_len: i32 = readInt();
+    let str2_len: i32 = readInt();
+    let edit_distance: i32 = processor.compute_edit_distance(str1_len, str2_len);
     printInt(edit_distance);
     
     // Regular expression matching
-    let mut regex_matcher = RegexMatcher::new();
-    let regex_pattern_length = readInt();
+    let mut regex_matcher: RegexMatcher = RegexMatcher::new();
+    let regex_pattern_length: i32 = readInt();
     regex_matcher.compile_pattern(regex_pattern_length);
     
-    let regex_result = regex_matcher.match_text(&processor.text, processor.text_length);
-    printInt(if regex_result { 1 } else { 0 });
+    let regex_result: bool = regex_matcher.match_text(&processor.text, processor.text_length);
+    printInt(if (regex_result) { 1 } else { 0 });
     
     // Output all results
     processor.output_results();
     
     // Advanced string transformations and analysis
-    let transformation_iterations = readInt();
-    let mut total_transformations = 0;
+    let transformation_iterations: i32 = readInt();
+    let mut total_transformations: i32 = 0;
     
     i = 0;
     while (i < transformation_iterations) {
         // Apply character transformations
-        let shift = (i * 7 + 3) % 26;
-        let mut j = 0;
+        let shift: i32 = (i * 7 + 3) % 26;
+        let mut j: i32 = 0;
         while (j < processor.text_length) {
-            let ch = processor.text[j as usize];
+            let ch: i32 = processor.text[j as usize];
             if (ch >= 65 && ch <= 90) { // Uppercase letters
                 processor.text[j as usize] = ((ch - 65 + shift) % 26) + 65;
             } else if (ch >= 97 && ch <= 122) { // Lowercase letters
@@ -845,6 +845,7 @@ fn main() {
     printInt(total_transformations);
     
     // Final comprehensive metric
-    let final_complexity = (processor.comparison_count + total_transformations) * processor.unique_chars / 100;
+    let final_complexity: i32 = (processor.comparison_count + total_transformations) * processor.unique_chars / 100;
     printInt(final_complexity);
+    exit(0);
 }

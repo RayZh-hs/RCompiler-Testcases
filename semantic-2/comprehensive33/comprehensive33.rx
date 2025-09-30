@@ -36,8 +36,6 @@ fn pm_rand_update(x: i32) -> i32 {
 // - Decision-making logic with deep conditional branches.
 // - Interaction between multiple complex data structures.
 
-fn printInt(n: i32) {}
-
 const GRID_WIDTH: i32 = 50;
 const GRID_HEIGHT: i32 = 50;
 const NUM_AGENTS: i32 = 20;
@@ -54,14 +52,14 @@ struct Agent {
 }
 
 struct World {
-    grid: [[i32; GRID_WIDTH]; GRID_HEIGHT],
-    agents: [Agent; NUM_AGENTS],
+    grid: [[i32; GRID_WIDTH as usize]; GRID_HEIGHT as usize],
+    agents: [Agent; NUM_AGENTS as usize],
 }
 
 fn main() {
     let mut world: World = World {
-        grid: [[0; GRID_WIDTH]; GRID_HEIGHT],
-        agents: [Agent { id: 0, x: 0, y: 0, energy: 0, target_x: 0, target_y: 0, active: false }; NUM_AGENTS],
+        grid: [[0; GRID_WIDTH as usize]; GRID_HEIGHT as usize],
+        agents: [Agent { id: 0, x: 0, y: 0, energy: 0, target_x: 0, target_y: 0, active: false }; NUM_AGENTS as usize],
     };
 
     initialize_world(&mut world, 98765);
@@ -71,13 +69,13 @@ fn main() {
         update_world(&mut world);
         process_interactions(&mut world);
         if (tick % 10 == 0) {
-            run_diagnostics(&world);
+            run_diagnostics(&mut world);
         }
         tick = tick + 1;
     }
 
     final_report(&world);
-    printInt(9999);
+    printlnInt(9999);
 }
 
 fn initialize_world(world: &mut World, seed: i32) {
@@ -170,11 +168,13 @@ fn process_interactions(world: &mut World) {
     let mut i: i32 = 0;
     while (i < NUM_AGENTS) {
         if (!world.agents[i as usize].active) {
+            i = i + 1;
             continue;
         }
         let mut j: i32 = i + 1;
         while (j < NUM_AGENTS) {
             if (!world.agents[j as usize].active) {
+                j = j + 1;
                 continue;
             }
 
@@ -206,7 +206,7 @@ fn process_interactions(world: &mut World) {
     }
 }
 
-fn run_diagnostics(world: &World) {
+fn run_diagnostics(world: &mut World) {
     let mut total_energy: i32 = 0;
     let mut active_agents: i32 = 0;
     let mut i: i32 = 0;
@@ -217,8 +217,8 @@ fn run_diagnostics(world: &World) {
         }
         i = i + 1;
     }
-    printInt(100000 + active_agents);
-    printInt(200000 + total_energy);
+    printlnInt(100000 + active_agents);
+    printlnInt(200000 + total_energy);
     provoke_error(world);
 }
 
@@ -226,9 +226,9 @@ fn final_report(world: &World) {
     let mut i: i32 = 0;
     while (i < NUM_AGENTS) {
         if (world.agents[i as usize].active) {
-            printInt(world.agents[i as usize].id * 10000 + world.agents[i as usize].energy);
+            printlnInt(world.agents[i as usize].id * 10000 + world.agents[i as usize].energy);
         } else {
-            printInt(world.agents[i as usize].id * 10000 + -1);
+            printlnInt(world.agents[i as usize].id * 10000 + -1);
         }
         i = i + 1;
     }
@@ -240,7 +240,7 @@ fn clamp(val: i32, min: i32, max: i32) -> i32 {
     return val;
 }
 
-fn provoke_error(world: &World) {
+fn provoke_error(world: &mut World) {
     let mut agent_copy: Agent = world.agents[0];
     agent_copy.energy = -100;
 
@@ -251,7 +251,7 @@ fn provoke_error(world: &World) {
                 let mut temp_agent: Agent = world.agents[i as usize];
                 temp_agent.energy = temp_agent.energy / 2;
                 if (temp_agent.energy > 100) {
-                    printInt(temp_agent.id + 5000);
+                    printlnInt(temp_agent.id + 5000);
                 }
             }
         }
@@ -278,8 +278,8 @@ fn provoke_error(world: &World) {
 
 fn another_simulation_scenario() {
     let mut world: World = World {
-        grid: [[0; GRID_WIDTH]; GRID_HEIGHT],
-        agents: [Agent { id: 0, x: 0, y: 0, energy: 0, target_x: 0, target_y: 0, active: false }; NUM_AGENTS],
+        grid: [[0; GRID_WIDTH as usize]; GRID_HEIGHT as usize],
+        agents: [Agent { id: 0, x: 0, y: 0, energy: 0, target_x: 0, target_y: 0, active: false }; NUM_AGENTS as usize],
     };
     initialize_world(&mut world, 11223);
     let mut i: i32 = 0;
