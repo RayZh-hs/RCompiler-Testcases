@@ -12,12 +12,12 @@ Comment: Comprehensive test of complex control flow and finite state machine sim
 */
 
 // Constants for state machine configuration
-const MAX_STATES: i32 = 50;
-const MAX_EVENTS: i32 = 100;
-const MAX_TRANSITIONS: i32 = 200;
-const MAX_TASKS: i32 = 100;
-const MAX_PROTOCOL_BUFFER: i32 = 1000;
-const MAX_NESTED_CALLS: i32 = 20;
+const MAX_STATES: usize = 50;
+const MAX_EVENTS: usize = 100;
+const MAX_TRANSITIONS: usize = 200;
+const MAX_TASKS: usize = 100;
+const MAX_PROTOCOL_BUFFER: usize = 1000;
+const MAX_NESTED_CALLS: usize = 20;
 const INVALID_STATE: i32 = -1;
 const INVALID_EVENT: i32 = -1;
 
@@ -91,7 +91,7 @@ struct Task {
     state: i32,
     remaining_time: i32,
     wait_event: i32,
-    next_task: i32,  // For linked list scheduling
+    next_task: i32, // For linked list scheduling
     execution_count: i32,
 }
 
@@ -131,10 +131,16 @@ struct NestedFSM {
 
 // Initialize FSM
 fn init_fsm() -> FSM {
-    let mut fsm = FSM {
+    let mut fsm: FSM = FSM {
         current_state: STATE_INIT,
         previous_state: INVALID_STATE,
-        transitions: [Transition { from_state: 0, event: 0, to_state: 0, action_id: 0, condition: 0 }; MAX_TRANSITIONS],
+        transitions: [Transition {
+            from_state: 0,
+            event: 0,
+            to_state: 0,
+            action_id: 0,
+            condition: 0,
+        }; MAX_TRANSITIONS],
         transition_count: 0,
         event_queue: [0; MAX_EVENTS],
         queue_head: 0,
@@ -144,24 +150,31 @@ fn init_fsm() -> FSM {
         error_count: 0,
         total_transitions: 0,
     };
-    
+
     // Initialize state counters
-    let mut i = 0;
+    let mut i: usize = 0;
     while (i < MAX_STATES) {
-        fsm.state_counters[i as usize] = 0;
+        fsm.state_counters[i] = 0;
         i = i + 1;
     }
-    
-    fsm.state_counters[STATE_INIT as usize] = 1;  // Start in init state
+
+    fsm.state_counters[STATE_INIT as usize] = 1; // Start in init state
     fsm
 }
 
 // Add transition to FSM
-fn add_transition(fsm: &mut FSM, from: i32, event: i32, to: i32, action: i32, condition: i32) -> bool {
-    if (fsm.transition_count >= MAX_TRANSITIONS) {
+fn add_transition(
+    fsm: &mut FSM,
+    from: i32,
+    event: i32,
+    to: i32,
+    action: i32,
+    condition: i32,
+) -> bool {
+    if (fsm.transition_count >= MAX_TRANSITIONS as i32) {
         return false;
     }
-    
+
     fsm.transitions[(fsm.transition_count) as usize] = Transition {
         from_state: from,
         event: event,
@@ -169,19 +182,19 @@ fn add_transition(fsm: &mut FSM, from: i32, event: i32, to: i32, action: i32, co
         action_id: action,
         condition: condition,
     };
-    
+
     fsm.transition_count = fsm.transition_count + 1;
     true
 }
 
 // Add event to FSM queue
 fn fsm_add_event(fsm: &mut FSM, event: i32) -> bool {
-    if (fsm.queue_size >= MAX_EVENTS) {
-        return false;  // Queue full
+    if (fsm.queue_size >= MAX_EVENTS as i32) {
+        return false; // Queue full
     }
-    
+
     fsm.event_queue[(fsm.queue_tail) as usize] = event;
-    fsm.queue_tail = (fsm.queue_tail + 1) % MAX_EVENTS;
+    fsm.queue_tail = (fsm.queue_tail + 1) % MAX_EVENTS as i32;
     fsm.queue_size = fsm.queue_size + 1;
     true
 }
@@ -191,9 +204,9 @@ fn fsm_get_event(fsm: &mut FSM) -> i32 {
     if (fsm.queue_size <= 0) {
         return INVALID_EVENT;
     }
-    
-    let event = fsm.event_queue[(fsm.queue_head) as usize];
-    fsm.queue_head = (fsm.queue_head + 1) % MAX_EVENTS;
+
+    let event: i32 = fsm.event_queue[(fsm.queue_head) as usize];
+    fsm.queue_head = (fsm.queue_head + 1) % MAX_EVENTS as i32;
     fsm.queue_size = fsm.queue_size - 1;
     event
 }
@@ -202,7 +215,7 @@ fn fsm_get_event(fsm: &mut FSM) -> i32 {
 fn evaluate_condition(condition: i32, current_state: i32, event: i32, context: i32) -> bool {
     // Complex branching logic for condition evaluation
     if (condition == 0) {
-        return true;  // Always true
+        return true; // Always true
     } else if (condition == 1) {
         return current_state == STATE_READY;
     } else if (condition == 2) {
@@ -228,9 +241,9 @@ fn evaluate_condition(condition: i32, current_state: i32, event: i32, context: i
         }
     } else if (condition == 6) {
         // Multi-level condition with various branches
-        let temp1 = current_state * 3 + event;
-        let temp2 = context / 2;
-        
+        let temp1: i32 = current_state * 3 + event;
+        let temp2: i32 = context / 2;
+
         if (temp1 > temp2) {
             if (current_state < STATE_SUSPENDED) {
                 return event != EVENT_ABORT;
@@ -257,7 +270,7 @@ fn evaluate_condition(condition: i32, current_state: i32, event: i32, context: i
 // Execute action based on action ID
 fn execute_action(action_id: i32, fsm: &mut FSM, context: &mut i32) -> i32 {
     if (action_id == 0) {
-        return 0;  // No action
+        return 0; // No action
     } else if (action_id == 1) {
         *context = *context + 1;
         return 1;
@@ -272,7 +285,7 @@ fn execute_action(action_id: i32, fsm: &mut FSM, context: &mut i32) -> i32 {
         return 3;
     } else if (action_id == 4) {
         // Complex action with multiple operations
-        let temp = *context;
+        let temp: i32 = *context;
         *context = (temp * 3 + 17) % 100;
         fsm.error_count = fsm.error_count + 1;
         return 4;
@@ -291,14 +304,14 @@ fn execute_action(action_id: i32, fsm: &mut FSM, context: &mut i32) -> i32 {
         return 5;
     } else if (action_id == 6) {
         // Multi-step action with branching
-        let mut i = 0;
+        let mut i: i32 = 0;
         while (i < 5) {
             if (i % 2 == 0) {
                 *context = *context + i;
             } else {
                 *context = *context - i;
             }
-            
+
             if (*context % 3 == 0) {
                 fsm_add_event(fsm, EVENT_PROCESS + i);
             }
@@ -307,8 +320,8 @@ fn execute_action(action_id: i32, fsm: &mut FSM, context: &mut i32) -> i32 {
         return 6;
     } else {
         // Default action with complex computation
-        let mut result = action_id;
-        let mut i = 0;
+        let mut result: i32 = action_id;
+        let mut i: i32 = 0;
         while (i < action_id % 10) {
             result = result * 2 + *context;
             if (result > 1000) {
@@ -323,35 +336,36 @@ fn execute_action(action_id: i32, fsm: &mut FSM, context: &mut i32) -> i32 {
 
 // Process single FSM step
 fn fsm_step(fsm: &mut FSM, context: &mut i32) -> bool {
-    let event = fsm_get_event(fsm);
+    let event: i32 = fsm_get_event(fsm);
     if (event == INVALID_EVENT) {
-        return false;  // No events to process
+        return false; // No events to process
     }
-    
+
     // Find matching transition
-    let mut i = 0;
+    let mut i: i32 = 0;
     while (i < fsm.transition_count) {
-        let transition = &fsm.transitions[i as usize];
-        
+        let transition: &Transition = &fsm.transitions[i as usize];
+
         if (transition.from_state == fsm.current_state && transition.event == event) {
             if (evaluate_condition(transition.condition, fsm.current_state, event, *context)) {
                 // Execute transition
                 fsm.previous_state = fsm.current_state;
                 fsm.current_state = transition.to_state;
-                
+
                 // Update state counters
-                fsm.state_counters[(fsm.current_state) as usize] = fsm.state_counters[(fsm.current_state) as usize] + 1;
+                fsm.state_counters[(fsm.current_state) as usize] =
+                    fsm.state_counters[(fsm.current_state) as usize] + 1;
                 fsm.total_transitions = fsm.total_transitions + 1;
-                
+
                 // Execute action
                 execute_action(transition.action_id, fsm, context);
-                
+
                 return true;
             }
         }
         i = i + 1;
     }
-    
+
     // No valid transition found
     fsm.error_count = fsm.error_count + 1;
     false
@@ -360,7 +374,7 @@ fn fsm_step(fsm: &mut FSM, context: &mut i32) -> bool {
 // Initialize protocol parser
 fn init_protocol_parser() -> ProtocolParser {
     ProtocolParser {
-        state: 0,  // Idle state
+        state: 0, // Idle state
         buffer: [0; MAX_PROTOCOL_BUFFER],
         buffer_pos: 0,
         packet_count: 0,
@@ -373,80 +387,92 @@ fn init_protocol_parser() -> ProtocolParser {
 // Parse protocol packet with complex state logic
 fn parse_packet(parser: &mut ProtocolParser, packet_type: i32, data: i32, seq: i32) -> i32 {
     // Complex parsing logic with multiple states and conditions
-    if (parser.state == 0) {  // Idle
+    if (parser.state == 0) {
+        // Idle
         if (packet_type == PACKET_SYN) {
-            parser.state = 1;  // SYN received
+            parser.state = 1; // SYN received
             parser.expected_seq = seq + 1;
-            return 1;  // Send SYN-ACK
+            return 1; // Send SYN-ACK
         } else {
             parser.error_count = parser.error_count + 1;
-            return -1;  // Error
+            return -1; // Error
         }
-    } else if (parser.state == 1) {  // SYN received
+    } else if (parser.state == 1) {
+        // SYN received
         if (packet_type == PACKET_ACK && seq == parser.expected_seq) {
-            parser.state = 2;  // Established
+            parser.state = 2; // Established
             parser.expected_seq = seq + 1;
-            return 2;  // Connection established
+            return 2; // Connection established
         } else if (packet_type == PACKET_RST) {
-            parser.state = 0;  // Reset to idle
-            return 0;  // Connection reset
+            parser.state = 0; // Reset to idle
+            return 0; // Connection reset
         } else {
             parser.error_count = parser.error_count + 1;
-            return -1;  // Error
+            return -1; // Error
         }
-    } else if (parser.state == 2) {  // Established
+    } else if (parser.state == 2) {
+        // Established
         if (packet_type == PACKET_DATA) {
             if (seq == parser.expected_seq) {
                 // Store data in buffer
-                if (parser.buffer_pos < MAX_PROTOCOL_BUFFER) {
+                if (parser.buffer_pos < MAX_PROTOCOL_BUFFER as i32) {
                     parser.buffer[(parser.buffer_pos) as usize] = data;
                     parser.buffer_pos = parser.buffer_pos + 1;
                 }
                 parser.expected_seq = seq + 1;
                 parser.packet_count = parser.packet_count + 1;
-                return 3;  // Send ACK
+                return 3; // Send ACK
             } else {
                 parser.error_count = parser.error_count + 1;
-                return 4;  // Out of order, request retransmit
+                return 4; // Out of order, request retransmit
             }
         } else if (packet_type == PACKET_FIN) {
-            parser.state = 3;  // Closing
-            return 5;  // Send FIN-ACK
+            parser.state = 3; // Closing
+            return 5; // Send FIN-ACK
         } else if (packet_type == PACKET_PING) {
-            return 6;  // Send PONG
+            return 6; // Send PONG
         } else if (packet_type == PACKET_RST) {
-            parser.state = 0;  // Reset to idle
+            parser.state = 0; // Reset to idle
             parser.buffer_pos = 0;
-            return 0;  // Connection reset
+            return 0; // Connection reset
         } else {
             parser.error_count = parser.error_count + 1;
-            return -1;  // Error
+            return -1; // Error
         }
-    } else if (parser.state == 3) {  // Closing
+    } else if (parser.state == 3) {
+        // Closing
         if (packet_type == PACKET_ACK) {
-            parser.state = 0;  // Back to idle
+            parser.state = 0; // Back to idle
             parser.buffer_pos = 0;
-            return 7;  // Connection closed
+            return 7; // Connection closed
         } else if (packet_type == PACKET_RST) {
-            parser.state = 0;  // Reset to idle
+            parser.state = 0; // Reset to idle
             parser.buffer_pos = 0;
-            return 0;  // Connection reset
+            return 0; // Connection reset
         } else {
             parser.error_count = parser.error_count + 1;
-            return -1;  // Error
+            return -1; // Error
         }
     } else {
         // Invalid state
         parser.error_count = parser.error_count + 1;
-        parser.state = 0;  // Reset to idle
-        return -1;  // Error
+        parser.state = 0; // Reset to idle
+        return -1; // Error
     }
 }
 
 // Initialize task scheduler
 fn init_task_scheduler() -> TaskScheduler {
     TaskScheduler {
-        tasks: [Task { id: 0, priority: 0, state: 0, remaining_time: 0, wait_event: 0, next_task: -1, execution_count: 0 }; MAX_TASKS],
+        tasks: [Task {
+            id: 0,
+            priority: 0,
+            state: 0,
+            remaining_time: 0,
+            wait_event: 0,
+            next_task: -1,
+            execution_count: 0,
+        }; MAX_TASKS],
         task_count: 0,
         current_task: -1,
         ready_queue: [-1; MAX_TASKS],
@@ -460,74 +486,78 @@ fn init_task_scheduler() -> TaskScheduler {
 
 // Add task to scheduler
 fn add_task(scheduler: &mut TaskScheduler, priority: i32, execution_time: i32) -> i32 {
-    if (scheduler.task_count >= MAX_TASKS) {
-        return -1;  // No space
+    if (scheduler.task_count >= MAX_TASKS as i32) {
+        return -1; // No space
     }
-    
-    let task_id = scheduler.task_count;
+
+    let task_id: i32 = scheduler.task_count;
     scheduler.tasks[task_id as usize] = Task {
         id: task_id,
         priority: priority,
-        state: 0,  // Ready
+        state: 0, // Ready
         remaining_time: execution_time,
         wait_event: -1,
         next_task: -1,
         execution_count: 0,
     };
-    
+
     // Insert into ready queue based on priority
-    let mut i = 0;
+    let mut i: i32 = 0;
     while (i < scheduler.ready_count) {
-        let existing_task = scheduler.ready_queue[i as usize];
+        let existing_task: i32 = scheduler.ready_queue[i as usize];
         if (scheduler.tasks[existing_task as usize].priority < priority) {
             break;
         }
         i = i + 1;
     }
-    
+
     // Shift elements to make space
-    let mut j = scheduler.ready_count;
+    let mut j: i32 = scheduler.ready_count;
     while (j > i) {
         scheduler.ready_queue[j as usize] = scheduler.ready_queue[j as usize - 1];
         j = j - 1;
     }
-    
+
     scheduler.ready_queue[i as usize] = task_id;
     scheduler.ready_count = scheduler.ready_count + 1;
     scheduler.task_count = scheduler.task_count + 1;
-    
+
     task_id
 }
 
 // Schedule next task with complex priority logic
 fn schedule_next_task(scheduler: &mut TaskScheduler) -> i32 {
     scheduler.current_time = scheduler.current_time + 1;
-    
+
     // Check for task completion or preemption
     if (scheduler.current_task != -1) {
-        let current = scheduler.current_task;
-        scheduler.tasks[current as usize].remaining_time = scheduler.tasks[current as usize].remaining_time - 1;
-        scheduler.tasks[current as usize].execution_count = scheduler.tasks[current as usize].execution_count + 1;
-        
+        let current: i32 = scheduler.current_task;
+        scheduler.tasks[current as usize].remaining_time =
+            scheduler.tasks[current as usize].remaining_time - 1;
+        scheduler.tasks[current as usize].execution_count =
+            scheduler.tasks[current as usize].execution_count + 1;
+
         if (scheduler.tasks[current as usize].remaining_time <= 0) {
             // Task completed
-            scheduler.tasks[current as usize].state = 2;  // Completed
+            scheduler.tasks[current as usize].state = 2; // Completed
             scheduler.current_task = -1;
         } else {
             // Check for preemption based on complex logic
-            let mut should_preempt = false;
-            
+            let mut should_preempt: bool = false;
+
             if (scheduler.ready_count > 0) {
-                let next_task = scheduler.ready_queue[0];
-                let current_priority = scheduler.tasks[current as usize].priority;
-                let next_priority = scheduler.tasks[next_task as usize].priority;
-                
+                let next_task: i32 = scheduler.ready_queue[0];
+                let current_priority: i32 = scheduler.tasks[current as usize].priority;
+                let next_priority: i32 = scheduler.tasks[next_task as usize].priority;
+
                 // Complex preemption logic
                 if (next_priority > current_priority) {
                     should_preempt = true;
                 } else if (next_priority == current_priority) {
                     // Round-robin within same priority
-                    if (scheduler.tasks[current as usize].execution_count % scheduler.time_slice == 0) {
+                    if (scheduler.tasks[current as usize].execution_count % scheduler.time_slice
+                        == 0)
+                    {
                         should_preempt = true;
                     }
                 } else if (scheduler.current_time % 50 == 0) {
@@ -535,49 +565,51 @@ fn schedule_next_task(scheduler: &mut TaskScheduler) -> i32 {
                     should_preempt = true;
                 }
             }
-            
+
             if (should_preempt) {
                 // Move current task back to ready queue
-                scheduler.tasks[current as usize].state = 0;  // Ready
-                
+                scheduler.tasks[current as usize].state = 0; // Ready
+
                 // Insert back into ready queue
-                let mut i = 0;
+                let mut i: i32 = 0;
                 while (i < scheduler.ready_count) {
-                    let existing_task = scheduler.ready_queue[i as usize];
-                    if (scheduler.tasks[existing_task as usize].priority < scheduler.tasks[current as usize].priority) {
+                    let existing_task: i32 = scheduler.ready_queue[i as usize];
+                    if (scheduler.tasks[existing_task as usize].priority
+                        < scheduler.tasks[current as usize].priority)
+                    {
                         break;
                     }
                     i = i + 1;
                 }
-                
+
                 // Shift and insert
-                let mut j = scheduler.ready_count;
+                let mut j: i32 = scheduler.ready_count;
                 while (j > i) {
                     scheduler.ready_queue[j as usize] = scheduler.ready_queue[j as usize - 1];
                     j = j - 1;
                 }
-                
+
                 scheduler.ready_queue[i as usize] = current;
                 scheduler.ready_count = scheduler.ready_count + 1;
                 scheduler.current_task = -1;
             }
         }
     }
-    
+
     // Select next task if no current task
     if (scheduler.current_task == -1 && scheduler.ready_count > 0) {
         scheduler.current_task = scheduler.ready_queue[0];
-        scheduler.tasks[(scheduler.current_task) as usize].state = 1;  // Running
-        
+        scheduler.tasks[(scheduler.current_task) as usize].state = 1; // Running
+
         // Remove from ready queue
-        let mut i = 0;
+        let mut i: i32 = 0;
         while (i < scheduler.ready_count - 1) {
             scheduler.ready_queue[i as usize] = scheduler.ready_queue[i as usize + 1];
             i = i + 1;
         }
         scheduler.ready_count = scheduler.ready_count - 1;
     }
-    
+
     scheduler.current_task
 }
 
@@ -586,14 +618,14 @@ fn complex_nested_control_flow(depth: i32, value: i32) -> i32 {
     if (depth <= 0) {
         return value;
     }
-    
-    let mut result = value;
-    
+
+    let mut result: i32 = value;
+
     // Complex nested branching
     if (depth % 7 == 0) {
         if (value > 100) {
             if (value % 3 == 0) {
-                let mut i = 0;
+                let mut i: i32 = 0;
                 while (i < depth) {
                     if (i % 2 == 0) {
                         result = result + i * 2;
@@ -612,7 +644,7 @@ fn complex_nested_control_flow(depth: i32, value: i32) -> i32 {
                     i = i + 1;
                 }
             } else if (value % 3 == 1) {
-                let mut j = depth;
+                let mut j: i32 = depth;
                 while (j > 0) {
                     if (j % 4 == 0) {
                         result = result * 2;
@@ -623,7 +655,7 @@ fn complex_nested_control_flow(depth: i32, value: i32) -> i32 {
                     } else {
                         result = result / 2;
                     }
-                    
+
                     if (result > 500) {
                         break;
                     }
@@ -633,7 +665,7 @@ fn complex_nested_control_flow(depth: i32, value: i32) -> i32 {
                 result = complex_nested_control_flow(depth - 1, result / 2);
             }
         } else if (value > 50) {
-            let mut k = 0;
+            let mut k: i32 = 0;
             while (k < 10) {
                 if (k % 3 == 0) {
                     result = result + k * depth;
@@ -652,7 +684,7 @@ fn complex_nested_control_flow(depth: i32, value: i32) -> i32 {
         }
     } else if (depth % 7 == 1) {
         // Another complex branch
-        let temp = result;
+        let temp: i32 = result;
         if (temp > depth * 10) {
             result = complex_nested_control_flow(depth - 1, temp - depth);
         } else {
@@ -662,137 +694,151 @@ fn complex_nested_control_flow(depth: i32, value: i32) -> i32 {
         // Default recursive case with modification
         result = complex_nested_control_flow(depth - 1, result * 2 + depth);
     }
-    
-    result % 10000  // Keep result manageable
+
+    result % 10000 // Keep result manageable
 }
 
 // Main test function
 fn test_complex_control_flow() {
-    printInt(20001);  // Test start marker
-    
+    printlnInt(20001); // Test start marker
+
     // Test 1: FSM with complex transitions
-    let mut fsm = init_fsm();
-    let mut context = 42;
-    
+    let mut fsm: FSM = init_fsm();
+    let mut context: i32 = 42;
+
     // Set up complex state machine
     add_transition(&mut fsm, STATE_INIT, EVENT_START, STATE_READY, 1, 0);
     add_transition(&mut fsm, STATE_READY, EVENT_PROCESS, STATE_PROCESSING, 2, 1);
-    add_transition(&mut fsm, STATE_PROCESSING, EVENT_COMPLETE, STATE_READY, 3, 5);
+    add_transition(
+        &mut fsm,
+        STATE_PROCESSING,
+        EVENT_COMPLETE,
+        STATE_READY,
+        3,
+        5,
+    );
     add_transition(&mut fsm, STATE_PROCESSING, EVENT_ERROR, STATE_ERROR, 4, 4);
     add_transition(&mut fsm, STATE_ERROR, EVENT_RETRY, STATE_READY, 5, 6);
     add_transition(&mut fsm, STATE_READY, EVENT_SUSPEND, STATE_SUSPENDED, 6, 2);
     add_transition(&mut fsm, STATE_SUSPENDED, EVENT_RESUME, STATE_READY, 1, 3);
-    
+
     // Generate complex event sequence
-    let mut i = 0;
+    let mut i: i32 = 0;
     while (i < 100) {
-        let event = (i * 7 + 3) % 10;  // Generate varied events
+        let event: i32 = (i * 7 + 3) % 10; // Generate varied events
         fsm_add_event(&mut fsm, event);
         i = i + 1;
     }
-    
+
     // Process events
-    let mut processed = 0;
+    let mut processed: i32 = 0;
     while (processed < 150) {
         if (!fsm_step(&mut fsm, &mut context)) {
-            fsm_add_event(&mut fsm, EVENT_PROCESS);  // Add more events
+            fsm_add_event(&mut fsm, EVENT_PROCESS); // Add more events
         }
         processed = processed + 1;
     }
-    
-    printInt(fsm.total_transitions);
-    printInt(fsm.error_count);
-    printInt(context);
-    
+
+    printlnInt(fsm.total_transitions);
+    printlnInt(fsm.error_count);
+    printlnInt(context);
+
     // Test 2: Protocol parser simulation
-    let mut parser = init_protocol_parser();
-    let mut packet_responses = 0;
-    
+    let mut parser: ProtocolParser = init_protocol_parser();
+    let mut packet_responses: i32 = 0;
+
     // Simulate complex protocol exchange
     i = 0;
     while (i < 200) {
-        let packet_type = (i % 7) + 1;
-        let data = i * 13 + 7;
-        let seq = i + 1;
-        
-        let response = parse_packet(&mut parser, packet_type, data, seq);
+        let packet_type: i32 = (i % 7) + 1;
+        let data: i32 = i * 13 + 7;
+        let seq: i32 = i + 1;
+
+        let response: i32 = parse_packet(&mut parser, packet_type, data, seq);
         if (response > 0) {
             packet_responses = packet_responses + 1;
         }
-        
+
         // Complex state-dependent logic
         if (parser.state == 2 && i % 10 == 0) {
             // Send ping occasionally
             parse_packet(&mut parser, PACKET_PING, 0, seq + 1);
         }
-        
+
         if (parser.error_count > 5 && i % 15 == 0) {
             // Reset on too many errors
             parse_packet(&mut parser, PACKET_RST, 0, 0);
         }
-        
+
         i = i + 1;
     }
-    
-    printInt(parser.packet_count);
-    printInt(parser.error_count);
-    printInt(packet_responses);
-    
+
+    printlnInt(parser.packet_count);
+    printlnInt(parser.error_count);
+    printlnInt(packet_responses);
+
     // Test 3: Task scheduler simulation
-    let mut scheduler = init_task_scheduler();
-    
+    let mut scheduler: TaskScheduler = init_task_scheduler();
+
     // Add tasks with different priorities
     i = 0;
     while (i < 50) {
-        let priority = (i % 4) + 1;
-        let execution_time = (i * 3 + 5) % 20 + 1;
+        let priority: i32 = (i % 4) + 1;
+        let execution_time: i32 = (i * 3 + 5) % 20 + 1;
         add_task(&mut scheduler, priority, execution_time);
         i = i + 1;
     }
-    
+
     // Run scheduler simulation
-    let mut scheduling_steps = 0;
+    let mut scheduling_steps: i32 = 0;
     i = 0;
     while (i < 1000) {
-        let current = schedule_next_task(&mut scheduler);
+        let current: i32 = schedule_next_task(&mut scheduler);
         if (current != -1) {
             scheduling_steps = scheduling_steps + 1;
         }
-        
+
         // Occasionally add new tasks
-        if (i % 50 == 0 && scheduler.task_count < MAX_TASKS) {
-            let priority = ((i / 50) % 4) + 1;
-            let execution_time = (i / 10) % 15 + 1;
+        if (i % 50 == 0 && scheduler.task_count < MAX_TASKS as i32) {
+            let priority: i32 = ((i / 50) % 4) + 1;
+            let execution_time: i32 = (i / 10) % 15 + 1;
             add_task(&mut scheduler, priority, execution_time);
         }
-        
+
         i = i + 1;
     }
-    
-    printInt(scheduling_steps);
-    printInt(scheduler.task_count);
-    
+
+    printlnInt(scheduling_steps);
+    printlnInt(scheduler.task_count);
+
     // Test 4: Complex nested control flow
-    let mut nested_results = 0;
+    let mut nested_results: i32 = 0;
     i = 1;
     while (i <= 20) {
-        let result = complex_nested_control_flow(i, i * 17 + 3);
+        let result: i32 = complex_nested_control_flow(i, i * 17 + 3);
         nested_results = nested_results + result;
         i = i + 1;
     }
-    
-    printInt(nested_results % 100000);
-    
+
+    printlnInt(nested_results % 100000);
+
     // Test 5: Multiple interacting state machines
-    let mut fsm2 = init_fsm();
-    let mut context2 = 17;
-    
+    let mut fsm2: FSM = init_fsm();
+    let mut context2: i32 = 17;
+
     // Set up second FSM with different transitions
     add_transition(&mut fsm2, STATE_INIT, EVENT_START, STATE_PROCESSING, 2, 0);
-    add_transition(&mut fsm2, STATE_PROCESSING, EVENT_PROCESS, STATE_WAITING, 4, 2);
+    add_transition(
+        &mut fsm2,
+        STATE_PROCESSING,
+        EVENT_PROCESS,
+        STATE_WAITING,
+        4,
+        2,
+    );
     add_transition(&mut fsm2, STATE_WAITING, EVENT_TIMEOUT, STATE_ERROR, 6, 1);
     add_transition(&mut fsm2, STATE_ERROR, EVENT_RESET, STATE_INIT, 1, 0);
-    
+
     // Interact two FSMs
     i = 0;
     while (i < 100) {
@@ -800,30 +846,30 @@ fn test_complex_control_flow() {
         if (!fsm_step(&mut fsm, &mut context)) {
             fsm_add_event(&mut fsm, (i % 5) + EVENT_START);
         }
-        
+
         // Process FSM 2
         if (!fsm_step(&mut fsm2, &mut context2)) {
             fsm_add_event(&mut fsm2, (i % 3) + EVENT_START);
         }
-        
+
         // Cross-interaction based on states
         if (fsm.current_state == STATE_PROCESSING && fsm2.current_state == STATE_WAITING) {
             fsm_add_event(&mut fsm2, EVENT_COMPLETE);
             fsm_add_event(&mut fsm, EVENT_SUSPEND);
         }
-        
+
         if (context > 80 && context2 < 20) {
             context2 = context2 + context / 4;
             context = context - 10;
         }
-        
+
         i = i + 1;
     }
-    
-    printInt(fsm2.total_transitions);
-    printInt(context2);
-    
-    printInt(20999);  // Test end marker
+
+    printlnInt(fsm2.total_transitions);
+    printlnInt(context2);
+
+    printlnInt(20999); // Test end marker
 }
 
 fn main() {

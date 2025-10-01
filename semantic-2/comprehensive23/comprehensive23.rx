@@ -29,8 +29,8 @@ Loop optimization for iterative agreement protocols
 // - Loop optimization for iterative agreement protocols
 
 fn main() {
-    printInt(42);
-    
+    printlnInt(42);
+
     // Initialize distributed system with 100 nodes
     let node_count: i32 = 100;
     let mut nodes: [i32; 100] = [0; 100];
@@ -43,20 +43,20 @@ fn main() {
     let mut node_last_applied: [i32; 100] = [0; 100];
     let mut node_next_indices: [[i32; 100]; 100] = [[0; 100]; 100];
     let mut node_match_indices: [[i32; 100]; 100] = [[0; 100]; 100];
-    
+
     // Network simulation variables
     let mut message_queue: [[i32; 10]; 1000] = [[0; 10]; 1000]; // [sender, receiver, type, term, data...]
     let mut queue_head: i32 = 0;
     let mut queue_tail: i32 = 0;
     let mut network_partition: [bool; 100] = [false; 100];
     let mut message_delays: [i32; 1000] = [0; 1000];
-    
+
     // Performance monitoring
     let mut consensus_rounds: i32 = 0;
     let mut total_messages: i32 = 0;
     let mut leader_changes: i32 = 0;
     let mut failed_elections: i32 = 0;
-    
+
     // Initialize nodes with random IDs
     let mut i: i32 = 0;
     while (i < node_count) {
@@ -68,7 +68,7 @@ fn main() {
         node_logs[i as usize][0] = 0; // Genesis entry
         node_commit_indices[i as usize] = 0;
         node_last_applied[i as usize] = 0;
-        
+
         // Initialize next and match indices for all peers
         let mut j: i32 = 0;
         while (j < node_count) {
@@ -78,94 +78,139 @@ fn main() {
         }
         i = i + 1;
     }
-    
+
     // Simulate complex distributed consensus for 1000 rounds
     let max_rounds: i32 = 1000;
     let mut round: i32 = 0;
-    
+
     while (round < max_rounds) {
         // Simulate network conditions
         simulate_network_conditions(&mut network_partition, round, node_count);
-        
+
         // Process heartbeat and election timeouts
-        process_timeouts(&mut node_states, &mut node_terms, &mut node_votes, 
-                        &mut message_queue, &mut queue_tail, node_count, round);
-        
+        process_timeouts(
+            &mut node_states,
+            &mut node_terms,
+            &mut node_votes,
+            &mut message_queue,
+            &mut queue_tail,
+            node_count,
+            round,
+        );
+
         // Process pending messages
         let messages_processed: i32 = process_message_queue(
-            &mut message_queue, &mut queue_head, &mut queue_tail,
-            &mut node_states, &mut node_terms, &mut node_votes,
-            &mut node_logs, &mut node_log_sizes, &mut node_commit_indices,
-            &mut node_next_indices, &mut node_match_indices,
-            &network_partition, node_count
+            &mut message_queue,
+            &mut queue_head,
+            &mut queue_tail,
+            &mut node_states,
+            &mut node_terms,
+            &mut node_votes,
+            &mut node_logs,
+            &mut node_log_sizes,
+            &mut node_commit_indices,
+            &mut node_next_indices,
+            &mut node_match_indices,
+            &network_partition,
+            node_count,
         );
-        
+
         total_messages = total_messages + messages_processed;
-        
+
         // Check for leader election completion
         let leader_id: i32 = check_leader_election(&node_states, &node_terms, node_count);
         if (leader_id >= 0) {
             // Leader found, simulate log replication
-            simulate_log_replication(leader_id, &mut node_logs, &mut node_log_sizes,
-                                   &mut node_commit_indices, &mut node_next_indices,
-                                   &mut node_match_indices, &mut message_queue,
-                                   &mut queue_tail, &network_partition, node_count, round);
+            simulate_log_replication(
+                leader_id,
+                &mut node_logs,
+                &mut node_log_sizes,
+                &mut node_commit_indices,
+                &mut node_next_indices,
+                &mut node_match_indices,
+                &mut message_queue,
+                &mut queue_tail,
+                &network_partition,
+                node_count,
+                round,
+            );
         }
-        
+
         // Simulate client requests to current leader
         if (leader_id >= 0 && round % 10 == 0) {
             let new_entry: i32 = round / 10 + 1000;
             append_log_entry(leader_id, new_entry, &mut node_logs, &mut node_log_sizes);
         }
-        
+
         // Complex state consistency verification
         let consistency_score: i32 = verify_system_consistency(
-            &node_states, &node_terms, &node_logs, &node_log_sizes,
-            &node_commit_indices, node_count
+            &node_states,
+            &node_terms,
+            &node_logs,
+            &node_log_sizes,
+            &node_commit_indices,
+            node_count,
         );
-        
+
         if (consistency_score < 80 && round > 100) {
             // System inconsistency detected, trigger recovery
-            trigger_recovery_protocol(&mut node_states, &mut node_terms,
-                                    &mut node_votes, node_count);
+            trigger_recovery_protocol(
+                &mut node_states,
+                &mut node_terms,
+                &mut node_votes,
+                node_count,
+            );
             failed_elections = failed_elections + 1;
         }
-        
+
         // Advanced partition tolerance testing
         if (round % 50 == 0) {
-            simulate_byzantine_failures(&mut node_states, &mut network_partition,
-                                      node_count, round);
+            simulate_byzantine_failures(
+                &mut node_states,
+                &mut network_partition,
+                node_count,
+                round,
+            );
         }
-        
+
         // Performance optimization: garbage collection simulation
         if (round % 100 == 0) {
-            compact_logs(&mut node_logs, &mut node_log_sizes, &node_commit_indices, node_count);
+            compact_logs(
+                &mut node_logs,
+                &mut node_log_sizes,
+                &node_commit_indices,
+                node_count,
+            );
         }
-        
+
         round = round + 1;
         if (round % 100 == 0) {
             consensus_rounds = consensus_rounds + 1;
         }
     }
-    
+
     // Complex analytics and final state verification
     let final_leader: i32 = find_stable_leader(&node_states, &node_terms, node_count);
     let total_committed: i32 = count_total_committed_entries(&node_commit_indices, node_count);
     let network_efficiency: i32 = calculate_network_efficiency(total_messages, consensus_rounds);
-    
+
     // Advanced hash-based state verification
-    let system_hash: i32 = compute_system_state_hash(&node_logs, &node_log_sizes,
-                                                   &node_commit_indices, node_count);
-    
+    let system_hash: i32 = compute_system_state_hash(
+        &node_logs,
+        &node_log_sizes,
+        &node_commit_indices,
+        node_count,
+    );
+
     // Output comprehensive results
-    printInt(final_leader);
-    printInt(total_committed);
-    printInt(network_efficiency);
-    printInt(system_hash);
-    printInt(leader_changes);
-    printInt(failed_elections);
-    printInt(total_messages);
-    printInt(consensus_rounds);
+    printlnInt(final_leader);
+    printlnInt(total_committed);
+    printlnInt(network_efficiency);
+    printlnInt(system_hash);
+    printlnInt(leader_changes);
+    printlnInt(failed_elections);
+    printlnInt(total_messages);
+    printlnInt(consensus_rounds);
 }
 
 // Simulate dynamic network conditions with partitions and healing
@@ -196,21 +241,29 @@ fn simulate_network_conditions(partition: &mut [bool; 100], round: i32, node_cou
 }
 
 // Process election and heartbeat timeouts with complex state transitions
-fn process_timeouts(states: &mut [i32; 100], terms: &mut [i32; 100], votes: &mut [i32; 100],
-                   queue: &mut [[i32; 10]; 1000], tail: &mut i32, node_count: i32, round: i32) {
+fn process_timeouts(
+    states: &mut [i32; 100],
+    terms: &mut [i32; 100],
+    votes: &mut [i32; 100],
+    queue: &mut [[i32; 10]; 1000],
+    tail: &mut i32,
+    node_count: i32,
+    round: i32,
+) {
     let mut i: i32 = 0;
-    
+
     while (i < node_count) {
         // Simulate randomized timeouts
         let timeout_trigger: bool = (i * 23 + round * 7) % 47 == 0;
-        
+
         if (timeout_trigger) {
-            if (states[i as usize] == 0 || states[i as usize] == 1) { // follower or candidate
+            if (states[i as usize] == 0 || states[i as usize] == 1) {
+                // follower or candidate
                 // Start election
                 states[i as usize] = 1; // become candidate
                 terms[i as usize] = terms[i as usize] + 1;
                 votes[i as usize] = i; // vote for self
-                
+
                 // Send vote requests to all other nodes
                 let mut j: i32 = 0;
                 while (j < node_count) {
@@ -219,7 +272,8 @@ fn process_timeouts(states: &mut [i32; 100], terms: &mut [i32; 100], votes: &mut
                     }
                     j = j + 1;
                 }
-            } else if (states[i as usize] == 2) { // leader
+            } else if (states[i as usize] == 2) {
+                // leader
                 // Send heartbeats
                 let mut j: i32 = 0;
                 while (j < node_count) {
@@ -235,15 +289,24 @@ fn process_timeouts(states: &mut [i32; 100], terms: &mut [i32; 100], votes: &mut
 }
 
 // Process message queue with complex protocol logic
-fn process_message_queue(queue: &mut [[i32; 10]; 1000], head: &mut i32, tail: &mut i32,
-                        states: &mut [i32; 100], terms: &mut [i32; 100], votes: &mut [i32; 100],
-                        logs: &mut [[i32; 50]; 100], log_sizes: &mut [i32; 100],
-                        commit_indices: &mut [i32; 100], next_indices: &mut [[i32; 100]; 100],
-                        match_indices: &mut [[i32; 100]; 100], partition: &[bool; 100],
-                        node_count: i32) -> i32 {
+fn process_message_queue(
+    queue: &mut [[i32; 10]; 1000],
+    head: &mut i32,
+    tail: &mut i32,
+    states: &mut [i32; 100],
+    terms: &mut [i32; 100],
+    votes: &mut [i32; 100],
+    logs: &mut [[i32; 50]; 100],
+    log_sizes: &mut [i32; 100],
+    commit_indices: &mut [i32; 100],
+    next_indices: &mut [[i32; 100]; 100],
+    match_indices: &mut [[i32; 100]; 100],
+    partition: &[bool; 100],
+    node_count: i32,
+) -> i32 {
     let mut processed: i32 = 0;
     let max_process: i32 = 100; // Limit processing per round
-    
+
     while (*head != *tail && processed < max_process) {
         let sender: i32 = queue[*head as usize][0];
         let receiver: i32 = queue[*head as usize][1];
@@ -252,52 +315,95 @@ fn process_message_queue(queue: &mut [[i32; 10]; 1000], head: &mut i32, tail: &m
         let data1: i32 = queue[*head as usize][4];
         let data2: i32 = queue[*head as usize][5];
         let data3: i32 = queue[*head as usize][6];
-        
+
         // Check if message can be delivered (network partition simulation)
         let delivered: bool = !partition[sender as usize] && !partition[receiver as usize];
-        
-        if (delivered && sender >= 0 && sender < node_count && receiver >= 0 && receiver < node_count) {
-            if (msg_type == 1) { // vote request
+
+        if (delivered
+            && sender >= 0
+            && sender < node_count
+            && receiver >= 0
+            && receiver < node_count)
+        {
+            if (msg_type == 1) {
+                // vote request
                 handle_vote_request(sender, receiver, msg_term, states, terms, votes);
-            } else if (msg_type == 2) { // heartbeat
+            } else if (msg_type == 2) {
+                // heartbeat
                 handle_heartbeat(sender, receiver, msg_term, states, terms, votes);
-            } else if (msg_type == 3) { // vote response
+            } else if (msg_type == 3) {
+                // vote response
                 handle_vote_response(sender, receiver, msg_term, data1, states, terms, node_count);
-            } else if (msg_type == 4) { // append entries
-                handle_append_entries(sender, receiver, msg_term, data1, data2, data3,
-                                    states, terms, logs, log_sizes, commit_indices);
-            } else if (msg_type == 5) { // append response
-                handle_append_response(sender, receiver, msg_term, data1, data2,
-                                     states, next_indices, match_indices);
+            } else if (msg_type == 4) {
+                // append entries
+                handle_append_entries(
+                    sender,
+                    receiver,
+                    msg_term,
+                    data1,
+                    data2,
+                    data3,
+                    states,
+                    terms,
+                    logs,
+                    log_sizes,
+                    commit_indices,
+                );
+            } else if (msg_type == 5) {
+                // append response
+                handle_append_response(
+                    sender,
+                    receiver,
+                    msg_term,
+                    data1,
+                    data2,
+                    states,
+                    next_indices,
+                    match_indices,
+                );
             }
         }
-        
+
         *head = (*head + 1) % 1000;
         processed = processed + 1;
     }
-    
+
     processed
 }
 
 // Handle vote request with complex validation
-fn handle_vote_request(sender: i32, receiver: i32, term: i32, states: &mut [i32; 100],
-                      terms: &mut [i32; 100], votes: &mut [i32; 100]) {
-    if term > terms[receiver as usize] {
+fn handle_vote_request(
+    sender: i32,
+    receiver: i32,
+    term: i32,
+    states: &mut [i32; 100],
+    terms: &mut [i32; 100],
+    votes: &mut [i32; 100],
+) {
+    if (term > terms[receiver as usize]) {
         terms[receiver as usize] = term;
         states[receiver as usize] = 0; // revert to follower
         votes[receiver as usize] = -1;
     }
-    
-    if term == terms[receiver as usize] && (votes[receiver as usize] == -1 || votes[receiver as usize] == sender) {
+
+    if (term == terms[receiver as usize]
+        && (votes[receiver as usize] == -1 || votes[receiver as usize] == sender))
+    {
         votes[receiver as usize] = sender;
         // Send vote response (simplified - would need message queue)
     }
 }
 
 // Handle heartbeat with state updates
-fn handle_heartbeat(sender: i32, receiver: i32, term: i32, states: &mut [i32; 100],
-                   terms: &mut [i32; 100], votes: &mut [i32; 100]) {
-    if term >= terms[receiver as usize] {
+fn handle_heartbeat(
+    sender: i32,
+    receiver: i32,
+    term: i32,
+    states: &mut [i32; 100],
+    terms: &mut [i32; 100],
+    votes: &mut [i32; 100],
+) {
+    if (term >= terms[receiver as usize]) {
         terms[receiver as usize] = term;
         states[receiver as usize] = 0; // become follower
         votes[receiver as usize] = -1;
@@ -305,37 +411,54 @@ fn handle_heartbeat(sender: i32, receiver: i32, term: i32, states: &mut [i32; 10
 }
 
 // Handle vote response with leader election logic
-fn handle_vote_response(sender: i32, receiver: i32, term: i32, granted: i32,
-                       states: &mut [i32; 100], terms: &mut [i32; 100], node_count: i32) {
-    if states[receiver as usize] == 1 && term == terms[receiver as usize] && granted == 1 {
+fn handle_vote_response(
+    sender: i32,
+    receiver: i32,
+    term: i32,
+    granted: i32,
+    states: &mut [i32; 100],
+    terms: &[i32; 100],
+    node_count: i32,
+) {
+    if (states[receiver as usize] == 1 && term == terms[receiver as usize] && granted == 1) {
         // Count votes (simplified - in real implementation would track votes)
         let vote_threshold: i32 = node_count / 2 + 1;
         // If enough votes received, become leader
-        if receiver * 3 % node_count >= vote_threshold - 1 { // Simplified vote counting
+        if (receiver * 3 % node_count >= vote_threshold - 1) {
+            // Simplified vote counting
             states[receiver as usize] = 2; // become leader
         }
     }
 }
 
 // Handle append entries for log replication
-fn handle_append_entries(sender: i32, receiver: i32, term: i32, prev_log_index: i32,
-                        prev_log_term: i32, entry: i32, states: &mut [i32; 100],
-                        terms: &mut [i32; 100], logs: &mut [[i32; 50]; 100],
-                        log_sizes: &mut [i32; 100], commit_indices: &mut [i32; 100]) {
-    if term < terms[receiver as usize] {
+fn handle_append_entries(
+    sender: i32,
+    receiver: i32,
+    term: i32,
+    prev_log_index: i32,
+    prev_log_term: i32,
+    entry: i32,
+    states: &mut [i32; 100],
+    terms: &mut [i32; 100],
+    logs: &mut [[i32; 50]; 100],
+    log_sizes: &mut [i32; 100],
+    commit_indices: &mut [i32; 100],
+) {
+    if (term < terms[receiver as usize]) {
         return; // Reject outdated terms
     }
-    
-    if term > terms[receiver as usize] {
+
+    if (term > terms[receiver as usize]) {
         terms[receiver as usize] = term;
         states[receiver as usize] = 0; // become follower
     }
-    
+
     // Complex log consistency checks
-    if prev_log_index >= 0 && prev_log_index < log_sizes[receiver as usize] {
-        if logs[receiver as usize][prev_log_index as usize] == prev_log_term {
+    if (prev_log_index >= 0 && prev_log_index < log_sizes[receiver as usize]) {
+        if (logs[receiver as usize][prev_log_index as usize] == prev_log_term) {
             // Append new entry
-            if entry > 0 && log_sizes[receiver as usize] < 50 {
+            if (entry > 0 && log_sizes[receiver as usize] < 50) {
                 logs[receiver as usize][(log_sizes[receiver as usize]) as usize] = entry;
                 log_sizes[receiver as usize] = log_sizes[receiver as usize] + 1;
             }
@@ -344,16 +467,25 @@ fn handle_append_entries(sender: i32, receiver: i32, term: i32, prev_log_index: 
 }
 
 // Handle append response for leader state management
-fn handle_append_response(sender: i32, receiver: i32, term: i32, success: i32, match_index: i32,
-                         states: &mut [i32; 100], next_indices: &mut [[i32; 100]; 100],
-                         match_indices: &mut [[i32; 100]; 100]) {
-    if states[receiver as usize] == 2 && term == states[receiver as usize] { // if still leader
-        if success == 1 {
+fn handle_append_response(
+    sender: i32,
+    receiver: i32,
+    term: i32,
+    success: i32,
+    match_index: i32,
+    states: &[i32; 100],
+    next_indices: &mut [[i32; 100]; 100],
+    match_indices: &mut [[i32; 100]; 100],
+) {
+    if (states[receiver as usize] == 2 && term == states[receiver as usize]) {
+        // if still leader
+        if (success == 1) {
             next_indices[receiver as usize][sender as usize] = match_index + 1;
             match_indices[receiver as usize][sender as usize] = match_index;
         } else {
-            if next_indices[receiver as usize][sender as usize] > 0 {
-                next_indices[receiver as usize][sender as usize] = next_indices[receiver as usize][sender as usize] - 1;
+            if (next_indices[receiver as usize][sender as usize] > 0) {
+                next_indices[receiver as usize][sender as usize] =
+                    next_indices[receiver as usize][sender as usize] - 1;
             }
         }
     }
@@ -364,7 +496,7 @@ fn check_leader_election(states: &[i32; 100], terms: &[i32; 100], node_count: i3
     let mut max_term: i32 = -1;
     let mut leader_count: i32 = 0;
     let mut leader_id: i32 = -1;
-    
+
     let mut i: i32 = 0;
     while (i < node_count) {
         if (terms[i as usize] > max_term) {
@@ -372,7 +504,7 @@ fn check_leader_election(states: &[i32; 100], terms: &[i32; 100], node_count: i3
         }
         i = i + 1;
     }
-    
+
     i = 0;
     while (i < node_count) {
         if (states[i as usize] == 2 && terms[i as usize] == max_term) {
@@ -381,34 +513,43 @@ fn check_leader_election(states: &[i32; 100], terms: &[i32; 100], node_count: i3
         }
         i = i + 1;
     }
-    
-    if leader_count == 1 {
-        leader_id
-    } else {
-        -1
-    }
+
+    if (leader_count == 1) { leader_id } else { -1 }
 }
 
 // Simulate log replication from leader to followers
-fn simulate_log_replication(leader: i32, logs: &mut [[i32; 50]; 100], log_sizes: &mut [i32; 100],
-                           commit_indices: &mut [i32; 100], next_indices: &mut [[i32; 100]; 100],
-                           match_indices: &mut [[i32; 100]; 100], queue: &mut [[i32; 10]; 1000],
-                           tail: &mut i32, partition: &[bool; 100], node_count: i32, round: i32) {
+fn simulate_log_replication(
+    leader: i32,
+    logs: &[[i32; 50]; 100],
+    log_sizes: &[i32; 100],
+    commit_indices: &mut [i32; 100],
+    next_indices: &mut [[i32; 100]; 100],
+    match_indices: &mut [[i32; 100]; 100],
+    queue: &mut [[i32; 10]; 1000],
+    tail: &mut i32,
+    partition: &[bool; 100],
+    node_count: i32,
+    round: i32,
+) {
     let mut i: i32 = 0;
     while (i < node_count) {
         if (i != leader && !partition[i as usize]) {
             let next_index: i32 = next_indices[leader as usize][i as usize];
             if (next_index < log_sizes[leader as usize]) {
                 let prev_index: i32 = next_index - 1;
-                let prev_term: i32 = if prev_index >= 0 { logs[leader as usize][prev_index as usize] } else { 0 };
+                let prev_term: i32 = if (prev_index >= 0) {
+                    logs[leader as usize][prev_index as usize]
+                } else {
+                    0
+                };
                 let entry: i32 = logs[leader as usize][next_index as usize];
-                
+
                 enqueue_message(queue, tail, leader, i, 4, 0, prev_index, prev_term, entry);
             }
         }
         i = i + 1;
     }
-    
+
     // Update commit index based on majority replication
     let mut new_commit: i32 = commit_indices[leader as usize];
     let mut j: i32 = commit_indices[leader as usize] + 1;
@@ -421,8 +562,8 @@ fn simulate_log_replication(leader: i32, logs: &mut [[i32; 50]; 100], log_sizes:
             }
             k = k + 1;
         }
-        
-        if replicated_count > node_count / 2 {
+
+        if (replicated_count > node_count / 2) {
             new_commit = j;
         }
         j = j + 1;
@@ -431,30 +572,41 @@ fn simulate_log_replication(leader: i32, logs: &mut [[i32; 50]; 100], log_sizes:
 }
 
 // Append new log entry
-fn append_log_entry(node: i32, entry: i32, logs: &mut [[i32; 50]; 100], log_sizes: &mut [i32; 100]) {
-    if log_sizes[node as usize] < 50 {
+fn append_log_entry(
+    node: i32,
+    entry: i32,
+    logs: &mut [[i32; 50]; 100],
+    log_sizes: &mut [i32; 100],
+) {
+    if (log_sizes[node as usize] < 50) {
         logs[node as usize][(log_sizes[node as usize]) as usize] = entry;
         log_sizes[node as usize] = log_sizes[node as usize] + 1;
     }
 }
 
 // Verify system consistency with complex scoring
-fn verify_system_consistency(states: &[i32; 100], terms: &[i32; 100], logs: &[[i32; 50]; 100],
-                            log_sizes: &[i32; 100], commit_indices: &[i32; 100], node_count: i32) -> i32 {
+fn verify_system_consistency(
+    states: &[i32; 100],
+    terms: &[i32; 100],
+    logs: &[[i32; 50]; 100],
+    log_sizes: &[i32; 100],
+    commit_indices: &[i32; 100],
+    node_count: i32,
+) -> i32 {
     let mut consistency_score: i32 = 100;
-    
+
     // Check for split leadership
     let mut leader_count: i32 = 0;
     let mut max_term: i32 = -1;
     let mut i: i32 = 0;
-    
+
     while (i < node_count) {
         if (terms[i as usize] > max_term) {
             max_term = terms[i as usize];
         }
         i = i + 1;
     }
-    
+
     i = 0;
     while (i < node_count) {
         if (states[i as usize] == 2 && terms[i as usize] == max_term) {
@@ -462,25 +614,25 @@ fn verify_system_consistency(states: &[i32; 100], terms: &[i32; 100], logs: &[[i
         }
         i = i + 1;
     }
-    
-    if leader_count > 1 {
+
+    if (leader_count > 1) {
         consistency_score = consistency_score - 30; // Split brain penalty
-    } else if leader_count == 0 {
+    } else if (leader_count == 0) {
         consistency_score = consistency_score - 20; // No leader penalty
     }
-    
+
     // Check log consistency among committed entries
     let mut log_inconsistencies: i32 = 0;
     i = 0;
     while (i < node_count) {
         let mut j: i32 = i + 1;
         while (j < node_count) {
-            let min_commit: i32 = if commit_indices[i as usize] < commit_indices[j as usize] {
+            let min_commit: i32 = if (commit_indices[i as usize] < commit_indices[j as usize]) {
                 commit_indices[i as usize]
             } else {
                 commit_indices[j as usize]
             };
-            
+
             let mut k: i32 = 0;
             while (k <= min_commit && k < 50) {
                 if (logs[i as usize][k as usize] != logs[j as usize][k as usize]) {
@@ -492,19 +644,23 @@ fn verify_system_consistency(states: &[i32; 100], terms: &[i32; 100], logs: &[[i
         }
         i = i + 1;
     }
-    
+
     consistency_score = consistency_score - log_inconsistencies * 2;
-    
-    if consistency_score < 0 {
+
+    if (consistency_score < 0) {
         consistency_score = 0;
     }
-    
+
     consistency_score
 }
 
 // Trigger recovery protocol for system inconsistencies
-fn trigger_recovery_protocol(states: &mut [i32; 100], terms: &mut [i32; 100],
-                            votes: &mut [i32; 100], node_count: i32) {
+fn trigger_recovery_protocol(
+    states: &mut [i32; 100],
+    terms: &[i32; 100],
+    votes: &mut [i32; 100],
+    node_count: i32,
+) {
     // Reset all nodes to follower state
     let mut i: i32 = 0;
     while (i < node_count) {
@@ -516,12 +672,17 @@ fn trigger_recovery_protocol(states: &mut [i32; 100], terms: &mut [i32; 100],
 }
 
 // Simulate Byzantine failures and network attacks
-fn simulate_byzantine_failures(states: &mut [i32; 100], partition: &mut [bool; 100],
-                              node_count: i32, round: i32) {
+fn simulate_byzantine_failures(
+    states: &mut [i32; 100],
+    partition: &mut [bool; 100],
+    node_count: i32,
+    round: i32,
+) {
     // Randomly corrupt some nodes
     let mut i: i32 = 0;
-    while i < node_count {
-        if (i * 19 + round * 5) % 97 == 0 { // ~1% Byzantine failure rate
+    while (i < node_count) {
+        if ((i * 19 + round * 5) % 97 == 0) {
+            // ~1% Byzantine failure rate
             states[i as usize] = 3; // Byzantine state (invalid)
             partition[i as usize] = true; // Isolate Byzantine nodes
         }
@@ -530,15 +691,19 @@ fn simulate_byzantine_failures(states: &mut [i32; 100], partition: &mut [bool; 1
 }
 
 // Compact logs for memory optimization
-fn compact_logs(logs: &mut [[i32; 50]; 100], log_sizes: &mut [i32; 100],
-               commit_indices: &[i32; 100], node_count: i32) {
+fn compact_logs(
+    logs: &mut [[i32; 50]; 100],
+    log_sizes: &mut [i32; 100],
+    commit_indices: &[i32; 100],
+    node_count: i32,
+) {
     let mut i: i32 = 0;
-    while i < node_count {
+    while (i < node_count) {
         let compact_until: i32 = commit_indices[i as usize] / 2; // Keep half of committed entries
-        if compact_until > 0 && compact_until < log_sizes[i as usize] {
+        if (compact_until > 0 && compact_until < log_sizes[i as usize]) {
             // Shift remaining entries
             let mut j: i32 = 0;
-            while j + compact_until < log_sizes[i as usize] {
+            while (j + compact_until < log_sizes[i as usize]) {
                 logs[i as usize][j as usize] = logs[i as usize][(j + compact_until) as usize];
                 j = j + 1;
             }
@@ -552,16 +717,16 @@ fn compact_logs(logs: &mut [[i32; 50]; 100], log_sizes: &mut [i32; 100],
 fn find_stable_leader(states: &[i32; 100], terms: &[i32; 100], node_count: i32) -> i32 {
     let mut max_term: i32 = -1;
     let mut stable_leader: i32 = -1;
-    
+
     let mut i: i32 = 0;
-    while i < node_count {
-        if states[i as usize] == 2 && terms[i as usize] > max_term {
+    while (i < node_count) {
+        if (states[i as usize] == 2 && terms[i as usize] > max_term) {
             max_term = terms[i as usize];
             stable_leader = i;
         }
         i = i + 1;
     }
-    
+
     stable_leader
 }
 
@@ -569,7 +734,7 @@ fn find_stable_leader(states: &[i32; 100], terms: &[i32; 100], node_count: i32) 
 fn count_total_committed_entries(commit_indices: &[i32; 100], node_count: i32) -> i32 {
     let mut total: i32 = 0;
     let mut i: i32 = 0;
-    while i < node_count {
+    while (i < node_count) {
         total = total + commit_indices[i as usize];
         i = i + 1;
     }
@@ -578,7 +743,7 @@ fn count_total_committed_entries(commit_indices: &[i32; 100], node_count: i32) -
 
 // Calculate network efficiency metrics
 fn calculate_network_efficiency(total_messages: i32, consensus_rounds: i32) -> i32 {
-    if consensus_rounds > 0 {
+    if (consensus_rounds > 0) {
         (total_messages * 100) / (consensus_rounds * 100) // Simplified efficiency metric
     } else {
         0
@@ -586,34 +751,46 @@ fn calculate_network_efficiency(total_messages: i32, consensus_rounds: i32) -> i
 }
 
 // Compute hash of system state for verification
-fn compute_system_state_hash(logs: &[[i32; 50]; 100], log_sizes: &[i32; 100],
-                            commit_indices: &[i32; 100], node_count: i32) -> i32 {
+fn compute_system_state_hash(
+    logs: &[[i32; 50]; 100],
+    log_sizes: &[i32; 100],
+    commit_indices: &[i32; 100],
+    node_count: i32,
+) -> i32 {
     let mut hash: i32 = 17;
     let mut i: i32 = 0;
-    
-    while i < node_count {
-        hash = hash * 31 + log_sizes[i as usize];
-        hash = hash * 31 + commit_indices[i as usize];
-        
+
+    while (i < node_count) {
+        hash = (hash * 31 + log_sizes[i as usize]) % 16777219;
+        hash = (hash * 31 + commit_indices[i as usize]) % 16777219;
+
         let mut j: i32 = 0;
-        while j < log_sizes[i as usize] && j < 50 {
-            hash = hash * 31 + logs[i as usize][j as usize];
+        while (j < log_sizes[i as usize] && j < 50) {
+            hash = (hash * 31 + logs[i as usize][j as usize]) % 16777219;
             j = j + 1;
         }
         i = i + 1;
     }
-    
-    if hash < 0 {
+
+    if (hash < 0) {
         hash = -hash;
     }
-    
+
     hash % 1000000 // Keep hash within reasonable range
 }
 
 // Enqueue message for inter-node communication
-fn enqueue_message(queue: &mut [[i32; 10]; 1000], tail: &mut i32,
-                  sender: i32, receiver: i32, msg_type: i32, term: i32,
-                  data1: i32, data2: i32, data3: i32) {
+fn enqueue_message(
+    queue: &mut [[i32; 10]; 1000],
+    tail: &mut i32,
+    sender: i32,
+    receiver: i32,
+    msg_type: i32,
+    term: i32,
+    data1: i32,
+    data2: i32,
+    data3: i32,
+) {
     queue[*tail as usize][0] = sender;
     queue[*tail as usize][1] = receiver;
     queue[*tail as usize][2] = msg_type;
@@ -624,6 +801,6 @@ fn enqueue_message(queue: &mut [[i32; 10]; 1000], tail: &mut i32,
     queue[*tail as usize][7] = 0; // Reserved
     queue[*tail as usize][8] = 0; // Reserved
     queue[*tail as usize][9] = 0; // Reserved
-    
+
     *tail = (*tail + 1) % 1000;
 }

@@ -22,7 +22,7 @@ Optimization of conditional branches for memory state checks.
 // - Loop-heavy logic for searching and coalescing memory blocks.
 // - Optimization of conditional branches for memory state checks.
 
-fn printInt(n: i32) {}
+fn printlnInt(n: i32) {}
 
 const HEAP_SIZE: i32 = 1024;
 const BLOCK_HEADER_SIZE: i32 = 2;
@@ -43,49 +43,49 @@ fn main() {
 
     p1 = my_malloc(&mut heap, &mut free_list_head, 100);
     if (p1 > 0) {
-        printInt(1001);
+        printlnInt(1001);
         fill_memory(&mut heap, p1, 100, 1);
     }
 
     p2 = my_malloc(&mut heap, &mut free_list_head, 200);
     if (p2 > 0) {
-        printInt(1002);
+        printlnInt(1002);
         fill_memory(&mut heap, p2, 200, 2);
     }
 
     p3 = my_malloc(&mut heap, &mut free_list_head, 150);
     if (p3 > 0) {
-        printInt(1003);
+        printlnInt(1003);
         fill_memory(&mut heap, p3, 150, 3);
     }
 
     my_free(&mut heap, &mut free_list_head, p2);
-    printInt(1004);
+    printlnInt(1004);
 
     p4 = my_malloc(&mut heap, &mut free_list_head, 50);
     if (p4 > 0) {
-        printInt(1005);
+        printlnInt(1005);
         fill_memory(&mut heap, p4, 50, 4);
     }
 
     p5 = my_malloc(&mut heap, &mut free_list_head, 250);
     if (p5 < 0) {
-        printInt(1006);
+        printlnInt(1006);
     }
 
     my_free(&mut heap, &mut free_list_head, p1);
     my_free(&mut heap, &mut free_list_head, p3);
     my_free(&mut heap, &mut free_list_head, p4);
-    printInt(1007);
+    printlnInt(1007);
 
     p1 = my_malloc(&mut heap, &mut free_list_head, 800);
     if (p1 > 0) {
-        printInt(1008);
+        printlnInt(1008);
         fill_memory(&mut heap, p1, 800, 5);
     }
 
     verify_memory(&mut heap, p1, 800, 5);
-    printInt(9999);
+    printlnInt(9999);
 }
 
 fn init_heap(heap: &mut [i32; HEAP_SIZE], free_list_head: &mut i32) {
@@ -201,7 +201,7 @@ fn verify_memory(heap: &[i32; HEAP_SIZE], start: i32, size: i32, value: i32) {
         i = i + 1;
     }
     if (errors > 0) {
-        printInt(-999);
+        printlnInt(-999);
     }
 }
 
@@ -249,7 +249,7 @@ fn complex_memory_churn(heap: &mut [i32; HEAP_SIZE], free_list_head: &mut i32) {
 
     let final_alloc: i32 = my_malloc(heap, free_list_head, HEAP_SIZE - 100);
     if (final_alloc > 0) {
-        printInt(8888);
+        printlnInt(8888);
     }
 }
 
@@ -281,7 +281,7 @@ fn another_level_of_scope() {
             if (i == 5) {
                 let mut another_block_var: i32 = 5;
                 another_block_var = another_block_var + loop_var;
-                printInt(another_block_var);
+                printlnInt(another_block_var);
             }
             i = i + 1;
         }
@@ -331,9 +331,9 @@ fn another_level_of_scope() {
 
     let final_check: i32 = my_malloc(&mut heap, &mut free_list_head, HEAP_SIZE - 50);
     if (final_check > 0) {
-        printInt(7777);
+        printlnInt(7777);
     } else {
-        printInt(-7777);
+        printlnInt(-7777);
     }
 
     {
@@ -341,9 +341,9 @@ fn another_level_of_scope() {
         if (shadow_var > 5) {
             let mut shadow_var: i32 = 20;
             shadow_var = shadow_var + 1;
-            printInt(shadow_var);
+            printlnInt(shadow_var);
         }
-        printInt(shadow_var);
+        printlnInt(shadow_var);
     }
 
     let mut error_ptr: i32 = 0;

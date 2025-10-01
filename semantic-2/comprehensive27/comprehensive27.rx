@@ -31,29 +31,29 @@ Function call overhead optimization for frequently called utility functions
 fn main() {
     // Initialize a comprehensive cache system simulation
     // This simulates a 3-level cache hierarchy with LRU replacement policy
-    printInt(42); // Expected output marker
+    printlnInt(42); // Expected output marker
     
     // Test the cache system with various access patterns
     let cache_performance: i32 = run_cache_simulation();
-    printInt(cache_performance);
+    printlnInt(cache_performance);
     
     // Test memory management algorithms
     let memory_efficiency: i32 = run_memory_manager();
-    printInt(memory_efficiency);
+    printlnInt(memory_efficiency);
     
     // Test hash table operations with collision resolution
     let hash_operations: i32 = run_hash_table_tests();
-    printInt(hash_operations);
+    printlnInt(hash_operations);
     
     // Test priority queue operations for cache replacement
     let priority_queue_ops: i32 = run_priority_queue_tests();
-    printInt(priority_queue_ops);
+    printlnInt(priority_queue_ops);
     
     // Run comprehensive system integration test
     let integration_result: i32 = run_integrated_system_test();
-    printInt(integration_result);
+    printlnInt(integration_result);
     
-    printInt(99); // End marker
+    printlnInt(99); // End marker
 }
 
 // Cache system constants

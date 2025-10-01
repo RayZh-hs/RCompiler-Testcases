@@ -56,30 +56,30 @@ fn main() {
 fn testMemoryAccessPatterns() {
     printlnInt(1501); // Start memory access test
 
-    let large_array: [i32; 4096] = [0; 4096];
-    initializeLargeArray(large_array);
+    let mut large_array: [i32; 4096] = [0; 4096];
+    initializeLargeArray(&mut large_array);
 
     // Test sequential access pattern
-    let sequential_sum: i32 = sequentialAccess(large_array);
+    let sequential_sum: i32 = sequentialAccess(&mut large_array);
     printlnInt(sequential_sum);
 
     // Test strided access pattern
-    let strided_sum: i32 = stridedAccess(large_array, 8);
+    let strided_sum: i32 = stridedAccess(&mut large_array, 8);
     printlnInt(strided_sum);
 
     // Test random access pattern
-    let random_sum: i32 = randomAccess(large_array);
+    let random_sum: i32 = randomAccess(&mut large_array);
     printlnInt(random_sum);
 
     // Test backward access pattern
-    let backward_sum: i32 = backwardAccess(large_array);
+    let backward_sum: i32 = backwardAccess(&mut large_array);
     printlnInt(backward_sum);
 
     printlnInt(1502); // End memory access test
 }
 
 // Initialize large array with pattern
-fn initializeLargeArray(mut arr: [i32; 4096]) {
+fn initializeLargeArray(arr: &mut [i32; 4096]) {
     let mut i: i32 = 0;
     let mut seed: i32 = 98765;
 
@@ -94,7 +94,7 @@ fn initializeLargeArray(mut arr: [i32; 4096]) {
 }
 
 // Sequential memory access pattern
-fn sequentialAccess(arr: [i32; 4096]) -> i32 {
+fn sequentialAccess(arr: &mut [i32; 4096]) -> i32 {
     let mut sum: i32 = 0;
     let mut i: i32 = 0;
 
@@ -108,7 +108,7 @@ fn sequentialAccess(arr: [i32; 4096]) -> i32 {
 }
 
 // Strided memory access pattern
-fn stridedAccess(arr: [i32; 4096], stride: i32) -> i32 {
+fn stridedAccess(arr: &mut [i32; 4096], stride: i32) -> i32 {
     let mut sum: i32 = 0;
     let mut i: i32 = 0;
 
@@ -122,7 +122,7 @@ fn stridedAccess(arr: [i32; 4096], stride: i32) -> i32 {
 }
 
 // Random memory access pattern
-fn randomAccess(arr: [i32; 4096]) -> i32 {
+fn randomAccess(arr: &mut [i32; 4096]) -> i32 {
     let mut sum: i32 = 0;
     let mut seed: i32 = 54321;
     let mut iteration: i32 = 0;
@@ -142,7 +142,7 @@ fn randomAccess(arr: [i32; 4096]) -> i32 {
 }
 
 // Backward memory access pattern
-fn backwardAccess(arr: [i32; 4096]) -> i32 {
+fn backwardAccess(arr: &mut [i32; 4096]) -> i32 {
     let mut sum: i32 = 0;
     let mut i: i32 = 4095;
 
@@ -159,30 +159,30 @@ fn backwardAccess(arr: [i32; 4096]) -> i32 {
 fn testMultiDimensionalArrayAccess() {
     printlnInt(1503); // Start multi-dimensional test
 
-    let matrix: [i32; 1024] = [0; 1024]; // 32x32 matrix
-    initializeMatrix32x32(matrix);
+    let mut matrix: [i32; 1024] = [0; 1024]; // 32x32 matrix
+    initializeMatrix32x32(&mut matrix);
 
     // Test row-major access pattern
-    let row_major_sum: i32 = rowMajorAccess(matrix);
+    let row_major_sum: i32 = rowMajorAccess(&matrix);
     printlnInt(row_major_sum);
 
     // Test column-major access pattern
-    let column_major_sum: i32 = columnMajorAccess(matrix);
+    let column_major_sum: i32 = columnMajorAccess(&matrix);
     printlnInt(column_major_sum);
 
     // Test diagonal access pattern
-    let diagonal_sum: i32 = diagonalAccess(matrix);
+    let diagonal_sum: i32 = diagonalAccess(&matrix);
     printlnInt(diagonal_sum);
 
     // Test block access pattern
-    let block_sum: i32 = blockAccess(matrix);
+    let block_sum: i32 = blockAccess(&matrix);
     printlnInt(block_sum);
 
     printlnInt(1504); // End multi-dimensional test
 }
 
 // Initialize 32x32 matrix
-fn initializeMatrix32x32(mut matrix: [i32; 1024]) {
+fn initializeMatrix32x32(matrix: &mut [i32; 1024]) {
     let mut i: i32 = 0;
     while (i < 32) {
         let mut j: i32 = 0;
@@ -195,7 +195,7 @@ fn initializeMatrix32x32(mut matrix: [i32; 1024]) {
 }
 
 // Row-major access pattern (cache friendly)
-fn rowMajorAccess(matrix: [i32; 1024]) -> i32 {
+fn rowMajorAccess(matrix: &[i32; 1024]) -> i32 {
     let mut sum: i32 = 0;
     let mut i: i32 = 0;
 
@@ -212,7 +212,7 @@ fn rowMajorAccess(matrix: [i32; 1024]) -> i32 {
 }
 
 // Column-major access pattern (cache unfriendly)
-fn columnMajorAccess(matrix: [i32; 1024]) -> i32 {
+fn columnMajorAccess(matrix: &[i32; 1024]) -> i32 {
     let mut sum: i32 = 0;
     let mut j: i32 = 0;
 
@@ -229,7 +229,7 @@ fn columnMajorAccess(matrix: [i32; 1024]) -> i32 {
 }
 
 // Diagonal access pattern
-fn diagonalAccess(matrix: [i32; 1024]) -> i32 {
+fn diagonalAccess(matrix: &[i32; 1024]) -> i32 {
     let mut sum: i32 = 0;
     let mut i: i32 = 0;
 
@@ -250,7 +250,7 @@ fn diagonalAccess(matrix: [i32; 1024]) -> i32 {
 }
 
 // Block access pattern (cache-conscious)
-fn blockAccess(matrix: [i32; 1024]) -> i32 {
+fn blockAccess(matrix: &[i32; 1024]) -> i32 {
     let mut sum: i32 = 0;
     let block_size: i32 = 8;
     let mut block_i: i32 = 0;
@@ -420,34 +420,34 @@ fn testHybridDataLayout() -> i32 {
 fn testMemoryStridePatterns() {
     printlnInt(1507); // Start stride pattern test
 
-    let test_array: [i32; 2048] = [0; 2048];
-    initializeStrideTestArray(test_array);
+    let mut test_array: [i32; 2048] = [0; 2048];
+    initializeStrideTestArray(&mut test_array);
 
     // Test different stride patterns
-    let stride_1_sum: i32 = processWithStride(test_array, 1);
+    let stride_1_sum: i32 = processWithStride(&test_array, 1);
     printlnInt(stride_1_sum);
 
-    let stride_2_sum: i32 = processWithStride(test_array, 2);
+    let stride_2_sum: i32 = processWithStride(&test_array, 2);
     printlnInt(stride_2_sum);
 
-    let stride_4_sum: i32 = processWithStride(test_array, 4);
+    let stride_4_sum: i32 = processWithStride(&test_array, 4);
     printlnInt(stride_4_sum);
 
-    let stride_8_sum: i32 = processWithStride(test_array, 8);
+    let stride_8_sum: i32 = processWithStride(&test_array, 8);
     printlnInt(stride_8_sum);
 
-    let stride_16_sum: i32 = processWithStride(test_array, 16);
+    let stride_16_sum: i32 = processWithStride(&test_array, 16);
     printlnInt(stride_16_sum);
 
     // Test complex stride patterns
-    let complex_stride_sum: i32 = processWithComplexStride(test_array);
+    let complex_stride_sum: i32 = processWithComplexStride(&test_array);
     printlnInt(complex_stride_sum);
 
     printlnInt(1508); // End stride pattern test
 }
 
 // Initialize array for stride testing
-fn initializeStrideTestArray(mut arr: [i32; 2048]) {
+fn initializeStrideTestArray(arr: &mut [i32; 2048]) {
     let mut i: i32 = 0;
     while (i < 2048) {
         arr[i as usize] = (i % 100) + 1;
@@ -456,7 +456,7 @@ fn initializeStrideTestArray(mut arr: [i32; 2048]) {
 }
 
 // Process array with given stride
-fn processWithStride(arr: [i32; 2048], stride: i32) -> i32 {
+fn processWithStride(arr: &[i32; 2048], stride: i32) -> i32 {
     let mut sum: i32 = 0;
     let mut i: i32 = 0;
 
@@ -469,7 +469,7 @@ fn processWithStride(arr: [i32; 2048], stride: i32) -> i32 {
 }
 
 // Process array with complex stride pattern
-fn processWithComplexStride(arr: [i32; 2048]) -> i32 {
+fn processWithComplexStride(arr: &[i32; 2048]) -> i32 {
     let mut sum: i32 = 0;
     let mut i: i32 = 0;
     let mut stride: i32 = 1;
@@ -530,7 +530,7 @@ fn cacheObliviousMatrixMultiplication() -> i32 {
     }
 
     // Perform blocked matrix multiplication
-    cacheObliviousMultiplyRecursive(matrix_a, matrix_b, matrix_c, 8, 0, 0, 0, 0, 0, 0);
+    cacheObliviousMultiplyRecursive(&matrix_a, &matrix_b, &mut matrix_c, 8, 0, 0, 0, 0, 0, 0);
 
     // Calculate sum
     let mut sum: i32 = 0;
@@ -545,9 +545,9 @@ fn cacheObliviousMatrixMultiplication() -> i32 {
 
 // Recursive cache-oblivious matrix multiplication
 fn cacheObliviousMultiplyRecursive(
-    a: [i32; 64],
-    b: [i32; 64],
-    mut c: [i32; 64],
+    a: &[i32; 64],
+    b: &[i32; 64],
+    c: &mut [i32; 64],
     size: i32,
     a_row: i32,
     a_col: i32,
@@ -597,17 +597,17 @@ fn cacheObliviousMultiplyRecursive(
 
 // Cache-conscious sorting algorithm
 fn cacheConsciousSort() -> i32 {
-    let test_data: [i32; 512] = [0; 512];
-    initializeSortTestData(test_data);
+    let mut test_data: [i32; 512] = [0; 512];
+    initializeSortTestData(&mut test_data);
 
     // Perform cache-conscious merge sort
-    let comparisons: i32 = cacheConsciousMergeSort(test_data, 0, 511);
+    let comparisons: i32 = cacheConsciousMergeSort(&mut test_data, 0, 511);
 
     return comparisons;
 }
 
 // Initialize test data for sorting
-fn initializeSortTestData(mut arr: [i32; 512]) {
+fn initializeSortTestData(arr: &mut [i32; 512]) {
     let mut seed: i32 = 13579;
     let mut i: i32 = 0;
 
@@ -622,7 +622,7 @@ fn initializeSortTestData(mut arr: [i32; 512]) {
 }
 
 // Cache-conscious merge sort
-fn cacheConsciousMergeSort(arr: [i32; 512], left: i32, right: i32) -> i32 {
+fn cacheConsciousMergeSort(arr: &mut [i32; 512], left: i32, right: i32) -> i32 {
     if (left >= right) {
         return 0;
     }
@@ -643,7 +643,7 @@ fn cacheConsciousMergeSort(arr: [i32; 512], left: i32, right: i32) -> i32 {
 }
 
 // Insertion sort for small arrays
-fn insertionSort(mut arr: [i32; 512], left: i32, right: i32) -> i32 {
+fn insertionSort(arr: &mut [i32; 512], left: i32, right: i32) -> i32 {
     let mut comparisons: i32 = 0;
     let mut i: i32 = left + 1;
 
@@ -669,7 +669,7 @@ fn insertionSort(mut arr: [i32; 512], left: i32, right: i32) -> i32 {
 }
 
 // Cache-friendly merge operation
-fn cacheFriendlyMerge(mut arr: [i32; 512], left: i32, mid: i32, right: i32) -> i32 {
+fn cacheFriendlyMerge(arr: &mut [i32; 512], left: i32, mid: i32, right: i32) -> i32 {
     let left_size: i32 = mid - left + 1;
     let right_size: i32 = right - mid;
 
@@ -726,44 +726,44 @@ fn cacheFriendlyMerge(mut arr: [i32; 512], left: i32, mid: i32, right: i32) -> i
 
 // Cache-aware data processing
 fn cacheAwareDataProcessing() -> i32 {
-    let data_grid: [i32; 1024] = [0; 1024]; // 32x32 grid
-    initializeDataGrid(data_grid);
+    let mut data_grid: [i32; 1024] = [0; 1024]; // 32x32 grid
+    initializeDataGrid(&mut data_grid);
 
     // Process data in cache-friendly blocks
-    let result: i32 = processDataInBlocks(data_grid);
+    let result: i32 = processDataInBlocks(&mut data_grid);
 
     return result;
 }
 
 // Initialize data grid
-fn initializeDataGrid(mut grid: [i32; 1024]) {
-    let mut i: i32 = 0;
+fn initializeDataGrid(grid: &mut [i32; 1024]) {
+    let mut i: usize = 0;
     while (i < 1024) {
-        grid[i as usize] = (i % 50) + 1;
+        grid[i] = (i % 50) as i32 + 1;
         i = i + 1;
     }
 }
 
 // Process data in cache-friendly blocks
-fn processDataInBlocks(mut grid: [i32; 1024]) -> i32 {
+fn processDataInBlocks(grid: &mut [i32; 1024]) -> i32 {
     let mut total_sum: i32 = 0;
-    let block_size: i32 = 8;
-    let grid_size: i32 = 32;
+    let block_size: usize = 8;
+    let grid_size: usize = 32;
 
-    let mut block_row: i32 = 0;
+    let mut block_row: usize = 0;
     while (block_row < grid_size) {
-        let mut block_col: i32 = 0;
+        let mut block_col: usize = 0;
         while (block_col < grid_size) {
             // Process 8x8 block
-            let mut row: i32 = block_row;
-            let end_row: i32 = block_row + block_size;
+            let mut row: usize = block_row;
+            let end_row: usize = block_row + block_size;
             while (row < end_row && row < grid_size) {
-                let mut col: i32 = block_col;
-                let end_col: i32 = block_col + block_size;
+                let mut col: usize = block_col;
+                let end_col: usize = block_col + block_size;
                 while (col < end_col && col < grid_size) {
-                    let index: i32 = row * grid_size + col;
-                    grid[index as usize] = grid[index as usize] * 2 + 1;
-                    total_sum = total_sum + grid[index as usize];
+                    let index: usize = row * grid_size + col;
+                    grid[index] = grid[index] * 2 + 1;
+                    total_sum = total_sum + grid[index];
                     col = col + 1;
                 }
                 row = row + 1;
@@ -778,15 +778,15 @@ fn processDataInBlocks(mut grid: [i32; 1024]) -> i32 {
 
 // Temporal locality optimization
 fn temporalLocalityOptimization() -> i32 {
-    let working_set: [i32; 256] = [0; 256];
-    initializeWorkingSet(working_set);
+    let mut working_set: [i32; 256] = [0; 256];
+    initializeWorkingSet(&mut working_set);
 
     let mut total_operations: i32 = 0;
     let mut iteration: i32 = 0;
 
     // Perform multiple passes over the same data to exploit temporal locality
     while (iteration < 100) {
-        let pass_operations: i32 = processWorkingSet(working_set);
+        let pass_operations: i32 = processWorkingSet(&mut working_set);
         total_operations = total_operations + pass_operations;
         iteration = iteration + 1;
     }
@@ -795,7 +795,7 @@ fn temporalLocalityOptimization() -> i32 {
 }
 
 // Initialize working set
-fn initializeWorkingSet(mut working_set: [i32; 256]) {
+fn initializeWorkingSet(working_set: &mut [i32; 256]) {
     let mut i: i32 = 0;
     while (i < 256) {
         working_set[i as usize] = i + 1;
@@ -804,7 +804,7 @@ fn initializeWorkingSet(mut working_set: [i32; 256]) {
 }
 
 // Process working set (temporal locality friendly)
-fn processWorkingSet(mut working_set: [i32; 256]) -> i32 {
+fn processWorkingSet(working_set: &mut [i32; 256]) -> i32 {
     let mut operations: i32 = 0;
     let mut i: i32 = 0;
 

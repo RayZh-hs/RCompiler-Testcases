@@ -29,48 +29,48 @@ struct StringProcessor {
     // Primary text data
     text: [i32; 5000],
     text_length: i32,
-    
+
     // Pattern matching data
     patterns: [[i32; 200]; 50],
     pattern_lengths: [i32; 50],
     pattern_count: i32,
-    
+
     // Suffix array and related structures
     suffix_array: [i32; 5000],
     lcp_array: [i32; 5000],
     rank_array: [i32; 5000],
-    
+
     // KMP preprocessing
     lps: [i32; 200],
-    
+
     // Boyer-Moore preprocessing
     bad_char: [i32; 256],
     good_suffix: [i32; 200],
-    
+
     // Rabin-Karp hashing
     pattern_hash: [i32; 50],
     text_hash: [i32; 5000],
     base: i32,
     mod_value: i32,
-    
+
     // Edit distance matrix
     dp_matrix: [[i32; 500]; 500],
-    
+
     // Huffman coding structures
     char_frequency: [i32; 256],
     huffman_codes: [[i32; 20]; 256],
     code_lengths: [i32; 256],
-    
+
     // Text statistics
     word_count: i32,
     sentence_count: i32,
     paragraph_count: i32,
     unique_chars: i32,
-    
+
     // Search results
     match_positions: [[i32; 100]; 50],
     match_counts: [i32; 50],
-    
+
     // Performance metrics
     algorithm_times: [i32; 10],
     comparison_count: i32,
@@ -94,7 +94,7 @@ impl StringProcessor {
             pattern_hash: [0; 50],
             text_hash: [0; 5000],
             base: 256,
-            mod_value: 1000000007,
+            mod_value: 10007,
             dp_matrix: [[0; 500]; 500],
             char_frequency: [0; 256],
             huffman_codes: [[0; 20]; 256],
@@ -110,58 +110,58 @@ impl StringProcessor {
             hash_collisions: 0,
         }
     }
-    
+
     // Initialize text data from input
     fn initialize_text(&mut self, length: i32) {
         self.text_length = length;
         let mut i: i32 = 0;
         while (i < length) {
-            self.text[i as usize] = readInt();
+            self.text[i as usize] = getInt();
             i += 1;
         }
-        
+
         self.analyze_text_statistics();
         self.build_suffix_array();
         self.compute_lcp_array();
         self.prepare_rabin_karp_hashes();
     }
-    
+
     // Add patterns for matching
     fn add_pattern(&mut self, length: i32) {
         if (self.pattern_count >= 50) {
             return;
         }
-        
+
         let pattern_index: i32 = self.pattern_count;
         self.pattern_lengths[pattern_index as usize] = length;
-        
+
         let mut i: i32 = 0;
         while (i < length) {
-            self.patterns[pattern_index as usize][i as usize] = readInt();
+            self.patterns[pattern_index as usize][i as usize] = getInt();
             i += 1;
         }
-        
+
         self.preprocess_kmp(pattern_index);
         self.preprocess_boyer_moore(pattern_index);
         self.compute_pattern_hash(pattern_index);
-        
+
         self.pattern_count += 1;
     }
-    
+
     // Analyze basic text statistics
     fn analyze_text_statistics(&mut self) {
         self.word_count = 0;
         self.sentence_count = 0;
         self.paragraph_count = 0;
         self.unique_chars = 0;
-        
+
         // Clear frequency array
         let mut i: i32 = 0;
         while (i < 256) {
             self.char_frequency[i as usize] = 0;
             i += 1;
         }
-        
+
         // Count character frequencies and basic statistics
         i = 0;
         while (i < self.text_length) {
@@ -169,25 +169,25 @@ impl StringProcessor {
             if (ch >= 0 && ch < 256) {
                 self.char_frequency[ch as usize] += 1;
             }
-            
+
             // Simple word boundary detection (space = 32)
             if (ch == 32 && i > 0 && self.text[(i - 1) as usize] != 32) {
                 self.word_count += 1;
             }
-            
+
             // Sentence boundary detection (period = 46, exclamation = 33, question = 63)
             if (ch == 46 || ch == 33 || ch == 63) {
                 self.sentence_count += 1;
             }
-            
+
             // Paragraph boundary detection (newline = 10)
             if (ch == 10) {
                 self.paragraph_count += 1;
             }
-            
+
             i += 1;
         }
-        
+
         // Count unique characters
         i = 0;
         while (i < 256) {
@@ -196,13 +196,13 @@ impl StringProcessor {
             }
             i += 1;
         }
-        
+
         // Final word count adjustment
         if (self.text_length > 0 && self.text[(self.text_length - 1) as usize] != 32) {
             self.word_count += 1;
         }
     }
-    
+
     // Build suffix array using simple O(n^2 log n) algorithm
     fn build_suffix_array(&mut self) {
         // Initialize suffix array with indices
@@ -211,14 +211,18 @@ impl StringProcessor {
             self.suffix_array[i as usize] = i;
             i += 1;
         }
-        
+
         // Sort suffixes using bubble sort (simplified for this implementation)
         let mut sorted: bool = false;
         while (!sorted) {
             sorted = true;
             i = 0;
             while (i < self.text_length - 1) {
-                if (self.compare_suffixes(self.suffix_array[i as usize], self.suffix_array[(i + 1) as usize]) > 0) {
+                if (self.compare_suffixes(
+                    self.suffix_array[i as usize],
+                    self.suffix_array[(i + 1) as usize],
+                ) > 0)
+                {
                     let temp = self.suffix_array[i as usize];
                     self.suffix_array[i as usize] = self.suffix_array[(i + 1) as usize];
                     self.suffix_array[(i + 1) as usize] = temp;
@@ -227,7 +231,7 @@ impl StringProcessor {
                 i += 1;
             }
         }
-        
+
         // Build rank array
         i = 0;
         while (i < self.text_length) {
@@ -235,7 +239,7 @@ impl StringProcessor {
             i += 1;
         }
     }
-    
+
     // Compare two suffixes lexicographically
     fn compare_suffixes(&mut self, i: i32, j: i32) -> i32 {
         let mut k: i32 = 0;
@@ -248,7 +252,7 @@ impl StringProcessor {
             }
             k += 1;
         }
-        
+
         if (i + k >= self.text_length && j + k >= self.text_length) {
             return 0;
         } else if (i + k >= self.text_length) {
@@ -257,47 +261,50 @@ impl StringProcessor {
             return 1;
         }
     }
-    
+
     // Compute LCP (Longest Common Prefix) array
     fn compute_lcp_array(&mut self) {
         let mut k: i32 = 0;
         let mut i: i32 = 0;
-        
+
         while (i < self.text_length) {
             if (self.rank_array[i as usize] == self.text_length - 1) {
                 k = 0;
                 i += 1;
                 continue;
             }
-            
+
             let j = self.suffix_array[(self.rank_array[i as usize] + 1) as usize];
-            
-            while (i + k < self.text_length && j + k < self.text_length && 
-                  self.text[(i + k) as usize] == self.text[(j + k) as usize]) {
+
+            while (i + k < self.text_length
+                && j + k < self.text_length
+                && self.text[(i + k) as usize] == self.text[(j + k) as usize])
+            {
                 k += 1;
             }
-            
+
             self.lcp_array[self.rank_array[i as usize] as usize] = k;
-            
+
             if (k > 0) {
                 k -= 1;
             }
-            
+
             i += 1;
         }
     }
-    
+
     // KMP preprocessing - compute LPS array
     fn preprocess_kmp(&mut self, pattern_index: i32) {
         let pattern_len: i32 = self.pattern_lengths[pattern_index as usize];
         let mut length: i32 = 0;
         let mut i: i32 = 1;
-        
+
         self.lps[0] = 0;
-        
+
         while (i < pattern_len) {
-            if (self.patterns[pattern_index as usize][i as usize] == 
-               self.patterns[pattern_index as usize][length as usize]) {
+            if (self.patterns[pattern_index as usize][i as usize]
+                == self.patterns[pattern_index as usize][length as usize])
+            {
                 length += 1;
                 self.lps[i as usize] = length;
                 i += 1;
@@ -311,18 +318,18 @@ impl StringProcessor {
             }
         }
     }
-    
+
     // Boyer-Moore preprocessing
     fn preprocess_boyer_moore(&mut self, pattern_index: i32) {
         let pattern_len: i32 = self.pattern_lengths[pattern_index as usize];
-        
+
         // Initialize bad character array
         let mut i: i32 = 0;
         while (i < 256) {
             self.bad_char[i as usize] = -1;
             i += 1;
         }
-        
+
         // Fill bad character array
         i = 0;
         while (i < pattern_len) {
@@ -332,7 +339,7 @@ impl StringProcessor {
             }
             i += 1;
         }
-        
+
         // Simplified good suffix preprocessing
         i = 0;
         while (i < pattern_len) {
@@ -340,69 +347,76 @@ impl StringProcessor {
             i += 1;
         }
     }
-    
+
     // Rabin-Karp hash computation
     fn compute_pattern_hash(&mut self, pattern_index: i32) {
         let pattern_len: i32 = self.pattern_lengths[pattern_index as usize];
         let mut hash_value: i32 = 0;
         let mut power: i32 = 1;
-        
+
         let mut i: i32 = 0;
         while (i < pattern_len) {
-            hash_value = (hash_value + (self.patterns[pattern_index as usize][i as usize] * power) % self.mod_value) % self.mod_value;
+            hash_value = (hash_value
+                + (self.patterns[pattern_index as usize][i as usize] * power) % self.mod_value)
+                % self.mod_value;
             if (i < pattern_len - 1) {
                 power = (power * self.base) % self.mod_value;
             }
             i += 1;
         }
-        
+
         self.pattern_hash[pattern_index as usize] = hash_value;
     }
-    
+
     // Prepare rolling hashes for text
     fn prepare_rabin_karp_hashes(&mut self) {
         if (self.text_length == 0) {
             return;
         }
-        
+
         // Compute hash for first window
         self.text_hash[0] = self.text[0] % self.mod_value;
-        
+
         let mut i: i32 = 1;
         while (i < self.text_length) {
-            self.text_hash[i as usize] = (self.text_hash[(i - 1) as usize] * self.base + self.text[i as usize]) % self.mod_value;
+            self.text_hash[i as usize] = (self.text_hash[(i - 1) as usize] % self.mod_value
+                * self.base % self.mod_value
+                + self.text[i as usize] % self.mod_value)
+                % self.mod_value;
             i += 1;
         }
     }
-    
+
     // KMP string matching
     fn kmp_search(&mut self, pattern_index: i32) {
         let pattern_len: i32 = self.pattern_lengths[pattern_index as usize];
         self.match_counts[pattern_index as usize] = 0;
-        
+
         if (pattern_len > self.text_length) {
             return;
         }
-        
+
         let mut i: i32 = 0; // index for text
         let mut j: i32 = 0; // index for pattern
-        
+
         while (i < self.text_length) {
             self.comparison_count += 1;
             if (self.patterns[pattern_index as usize][j as usize] == self.text[i as usize]) {
                 i += 1;
                 j += 1;
             }
-            
+
             if (j == pattern_len) {
                 // Found a match
                 if (self.match_counts[pattern_index as usize] < 100) {
-                    self.match_positions[pattern_index as usize][self.match_counts[pattern_index as usize] as usize] = i - j;
+                    self.match_positions[pattern_index as usize]
+                        [self.match_counts[pattern_index as usize] as usize] = i - j;
                 }
                 self.match_counts[pattern_index as usize] += 1;
                 j = self.lps[(j - 1) as usize];
-            } else if (i < self.text_length && 
-                      self.patterns[pattern_index as usize][j as usize] != self.text[i as usize]) {
+            } else if (i < self.text_length
+                && self.patterns[pattern_index as usize][j as usize] != self.text[i as usize])
+            {
                 if (j != 0) {
                     j = self.lps[(j - 1) as usize];
                 } else {
@@ -411,64 +425,77 @@ impl StringProcessor {
             }
         }
     }
-    
+
     // Boyer-Moore string matching
     fn boyer_moore_search(&mut self, pattern_index: i32) {
         let pattern_len: i32 = self.pattern_lengths[pattern_index as usize];
         let mut matches_found: i32 = 0;
-        
+
         if (pattern_len > self.text_length) {
             return;
         }
-        
+
         let mut shift: i32 = 0;
         while (shift <= self.text_length - pattern_len) {
             let mut j: i32 = pattern_len - 1;
-            
+
             // Check pattern from right to left
-            while (j >= 0 && self.patterns[pattern_index as usize][j as usize] == self.text[(shift + j) as usize]) {
+            while (j >= 0
+                && self.patterns[pattern_index as usize][j as usize]
+                    == self.text[(shift + j) as usize])
+            {
                 j -= 1;
                 self.comparison_count += 1;
             }
-            
+
             if (j < 0) {
                 // Found a match
                 matches_found += 1;
-                shift += if (shift + pattern_len < self.text_length) { pattern_len } else { 1 };
+                shift += if (shift + pattern_len < self.text_length) {
+                    pattern_len
+                } else {
+                    1
+                };
             } else {
                 // Calculate shift using bad character rule
-                let bad_char_shift: i32 = j - self.bad_char[self.text[(shift + j) as usize] as usize];
-                shift += if (bad_char_shift > 1) { bad_char_shift } else { 1 };
+                let bad_char_shift: i32 =
+                    j - self.bad_char[self.text[(shift + j) as usize] as usize];
+                shift += if (bad_char_shift > 1) {
+                    bad_char_shift
+                } else {
+                    1
+                };
                 self.comparison_count += 1;
             }
         }
-        
+
         // Store additional matches found by Boyer-Moore
         self.algorithm_times[1] = matches_found;
     }
-    
+
     // Rabin-Karp string matching with rolling hash
     fn rabin_karp_search(&mut self, pattern_index: i32) {
         let pattern_len: i32 = self.pattern_lengths[pattern_index as usize];
         let pattern_hash: i32 = self.pattern_hash[pattern_index as usize];
         let mut matches_found: i32 = 0;
-        
+
         if (pattern_len > self.text_length) {
             return;
         }
-        
+
         // Calculate hash for first window
         let mut window_hash: i32 = 0;
         let mut power: i32 = 1;
         let mut i: i32 = 0;
         while (i < pattern_len) {
-            window_hash = (window_hash + (self.text[i as usize] * power) % self.mod_value) % self.mod_value;
+            window_hash =
+                (window_hash + (self.text[i as usize] * power) % self.mod_value) % self.mod_value;
             if (i < pattern_len - 1) {
                 power = (power * self.base) % self.mod_value;
             }
             i += 1;
         }
-        
+
         // Check first window
         if (window_hash == pattern_hash) {
             if (self.verify_match(0, pattern_index)) {
@@ -477,14 +504,17 @@ impl StringProcessor {
                 self.hash_collisions += 1;
             }
         }
-        
+
         // Roll the hash for remaining windows
         i = pattern_len;
         while (i < self.text_length) {
             // Remove leading character and add trailing character
-            window_hash = (window_hash - (self.text[(i - pattern_len) as usize] * power) % self.mod_value + self.mod_value) % self.mod_value;
+            window_hash = (window_hash
+                - (self.text[(i - pattern_len) as usize] * power) % self.mod_value
+                + self.mod_value)
+                % self.mod_value;
             window_hash = (window_hash * self.base + self.text[i as usize]) % self.mod_value;
-            
+
             if (window_hash == pattern_hash) {
                 if (self.verify_match(i - pattern_len + 1, pattern_index)) {
                     matches_found += 1;
@@ -494,83 +524,95 @@ impl StringProcessor {
             }
             i += 1;
         }
-        
+
         self.algorithm_times[2] = matches_found;
     }
-    
+
     // Verify potential match found by hash
     fn verify_match(&mut self, text_pos: i32, pattern_index: i32) -> bool {
         let pattern_len: i32 = self.pattern_lengths[pattern_index as usize];
         let mut i: i32 = 0;
         while (i < pattern_len) {
             self.comparison_count += 1;
-            if (self.text[(text_pos + i) as usize] != self.patterns[pattern_index as usize][i as usize]) {
+            if (self.text[(text_pos + i) as usize]
+                != self.patterns[pattern_index as usize][i as usize])
+            {
                 return false;
             }
             i += 1;
         }
         return true;
     }
-    
+
     // Edit distance computation using dynamic programming
     fn compute_edit_distance(&mut self, str1_len: i32, str2_len: i32) -> i32 {
         // Read the two strings
         let mut str1: [i32; 500] = [0; 500];
         let mut str2: [i32; 500] = [0; 500];
-        
+
         let mut i: i32 = 0;
         while (i < str1_len) {
-            str1[i as usize] = readInt();
+            str1[i as usize] = getInt();
             i += 1;
         }
-        
+
         i = 0;
         while (i < str2_len) {
-            str2[i as usize] = readInt();
+            str2[i as usize] = getInt();
             i += 1;
         }
-        
+
         // Initialize DP matrix
         i = 0;
         while (i <= str1_len) {
             self.dp_matrix[i as usize][0] = i;
             i += 1;
         }
-        
+
         let mut j = 0;
         while (j <= str2_len) {
             self.dp_matrix[0][j as usize] = j;
             j += 1;
         }
-        
+
         // Fill DP matrix
         i = 1;
         while (i <= str1_len) {
             j = 1;
             while (j <= str2_len) {
                 if (str1[(i - 1) as usize] == str2[(j - 1) as usize]) {
-                    self.dp_matrix[i as usize][j as usize] = self.dp_matrix[(i - 1) as usize][(j - 1) as usize];
+                    self.dp_matrix[i as usize][j as usize] =
+                        self.dp_matrix[(i - 1) as usize][(j - 1) as usize];
                 } else {
                     let insert_cost: i32 = self.dp_matrix[i as usize][(j - 1) as usize] + 1;
                     let delete_cost: i32 = self.dp_matrix[(i - 1) as usize][j as usize] + 1;
-                    let substitute_cost: i32 = self.dp_matrix[(i - 1) as usize][(j - 1) as usize] + 1;
-                    
+                    let substitute_cost: i32 =
+                        self.dp_matrix[(i - 1) as usize][(j - 1) as usize] + 1;
+
                     let min_cost: i32 = if (insert_cost < delete_cost) {
-                        if (insert_cost < substitute_cost) { insert_cost } else { substitute_cost }
+                        if (insert_cost < substitute_cost) {
+                            insert_cost
+                        } else {
+                            substitute_cost
+                        }
                     } else {
-                        if (delete_cost < substitute_cost) { delete_cost } else { substitute_cost }
+                        if (delete_cost < substitute_cost) {
+                            delete_cost
+                        } else {
+                            substitute_cost
+                        }
                     };
-                    
+
                     self.dp_matrix[i as usize][j as usize] = min_cost;
                 }
                 j += 1;
             }
             i += 1;
         }
-        
+
         return self.dp_matrix[str1_len as usize][str2_len as usize];
     }
-    
+
     // Simplified Huffman coding frequency analysis
     fn analyze_compression_potential(&mut self) -> i32 {
         // Calculate entropy based on character frequencies
@@ -580,7 +622,7 @@ impl StringProcessor {
             if (self.char_frequency[i as usize] > 0) {
                 let frequency: i32 = self.char_frequency[i as usize];
                 let probability: i32 = (frequency * 1000) / self.text_length; // Scale by 1000 for integer arithmetic
-                
+
                 // Simplified log calculation (approximation)
                 let mut log_approx: i32 = 0;
                 let mut temp: i32 = probability;
@@ -588,16 +630,16 @@ impl StringProcessor {
                     log_approx += 1;
                     temp /= 2;
                 }
-                
+
                 total_entropy += frequency * log_approx;
                 self.code_lengths[i as usize] = if log_approx > 0 { log_approx } else { 1 };
             }
             i += 1;
         }
-        
+
         return self.text_length * 8 - total_entropy; // Compression potential
     }
-    
+
     // Longest repeated substring using suffix array
     fn find_longest_repeated_substring(&self) -> i32 {
         let mut max_lcp: i32 = 0;
@@ -610,7 +652,7 @@ impl StringProcessor {
         }
         return max_lcp;
     }
-    
+
     // Complex text analysis combining multiple algorithms
     fn perform_comprehensive_analysis(&mut self) {
         // Perform all pattern matching algorithms
@@ -621,62 +663,66 @@ impl StringProcessor {
             self.rabin_karp_search(pattern_idx);
             pattern_idx += 1;
         }
-        
+
         // Compression analysis
         let compression_potential: i32 = self.analyze_compression_potential();
         self.algorithm_times[3] = compression_potential;
-        
+
         // Longest repeated substring
         let longest_repeat: i32 = self.find_longest_repeated_substring();
         self.algorithm_times[4] = longest_repeat;
-        
+
         // Additional text metrics
-        let avg_word_length: i32 = if (self.word_count > 0) { self.text_length / self.word_count } else { 0 };
+        let avg_word_length: i32 = if (self.word_count > 0) {
+            self.text_length / self.word_count
+        } else {
+            0
+        };
         let text_complexity: i32 = (self.unique_chars * 100) / 256;
-        
+
         self.algorithm_times[5] = avg_word_length;
         self.algorithm_times[6] = text_complexity;
     }
-    
+
     // Output comprehensive results
     fn output_results(&self) {
         // Text statistics
-        printInt(self.text_length);
-        printInt(self.word_count);
-        printInt(self.sentence_count);
-        printInt(self.paragraph_count);
-        printInt(self.unique_chars);
-        
+        printlnInt(self.text_length);
+        printlnInt(self.word_count);
+        printlnInt(self.sentence_count);
+        printlnInt(self.paragraph_count);
+        printlnInt(self.unique_chars);
+
         // Pattern matching results
         let mut i: i32 = 0;
         while (i < self.pattern_count) {
-            printInt(self.match_counts[i as usize]);
+            printlnInt(self.match_counts[i as usize]);
             i += 1;
         }
-        
+
         // Algorithm performance metrics
-        printInt(self.comparison_count);
-        printInt(self.hash_collisions);
-        
+        printlnInt(self.comparison_count);
+        printlnInt(self.hash_collisions);
+
         // Analysis results
         i = 0;
         while (i < 7) {
-            printInt(self.algorithm_times[i as usize]);
+            printlnInt(self.algorithm_times[i as usize]);
             i += 1;
         }
-        
+
         // Suffix array sample (first 10 entries)
         i = 0;
         while (i < 10 && i < self.text_length) {
-            printInt(self.suffix_array[i as usize]);
+            printlnInt(self.suffix_array[i as usize]);
             i += 1;
         }
-        
+
         // Final complexity score
         let pattern_complexity: i32 = self.comparison_count / (self.pattern_count + 1);
         let text_complexity: i32 = (self.unique_chars * self.word_count) / 100;
         let final_score: i32 = pattern_complexity + text_complexity + self.algorithm_times[3];
-        printInt(final_score);
+        printlnInt(final_score);
     }
 }
 
@@ -699,22 +745,22 @@ impl RegexMatcher {
             match_found: false,
         }
     }
-    
+
     fn compile_pattern(&mut self, length: i32) {
         self.pattern_length = length;
         let mut i: i32 = 0;
         while (i < length) {
-            self.pattern[i as usize] = readInt();
+            self.pattern[i as usize] = getInt();
             i += 1;
         }
-        
+
         // Build simple NFA (simplified for basic patterns)
         self.build_nfa();
     }
-    
+
     fn build_nfa(&mut self) {
         self.state_count = self.pattern_length + 1;
-        
+
         // Initialize NFA states
         let mut i: i32 = 0;
         while (i < self.state_count) {
@@ -725,7 +771,7 @@ impl RegexMatcher {
             }
             i += 1;
         }
-        
+
         // Build transitions for literal characters
         i = 0;
         while (i < self.pattern_length) {
@@ -736,45 +782,49 @@ impl RegexMatcher {
             i += 1;
         }
     }
-    
+
     fn match_text(&mut self, text: &[i32; 5000], text_length: i32) -> bool {
         let mut current_states: [bool; 100] = [false; 100];
         let mut next_states: [bool; 100] = [false; 100];
-        
+
         current_states[0] = true;
-        
+
         let mut i: i32 = 0;
         while (i < text_length) {
             let ch: i32 = text[i as usize];
-            
+
             // Clear next states
             let mut j: i32 = 0;
             while (j < 100) {
                 next_states[j as usize] = false;
                 j += 1;
             }
-            
+
             // Process transitions
             j = 0;
             while (j < self.state_count) {
                 if (current_states[j as usize]) {
-                    if (j < self.pattern_length && ch >= 0 && ch < 100 && self.nfa_states[j as usize][ch as usize]) {
+                    if (j < self.pattern_length
+                        && ch >= 0
+                        && ch < 100
+                        && self.nfa_states[j as usize][ch as usize])
+                    {
                         next_states[(j + 1) as usize] = true;
                     }
                 }
                 j += 1;
             }
-            
+
             // Swap states
             j = 0;
             while (j < 100) {
                 current_states[j as usize] = next_states[j as usize];
                 j += 1;
             }
-            
+
             i += 1;
         }
-        
+
         return current_states[self.pattern_length as usize];
     }
 }
@@ -782,44 +832,44 @@ impl RegexMatcher {
 fn main() {
     // Initialize string processor
     let mut processor: StringProcessor = StringProcessor::new();
-    
+
     // Read text
-    let text_length: i32 = readInt();
+    let text_length: i32 = getInt();
     processor.initialize_text(text_length);
-    
+
     // Read patterns
-    let pattern_count: i32 = readInt();
+    let pattern_count: i32 = getInt();
     let mut i: i32 = 0;
     while (i < pattern_count) {
-        let pattern_length: i32 = readInt();
+        let pattern_length: i32 = getInt();
         processor.add_pattern(pattern_length);
         i += 1;
     }
-    
+
     // Perform comprehensive string analysis
     processor.perform_comprehensive_analysis();
-    
+
     // Edit distance computation
-    let str1_len: i32 = readInt();
-    let str2_len: i32 = readInt();
+    let str1_len: i32 = getInt();
+    let str2_len: i32 = getInt();
     let edit_distance: i32 = processor.compute_edit_distance(str1_len, str2_len);
-    printInt(edit_distance);
-    
+    printlnInt(edit_distance);
+
     // Regular expression matching
     let mut regex_matcher: RegexMatcher = RegexMatcher::new();
-    let regex_pattern_length: i32 = readInt();
+    let regex_pattern_length: i32 = getInt();
     regex_matcher.compile_pattern(regex_pattern_length);
-    
+
     let regex_result: bool = regex_matcher.match_text(&processor.text, processor.text_length);
-    printInt(if (regex_result) { 1 } else { 0 });
-    
+    printlnInt(if (regex_result) { 1 } else { 0 });
+
     // Output all results
     processor.output_results();
-    
+
     // Advanced string transformations and analysis
-    let transformation_iterations: i32 = readInt();
+    let transformation_iterations: i32 = getInt();
     let mut total_transformations: i32 = 0;
-    
+
     i = 0;
     while (i < transformation_iterations) {
         // Apply character transformations
@@ -827,25 +877,59 @@ fn main() {
         let mut j: i32 = 0;
         while (j < processor.text_length) {
             let ch: i32 = processor.text[j as usize];
-            if (ch >= 65 && ch <= 90) { // Uppercase letters
+            if (ch >= 65 && ch <= 90) {
+                // Uppercase letters
                 processor.text[j as usize] = ((ch - 65 + shift) % 26) + 65;
-            } else if (ch >= 97 && ch <= 122) { // Lowercase letters
+            } else if (ch >= 97 && ch <= 122) {
+                // Lowercase letters
                 processor.text[j as usize] = ((ch - 97 + shift) % 26) + 97;
             }
             j += 1;
         }
-        
+
         // Reanalyze after transformation
         processor.analyze_text_statistics();
         total_transformations += processor.unique_chars;
-        
+
         i += 1;
     }
-    
-    printInt(total_transformations);
-    
+
+    printlnInt(total_transformations);
+
     // Final comprehensive metric
-    let final_complexity: i32 = (processor.comparison_count + total_transformations) * processor.unique_chars / 100;
-    printInt(final_complexity);
+    let final_complexity: i32 =
+        (processor.comparison_count + total_transformations) * processor.unique_chars / 100;
+    printlnInt(final_complexity);
     exit(0);
 }
+
+/*
+Sample stdin input (covers all getInt() reads in order):
+
+# text_length
+14
+# text bytes (ASCII): "a hello world."
+97 32 104 101 108 108 111 32 119 111 114 108 100 46
+
+# pattern_count
+2
+# pattern 1 length and bytes: "hello"
+5
+104 101 108 108 111
+# pattern 2 length and bytes: "world"
+5
+119 111 114 108 100
+
+# edit distance: str1_len, str2_len, then str1 bytes ("kitten"), str2 bytes ("sitting")
+6
+7
+107 105 116 116 101 110
+115 105 116 116 105 110 103
+
+# regex_pattern_length and pattern bytes (matches leading 'a')
+1
+97
+
+# transformation_iterations
+2
+*/

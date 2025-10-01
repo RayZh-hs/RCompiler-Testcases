@@ -124,5 +124,5 @@ fn main() {
         }
         y = y + 1;
     }
-    printInt(checksum);
+    printlnInt(checksum);
 }

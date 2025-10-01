@@ -151,6 +151,6 @@ fn main() {
     }
 
     // This line will cause a compile error because `fragmentation_metric` is out of scope.
-    printInt(fragmentation_metric);
-    printInt(final_check_sum);
+    printlnInt(fragmentation_metric);
+    printlnInt(final_check_sum);
 }

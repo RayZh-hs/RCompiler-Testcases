@@ -354,7 +354,7 @@ fn fetch_decode_execute() {
                 pc = pc + 2;
             } else if opcode == 26 { // PRINT_REG
                 let r_src: i32 = memory[pc as usize];
-                printInt(registers[r_src as usize]);
+                printlnInt(registers[r_src as usize]);
                 pc = pc + 1;
             } else {
                 // Invalid opcode
@@ -371,8 +371,8 @@ fn main() {
     
     // Final check to ensure halt worked
     if (halt) {
-        printInt(1337);
+        printlnInt(1337);
     } else {
-        printInt(9999);
+        printlnInt(9999);
     }
 }

@@ -145,7 +145,7 @@ fn main() {
             let a: i32 = stack[sp as usize];
             if (a > b) { stack[sp as usize] = 1; } else { stack[sp as usize] = 0; }
         } else if (instruction == 13) { // PRINT
-            printInt(stack[sp as usize]);
+            printlnInt(stack[sp as usize]);
         } else if (instruction == 14) { // HALT
             halt = true;
         } else if (instruction == 15) { // DUP

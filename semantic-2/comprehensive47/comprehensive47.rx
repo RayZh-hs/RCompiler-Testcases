@@ -167,5 +167,5 @@ fn main() {
         }
         i = i + 1;
     }
-    printInt(best_fitness);
+    printlnInt(best_fitness);
 }

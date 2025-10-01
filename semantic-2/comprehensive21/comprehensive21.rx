@@ -12,9 +12,9 @@ Comment: Comprehensive test of large-scale data processing and performance optim
 */
 
 // Constants for large-scale data processing
-const MAX_ARRAY_SIZE: i32 = 10000;
-const MATRIX_SIZE: i32 = 100;
-const HASH_SIZE: i32 = 1009;  // Large prime for hash table
+const MAX_ARRAY_SIZE: usize = 10000;
+const MATRIX_SIZE: usize = 100;
+const HASH_SIZE: usize = 1009;  // Large prime for hash table
 const MAX_ITERATIONS: i32 = 1000;
 const STATISTICAL_SAMPLES: i32 = 5000;
 const PERFORMANCE_RUNS: i32 = 10;
@@ -55,7 +55,7 @@ struct SortingResults {
 
 // Initialize large dataset with various patterns
 fn init_dataset_pattern(pattern: i32, size: i32) -> DataSet {
-    let mut dataset = DataSet {
+    let mut dataset: DataSet = DataSet {
         data: [0; MAX_ARRAY_SIZE],
         size: size,
         sorted: false,
@@ -65,13 +65,13 @@ fn init_dataset_pattern(pattern: i32, size: i32) -> DataSet {
         mean: 0,
     };
     
-    let mut i = 0;
+    let mut i: i32 = 0;
     while (i < size) {
         let value: i32;
         
         if (pattern == 0) {
             // Random-like pattern
-            value = (i * 1103515245 + 12345) % 100000;
+            value = (i * 11047 + 12345) % 100000;
         } else if (pattern == 1) {
             // Ascending pattern
             value = i * 3 + 7;
@@ -138,10 +138,10 @@ fn init_performance_counter() -> PerformanceCounter {
 fn bubble_sort(data: &mut [i32; MAX_ARRAY_SIZE], size: i32, counter: &mut PerformanceCounter) {
     counter.function_calls = counter.function_calls + 1;
     
-    let mut i = 0;
+    let mut i: i32 = 0;
     while (i < size - 1) {
-        let mut j = 0;
-        let mut swapped = false;
+        let mut j: i32 = 0;
+        let mut swapped: bool = false;
         
         while (j < size - i - 1) {
             counter.comparisons = counter.comparisons + 1;
@@ -149,7 +149,7 @@ fn bubble_sort(data: &mut [i32; MAX_ARRAY_SIZE], size: i32, counter: &mut Perfor
             
             if (data[j as usize] > data[j as usize + 1]) {
                 // Swap elements
-                let temp = data[j as usize];
+                let temp: i32 = data[j as usize];
                 data[j as usize] = data[j as usize + 1];
                 data[j as usize + 1] = temp;
                 
@@ -174,10 +174,10 @@ fn bubble_sort(data: &mut [i32; MAX_ARRAY_SIZE], size: i32, counter: &mut Perfor
 fn selection_sort(data: &mut [i32; MAX_ARRAY_SIZE], size: i32, counter: &mut PerformanceCounter) {
     counter.function_calls = counter.function_calls + 1;
     
-    let mut i = 0;
+    let mut i: i32 = 0;
     while (i < size - 1) {
-        let mut min_idx = i;
-        let mut j = i + 1;
+        let mut min_idx: i32 = i;
+        let mut j: i32 = i + 1;
         
         while (j < size) {
             counter.comparisons = counter.comparisons + 1;
@@ -190,7 +190,7 @@ fn selection_sort(data: &mut [i32; MAX_ARRAY_SIZE], size: i32, counter: &mut Per
         }
         
         if (min_idx != i) {
-            let temp = data[i as usize];
+            let temp: i32 = data[i as usize];
             data[i as usize] = data[min_idx as usize];
             data[min_idx as usize] = temp;
             
@@ -208,10 +208,10 @@ fn selection_sort(data: &mut [i32; MAX_ARRAY_SIZE], size: i32, counter: &mut Per
 fn insertion_sort(data: &mut [i32; MAX_ARRAY_SIZE], size: i32, counter: &mut PerformanceCounter) {
     counter.function_calls = counter.function_calls + 1;
     
-    let mut i = 1;
+    let mut i: i32 = 1;
     while (i < size) {
-        let key = data[i as usize];
-        let mut j = i - 1;
+        let key: i32 = data[i as usize];
+        let mut j: i32 = i - 1;
         
         counter.memory_accesses = counter.memory_accesses + 1;
         
@@ -234,12 +234,12 @@ fn insertion_sort(data: &mut [i32; MAX_ARRAY_SIZE], size: i32, counter: &mut Per
 
 // Quick sort partition function
 fn partition(data: &mut [i32; MAX_ARRAY_SIZE], low: i32, high: i32, counter: &mut PerformanceCounter) -> i32 {
-    let pivot = data[high as usize];
-    let mut i = low - 1;
+    let pivot: i32 = data[high as usize];
+    let mut i: i32 = low - 1;
     
     counter.memory_accesses = counter.memory_accesses + 1;
     
-    let mut j = low;
+    let mut j: i32 = low;
     while (j < high) {
         counter.comparisons = counter.comparisons + 1;
         counter.memory_accesses = counter.memory_accesses + 1;
@@ -247,7 +247,7 @@ fn partition(data: &mut [i32; MAX_ARRAY_SIZE], low: i32, high: i32, counter: &mu
         if (data[j as usize] <= pivot) {
             i = i + 1;
             
-            let temp = data[i as usize];
+            let temp: i32 = data[i as usize];
             data[i as usize] = data[j as usize];
             data[j as usize] = temp;
             
@@ -256,9 +256,8 @@ fn partition(data: &mut [i32; MAX_ARRAY_SIZE], low: i32, high: i32, counter: &mu
         }
         j = j + 1;
     }
-    
-    let temp = data[i as usize + 1];
-    data[i as usize + 1] = data[high as usize];
+    let temp: i32 = data[(i + 1) as usize];
+    data[(i + 1) as usize] = data[high as usize];
     data[high as usize] = temp;
     
     counter.swaps = counter.swaps + 1;
@@ -272,7 +271,7 @@ fn quick_sort_range(data: &mut [i32; MAX_ARRAY_SIZE], low: i32, high: i32, count
     counter.function_calls = counter.function_calls + 1;
     
     if (low < high) {
-        let pi = partition(data, low, high, counter);
+        let pi: i32 = partition(data, low, high, counter);
         
         quick_sort_range(data, low, pi - 1, counter);
         quick_sort_range(data, pi + 1, high, counter);
@@ -289,17 +288,17 @@ fn quick_sort(data: &mut [i32; MAX_ARRAY_SIZE], size: i32, counter: &mut Perform
 
 // Merge function for merge sort
 fn merge(data: &mut [i32; MAX_ARRAY_SIZE], left: i32, mid: i32, right: i32, counter: &mut PerformanceCounter) {
-    let n1 = mid - left + 1;
-    let n2 = right - mid;
+    let n1: i32 = mid - left + 1;
+    let n2: i32 = right - mid;
     
     // Create temporary arrays (simulated with different indices)
-    let mut i = 0;
-    let mut j = 0;
-    let mut k = left;
+    let mut i: i32 = 0;
+    let mut j: i32 = 0;
+    let mut k: i32 = left;
     
     // We'll use a different approach since we can't create dynamic arrays
     // Store left part in higher indices temporarily
-    let temp_start = MAX_ARRAY_SIZE - n1;
+    let temp_start: i32 = MAX_ARRAY_SIZE as i32 - n1;
     i = 0;
     while (i < n1) {
         data[(temp_start + i) as usize] = data[(left + i) as usize];
@@ -347,7 +346,7 @@ fn merge_sort_range(data: &mut [i32; MAX_ARRAY_SIZE], left: i32, right: i32, cou
     counter.function_calls = counter.function_calls + 1;
     
     if (left < right) {
-        let mid = left + (right - left) / 2;
+        let mid: i32 = left + (right - left) / 2;
         
         merge_sort_range(data, left, mid, counter);
         merge_sort_range(data, mid + 1, right, counter);
@@ -365,9 +364,9 @@ fn merge_sort(data: &mut [i32; MAX_ARRAY_SIZE], size: i32, counter: &mut Perform
 
 // Heap sort helper functions
 fn heapify(data: &mut [i32; MAX_ARRAY_SIZE], n: i32, i: i32, counter: &mut PerformanceCounter) {
-    let mut largest = i;
-    let left = 2 * i + 1;
-    let right = 2 * i + 2;
+    let mut largest: i32 = i;
+    let left: i32 = 2 * i + 1;
+    let right: i32 = 2 * i + 2;
     
     counter.memory_accesses = counter.memory_accesses + 1;
     
@@ -390,7 +389,7 @@ fn heapify(data: &mut [i32; MAX_ARRAY_SIZE], n: i32, i: i32, counter: &mut Perfo
     }
     
     if (largest != i) {
-        let temp = data[i as usize];
+        let temp: i32 = data[i as usize];
         data[i as usize] = data[largest as usize];
         data[largest as usize] = temp;
         
@@ -406,7 +405,7 @@ fn heap_sort(data: &mut [i32; MAX_ARRAY_SIZE], size: i32, counter: &mut Performa
     counter.function_calls = counter.function_calls + 1;
     
     // Build heap
-    let mut i = size / 2 - 1;
+    let mut i: i32 = size / 2 - 1;
     while (i >= 0) {
         heapify(data, size, i, counter);
         i = i - 1;
@@ -415,7 +414,7 @@ fn heap_sort(data: &mut [i32; MAX_ARRAY_SIZE], size: i32, counter: &mut Performa
     // Extract elements from heap
     i = size - 1;
     while (i > 0) {
-        let temp = data[0];
+        let temp: i32 = data[0];
         data[0] = data[i as usize];
         data[i as usize] = temp;
         
@@ -433,11 +432,11 @@ fn heap_sort(data: &mut [i32; MAX_ARRAY_SIZE], size: i32, counter: &mut Performa
 fn binary_search(data: &[i32; MAX_ARRAY_SIZE], size: i32, target: i32, counter: &mut PerformanceCounter) -> i32 {
     counter.function_calls = counter.function_calls + 1;
     
-    let mut left = 0;
-    let mut right = size - 1;
+    let mut left: i32 = 0;
+    let mut right: i32 = size - 1;
     
     while (left <= right) {
-        let mid = left + (right - left) / 2;
+        let mid: i32 = left + (right - left) / 2;
         
         counter.comparisons = counter.comparisons + 1;
         counter.memory_accesses = counter.memory_accesses + 1;
@@ -461,7 +460,7 @@ fn binary_search(data: &[i32; MAX_ARRAY_SIZE], size: i32, target: i32, counter: 
 fn linear_search(data: &[i32; MAX_ARRAY_SIZE], size: i32, target: i32, counter: &mut PerformanceCounter) -> i32 {
     counter.function_calls = counter.function_calls + 1;
     
-    let mut i = 0;
+    let mut i: i32 = 0;
     while (i < size) {
         counter.comparisons = counter.comparisons + 1;
         counter.memory_accesses = counter.memory_accesses + 1;
@@ -479,11 +478,11 @@ fn linear_search(data: &[i32; MAX_ARRAY_SIZE], size: i32, target: i32, counter: 
 
 // Statistical computation functions
 fn compute_variance(data: &[i32; MAX_ARRAY_SIZE], size: i32, mean: i32) -> i32 {
-    let mut sum_squared_diff = 0;
-    let mut i = 0;
+    let mut sum_squared_diff: i32 = 0;
+    let mut i: i32 = 0;
     
     while (i < size) {
-        let diff = data[i as usize] - mean;
+        let diff: i32 = data[i as usize] - mean;
         sum_squared_diff = sum_squared_diff + diff * diff;
         i = i + 1;
     }
@@ -493,7 +492,7 @@ fn compute_variance(data: &[i32; MAX_ARRAY_SIZE], size: i32, mean: i32) -> i32 {
 
 fn compute_median(data: &mut [i32; MAX_ARRAY_SIZE], size: i32) -> i32 {
     // First sort the data (using a simple method for median)
-    let mut counter = init_performance_counter();
+    let mut counter: PerformanceCounter = init_performance_counter();
     quick_sort(data, size, &mut counter);
     
     if (size % 2 == 0) {
@@ -505,15 +504,15 @@ fn compute_median(data: &mut [i32; MAX_ARRAY_SIZE], size: i32) -> i32 {
 
 // Matrix operations for numerical testing
 fn init_matrix(rows: i32, cols: i32, pattern: i32) -> Matrix {
-    let mut matrix = Matrix {
+    let mut matrix: Matrix = Matrix {
         data: [[0; MATRIX_SIZE]; MATRIX_SIZE],
         rows: rows,
         cols: cols,
     };
     
-    let mut i = 0;
+    let mut i: i32 = 0;
     while (i < rows) {
-        let mut j = 0;
+        let mut j: i32 = 0;
         while (j < cols) {
             if (pattern == 0) {
                 // Identity matrix
@@ -545,13 +544,13 @@ fn matrix_multiply(a: &Matrix, b: &Matrix, result: &mut Matrix) -> bool {
     result.rows = a.rows;
     result.cols = b.cols;
     
-    let mut i = 0;
+    let mut i: i32 = 0;
     while (i < a.rows) {
-        let mut j = 0;
+        let mut j: i32 = 0;
         while (j < b.cols) {
             result.data[i as usize][j as usize] = 0;
             
-            let mut k = 0;
+            let mut k: i32 = 0;
             while (k < a.cols) {
                 result.data[i as usize][j as usize] = result.data[i as usize][j as usize] + a.data[i as usize][k as usize] * b.data[k as usize][j as usize];
                 k = k + 1;
@@ -566,7 +565,7 @@ fn matrix_multiply(a: &Matrix, b: &Matrix, result: &mut Matrix) -> bool {
 
 // Copy array for testing different algorithms
 fn copy_array(source: &[i32; MAX_ARRAY_SIZE], dest: &mut [i32; MAX_ARRAY_SIZE], size: i32) {
-    let mut i = 0;
+    let mut i: i32 = 0;
     while (i < size) {
         dest[i as usize] = source[i as usize];
         i = i + 1;
@@ -575,9 +574,9 @@ fn copy_array(source: &[i32; MAX_ARRAY_SIZE], dest: &mut [i32; MAX_ARRAY_SIZE], 
 
 // Verify if array is sorted
 fn is_sorted(data: &[i32; MAX_ARRAY_SIZE], size: i32) -> bool {
-    let mut i = 0;
+    let mut i: i32 = 0;
     while (i < size - 1) {
-        if (data[i as usize] > data[i as usize + 1]) {
+        if (data[i as usize] > data[(i + 1) as usize]) {
             return false;
         }
         i = i + 1;
@@ -587,53 +586,53 @@ fn is_sorted(data: &[i32; MAX_ARRAY_SIZE], size: i32) -> bool {
 
 // Main performance testing function
 fn test_large_scale_performance() {
-    printInt(21001);  // Test start marker
+    printlnInt(21001);  // Test start marker
     
     // Test 1: Sorting algorithm performance comparison
-    let test_sizes = [100, 500, 1000, 2000];
-    let mut size_idx = 0;
+    let test_sizes: [i32; 4] = [100, 500, 1000, 2000];
+    let mut size_idx: i32 = 0;
     
     while (size_idx < 4) {
-        let size = test_sizes[size_idx as usize];
-        printInt(21000 + size_idx * 100 + 10);  // Size marker
+        let size: i32 = test_sizes[size_idx as usize];
+        printlnInt(21000 + size_idx * 100 + 10);  // Size marker
         
         // Test different data patterns
-        let mut pattern = 0;
+        let mut pattern: i32 = 0;
         while (pattern < 8) {
-            let original_data = init_dataset_pattern(pattern, size);
-            let mut working_data = [0; MAX_ARRAY_SIZE];
+            let original_data: DataSet = init_dataset_pattern(pattern, size);
+            let mut working_data: [i32; MAX_ARRAY_SIZE] = [0; MAX_ARRAY_SIZE];
             
             // Test bubble sort
             copy_array(&original_data.data, &mut working_data, size);
-            let mut bubble_counter = init_performance_counter();
+            let mut bubble_counter: PerformanceCounter = init_performance_counter();
             bubble_sort(&mut working_data, size, &mut bubble_counter);
             
             if (!is_sorted(&working_data, size)) {
-                printInt(21901);  // Sorting error
+                printlnInt(21901);  // Sorting error
             }
             
             // Test quick sort
             copy_array(&original_data.data, &mut working_data, size);
-            let mut quick_counter = init_performance_counter();
+            let mut quick_counter: PerformanceCounter = init_performance_counter();
             quick_sort(&mut working_data, size, &mut quick_counter);
             
             if (!is_sorted(&working_data, size)) {
-                printInt(21902);  // Sorting error
+                printlnInt(21902);  // Sorting error
             }
             
             // Test merge sort
             copy_array(&original_data.data, &mut working_data, size);
-            let mut merge_counter = init_performance_counter();
+            let mut merge_counter: PerformanceCounter = init_performance_counter();
             merge_sort(&mut working_data, size, &mut merge_counter);
             
             if (!is_sorted(&working_data, size)) {
-                printInt(21903);  // Sorting error
+                printlnInt(21903);  // Sorting error
             }
             
             // Print performance comparison
-            printInt(bubble_counter.comparisons / 100);
-            printInt(quick_counter.comparisons / 100);
-            printInt(merge_counter.comparisons / 100);
+            printlnInt(bubble_counter.comparisons / 100);
+            printlnInt(quick_counter.comparisons / 100);
+            printlnInt(merge_counter.comparisons / 100);
             
             pattern = pattern + 1;
         }
@@ -642,27 +641,27 @@ fn test_large_scale_performance() {
     }
     
     // Test 2: Search algorithm performance
-    let search_data = init_dataset_pattern(0, 5000);
-    let mut sorted_data = [0; MAX_ARRAY_SIZE];
+    let search_data: DataSet = init_dataset_pattern(0, 5000);
+    let mut sorted_data: [i32; MAX_ARRAY_SIZE] = [0; MAX_ARRAY_SIZE];
     copy_array(&search_data.data, &mut sorted_data, 5000);
     
-    let mut sort_counter = init_performance_counter();
+    let mut sort_counter: PerformanceCounter = init_performance_counter();
     quick_sort(&mut sorted_data, 5000, &mut sort_counter);
     
     // Perform multiple searches
-    let mut search_hits = 0;
-    let mut linear_ops = 0;
-    let mut binary_ops = 0;
+    let mut search_hits: i32 = 0;
+    let mut linear_ops: i32 = 0;
+    let mut binary_ops: i32 = 0;
     
-    let mut i = 0;
+    let mut i: i32 = 0;
     while (i < 1000) {
-        let target = (i * 73 + 29) % 100000;
+        let target: i32 = (i * 73 + 29) % 100000;
         
-        let mut linear_counter = init_performance_counter();
-        let linear_result = linear_search(&search_data.data, 5000, target, &mut linear_counter);
+        let mut linear_counter: PerformanceCounter = init_performance_counter();
+        let linear_result: i32 = linear_search(&search_data.data, 5000, target, &mut linear_counter);
         
-        let mut binary_counter = init_performance_counter();
-        let binary_result = binary_search(&sorted_data, 5000, target, &mut binary_counter);
+        let mut binary_counter: PerformanceCounter = init_performance_counter();
+        let binary_result: i32 = binary_search(&sorted_data, 5000, target, &mut binary_counter);
         
         if (linear_result != -1 && binary_result != -1) {
             search_hits = search_hits + 1;
@@ -674,26 +673,26 @@ fn test_large_scale_performance() {
         i = i + 1;
     }
     
-    printInt(search_hits);
-    printInt(linear_ops / 1000);
-    printInt(binary_ops / 1000);
+    printlnInt(search_hits);
+    printlnInt(linear_ops / 1000);
+    printlnInt(binary_ops / 1000);
     
     // Test 3: Statistical computations
-    let stats_data = init_dataset_pattern(1, 3000);
+    let stats_data: DataSet = init_dataset_pattern(1, 300);
     
-    let variance = compute_variance(&stats_data.data, 3000, stats_data.mean);
-    let mut median_data = [0; MAX_ARRAY_SIZE];
-    copy_array(&stats_data.data, &mut median_data, 3000);
-    let median = compute_median(&mut median_data, 3000);
+    let variance: i32 = compute_variance(&stats_data.data, 300, stats_data.mean);
+    let mut median_data: [i32; MAX_ARRAY_SIZE] = [0; MAX_ARRAY_SIZE];
+    copy_array(&stats_data.data, &mut median_data, 300);
+    let median: i32 = compute_median(&mut median_data, 300);
     
-    printInt(stats_data.mean);
-    printInt(variance / 1000);
-    printInt(median);
+    printlnInt(stats_data.mean);
+    printlnInt(variance / 1000);
+    printlnInt(median);
     
     // Test 4: Matrix operations
-    let matrix_a = init_matrix(50, 50, 1);
-    let matrix_b = init_matrix(50, 50, 2);
-    let mut result_matrix = Matrix {
+    let matrix_a: Matrix = init_matrix(50, 50, 1);
+    let matrix_b: Matrix = init_matrix(50, 50, 2);
+    let mut result_matrix: Matrix = Matrix {
         data: [[0; MATRIX_SIZE]; MATRIX_SIZE],
         rows: 0,
         cols: 0,
@@ -701,24 +700,24 @@ fn test_large_scale_performance() {
     
     if (matrix_multiply(&matrix_a, &matrix_b, &mut result_matrix)) {
         // Compute matrix sum for verification
-        let mut matrix_sum = 0;
-        let mut i = 0;
+        let mut matrix_sum: i32 = 0;
+        let mut i: i32 = 0;
         while (i < 50) {
-            let mut j = 0;
+            let mut j: i32 = 0;
             while (j < 50) {
-                matrix_sum = matrix_sum + result_matrix.data[i as usize][j as usize];
+                matrix_sum = (matrix_sum + result_matrix.data[i as usize][j as usize])&1000000000;
                 j = j + 1;
             }
             i = i + 1;
         }
-        printInt(matrix_sum / 10000);
+        printlnInt(matrix_sum % 1000000000);
     }
     
     // Test 5: Memory access pattern analysis
-    let mut access_counter = init_performance_counter();
+    let mut access_counter: PerformanceCounter = init_performance_counter();
     
     // Sequential access pattern
-    let mut sequential_sum = 0;
+    let mut sequential_sum: i32 = 0;
     i = 0;
     while (i < 5000) {
         sequential_sum = sequential_sum + search_data.data[i as usize];
@@ -727,58 +726,58 @@ fn test_large_scale_performance() {
     }
     
     // Random access pattern
-    let mut random_sum = 0;
+    let mut random_sum: i32 = 0;
     i = 0;
     while (i < 5000) {
-        let index = (i * 1103515245 + 12345) % 5000;
+        let index: i32 = (i * 11241 + 12345) % 5000;
         random_sum = random_sum + search_data.data[index as usize];
         access_counter.memory_accesses = access_counter.memory_accesses + 1;
         i = i + 1;
     }
     
     // Strided access pattern
-    let mut strided_sum = 0;
+    let mut strided_sum: i32 = 0;
     i = 0;
     while (i < 1000) {
-        let index = (i * 5) % 5000;
+        let index: i32 = (i * 5) % 5000;
         strided_sum = strided_sum + search_data.data[index as usize];
         access_counter.memory_accesses = access_counter.memory_accesses + 1;
         i = i + 1;
     }
     
-    printInt(sequential_sum / 1000);
-    printInt(random_sum / 1000);
-    printInt(strided_sum / 100);
-    printInt(access_counter.memory_accesses / 1000);
+    printlnInt(sequential_sum / 1000);
+    printlnInt(random_sum / 1000);
+    printlnInt(strided_sum / 100);
+    printlnInt(access_counter.memory_accesses / 1000);
     
     // Test 6: Corner cases and extreme scenarios
     
     // Test with all same elements
-    let mut same_data = [42; MAX_ARRAY_SIZE];
-    let mut same_counter = init_performance_counter();
+    let mut same_data: [i32; MAX_ARRAY_SIZE] = [42; MAX_ARRAY_SIZE];
+    let mut same_counter: PerformanceCounter = init_performance_counter();
     quick_sort(&mut same_data, 1000, &mut same_counter);
-    printInt(same_counter.comparisons / 100);
+    printlnInt(same_counter.comparisons / 100);
     
     // Test with two distinct elements alternating
-    let mut alternating_data = [0; MAX_ARRAY_SIZE];
+    let mut alternating_data: [i32; MAX_ARRAY_SIZE] = [0; MAX_ARRAY_SIZE];
     i = 0;
     while (i < 1000) {
         alternating_data[i as usize] = if (i % 2 == 0) { 1 } else { 2 };
         i = i + 1;
     }
     
-    let mut alt_counter = init_performance_counter();
+    let mut alt_counter: PerformanceCounter = init_performance_counter();
     merge_sort(&mut alternating_data, 1000, &mut alt_counter);
-    printInt(alt_counter.comparisons / 100);
+    printlnInt(alt_counter.comparisons / 100);
     
     // Test with single element
-    let mut single_data = [0; MAX_ARRAY_SIZE];
+    let mut single_data: [i32; MAX_ARRAY_SIZE] = [0; MAX_ARRAY_SIZE];
     single_data[0] = 123;
-    let mut single_counter = init_performance_counter();
+    let mut single_counter: PerformanceCounter = init_performance_counter();
     heap_sort(&mut single_data, 1, &mut single_counter);
-    printInt(single_data[0]);
+    printlnInt(single_data[0]);
     
-    printInt(21999);  // Test end marker
+    printlnInt(21999);  // Test end marker
 }
 
 fn main() {

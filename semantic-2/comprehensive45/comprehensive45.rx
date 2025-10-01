@@ -126,6 +126,6 @@ fn main() {
         checksum = checksum + compressed_data[i as usize] * (i + 1);
         i = i + 1;
     }
-    printInt(checksum);
-    printInt(compressed_len);
+    printlnInt(checksum);
+    printlnInt(compressed_len);
 }

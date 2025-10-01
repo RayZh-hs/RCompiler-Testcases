@@ -213,7 +213,7 @@ fn main() {
 
     let file1_name: [i32; 16] = str_to_arr(1);
     let file1_inode: i32 = create_file(ROOT_INODE_NUM, file1_name);
-    printInt(file1_inode);
+    printlnInt(file1_inode);
 
     let mut data1: [i32; 100] = [0; 100];
     let mut i: i32 = 0;
@@ -222,14 +222,14 @@ fn main() {
         i = i + 1;
     }
     let written1: i32 = write_file(file1_inode, data1, 80);
-    printInt(written1);
+    printlnInt(written1);
 
     let checksum1: i32 = read_file(file1_inode);
-    printInt(checksum1);
+    printlnInt(checksum1);
 
     let file2_name: [i32; 16] = str_to_arr(2);
     let file2_inode: i32 = create_file(ROOT_INODE_NUM, file2_name);
-    printInt(file2_inode);
+    printlnInt(file2_inode);
 
     let mut data2: [i32; 100] = [0; 100];
     i = 0;
@@ -238,17 +238,17 @@ fn main() {
         i = i + 1;
     }
     let written2: i32 = write_file(file2_inode, data2, 150);
-    printInt(written2);
+    printlnInt(written2);
 
     let checksum2: i32 = read_file(file2_inode);
-    printInt(checksum2);
+    printlnInt(checksum2);
 
     let found_inode: i32 = find_in_dir(ROOT_INODE_NUM, file1_name);
-    printInt(found_inode);
+    printlnInt(found_inode);
 
     let not_found_name: [i32; 16] = str_to_arr(3);
     let not_found_inode: i32 = find_in_dir(ROOT_INODE_NUM, not_found_name);
-    printInt(not_found_inode);
+    printlnInt(not_found_inode);
 
     let mut free_blocks: i32 = 0;
     i = 0;
@@ -258,7 +258,7 @@ fn main() {
         }
         i = i + 1;
     }
-    printInt(free_blocks);
+    printlnInt(free_blocks);
 
     let mut free_inodes: i32 = 0;
     i = 0;
@@ -268,7 +268,7 @@ fn main() {
         }
         i = i + 1;
     }
-    printInt(free_inodes);
+    printlnInt(free_inodes);
 
     let mut fs_checksum: i32 = 0;
     i = 0;
@@ -276,7 +276,7 @@ fn main() {
         fs_checksum = fs_checksum + fs_data[i as usize];
         i = i + 1;
     }
-    printInt(fs_checksum % 10000);
+    printlnInt(fs_checksum % 10000);
 
     let mut j: i32 = 0;
     while (j < 10) {
@@ -289,7 +289,7 @@ fn main() {
         write_file(file1_inode, data, 10);
         j = j + 1;
     }
-    printInt(read_file(file1_inode));
+    printlnInt(read_file(file1_inode));
 
     let mut final_status: i32 = 1;
     let mut k: i32 = 0;
@@ -297,5 +297,5 @@ fn main() {
         let mut final_status: i32 = final_status + k;
         k = k + 1;
     }
-    printInt(final_status);
+    printlnInt(final_status);
 }

@@ -137,7 +137,7 @@ fn main() {
                 total_energy = total_energy + agents[j as usize].energy;
                 j = j + 1;
             }
-            printInt(total_energy);
+            printlnInt(total_energy);
         }
         time_step = time_step + 1;
     }
@@ -152,5 +152,5 @@ fn main() {
         }
         i = i + 1;
     }
-    printInt(final_world_sum);
+    printlnInt(final_world_sum);
 }

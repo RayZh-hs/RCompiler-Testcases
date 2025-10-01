@@ -29,10 +29,11 @@ Load balancing and leader election algorithm optimization
 // - Complex event-driven simulation with priority queues
 // - Cryptographic hash simulation for message integrity
 // - Load balancing and leader election algorithm optimization
+// - Reserve the passing-param-by-value of arrays
 
 fn main() {
     // Performance test marker - start
-    printInt(25000);
+    printlnInt(25000);
     
     // Initialize distributed system with 7 nodes (can tolerate 2 Byzantine failures)
     let node_count: i32 = 7;
@@ -60,13 +61,13 @@ fn main() {
     performAsynchronousConsensusTest(node_count, max_consensus_rounds);
     
     // Performance test marker - end
-    printInt(25999);
+    printlnInt(25999);
 }
 
 // Test 1: Basic Consensus Algorithm Implementation
 // Tests compiler optimization of voting mechanisms and state synchronization
 fn performBasicConsensusTest(node_count: i32) {
-    printInt(25001); // Start basic consensus test
+    printlnInt(25001); // Start basic consensus test
     
     // Initialize node states
     let mut node_states: [i32; 7] = [0; 7]; // 0=follower, 1=candidate, 2=leader
@@ -86,12 +87,12 @@ fn performBasicConsensusTest(node_count: i32) {
             let success: bool = performLogReplication(leader_id, node_count, node_logs, log_lengths);
             
             if (success) {
-                printInt(25000 + consensus_round); // Successfully reached consensus
+                printlnInt(25000 + consensus_round); // Successfully reached consensus
                 
                 // Verify consistency across all nodes
                 let consistency_check: bool = verifyLogConsistency(node_count, node_logs, log_lengths);
                 if (consistency_check) {
-                    printInt(25100 + consensus_round);
+                    printlnInt(25100 + consensus_round);
                 }
             }
         }
@@ -99,7 +100,7 @@ fn performBasicConsensusTest(node_count: i32) {
         consensus_round = consensus_round + 1;
     }
     
-    printInt(25099); // End basic consensus test
+    printlnInt(25099); // End basic consensus test
 }
 
 // Leader Election Algorithm with Complex Voting Logic
@@ -262,7 +263,7 @@ fn replicateToFollower(leader_id: i32, follower_id: i32, entry: i32, mut node_lo
 
 // Test 2: Byzantine Fault Tolerance Simulation
 fn performByzantineFaultToleranceTest(node_count: i32, byzantine_tolerance: i32) {
-    printInt(25201); // Start Byzantine fault tolerance test
+    printlnInt(25201); // Start Byzantine fault tolerance test
     
     // Mark some nodes as Byzantine (malicious)
     let mut byzantine_nodes: [bool; 7] = [false; 7];
@@ -297,7 +298,7 @@ fn performByzantineFaultToleranceTest(node_count: i32, byzantine_tolerance: i32)
             );
             
             if (agreement_reached) {
-                printInt(25200 + agreement_round);
+                printlnInt(25200 + agreement_round);
                 
                 // Verify that honest nodes agree despite Byzantine interference
                 let honest_agreement: bool = verifyHonestNodeAgreement(
@@ -305,7 +306,7 @@ fn performByzantineFaultToleranceTest(node_count: i32, byzantine_tolerance: i32)
                 );
                 
                 if (honest_agreement) {
-                    printInt(25220 + agreement_round);
+                    printlnInt(25220 + agreement_round);
                 }
             }
         }
@@ -313,7 +314,7 @@ fn performByzantineFaultToleranceTest(node_count: i32, byzantine_tolerance: i32)
         agreement_round = agreement_round + 1;
     }
     
-    printInt(25299); // End Byzantine fault tolerance test
+    printlnInt(25299); // End Byzantine fault tolerance test
 }
 
 // Complex Byzantine value proposal with malicious behavior simulation
@@ -412,11 +413,11 @@ fn performByzantineAgreement(
 
 // Test 3: Network Partition Simulation
 fn performNetworkPartitionTest(node_count: i32) {
-    printInt(25301); // Start network partition test
+    printlnInt(25301); // Start network partition test
     
     // Create network topology matrix
-    let mut network_connectivity: [[bool; 7]; 7] = [[true; 7]; 7];
-    let mut partition_groups: [i32; 7] = [0; 7]; // Which partition each node belongs to
+    let network_connectivity: [[bool; 7]; 7] = [[true; 7]; 7];
+    let partition_groups: [i32; 7] = [0; 7]; // Which partition each node belongs to
     
     // Simulate various partition scenarios
     let mut partition_scenario: i32 = 0;
@@ -430,7 +431,7 @@ fn performNetworkPartitionTest(node_count: i32) {
         );
         
         if (partition_consensus) {
-            printInt(25300 + partition_scenario);
+            printlnInt(25300 + partition_scenario);
         }
         
         // Simulate partition healing
@@ -440,20 +441,20 @@ fn performNetworkPartitionTest(node_count: i32) {
         let recovery_success: bool = testPartitionRecovery(node_count, network_connectivity);
         
         if (recovery_success) {
-            printInt(25310 + partition_scenario);
+            printlnInt(25310 + partition_scenario);
         }
         
         partition_scenario = partition_scenario + 1;
     }
     
-    printInt(25399); // End network partition test
+    printlnInt(25399); // End network partition test
 }
 
 // Create complex network partition patterns
 fn createNetworkPartition(
     node_count: i32, 
     mut network_connectivity: [[bool; 7]; 7], 
-    mut partition_groups: [i32; 7],
+    partition_groups: [i32; 7],
     scenario: i32
 ) {
     // Reset connectivity matrix
@@ -482,13 +483,13 @@ fn createNetworkPartition(
 
 // Test 4: Leader Election Under Failure Scenarios
 fn performLeaderElectionTest(node_count: i32) {
-    printInt(25401); // Start leader election test
+    printlnInt(25401); // Start leader election test
     
     // Initialize complex election state
     let mut node_priorities: [i32; 7] = [0; 7];
-    let mut node_health_status: [i32; 7] = [100; 7]; // Health percentage
-    let mut election_timeouts: [i32; 7] = [0; 7];
-    let mut failure_detectors: [[bool; 7]; 7] = [[false; 7]; 7]; // Node i detects failure of node j
+    let node_health_status: [i32; 7] = [100; 7]; // Health percentage
+    let election_timeouts: [i32; 7] = [0; 7];
+    let failure_detectors: [[bool; 7]; 7] = [[false; 7]; 7]; // Node i detects failure of node j
     
     // Generate initial priorities
     let mut i: i32 = 0;
@@ -512,7 +513,7 @@ fn performLeaderElectionTest(node_count: i32) {
         );
         
         if (elected_leader >= 0) {
-            printInt(25400 + elected_leader);
+            printlnInt(25400 + elected_leader);
             
             // Test leader stability under continuing failures
             let leadership_stable: bool = testLeadershipStability(
@@ -520,7 +521,7 @@ fn performLeaderElectionTest(node_count: i32) {
             );
             
             if (leadership_stable) {
-                printInt(25410 + election_round);
+                printlnInt(25410 + election_round);
             }
         }
         
@@ -530,26 +531,26 @@ fn performLeaderElectionTest(node_count: i32) {
         election_round = election_round + 1;
     }
     
-    printInt(25499); // End leader election test
+    printlnInt(25499); // End leader election test
 }
 
 // Test 5: Asynchronous Consensus with Message Delays
 fn performAsynchronousConsensusTest(node_count: i32, max_rounds: i32) {
-    printInt(25501); // Start asynchronous consensus test
+    printlnInt(25501); // Start asynchronous consensus test
     
     // Message queue simulation
-    let mut message_queue: [i32; 1000] = [0; 1000]; // Circular buffer for messages
-    let mut queue_head: i32 = 0;
-    let mut queue_tail: i32 = 0;
-    let mut queue_size: i32 = 0;
+    let message_queue: [i32; 1000] = [0; 1000]; // Circular buffer for messages
+    let queue_head: i32 = 0;
+    let queue_tail: i32 = 0;
+    let queue_size: i32 = 0;
     
     // Message delay simulation
-    let mut message_delays: [i32; 1000] = [0; 1000];
-    let mut message_timestamps: [i32; 1000] = [0; 1000];
+    let message_delays: [i32; 1000] = [0; 1000];
+    let message_timestamps: [i32; 1000] = [0; 1000];
     
     // Node state for asynchronous consensus
-    let mut node_proposals: [i32; 7] = [0; 7];
-    let mut node_decisions: [i32; 7] = [-1; 7]; // -1 means no decision yet
+    let node_proposals: [i32; 7] = [0; 7];
+    let node_decisions: [i32; 7] = [-1; 7]; // -1 means no decision yet
     let mut consensus_values: [i32; 100] = [0; 100]; // History of consensus values
     let mut consensus_count: i32 = 0;
     
@@ -580,7 +581,7 @@ fn performAsynchronousConsensusTest(node_count: i32, max_rounds: i32) {
                 consensus_values[consensus_count as usize] = consensus_value;
                 consensus_count = consensus_count + 1;
                 
-                printInt(25500 + consensus_count);
+                printlnInt(25500 + consensus_count);
                 
                 // Reset for next consensus round
                 resetNodeDecisions(node_count, node_decisions);
@@ -593,10 +594,10 @@ fn performAsynchronousConsensusTest(node_count: i32, max_rounds: i32) {
     // Verify consensus history consistency
     let history_consistent: bool = verifyConsensusHistory(consensus_values, consensus_count);
     if (history_consistent) {
-        printInt(25550);
+        printlnInt(25550);
     }
     
-    printInt(25599); // End asynchronous consensus test
+    printlnInt(25599); // End asynchronous consensus test
 }
 
 // Utility Functions for Complex Calculations
@@ -807,7 +808,7 @@ fn verifyHonestNodeAgreement(
 
 fn createBinaryPartition(
     node_count: i32, 
-    mut network_connectivity: [[bool; 7]; 7], 
+    network_connectivity: [[bool; 7]; 7], 
     mut partition_groups: [i32; 7]
 ) {
     let partition_size: i32 = node_count / 2;
@@ -828,7 +829,7 @@ fn createBinaryPartition(
 
 fn createAsymmetricPartition(
     node_count: i32, 
-    mut network_connectivity: [[bool; 7]; 7], 
+    network_connectivity: [[bool; 7]; 7], 
     mut partition_groups: [i32; 7]
 ) {
     let majority_size: i32 = (node_count * 2) / 3;
@@ -848,7 +849,7 @@ fn createAsymmetricPartition(
 
 fn createMultiwayPartition(
     node_count: i32, 
-    mut network_connectivity: [[bool; 7]; 7], 
+    network_connectivity: [[bool; 7]; 7], 
     mut partition_groups: [i32; 7]
 ) {
     // Create 3-way partition
@@ -991,7 +992,7 @@ fn conductFailureAwareElection(
     node_priorities: [i32; 7],
     node_health_status: [i32; 7],
     failure_detectors: [[bool; 7]; 7],
-    mut election_timeouts: [i32; 7]
+    election_timeouts: [i32; 7],
 ) -> i32 {
     let mut best_candidate: i32 = -1;
     let mut best_score: i32 = -1;
@@ -1097,7 +1098,7 @@ fn processAsyncMessages(
     mut queue_head: i32,
     mut queue_tail: i32,
     mut queue_size: i32,
-    mut node_decisions: [i32; 7],
+    node_decisions: [i32; 7],
     current_time: i32
 ) -> i32 {
     let mut processed_count: i32 = 0;

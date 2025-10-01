@@ -75,7 +75,7 @@ fn main() {
                 state = 4; // ERROR
             }
         }
-        printInt(state);
+        printlnInt(state);
         i = i + 1;
     }
 }

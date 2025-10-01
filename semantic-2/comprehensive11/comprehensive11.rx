@@ -15,24 +15,24 @@ Boolean function inlining and optimization
 Truth table computation optimization
 */
 
-
-
 // Unified RNG: Park–Miller (a=16807, m=2147483647) using Schrage method to avoid overflow
 fn pm_rand_update(x: i32) -> i32 {
     let a = 16807;
     let m = 2147483647;
     let q = 127773; // m / a
-    let r = 2836;   // m % a
+    let r = 2836; // m % a
     let mut k = x / q;
     let mut new_x = a * (x - k * q) - r * k;
-    if (new_x <= 0) { new_x += m; }
+    if (new_x <= 0) {
+        new_x += m;
+    }
     return new_x;
 }
 
 // comprehensive11.rx - Comprehensive Test 11: Boolean Logic and Optimization Test
 // This test focuses on compiler optimization of Boolean operations including:
 // - Boolean expression optimization and short-circuiting
-// - Branch prediction optimization for Boolean conditions  
+// - Branch prediction optimization for Boolean conditions
 // - Boolean array operations and bit manipulation simulation
 // - Complex conditional logic optimization
 // - Boolean function inlining and optimization
@@ -40,65 +40,65 @@ fn pm_rand_update(x: i32) -> i32 {
 
 fn main() {
     // Performance test marker - start
-    printInt(1100);
-    
+    printlnInt(1100);
+
     // Test 1: Complex Boolean expression evaluation
     // Tests compiler's ability to optimize Boolean logic and short-circuiting
     testBooleanExpressionOptimization();
-    
+
     // Test 2: Boolean array operations and pattern matching
     // Tests optimization of Boolean array access and manipulation
     testBooleanArrayOperations();
-    
+
     // Test 3: Logical algorithm implementations
     // Tests optimization of algorithms heavily using Boolean logic
     testLogicalAlgorithms();
-    
+
     // Test 4: Boolean-based search and filtering
     // Tests optimization of Boolean-conditional control flow
     testBooleanSearchAndFilter();
-    
+
     // Test 5: Boolean state machine simulation
     // Tests optimization of complex Boolean state transitions
     testBooleanStateMachine();
-    
+
     // Performance test marker - end
-    printInt(1199);
+    printlnInt(1199);
     exit(0);
 }
 
 // Test 1: Boolean Expression Optimization
 // Tests compiler's short-circuit evaluation and Boolean expression simplification
 fn testBooleanExpressionOptimization() {
-    printInt(1101); // Start Boolean expression test
-    
+    printlnInt(1101); // Start Boolean expression test
+
     let mut result_count: i32 = 0;
     let mut i: i32 = 0;
-    
+
     // Test complex Boolean expressions with potential for optimization
     while (i < 10000) {
         let a: bool = (i % 2 == 0);
         let b: bool = (i % 3 == 0);
         let c: bool = (i % 5 == 0);
         let d: bool = (i % 7 == 0);
-        
+
         // Complex Boolean expression that can benefit from optimization
         let complex_result: bool = (a && b) || (c && !d) || (!a && b && c) || (a && !b && !c && d);
-        
+
         if (complex_result) {
             result_count = result_count + 1;
         }
-        
+
         // Test Boolean expressions with function calls
         if (evaluateComplexCondition(i) && (i % 100 == 0)) {
             result_count = result_count + 2;
         }
-        
+
         i = i + 1;
     }
-    
-    printInt(result_count);
-    printInt(1102); // End Boolean expression test
+
+    printlnInt(result_count);
+    printlnInt(1102); // End Boolean expression test
 }
 
 // Helper function for complex Boolean evaluation
@@ -106,7 +106,7 @@ fn evaluateComplexCondition(value: i32) -> bool {
     let condition1: bool = isPrime(value);
     let condition2: bool = (value % 4 == 0);
     let condition3: bool = (value > 100) && (value < 9900);
-    
+
     // Return complex Boolean expression
     return (condition1 || condition2) && condition3;
 }
@@ -114,12 +114,12 @@ fn evaluateComplexCondition(value: i32) -> bool {
 // Test 2: Boolean Array Operations
 // Tests optimization of Boolean array manipulation and pattern detection
 fn testBooleanArrayOperations() {
-    printInt(1103); // Start Boolean array test
-    
+    printlnInt(1103); // Start Boolean array test
+
     let mut bool_grid: [bool; 10000] = [false; 10000]; // 100x100 Boolean grid
     let mut pattern_count: i32 = 0;
     let mut row: i32 = 0;
-    
+
     // Initialize Boolean grid with patterns
     while (row < 100) {
         let mut col: i32 = 0;
@@ -131,31 +131,31 @@ fn testBooleanArrayOperations() {
         }
         row = row + 1;
     }
-    
+
     // Perform Boolean operations on the grid
     performBooleanGridOperations(bool_grid, &mut pattern_count);
-    
+
     // Count specific Boolean patterns
     pattern_count = pattern_count + countBooleanPatterns(bool_grid);
-    
-    printInt(pattern_count);
-    printInt(1104); // End Boolean array test
+
+    printlnInt(pattern_count);
+    printlnInt(1104); // End Boolean array test
 }
 
 // Perform various Boolean operations on grid
 fn performBooleanGridOperations(mut grid: [bool; 10000], pattern_count: &mut i32) {
     let mut operations: i32 = 0;
     let mut row: i32 = 1;
-    
+
     // Apply Boolean cellular automaton rules
     while (row < 99) {
         let mut col: i32 = 1;
         while (col < 99) {
             let index: i32 = row * 100 + col;
-            
+
             // Count Boolean neighbors
             let neighbor_count: i32 = countBooleanNeighbors(grid, row, col);
-            
+
             // Apply Boolean rules based on neighbors
             if (grid[index as usize] && (neighbor_count < 2 || neighbor_count > 3)) {
                 grid[index as usize] = false;
@@ -164,12 +164,12 @@ fn performBooleanGridOperations(mut grid: [bool; 10000], pattern_count: &mut i32
                 grid[index as usize] = true;
                 operations = operations + 1;
             }
-            
+
             col = col + 1;
         }
         row = row + 1;
     }
-    
+
     *pattern_count = *pattern_count + operations;
 }
 
@@ -177,7 +177,7 @@ fn performBooleanGridOperations(mut grid: [bool; 10000], pattern_count: &mut i32
 fn countBooleanNeighbors(grid: [bool; 10000], row: i32, col: i32) -> i32 {
     let mut count: i32 = 0;
     let mut dr: i32 = -1;
-    
+
     while (dr <= 1) {
         let mut dc: i32 = -1;
         while (dc <= 1) {
@@ -195,7 +195,7 @@ fn countBooleanNeighbors(grid: [bool; 10000], row: i32, col: i32) -> i32 {
         }
         dr = dr + 1;
     }
-    
+
     return count;
 }
 
@@ -203,7 +203,7 @@ fn countBooleanNeighbors(grid: [bool; 10000], row: i32, col: i32) -> i32 {
 fn countBooleanPatterns(grid: [bool; 10000]) -> i32 {
     let mut pattern_count: i32 = 0;
     let mut row: i32 = 0;
-    
+
     // Look for specific Boolean patterns
     while (row < 98) {
         let mut col: i32 = 0;
@@ -212,17 +212,17 @@ fn countBooleanPatterns(grid: [bool; 10000]) -> i32 {
             if (checkBooleanPattern2x2(grid, row, col)) {
                 pattern_count = pattern_count + 1;
             }
-            
+
             // Check for 3x3 Boolean patterns
             if (checkBooleanPattern3x3(grid, row, col)) {
                 pattern_count = pattern_count + 2;
             }
-            
+
             col = col + 1;
         }
         row = row + 1;
     }
-    
+
     return pattern_count;
 }
 
@@ -232,7 +232,7 @@ fn checkBooleanPattern2x2(grid: [bool; 10000], row: i32, col: i32) -> bool {
     let tr: bool = grid[(row * 100 + col + 1) as usize];
     let bl: bool = grid[((row + 1) * 100 + col) as usize];
     let br: bool = grid[((row + 1) * 100 + col + 1) as usize];
-    
+
     // Look for specific patterns
     return (tl && !tr && !bl && br) || (!tl && tr && bl && !br);
 }
@@ -242,10 +242,10 @@ fn checkBooleanPattern3x3(grid: [bool; 10000], row: i32, col: i32) -> bool {
     if (row + 2 >= 100 || col + 2 >= 100) {
         return false;
     }
-    
+
     let mut true_count: i32 = 0;
     let mut r: i32 = 0;
-    
+
     while (r < 3) {
         let mut c: i32 = 0;
         while (c < 3) {
@@ -256,7 +256,7 @@ fn checkBooleanPattern3x3(grid: [bool; 10000], row: i32, col: i32) -> bool {
         }
         r = r + 1;
     }
-    
+
     // Pattern: exactly 5 true values in 3x3 grid
     return true_count == 5;
 }
@@ -264,36 +264,37 @@ fn checkBooleanPattern3x3(grid: [bool; 10000], row: i32, col: i32) -> bool {
 // Test 3: Logical Algorithms
 // Tests optimization of algorithms that heavily use Boolean logic
 fn testLogicalAlgorithms() {
-    printInt(1105); // Start logical algorithms test
-    
+    printlnInt(1105); // Start logical algorithms test
+
     let mut result_sum: i32 = 0;
-    
+
     // Test Boolean satisfiability solver simulation
     result_sum = result_sum + testBooleanSATSolver();
-    
+
     // Test Boolean function evaluation
     result_sum = result_sum + testBooleanFunctionEvaluation();
-    
+
     // Test logical puzzles solving
     result_sum = result_sum + solveBooleanPuzzles();
-    
-    printInt(result_sum);
-    printInt(1106); // End logical algorithms test
+
+    printlnInt(result_sum);
+    printlnInt(1106); // End logical algorithms test
 }
 
 // Simulate Boolean satisfiability solver
 fn testBooleanSATSolver() -> i32 {
     let mut satisfiable_count: i32 = 0;
     let mut assignment: i32 = 0;
-    
+
     // Test all possible Boolean assignments for a 10-variable problem
-    while (assignment < 1024) { // 2^10 = 1024
+    while (assignment < 1024) {
+        // 2^10 = 1024
         if (evaluateBooleanFormula(assignment)) {
             satisfiable_count = satisfiable_count + 1;
         }
         assignment = assignment + 1;
     }
-    
+
     return satisfiable_count;
 }
 
@@ -310,7 +311,7 @@ fn evaluateBooleanFormula(assignment: i32) -> bool {
     let x7: bool = (assignment & 128) != 0;
     let x8: bool = (assignment & 256) != 0;
     let x9: bool = (assignment & 512) != 0;
-    
+
     // Complex Boolean formula (CNF - Conjunctive Normal Form)
     let clause1: bool = x0 || !x1 || x2;
     let clause2: bool = !x0 || x3 || !x4;
@@ -320,7 +321,7 @@ fn evaluateBooleanFormula(assignment: i32) -> bool {
     let clause6: bool = !x5 || !x7 || x9;
     let clause7: bool = x6 || x8 || !x9;
     let clause8: bool = !x0 || !x1 || !x2;
-    
+
     return clause1 && clause2 && clause3 && clause4 && clause5 && clause6 && clause7 && clause8;
 }
 
@@ -328,25 +329,26 @@ fn evaluateBooleanFormula(assignment: i32) -> bool {
 fn testBooleanFunctionEvaluation() -> i32 {
     let mut evaluation_count: i32 = 0;
     let mut input: i32 = 0;
-    
+
     // Evaluate various Boolean functions
-    while (input < 256) { // 2^8 = 256
+    while (input < 256) {
+        // 2^8 = 256
         // Evaluate multiple Boolean functions
         if (evaluateParityFunction(input)) {
             evaluation_count = evaluation_count + 1;
         }
-        
+
         if (evaluateMajorityFunction(input)) {
             evaluation_count = evaluation_count + 2;
         }
-        
+
         if (evaluateThresholdFunction(input)) {
             evaluation_count = evaluation_count + 3;
         }
-        
+
         input = input + 1;
     }
-    
+
     return evaluation_count;
 }
 
@@ -354,14 +356,14 @@ fn testBooleanFunctionEvaluation() -> i32 {
 fn evaluateParityFunction(input: i32) -> bool {
     let mut parity: bool = false;
     let mut temp: i32 = input;
-    
+
     while (temp > 0) {
         if (temp & 1) != 0 {
             parity = !parity;
         }
         temp = temp / 2;
     }
-    
+
     return parity;
 }
 
@@ -369,14 +371,14 @@ fn evaluateParityFunction(input: i32) -> bool {
 fn evaluateMajorityFunction(input: i32) -> bool {
     let mut count: i32 = 0;
     let mut temp: i32 = input;
-    
+
     while (temp > 0) {
         if (temp & 1) != 0 {
             count = count + 1;
         }
         temp = temp / 2;
     }
-    
+
     return count > 4; // More than half of 8 bits
 }
 
@@ -384,27 +386,27 @@ fn evaluateMajorityFunction(input: i32) -> bool {
 fn evaluateThresholdFunction(input: i32) -> bool {
     let mut count: i32 = 0;
     let mut temp: i32 = input;
-    
+
     while (temp > 0) {
         if (temp & 1) != 0 {
             count = count + 1;
         }
         temp = temp / 2;
     }
-    
+
     return count >= 3;
 }
 
 // Solve Boolean puzzles
 fn solveBooleanPuzzles() -> i32 {
     let mut solutions: i32 = 0;
-    
+
     // Solve N-Queens problem using Boolean representation
     solutions = solutions + solveNQueensBooleanVersion(8);
-    
+
     // Solve Sudoku-like Boolean constraint problem
     solutions = solutions + solveBooleanConstraints();
-    
+
     return solutions;
 }
 
@@ -419,10 +421,10 @@ fn nQueensBacktrack(mut board: [bool; 64], row: i32, n: i32) -> i32 {
     if (row == n) {
         return 1; // Found a solution
     }
-    
+
     let mut solutions: i32 = 0;
     let mut col: i32 = 0;
-    
+
     while (col < n) {
         if (isSafePosition(board, row, col, n)) {
             board[(row * n + col) as usize] = true;
@@ -431,14 +433,14 @@ fn nQueensBacktrack(mut board: [bool; 64], row: i32, n: i32) -> i32 {
         }
         col = col + 1;
     }
-    
+
     return solutions;
 }
 
 // Check if position is safe for queen placement
 fn isSafePosition(board: [bool; 64], row: i32, col: i32, n: i32) -> bool {
     let mut i: i32 = 0;
-    
+
     // Check column
     while (i < row) {
         if (board[(i * n + col) as usize]) {
@@ -446,7 +448,7 @@ fn isSafePosition(board: [bool; 64], row: i32, col: i32, n: i32) -> bool {
         }
         i = i + 1;
     }
-    
+
     // Check diagonal (upper left)
     i = row - 1;
     let mut j: i32 = col - 1;
@@ -457,7 +459,7 @@ fn isSafePosition(board: [bool; 64], row: i32, col: i32, n: i32) -> bool {
         i = i - 1;
         j = j - 1;
     }
-    
+
     // Check diagonal (upper right)
     i = row - 1;
     j = col + 1;
@@ -468,7 +470,7 @@ fn isSafePosition(board: [bool; 64], row: i32, col: i32, n: i32) -> bool {
         i = i - 1;
         j = j + 1;
     }
-    
+
     return true;
 }
 
@@ -476,15 +478,16 @@ fn isSafePosition(board: [bool; 64], row: i32, col: i32, n: i32) -> bool {
 fn solveBooleanConstraints() -> i32 {
     let mut solution_count: i32 = 0;
     let mut assignment: i32 = 0;
-    
+
     // Try all possible assignments for 16 Boolean variables
-    while (assignment < 65536) { // 2^16
+    while (assignment < 65536) {
+        // 2^16
         if (satisfiesAllBooleanConstraints(assignment)) {
             solution_count = solution_count + 1;
         }
         assignment = assignment + 1;
     }
-    
+
     return solution_count;
 }
 
@@ -492,14 +495,14 @@ fn solveBooleanConstraints() -> i32 {
 fn satisfiesAllBooleanConstraints(assignment: i32) -> bool {
     // Extract 16 Boolean variables
     let vars: [bool; 16] = extractBooleanVariables(assignment);
-    
+
     // Define constraints
     let constraint1: bool = vars[0] || (!vars[1] && vars[2]);
     let constraint2: bool = !vars[3] || (vars[4] && !vars[5]);
     let constraint3: bool = (vars[6] || vars[7]) && (!vars[8] || vars[9]);
     let constraint4: bool = vars[10] == (vars[11] && vars[12]);
     let constraint5: bool = (vars[13] || vars[14]) != vars[15];
-    
+
     return constraint1 && constraint2 && constraint3 && constraint4 && constraint5;
 }
 
@@ -508,40 +511,40 @@ fn extractBooleanVariables(assignment: i32) -> [bool; 16] {
     let mut vars: [bool; 16] = [false; 16];
     let mut i: i32 = 0;
     let mut temp: i32 = assignment;
-    
+
     while (i < 16) {
         vars[i as usize] = (temp & 1) != 0;
         temp = temp / 2;
         i = i + 1;
     }
-    
+
     return vars;
 }
 
 // Test 4: Boolean-based Search and Filtering
 fn testBooleanSearchAndFilter() {
-    printInt(1107); // Start Boolean search test
-    
+    printlnInt(1107); // Start Boolean search test
+
     let mut search_results: i32 = 0;
-    
+
     // Create large dataset for Boolean filtering
     let mut data: [i32; 5000] = [0; 5000];
     initializeSearchData(data);
-    
+
     // Perform Boolean-based filtering operations
     search_results = search_results + performBooleanFilter(data);
     search_results = search_results + performMultiCriteriaSearch(data);
     search_results = search_results + performBooleanRangeSearch(data);
-    
-    printInt(search_results);
-    printInt(1108); // End Boolean search test
+
+    printlnInt(search_results);
+    printlnInt(1108); // End Boolean search test
 }
 
 // Initialize search data
 fn initializeSearchData(mut data: [i32; 5000]) {
     let mut i: i32 = 0;
     let mut seed: i32 = 54321;
-    
+
     while i < 5000 {
         seed = pm_rand_update(seed);
         if (seed < 0) {
@@ -556,21 +559,21 @@ fn initializeSearchData(mut data: [i32; 5000]) {
 fn performBooleanFilter(data: [i32; 5000]) -> i32 {
     let mut filtered_count: i32 = 0;
     let mut i: i32 = 0;
-    
+
     while i < 5000 {
         let condition1: bool = data[i as usize] > 1000;
         let condition2: bool = data[i as usize] % 2 == 0;
         let condition3: bool = data[i as usize] < 8000;
         let condition4: bool = isPrime(data[i as usize] % 100);
-        
+
         // Complex Boolean filter condition
         if (condition1 && condition2) || (condition3 && condition4) {
             filtered_count = filtered_count + 1;
         }
-        
+
         i = i + 1;
     }
-    
+
     return filtered_count;
 }
 
@@ -578,25 +581,25 @@ fn performBooleanFilter(data: [i32; 5000]) -> i32 {
 fn performMultiCriteriaSearch(data: [i32; 5000]) -> i32 {
     let mut match_count: i32 = 0;
     let mut i: i32 = 0;
-    
+
     while i < 5000 {
         let criteria_met: i32 = countCriteriaMet(data[i as usize]);
-        
+
         // Boolean condition based on number of criteria met
         if (criteria_met >= 3) {
             match_count = match_count + 1;
         }
-        
+
         i = i + 1;
     }
-    
+
     return match_count;
 }
 
 // Count how many search criteria are met
 fn countCriteriaMet(value: i32) -> i32 {
     let mut count: i32 = 0;
-    
+
     if (value % 3 == 0) {
         count = count + 1;
     }
@@ -612,7 +615,7 @@ fn countCriteriaMet(value: i32) -> i32 {
     if (value % 100) > 50 {
         count = count + 1;
     }
-    
+
     return count;
 }
 
@@ -620,36 +623,36 @@ fn countCriteriaMet(value: i32) -> i32 {
 fn performBooleanRangeSearch(data: [i32; 5000]) -> i32 {
     let mut range_matches: i32 = 0;
     let mut i: i32 = 0;
-    
+
     while i < 5000 {
         let in_range1: bool = (data[i as usize] >= 1000) && (data[i as usize] <= 3000);
         let in_range2: bool = (data[i as usize] >= 6000) && (data[i as usize] <= 8000);
         let in_range3: bool = (data[i as usize] >= 500) && (data[i as usize] <= 1500);
-        
+
         // Boolean combination of range conditions
         if (in_range1 || in_range2 || (in_range3 && (data[i as usize] % 2 == 0))) {
             range_matches = range_matches + 1;
         }
-        
+
         i = i + 1;
     }
-    
+
     return range_matches;
 }
 
 // Test 5: Boolean State Machine Simulation
 fn testBooleanStateMachine() {
-    printInt(1109); // Start state machine test
-    
+    printlnInt(1109); // Start state machine test
+
     let mut transitions: i32 = 0;
-    
+
     // Simulate complex Boolean state machine
     transitions = transitions + simulateTrafficLightController();
     transitions = transitions + simulateDigitalCircuit();
     transitions = transitions + simulateBooleanAutomaton();
-    
-    printInt(transitions);
-    printInt(1110); // End state machine test
+
+    printlnInt(transitions);
+    printlnInt(1110); // End state machine test
 }
 
 // Simulate traffic light controller with Boolean logic
@@ -657,45 +660,60 @@ fn simulateTrafficLightController() -> i32 {
     let mut state: i32 = 0; // 0: Red, 1: Green, 2: Yellow
     let mut transitions: i32 = 0;
     let mut time: i32 = 0;
-    
+
     while (time < 10000) {
         let pedestrian_button: bool = (time % 100) < 10;
         let emergency_vehicle: bool = (time % 500) < 5;
         let traffic_sensor: bool = (time % 50) < 25;
-        
+
         let old_state: i32 = state;
-        state = getNextTrafficState(state, pedestrian_button, emergency_vehicle, traffic_sensor, time);
-        
+        state = getNextTrafficState(
+            state,
+            pedestrian_button,
+            emergency_vehicle,
+            traffic_sensor,
+            time,
+        );
+
         if (state != old_state) {
             transitions = transitions + 1;
         }
-        
+
         time = time + 1;
     }
-    
+
     return transitions;
 }
 
 // Get next traffic light state based on Boolean inputs
-fn getNextTrafficState(current_state: i32, pedestrian: bool, emergency: bool, traffic: bool, time: i32) -> i32 {
+fn getNextTrafficState(
+    current_state: i32,
+    pedestrian: bool,
+    emergency: bool,
+    traffic: bool,
+    time: i32,
+) -> i32 {
     if (emergency) {
-            return 1; // Emergency override to green
+        return 1; // Emergency override to green
     }
-    
-    if (current_state == 0) { // Red
+
+    if (current_state == 0) {
+        // Red
         if (time % 60) > 30 || (pedestrian && !traffic) {
             return 1; // Change to green
         }
-    } else if (current_state == 1) { // Green
-            if ((time % 60) > 50 || (pedestrian && (time % 120) > 60)) {
+    } else if (current_state == 1) {
+        // Green
+        if ((time % 60) > 50 || (pedestrian && (time % 120) > 60)) {
             return 2; // Change to yellow
         }
-    } else if (current_state == 2) { // Yellow
+    } else if (current_state == 2) {
+        // Yellow
         if ((time % 60) > 55) {
             return 0; // Change to red
         }
     }
-    
+
     return current_state; // No state change
 }
 
@@ -703,31 +721,31 @@ fn getNextTrafficState(current_state: i32, pedestrian: bool, emergency: bool, tr
 fn simulateDigitalCircuit() -> i32 {
     let mut output_changes: i32 = 0;
     let mut clock_cycle: i32 = 0;
-    
+
     // Initialize Boolean registers
     let mut reg_a: bool = false;
     let mut reg_b: bool = false;
     let mut reg_c: bool = false;
     let mut reg_d: bool = false;
-    
+
     while (clock_cycle < 1000) {
         // Generate Boolean inputs
         let input1: bool = (clock_cycle % 4) < 2;
         let input2: bool = (clock_cycle % 8) < 4;
         let input3: bool = (clock_cycle % 16) < 8;
-        
+
         // Save old values
         let old_a: bool = reg_a;
         let old_b: bool = reg_b;
         let old_c: bool = reg_c;
         let old_d: bool = reg_d;
-        
+
         // Boolean logic operations
         reg_a = input1 && input2;
         reg_b = input2 || input3;
         reg_c = reg_a != reg_b; // XOR operation
         reg_d = !(reg_a && reg_b && reg_c);
-        
+
         // Count output changes
         if (old_a != reg_a) {
             output_changes = output_changes + 1;
@@ -741,10 +759,10 @@ fn simulateDigitalCircuit() -> i32 {
         if (old_d != reg_d) {
             output_changes = output_changes + 1;
         }
-        
+
         clock_cycle = clock_cycle + 1;
     }
-    
+
     return output_changes;
 }
 
@@ -753,47 +771,47 @@ fn simulateBooleanAutomaton() -> i32 {
     let mut cells: [bool; 100] = [false; 100];
     let mut generation: i32 = 0;
     let mut total_changes: i32 = 0;
-    
+
     // Initialize with some Boolean pattern
     cells[49] = true;
     cells[50] = true;
     cells[51] = true;
-    
+
     while (generation < 500) {
         let mut new_cells: [bool; 100] = [false; 100];
         let mut changes: i32 = 0;
         let mut i: i32 = 1;
-        
+
         // Apply Boolean automaton rules
-    while (i < 99) {
+        while (i < 99) {
             let left: bool = cells[i as usize - 1];
             let center: bool = cells[i as usize];
             let right: bool = cells[i as usize + 1];
-            
+
             // Rule 30: Boolean rule for cellular automaton
-            new_cells[i as usize] = (left && !center && !right) || 
-                          (!left && center && !right) ||
-                          (!left && !center && right) ||
-                          (!left && center && right);
-            
+            new_cells[i as usize] = (left && !center && !right)
+                || (!left && center && !right)
+                || (!left && !center && right)
+                || (!left && center && right);
+
             if (new_cells[i as usize] != cells[i as usize]) {
                 changes = changes + 1;
             }
-            
+
             i = i + 1;
         }
-        
+
         // Copy new generation
         i = 0;
-    while (i < 100) {
+        while (i < 100) {
             cells[i as usize] = new_cells[i as usize];
             i = i + 1;
         }
-        
+
         total_changes = total_changes + changes;
         generation = generation + 1;
     }
-    
+
     return total_changes;
 }
 
@@ -808,7 +826,7 @@ fn isPrime(n: i32) -> bool {
     if (n % 2 == 0 || n % 3 == 0) {
         return false;
     }
-    
+
     let mut i: i32 = 5;
     while i * i <= n {
         if (n % i == 0 || n % (i + 2) == 0) {
@@ -816,6 +834,6 @@ fn isPrime(n: i32) -> bool {
         }
         i = i + 6;
     }
-    
+
     return true;
 }

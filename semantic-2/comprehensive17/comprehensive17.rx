@@ -25,94 +25,109 @@ Branch optimization in conditional matrix operations
 // - Branch optimization in conditional matrix operations
 
 fn main() {
-    printInt(1700); // Test start marker
-    
+    printlnInt(1700); // Test start marker
+
     // Initialize and test basic matrix operations
     performBasicMatrixOperations();
-    
+
     // Test advanced matrix algorithms
     performAdvancedMatrixAlgorithms();
-    
+
     // Test sparse matrix implementations
     performSparseMatrixOperations();
-    
+
     // Test matrix performance benchmarks
     performMatrixPerformanceBenchmarks();
-    
+
     // Test edge cases and boundary conditions
     testMatrixEdgeCases();
-    
-    printInt(1799); // Test end marker
+
+    printlnInt(1799); // Test end marker
     exit(0);
 }
 
 // Basic matrix operations testing
 fn performBasicMatrixOperations() {
-    printInt(1701); // Basic operations start
-    
+    printlnInt(1701); // Basic operations start
+
     // Initialize test matrices - using 1D arrays to simulate 2D matrices
     // Matrix A: 20x20, Matrix B: 20x20, Result: 20x20
     let mut matrix_a: [i32; 400] = [0; 400];
     let mut matrix_b: [i32; 400] = [0; 400];
     let mut result_matrix: [i32; 400] = [0; 400];
     let matrix_size: i32 = 20;
-    
+
     // Initialize matrices with pattern data
-    initializeMatrices(matrix_a, matrix_b, matrix_size);
-    
+    initializeMatrices(&mut matrix_a, &mut matrix_b, matrix_size);
+
     // Test 1: Matrix addition
-    printInt(1702); // Matrix addition marker
-    matrixAddition(matrix_a, matrix_b, result_matrix, matrix_size);
-    let addition_sum: i32 = calculateMatrixSum(result_matrix, matrix_size);
-    printInt(addition_sum);
-    
+    printlnInt(1702); // Matrix addition marker
+    matrixAddition(
+        &mut matrix_a,
+        &mut matrix_b,
+        &mut result_matrix,
+        matrix_size,
+    );
+    let addition_sum: i32 = calculateMatrixSum(&mut result_matrix, matrix_size);
+    printlnInt(addition_sum);
+
     // Test 2: Matrix subtraction
-    printInt(1703); // Matrix subtraction marker
-    matrixSubtraction(matrix_a, matrix_b, result_matrix, matrix_size);
-    let subtraction_sum: i32 = calculateMatrixSum(result_matrix, matrix_size);
-    printInt(subtraction_sum);
-    
+    printlnInt(1703); // Matrix subtraction marker
+    matrixSubtraction(
+        &mut matrix_a,
+        &mut matrix_b,
+        &mut result_matrix,
+        matrix_size,
+    );
+    let subtraction_sum: i32 = calculateMatrixSum(&mut result_matrix, matrix_size);
+    printlnInt(subtraction_sum);
+
     // Test 3: Matrix multiplication
-    printInt(1704); // Matrix multiplication marker
-    matrixMultiplication(matrix_a, matrix_b, result_matrix, matrix_size);
-    let multiplication_sum: i32 = calculateMatrixSum(result_matrix, matrix_size);
-    printInt(multiplication_sum);
-    
+    printlnInt(1704); // Matrix multiplication marker
+    matrixMultiplication(
+        &mut matrix_a,
+        &mut matrix_b,
+        &mut result_matrix,
+        matrix_size,
+    );
+    let multiplication_sum: i32 = calculateMatrixSum(&mut result_matrix, matrix_size);
+    printlnInt(multiplication_sum);
+
     // Test 4: Matrix transpose
-    printInt(1705); // Matrix transpose marker
-    matrixTranspose(matrix_a, result_matrix, matrix_size);
-    let transpose_sum: i32 = calculateMatrixSum(result_matrix, matrix_size);
-    printInt(transpose_sum);
-    
+    printlnInt(1705); // Matrix transpose marker
+    matrixTranspose(&mut matrix_a, &mut result_matrix, matrix_size);
+    let transpose_sum: i32 = calculateMatrixSum(&mut result_matrix, matrix_size);
+    printlnInt(transpose_sum);
+
     // Test 5: Matrix determinant (for smaller matrices)
-    printInt(1706); // Matrix determinant marker
-    let mut small_matrix: [i32; 16] = [0; 16]; // 4x4 matrix
+    printlnInt(1706); // Matrix determinant marker
+    let small_matrix: [i32; 16] = [0; 16]; // 4x4 matrix
     initializeSmallMatrix(small_matrix);
     let determinant: i32 = calculateDeterminant4x4(small_matrix);
-    printInt(determinant);
+    printlnInt(determinant);
 }
 
 // Initialize matrices with specific patterns for testing
-fn initializeMatrices(mut matrix_a: [i32; 400], mut matrix_b: [i32; 400], size: i32) {
+fn initializeMatrices(matrix_a: &mut [i32; 400], matrix_b: &mut [i32; 400], size: i32) {
     let mut row: i32 = 0;
     while (row < size) {
         let mut col: i32 = 0;
         while (col < size) {
             let index: i32 = row * size + col;
-            
+
             // Matrix A: Identity-like pattern with variations
             if (row == col) {
                 matrix_a[index as usize] = row + col + 10;
             } else {
                 matrix_a[index as usize] = (row * 2 + col * 3) % 7;
             }
-            
+
             // Matrix B: Symmetric pattern
             if (row <= col) {
                 matrix_b[index as usize] = row * col + 5;
                 matrix_b[(col * size + row) as usize] = row * col + 5; // Ensure symmetry
             }
-            
+
             col = col + 1;
         }
         row = row + 1;
@@ -120,10 +135,15 @@ fn initializeMatrices(mut matrix_a: [i32; 400], mut matrix_b: [i32; 400], size: 
 }
 
 // Matrix addition with optimized access patterns
-fn matrixAddition(matrix_a: [i32; 400], matrix_b: [i32; 400], mut result: [i32; 400], size: i32) {
+fn matrixAddition(
+    matrix_a: &mut [i32; 400],
+    matrix_b: &mut [i32; 400],
+    result: &mut [i32; 400],
+    size: i32,
+) {
     let mut i: i32 = 0;
     let total_elements: i32 = size * size;
-    
+
     while (i < total_elements) {
         result[i as usize] = matrix_a[i as usize] + matrix_b[i as usize];
         i = i + 1;
@@ -131,7 +151,12 @@ fn matrixAddition(matrix_a: [i32; 400], matrix_b: [i32; 400], mut result: [i32; 
 }
 
 // Matrix subtraction
-fn matrixSubtraction(matrix_a: [i32; 400], matrix_b: [i32; 400], mut result: [i32; 400], size: i32) {
+fn matrixSubtraction(
+    matrix_a: &mut [i32; 400],
+    matrix_b: &mut [i32; 400],
+    result: &mut [i32; 400],
+    size: i32,
+) {
     let mut row: i32 = 0;
     while (row < size) {
         let mut col: i32 = 0;
@@ -145,26 +170,32 @@ fn matrixSubtraction(matrix_a: [i32; 400], matrix_b: [i32; 400], mut result: [i3
 }
 
 // Matrix multiplication with cache-efficient implementation
-fn matrixMultiplication(matrix_a: [i32; 400], matrix_b: [i32; 400], mut result: [i32; 400], size: i32) {
+fn matrixMultiplication(
+    matrix_a: &mut [i32; 400],
+    matrix_b: &mut [i32; 400],
+    result: &mut [i32; 400],
+    size: i32,
+) {
     // Initialize result matrix to zero
     let mut i: i32 = 0;
     while (i < size * size) {
         result[i as usize] = 0;
         i = i + 1;
     }
-    
+
     // Blocked matrix multiplication for better cache performance
     let block_size: i32 = 4; // Small blocks for this simplified implementation
     let mut row_block: i32 = 0;
-    
+
     while (row_block < size) {
         let mut col_block: i32 = 0;
         while (col_block < size) {
             let mut k_block: i32 = 0;
             while (k_block < size) {
                 // Process block
-                processMatrixBlock(matrix_a, matrix_b, result, size, 
-                                 row_block, col_block, k_block, block_size);
+                processMatrixBlock(
+                    matrix_a, matrix_b, result, size, row_block, col_block, k_block, block_size,
+                );
                 k_block = k_block + block_size;
             }
             col_block = col_block + block_size;
@@ -174,12 +205,20 @@ fn matrixMultiplication(matrix_a: [i32; 400], matrix_b: [i32; 400], mut result: 
 }
 
 // Process a block in matrix multiplication
-fn processMatrixBlock(matrix_a: [i32; 400], matrix_b: [i32; 400], mut result: [i32; 400],
-                     size: i32, row_start: i32, col_start: i32, k_start: i32, block_size: i32) {
+fn processMatrixBlock(
+    matrix_a: &mut [i32; 400],
+    matrix_b: &mut [i32; 400],
+    result: &mut [i32; 400],
+    size: i32,
+    row_start: i32,
+    col_start: i32,
+    k_start: i32,
+    block_size: i32,
+) {
     let row_end: i32 = minValue(row_start + block_size, size);
     let col_end: i32 = minValue(col_start + block_size, size);
     let k_end: i32 = minValue(k_start + block_size, size);
-    
+
     let mut i: i32 = row_start;
     while (i < row_end) {
         let mut j: i32 = col_start;
@@ -189,8 +228,8 @@ fn processMatrixBlock(matrix_a: [i32; 400], matrix_b: [i32; 400], mut result: [i
                 let result_index: i32 = i * size + j;
                 let a_index: i32 = i * size + k;
                 let b_index: i32 = k * size + j;
-                result[result_index as usize] = result[result_index as usize] + 
-                                     matrix_a[a_index as usize] * matrix_b[b_index as usize];
+                result[result_index as usize] = result[result_index as usize]
+                    + matrix_a[a_index as usize] * matrix_b[b_index as usize];
                 k = k + 1;
             }
             j = j + 1;
@@ -209,7 +248,7 @@ fn minValue(a: i32, b: i32) -> i32 {
 }
 
 // Matrix transpose
-fn matrixTranspose(matrix: [i32; 400], mut result: [i32; 400], size: i32) {
+fn matrixTranspose(matrix: &mut [i32; 400], result: &mut [i32; 400], size: i32) {
     let mut row: i32 = 0;
     while (row < size) {
         let mut col: i32 = 0;
@@ -224,32 +263,44 @@ fn matrixTranspose(matrix: [i32; 400], mut result: [i32; 400], size: i32) {
 }
 
 // Calculate sum of all matrix elements
-fn calculateMatrixSum(matrix: [i32; 400], size: i32) -> i32 {
+fn calculateMatrixSum(matrix: &mut [i32; 400], size: i32) -> i32 {
     let mut sum: i32 = 0;
     let mut i: i32 = 0;
     let total_elements: i32 = size * size;
-    
+
     while (i < total_elements) {
         sum = sum + matrix[i as usize];
         i = i + 1;
     }
-    
+
     return sum % 1000000; // Prevent overflow in output
 }
 
 // Initialize small matrix for determinant calculation
 fn initializeSmallMatrix(mut matrix: [i32; 16]) {
     // 4x4 matrix with specific values for determinant testing
-    matrix[0] = 4; matrix[1] = 3; matrix[2] = 2; matrix[3] = 1;
-    matrix[4] = 3; matrix[5] = 4; matrix[6] = 1; matrix[7] = 2;
-    matrix[8] = 2; matrix[9] = 1; matrix[10] = 4; matrix[11] = 3;
-    matrix[12] = 1; matrix[13] = 2; matrix[14] = 3; matrix[15] = 4;
+    matrix[0] = 4;
+    matrix[1] = 3;
+    matrix[2] = 2;
+    matrix[3] = 1;
+    matrix[4] = 3;
+    matrix[5] = 4;
+    matrix[6] = 1;
+    matrix[7] = 2;
+    matrix[8] = 2;
+    matrix[9] = 1;
+    matrix[10] = 4;
+    matrix[11] = 3;
+    matrix[12] = 1;
+    matrix[13] = 2;
+    matrix[14] = 3;
+    matrix[15] = 4;
 }
 
 // Calculate determinant of 4x4 matrix using cofactor expansion
 fn calculateDeterminant4x4(matrix: [i32; 16]) -> i32 {
     let mut determinant: i32 = 0;
-    
+
     // Expand along first row
     let mut col: i32 = 0;
     while (col < 4) {
@@ -261,7 +312,7 @@ fn calculateDeterminant4x4(matrix: [i32; 16]) -> i32 {
         }
         col = col + 1;
     }
-    
+
     return determinant;
 }
 
@@ -269,7 +320,7 @@ fn calculateDeterminant4x4(matrix: [i32; 16]) -> i32 {
 fn calculateCofactor4x4(matrix: [i32; 16], exclude_row: i32, exclude_col: i32) -> i32 {
     let mut minor_matrix: [i32; 9] = [0; 9]; // 3x3 minor matrix
     let mut minor_index: i32 = 0;
-    
+
     let mut row: i32 = 0;
     while (row < 4) {
         if (row != exclude_row) {
@@ -284,7 +335,7 @@ fn calculateCofactor4x4(matrix: [i32; 16], exclude_row: i32, exclude_col: i32) -
         }
         row = row + 1;
     }
-    
+
     return calculateDeterminant3x3(minor_matrix);
 }
 
@@ -293,48 +344,48 @@ fn calculateDeterminant3x3(matrix: [i32; 9]) -> i32 {
     let term1: i32 = matrix[0] * (matrix[4] * matrix[8] - matrix[5] * matrix[7]);
     let term2: i32 = matrix[1] * (matrix[3] * matrix[8] - matrix[5] * matrix[6]);
     let term3: i32 = matrix[2] * (matrix[3] * matrix[7] - matrix[4] * matrix[6]);
-    
+
     return term1 - term2 + term3;
 }
 
 // Advanced matrix algorithms
 fn performAdvancedMatrixAlgorithms() {
-    printInt(1710); // Advanced algorithms start
-    
+    printlnInt(1710); // Advanced algorithms start
+
     // Test 1: Matrix power calculation
-    printInt(1711); // Matrix power marker
+    printlnInt(1711); // Matrix power marker
     let mut base_matrix: [i32; 100] = [0; 100]; // 10x10 matrix
     let matrix_size: i32 = 10;
-    initializeMatrixForPower(base_matrix, matrix_size);
-    
+    initializeMatrixForPower(&mut base_matrix, matrix_size);
+
     let mut power_result: [i32; 100] = [0; 100];
-    matrixPower(base_matrix, power_result, matrix_size, 3);
-    let power_sum: i32 = calculateMatrixSum100(power_result, matrix_size);
-    printInt(power_sum);
-    
+    matrixPower(&base_matrix, &mut power_result, matrix_size, 3);
+    let power_sum: i32 = calculateMatrixSum100(&power_result, matrix_size);
+    printlnInt(power_sum);
+
     // Test 2: Matrix rotation operations
-    printInt(1712); // Matrix rotation marker
+    printlnInt(1712); // Matrix rotation marker
     let mut rotation_matrix: [i32; 64] = [0; 64]; // 8x8 matrix
-    initializeRotationMatrix(rotation_matrix);
-    
-    rotateMatrix90Degrees(rotation_matrix, 8);
+    initializeRotationMatrix(&mut rotation_matrix);
+
+    rotateMatrix90Degrees(&mut rotation_matrix, 8);
     let rotation_sum: i32 = calculateMatrixSum64(rotation_matrix);
-    printInt(rotation_sum);
-    
+    printlnInt(rotation_sum);
+
     // Test 3: Matrix diagonal operations
-    printInt(1713); // Matrix diagonal marker
-    let diagonal_sum: i32 = calculateDiagonalSums(base_matrix, matrix_size);
-    printInt(diagonal_sum);
-    
+    printlnInt(1713); // Matrix diagonal marker
+    let diagonal_sum: i32 = calculateDiagonalSums(&base_matrix, matrix_size);
+    printlnInt(diagonal_sum);
+
     // Test 4: Matrix trace and norm calculations
-    printInt(1714); // Matrix trace marker
-    let trace: i32 = calculateMatrixTrace(base_matrix, matrix_size);
-    let norm: i32 = calculateMatrixNorm(base_matrix, matrix_size);
-    printInt(trace + norm);
+    printlnInt(1714); // Matrix trace marker
+    let trace: i32 = calculateMatrixTrace(&base_matrix, matrix_size);
+    let norm: i32 = calculateMatrixNorm(&base_matrix, matrix_size);
+    printlnInt(trace + norm);
 }
 
 // Initialize matrix for power calculation
-fn initializeMatrixForPower(mut matrix: [i32; 100], size: i32) {
+fn initializeMatrixForPower(matrix: &mut [i32; 100], size: i32) {
     let mut row: i32 = 0;
     while (row < size) {
         let mut col: i32 = 0;
@@ -354,29 +405,29 @@ fn initializeMatrixForPower(mut matrix: [i32; 100], size: i32) {
 }
 
 // Calculate matrix power using repeated matrix multiplication
-fn matrixPower(base: [i32; 100], mut result: [i32; 100], size: i32, power: i32) {
+fn matrixPower(base: &[i32; 100], result: &mut [i32; 100], size: i32, power: i32) {
     // Initialize result as identity matrix
     initializeIdentityMatrix(result, size);
-    
+
     let mut temp_matrix: [i32; 100] = [0; 100];
     let mut current_power: i32 = 0;
-    
+
     while (current_power < power) {
         // result = result * base
-        matrixMultiplication100(result, base, temp_matrix, size);
-        copyMatrix100(temp_matrix, result, size);
+        matrixMultiplication100(result, base, &mut temp_matrix, size);
+        copyMatrix100(&temp_matrix, result, size);
         current_power = current_power + 1;
     }
 }
 
 // Initialize identity matrix
-fn initializeIdentityMatrix(mut matrix: [i32; 100], size: i32) {
+fn initializeIdentityMatrix(matrix: &mut [i32; 100], size: i32) {
     let mut i: i32 = 0;
     while (i < size * size) {
         matrix[i as usize] = 0;
         i = i + 1;
     }
-    
+
     let mut diag: i32 = 0;
     while (diag < size) {
         matrix[(diag * size + diag) as usize] = 1;
@@ -385,7 +436,12 @@ fn initializeIdentityMatrix(mut matrix: [i32; 100], size: i32) {
 }
 
 // Matrix multiplication for 10x10 matrices
-fn matrixMultiplication100(matrix_a: [i32; 100], matrix_b: [i32; 100], mut result: [i32; 100], size: i32) {
+fn matrixMultiplication100(
+    matrix_a: &[i32; 100],
+    matrix_b: &[i32; 100],
+    result: &mut [i32; 100],
+    size: i32,
+) {
     let mut i: i32 = 0;
     while (i < size) {
         let mut j: i32 = 0;
@@ -393,8 +449,8 @@ fn matrixMultiplication100(matrix_a: [i32; 100], matrix_b: [i32; 100], mut resul
             result[(i * size + j) as usize] = 0;
             let mut k: i32 = 0;
             while (k < size) {
-                result[(i * size + j) as usize] = result[(i * size + j) as usize] + 
-                                     matrix_a[(i * size + k) as usize] * matrix_b[(k * size + j) as usize];
+                result[(i * size + j) as usize] = result[(i * size + j) as usize]
+                    + matrix_a[(i * size + k) as usize] * matrix_b[(k * size + j) as usize];
                 k = k + 1;
             }
             j = j + 1;
@@ -404,7 +460,7 @@ fn matrixMultiplication100(matrix_a: [i32; 100], matrix_b: [i32; 100], mut resul
 }
 
 // Copy matrix for 10x10 matrices
-fn copyMatrix100(source: [i32; 100], mut dest: [i32; 100], size: i32) {
+fn copyMatrix100(source: &[i32; 100], dest: &mut [i32; 100], size: i32) {
     let mut i: i32 = 0;
     while (i < size * size) {
         dest[i as usize] = source[i as usize];
@@ -413,7 +469,7 @@ fn copyMatrix100(source: [i32; 100], mut dest: [i32; 100], size: i32) {
 }
 
 // Calculate sum for 10x10 matrix
-fn calculateMatrixSum100(matrix: [i32; 100], size: i32) -> i32 {
+fn calculateMatrixSum100(matrix: &[i32; 100], size: i32) -> i32 {
     let mut sum: i32 = 0;
     let mut i: i32 = 0;
     while (i < size * size) {
@@ -424,7 +480,7 @@ fn calculateMatrixSum100(matrix: [i32; 100], size: i32) -> i32 {
 }
 
 // Initialize rotation matrix
-fn initializeRotationMatrix(mut matrix: [i32; 64]) {
+fn initializeRotationMatrix(matrix: &mut [i32; 64]) {
     let mut i: i32 = 0;
     while (i < 8) {
         let mut j: i32 = 0;
@@ -437,16 +493,16 @@ fn initializeRotationMatrix(mut matrix: [i32; 64]) {
 }
 
 // Rotate matrix 90 degrees clockwise
-fn rotateMatrix90Degrees(mut matrix: [i32; 64], size: i32) {
+fn rotateMatrix90Degrees(matrix: &mut [i32; 64], size: i32) {
     let mut temp_matrix: [i32; 64] = [0; 64];
-    
+
     // Copy to temp
     let mut i: i32 = 0;
     while (i < size * size) {
         temp_matrix[i as usize] = matrix[i as usize];
         i = i + 1;
     }
-    
+
     // Rotate: new[j][size-1-i] = old[i][j]
     i = 0;
     while (i < size) {
@@ -473,22 +529,22 @@ fn calculateMatrixSum64(matrix: [i32; 64]) -> i32 {
 }
 
 // Calculate diagonal sums (main and anti-diagonal)
-fn calculateDiagonalSums(matrix: [i32; 100], size: i32) -> i32 {
+fn calculateDiagonalSums(matrix: &[i32; 100], size: i32) -> i32 {
     let mut main_diagonal_sum: i32 = 0;
     let mut anti_diagonal_sum: i32 = 0;
-    
+
     let mut i: i32 = 0;
     while (i < size) {
         main_diagonal_sum = main_diagonal_sum + matrix[(i * size + i) as usize];
         anti_diagonal_sum = anti_diagonal_sum + matrix[(i * size + (size - 1 - i)) as usize];
         i = i + 1;
     }
-    
+
     return main_diagonal_sum + anti_diagonal_sum;
 }
 
 // Calculate matrix trace (sum of diagonal elements)
-fn calculateMatrixTrace(matrix: [i32; 100], size: i32) -> i32 {
+fn calculateMatrixTrace(matrix: &[i32; 100], size: i32) -> i32 {
     let mut trace: i32 = 0;
     let mut i: i32 = 0;
     while (i < size) {
@@ -499,14 +555,14 @@ fn calculateMatrixTrace(matrix: [i32; 100], size: i32) -> i32 {
 }
 
 // Calculate matrix norm (Frobenius norm)
-fn calculateMatrixNorm(matrix: [i32; 100], size: i32) -> i32 {
+fn calculateMatrixNorm(matrix: &[i32; 100], size: i32) -> i32 {
     let mut norm_squared: i32 = 0;
     let mut i: i32 = 0;
     while (i < size * size) {
         norm_squared = norm_squared + matrix[i as usize] * matrix[i as usize];
         i = i + 1;
     }
-    
+
     // Return approximate square root
     return approximateSquareRoot(norm_squared);
 }
@@ -516,14 +572,14 @@ fn approximateSquareRoot(value: i32) -> i32 {
     if (value <= 1) {
         return value;
     }
-    
+
     let mut left: i32 = 1;
     let mut right: i32 = value;
     let mut result: i32 = 1;
-    
+
     while (left <= right) {
         let mid: i32 = left + (right - left) / 2;
-        
+
         if (mid <= value / mid) {
             result = mid;
             left = mid + 1;
@@ -531,7 +587,7 @@ fn approximateSquareRoot(value: i32) -> i32 {
             right = mid - 1;
         }
     }
-    
+
     return result;
 }
 
@@ -546,61 +602,87 @@ fn absValue(value: i32) -> i32 {
 
 // Sparse matrix operations
 fn performSparseMatrixOperations() {
-    printInt(1720); // Sparse matrix start
-    
+    printlnInt(1720); // Sparse matrix start
+
     // Sparse matrix representation: [row, col, value] triplets
     // Using coordinate (COO) format for simplicity
-    let mut sparse_rows: [i32; 200] = [0; 200];    // Row indices
-    let mut sparse_cols: [i32; 200] = [0; 200];    // Column indices  
-    let mut sparse_values: [i32; 200] = [0; 200];  // Values
-    let mut sparse_count: i32 = 0;                 // Number of non-zero elements
-    
+    let mut sparse_rows: [i32; 200] = [0; 200]; // Row indices
+    let mut sparse_cols: [i32; 200] = [0; 200]; // Column indices  
+    let mut sparse_values: [i32; 200] = [0; 200]; // Values
+    let mut sparse_count: i32 = 0; // Number of non-zero elements
+
     // Create sparse matrix with random non-zero elements
-    sparse_count = createSparseMatrix(sparse_rows, sparse_cols, sparse_values);
-    printInt(sparse_count);
-    
+    sparse_count = createSparseMatrix(&mut sparse_rows, &mut sparse_cols, &mut sparse_values);
+    printlnInt(sparse_count);
+
     // Test 1: Sparse matrix addition
-    printInt(1721); // Sparse addition marker
+    printlnInt(1721); // Sparse addition marker
     let mut sparse2_rows: [i32; 200] = [0; 200];
     let mut sparse2_cols: [i32; 200] = [0; 200];
     let mut sparse2_values: [i32; 200] = [0; 200];
-    let sparse2_count: i32 = createSparseMatrix2(sparse2_rows, sparse2_cols, sparse2_values);
-    
+    let sparse2_count: i32 =
+        createSparseMatrix2(&mut sparse2_rows, &mut sparse2_cols, &mut sparse2_values);
+
     let mut result_rows: [i32; 400] = [0; 400];
     let mut result_cols: [i32; 400] = [0; 400];
     let mut result_values: [i32; 400] = [0; 400];
     let result_count: i32 = sparseMatrixAddition(
-        sparse_rows, sparse_cols, sparse_values, sparse_count,
-        sparse2_rows, sparse2_cols, sparse2_values, sparse2_count,
-        result_rows, result_cols, result_values
+        &mut sparse_rows,
+        &mut sparse_cols,
+        &mut sparse_values,
+        sparse_count,
+        &mut sparse2_rows,
+        &mut sparse2_cols,
+        &mut sparse2_values,
+        sparse2_count,
+        &mut result_rows,
+        &mut result_cols,
+        &mut result_values,
     );
-    printInt(result_count);
-    
+    printlnInt(result_count);
+
     // Test 2: Sparse matrix transpose
-    printInt(1722); // Sparse transpose marker
+    printlnInt(1722); // Sparse transpose marker
     let mut transpose_rows: [i32; 200] = [0; 200];
     let mut transpose_cols: [i32; 200] = [0; 200];
     let mut transpose_values: [i32; 200] = [0; 200];
-    sparseMatrixTranspose(sparse_rows, sparse_cols, sparse_values, sparse_count,
-                         transpose_rows, transpose_cols, transpose_values);
-    
-    let transpose_sum: i32 = calculateSparseSum(transpose_values, sparse_count);
-    printInt(transpose_sum);
-    
-    // Test 3: Sparse matrix multiplication
-    printInt(1723); // Sparse multiplication marker
-    let mult_result: i32 = sparseMatrixMultiplication(
-        sparse_rows, sparse_cols, sparse_values, sparse_count,
-        transpose_rows, transpose_cols, transpose_values, sparse_count
+    sparseMatrixTranspose(
+        &mut sparse_rows,
+        &mut sparse_cols,
+        &mut sparse_values,
+        sparse_count,
+        &mut transpose_rows,
+        &mut transpose_cols,
+        &mut transpose_values,
     );
-    printInt(mult_result);
+
+    let transpose_sum: i32 = calculateSparseSum(&mut transpose_values, sparse_count);
+    printlnInt(transpose_sum);
+
+    // Test 3: Sparse matrix multiplication
+    printlnInt(1723); // Sparse multiplication marker
+    let mult_result: i32 = sparseMatrixMultiplication(
+        &mut sparse_rows,
+        &mut sparse_cols,
+        &mut sparse_values,
+        sparse_count,
+        &mut transpose_rows,
+        &mut transpose_cols,
+        &mut transpose_values,
+        sparse_count,
+    );
+    printlnInt(mult_result);
 }
 
 // Create first sparse matrix
-fn createSparseMatrix(mut rows: [i32; 200], mut cols: [i32; 200], mut values: [i32; 200]) -> i32 {
+fn createSparseMatrix(
+    rows: &mut [i32; 200],
+    cols: &mut [i32; 200],
+    values: &mut [i32; 200],
+) -> i32 {
     let mut count: i32 = 0;
     let matrix_size: i32 = 30; // 30x30 sparse matrix
-    
+
     // Create pattern: diagonal and some random elements
     let mut i: i32 = 0;
     while (i < matrix_size && count < 200) {
@@ -609,7 +691,7 @@ fn createSparseMatrix(mut rows: [i32; 200], mut cols: [i32; 200], mut values: [i
         cols[count as usize] = i;
         values[count as usize] = i + 10;
         count = count + 1;
-        
+
         // Super diagonal (if exists)
         if (i + 1 < matrix_size && count < 200) {
             rows[count as usize] = i;
@@ -617,7 +699,7 @@ fn createSparseMatrix(mut rows: [i32; 200], mut cols: [i32; 200], mut values: [i
             values[count as usize] = i + 5;
             count = count + 1;
         }
-        
+
         // Some scattered elements
         if (i % 3 == 0 && i + 5 < matrix_size && count < 200) {
             rows[count as usize] = i;
@@ -625,18 +707,22 @@ fn createSparseMatrix(mut rows: [i32; 200], mut cols: [i32; 200], mut values: [i
             values[count as usize] = i * 2;
             count = count + 1;
         }
-        
+
         i = i + 1;
     }
-    
+
     return count;
 }
 
 // Create second sparse matrix for operations
-fn createSparseMatrix2(mut rows: [i32; 200], mut cols: [i32; 200], mut values: [i32; 200]) -> i32 {
+fn createSparseMatrix2(
+    rows: &mut [i32; 200],
+    cols: &mut [i32; 200],
+    values: &mut [i32; 200],
+) -> i32 {
     let mut count: i32 = 0;
     let matrix_size: i32 = 30;
-    
+
     let mut i: i32 = 0;
     while (i < matrix_size && count < 200) {
         // Anti-diagonal pattern
@@ -646,7 +732,7 @@ fn createSparseMatrix2(mut rows: [i32; 200], mut cols: [i32; 200], mut values: [
             values[count as usize] = i + 3;
             count = count + 1;
         }
-        
+
         // Some other pattern
         if (i % 4 == 0 && count < 200) {
             rows[count as usize] = i;
@@ -654,28 +740,36 @@ fn createSparseMatrix2(mut rows: [i32; 200], mut cols: [i32; 200], mut values: [
             values[count as usize] = i * 3;
             count = count + 1;
         }
-        
+
         i = i + 1;
     }
-    
+
     return count;
 }
 
 // Sparse matrix addition
 fn sparseMatrixAddition(
-    rows1: [i32; 200], cols1: [i32; 200], values1: [i32; 200], count1: i32,
-    rows2: [i32; 200], cols2: [i32; 200], values2: [i32; 200], count2: i32,
-    mut result_rows: [i32; 400], mut result_cols: [i32; 400], mut result_values: [i32; 400]
+    rows1: &mut [i32; 200],
+    cols1: &mut [i32; 200],
+    values1: &mut [i32; 200],
+    count1: i32,
+    rows2: &mut [i32; 200],
+    cols2: &mut [i32; 200],
+    values2: &mut [i32; 200],
+    count2: i32,
+    result_rows: &mut [i32; 400],
+    result_cols: &mut [i32; 400],
+    result_values: &mut [i32; 400],
 ) -> i32 {
     let mut result_count: i32 = 0;
     let mut i1: i32 = 0;
     let mut i2: i32 = 0;
-    
+
     // Merge the two sparse matrices
     while (i1 < count1 && i2 < count2 && result_count < 400) {
         let pos1: i32 = rows1[i1 as usize] * 100 + cols1[i1 as usize]; // Linearize position
         let pos2: i32 = rows2[i2 as usize] * 100 + cols2[i2 as usize];
-        
+
         if (pos1 < pos2) {
             result_rows[result_count as usize] = rows1[i1 as usize];
             result_cols[result_count as usize] = cols1[i1 as usize];
@@ -698,7 +792,7 @@ fn sparseMatrixAddition(
             i2 = i2 + 1;
         }
     }
-    
+
     // Add remaining elements from first matrix
     while (i1 < count1 && result_count < 400) {
         result_rows[result_count as usize] = rows1[i1 as usize];
@@ -707,7 +801,7 @@ fn sparseMatrixAddition(
         result_count = result_count + 1;
         i1 = i1 + 1;
     }
-    
+
     // Add remaining elements from second matrix
     while (i2 < count2 && result_count < 400) {
         result_rows[result_count as usize] = rows2[i2 as usize];
@@ -716,23 +810,28 @@ fn sparseMatrixAddition(
         result_count = result_count + 1;
         i2 = i2 + 1;
     }
-    
+
     return result_count;
 }
 
 // Sparse matrix transpose
 fn sparseMatrixTranspose(
-    rows: [i32; 200], cols: [i32; 200], values: [i32; 200], count: i32,
-    mut trans_rows: [i32; 200], mut trans_cols: [i32; 200], mut trans_values: [i32; 200]
+    rows: &mut [i32; 200],
+    cols: &mut [i32; 200],
+    values: &mut [i32; 200],
+    count: i32,
+    trans_rows: &mut [i32; 200],
+    trans_cols: &mut [i32; 200],
+    trans_values: &mut [i32; 200],
 ) {
     let mut i: i32 = 0;
     while (i < count) {
-        trans_rows[i as usize] = cols[i as usize];    // Swap row and column
+        trans_rows[i as usize] = cols[i as usize]; // Swap row and column
         trans_cols[i as usize] = rows[i as usize];
         trans_values[i as usize] = values[i as usize];
         i = i + 1;
     }
-    
+
     // Sort by new row, then by new column (simple bubble sort for this implementation)
     let mut swapped: i32 = 1;
     while (swapped == 1) {
@@ -741,21 +840,21 @@ fn sparseMatrixTranspose(
         while (i < count - 1) {
             let pos1: i32 = trans_rows[i as usize] * 100 + trans_cols[i as usize];
             let pos2: i32 = trans_rows[i as usize + 1] * 100 + trans_cols[i as usize + 1];
-            
+
             if (pos1 > pos2) {
                 // Swap elements
                 let temp_row: i32 = trans_rows[i as usize];
                 let temp_col: i32 = trans_cols[i as usize];
                 let temp_val: i32 = trans_values[i as usize];
-                
+
                 trans_rows[i as usize] = trans_rows[i as usize + 1];
                 trans_cols[i as usize] = trans_cols[i as usize + 1];
                 trans_values[i as usize] = trans_values[i as usize + 1];
-                
+
                 trans_rows[i as usize + 1] = temp_row;
                 trans_cols[i as usize + 1] = temp_col;
                 trans_values[i as usize + 1] = temp_val;
-                
+
                 swapped = 1;
             }
             i = i + 1;
@@ -764,7 +863,7 @@ fn sparseMatrixTranspose(
 }
 
 // Calculate sum of sparse matrix values
-fn calculateSparseSum(values: [i32; 200], count: i32) -> i32 {
+fn calculateSparseSum(values: &mut [i32; 200], count: i32) -> i32 {
     let mut sum: i32 = 0;
     let mut i: i32 = 0;
     while (i < count) {
@@ -776,18 +875,24 @@ fn calculateSparseSum(values: [i32; 200], count: i32) -> i32 {
 
 // Simplified sparse matrix multiplication (returns sum of result)
 fn sparseMatrixMultiplication(
-    rows1: [i32; 200], cols1: [i32; 200], values1: [i32; 200], count1: i32,
-    rows2: [i32; 200], cols2: [i32; 200], values2: [i32; 200], count2: i32
+    rows1: &mut [i32; 200],
+    cols1: &mut [i32; 200],
+    values1: &mut [i32; 200],
+    count1: i32,
+    rows2: &mut [i32; 200],
+    cols2: &mut [i32; 200],
+    values2: &mut [i32; 200],
+    count2: i32,
 ) -> i32 {
     let mut result_sum: i32 = 0;
-    
+
     // For each non-zero element in first matrix
     let mut i: i32 = 0;
     while (i < count1) {
         let row: i32 = rows1[i as usize];
         let mid_col: i32 = cols1[i as usize];
         let val1: i32 = values1[i as usize];
-        
+
         // Find matching elements in second matrix
         let mut j: i32 = 0;
         while (j < count2) {
@@ -798,27 +903,27 @@ fn sparseMatrixMultiplication(
             }
             j = j + 1;
         }
-        
+
         i = i + 1;
     }
-    
+
     return result_sum % 100000;
 }
 
 // Matrix performance benchmarks
 fn performMatrixPerformanceBenchmarks() {
-    printInt(1730); // Performance benchmark start
-    
+    printlnInt(1730); // Performance benchmark start
+
     // Benchmark 1: Large matrix operations
-    printInt(1731); // Large matrix benchmark
+    printlnInt(1731); // Large matrix benchmark
     performLargeMatrixBenchmark();
-    
+
     // Benchmark 2: Repeated operations
-    printInt(1732); // Repeated operations benchmark
+    printlnInt(1732); // Repeated operations benchmark
     performRepeatedOperationsBenchmark();
-    
+
     // Benchmark 3: Memory access patterns
-    printInt(1733); // Memory access patterns benchmark
+    printlnInt(1733); // Memory access patterns benchmark
     performMemoryAccessBenchmark();
 }
 
@@ -828,27 +933,32 @@ fn performLargeMatrixBenchmark() {
     let mut large_matrix_b: [i32; 625] = [0; 625];
     let mut large_result: [i32; 625] = [0; 625];
     let large_size: i32 = 25;
-    
+
     // Initialize with complex patterns
-    initializeLargeMatrices(large_matrix_a, large_matrix_b, large_size);
-    
+    initializeLargeMatrices(&mut large_matrix_a, &mut large_matrix_b, large_size);
+
     // Perform multiple operations
     let start_time: i32 = 1000; // Simulated timing
-    
+
     // Multiple matrix multiplications
     let mut round: i32 = 0;
     while (round < 3) {
-        matrixMultiplication625(large_matrix_a, large_matrix_b, large_result, large_size);
-        copyMatrix625(large_result, large_matrix_a, large_size);
+        matrixMultiplication625(
+            &mut large_matrix_a,
+            &mut large_matrix_b,
+            &mut large_result,
+            large_size,
+        );
+        copyMatrix625(&mut large_result, &mut large_matrix_a, large_size);
         round = round + 1;
     }
-    
-    let result_sum: i32 = calculateMatrixSum625(large_result, large_size);
-    printInt(result_sum);
+
+    let result_sum: i32 = calculateMatrixSum625(&mut large_result, large_size);
+    printlnInt(result_sum);
 }
 
 // Initialize large matrices
-fn initializeLargeMatrices(mut matrix_a: [i32; 625], mut matrix_b: [i32; 625], size: i32) {
+fn initializeLargeMatrices(matrix_a: &mut [i32; 625], matrix_b: &mut [i32; 625], size: i32) {
     let mut i: i32 = 0;
     while (i < size) {
         let mut j: i32 = 0;
@@ -863,7 +973,12 @@ fn initializeLargeMatrices(mut matrix_a: [i32; 625], mut matrix_b: [i32; 625], s
 }
 
 // Matrix multiplication for 25x25 matrices
-fn matrixMultiplication625(matrix_a: [i32; 625], matrix_b: [i32; 625], mut result: [i32; 625], size: i32) {
+fn matrixMultiplication625(
+    matrix_a: &mut [i32; 625],
+    matrix_b: &mut [i32; 625],
+    result: &mut [i32; 625],
+    size: i32,
+) {
     let mut i: i32 = 0;
     while (i < size) {
         let mut j: i32 = 0;
@@ -871,8 +986,8 @@ fn matrixMultiplication625(matrix_a: [i32; 625], matrix_b: [i32; 625], mut resul
             result[(i * size + j) as usize] = 0;
             let mut k: i32 = 0;
             while (k < size) {
-                result[(i * size + j) as usize] = result[(i * size + j) as usize] + 
-                                     matrix_a[(i * size + k) as usize] * matrix_b[(k * size + j) as usize];
+                result[(i * size + j) as usize] = result[(i * size + j) as usize]
+                    + matrix_a[(i * size + k) as usize] * matrix_b[(k * size + j) as usize];
                 k = k + 1;
             }
             j = j + 1;
@@ -882,7 +997,7 @@ fn matrixMultiplication625(matrix_a: [i32; 625], matrix_b: [i32; 625], mut resul
 }
 
 // Copy matrix for 25x25 matrices
-fn copyMatrix625(source: [i32; 625], mut dest: [i32; 625], size: i32) {
+fn copyMatrix625(source: &mut [i32; 625], dest: &mut [i32; 625], size: i32) {
     let mut i: i32 = 0;
     while (i < size * size) {
         dest[i as usize] = source[i as usize];
@@ -891,11 +1006,11 @@ fn copyMatrix625(source: [i32; 625], mut dest: [i32; 625], size: i32) {
 }
 
 // Calculate sum for 25x25 matrix
-fn calculateMatrixSum625(matrix: [i32; 625], size: i32) -> i32 {
+fn calculateMatrixSum625(matrix: &mut [i32; 625], size: i32) -> i32 {
     let mut sum: i32 = 0;
     let mut i: i32 = 0;
     while (i < size * size) {
-        sum = sum + matrix[i as usize];
+        sum = (sum + matrix[i as usize]) % 1000000;
         i = i + 1;
     }
     return sum % 1000000;
@@ -906,28 +1021,28 @@ fn performRepeatedOperationsBenchmark() {
     let mut test_matrix: [i32; 144] = [0; 144]; // 12x12
     let mut temp_matrix: [i32; 144] = [0; 144];
     let size: i32 = 12;
-    
+
     // Initialize
     let mut i: i32 = 0;
     while (i < size * size) {
         test_matrix[i as usize] = (i * 3 + 7) % 20;
         i = i + 1;
     }
-    
+
     // Repeated transpose operations
     let mut operations: i32 = 0;
     while (operations < 10) {
-        matrixTranspose144(test_matrix, temp_matrix, size);
-        copyMatrix144(temp_matrix, test_matrix, size);
+        matrixTranspose144(&mut test_matrix, &mut temp_matrix, size);
+        copyMatrix144(&mut temp_matrix, &mut test_matrix, size);
         operations = operations + 1;
     }
-    
-    let final_sum: i32 = calculateMatrixSum144(test_matrix, size);
-    printInt(final_sum);
+
+    let final_sum: i32 = calculateMatrixSum144(&mut test_matrix, size);
+    printlnInt(final_sum);
 }
 
 // Matrix transpose for 12x12
-fn matrixTranspose144(matrix: [i32; 144], mut result: [i32; 144], size: i32) {
+fn matrixTranspose144(matrix: &mut [i32; 144], result: &mut [i32; 144], size: i32) {
     let mut i: i32 = 0;
     while (i < size) {
         let mut j: i32 = 0;
@@ -940,7 +1055,7 @@ fn matrixTranspose144(matrix: [i32; 144], mut result: [i32; 144], size: i32) {
 }
 
 // Copy matrix for 12x12
-fn copyMatrix144(source: [i32; 144], mut dest: [i32; 144], size: i32) {
+fn copyMatrix144(source: &mut [i32; 144], dest: &mut [i32; 144], size: i32) {
     let mut i: i32 = 0;
     while (i < 144) {
         dest[i as usize] = source[i as usize];
@@ -949,10 +1064,10 @@ fn copyMatrix144(source: [i32; 144], mut dest: [i32; 144], size: i32) {
 }
 
 // Calculate sum for 12x12 matrix
-fn calculateMatrixSum144(matrix: [i32; 144], size: i32) -> i32 {
+fn calculateMatrixSum144(matrix: &mut [i32; 144], size: i32) -> i32 {
     let mut sum: i32 = 0;
     let mut i: i32 = 0;
-    while (i < 144) {
+    while (i < size * size) {
         sum = sum + matrix[i as usize];
         i = i + 1;
     }
@@ -963,25 +1078,25 @@ fn calculateMatrixSum144(matrix: [i32; 144], size: i32) -> i32 {
 fn performMemoryAccessBenchmark() {
     let mut access_matrix: [i32; 256] = [0; 256]; // 16x16
     let size: i32 = 16;
-    
+
     // Initialize matrix
     let mut i: i32 = 0;
     while (i < 256) {
         access_matrix[i as usize] = i + 1;
         i = i + 1;
     }
-    
+
     // Test different access patterns
-    let row_major_sum: i32 = testRowMajorAccess(access_matrix, size);
-    let col_major_sum: i32 = testColumnMajorAccess(access_matrix, size);
-    let diagonal_sum: i32 = testDiagonalAccess(access_matrix, size);
-    let random_sum: i32 = testRandomAccess(access_matrix, size);
-    
-    printInt(row_major_sum + col_major_sum + diagonal_sum + random_sum);
+    let row_major_sum: i32 = testRowMajorAccess(&access_matrix, size);
+    let col_major_sum: i32 = testColumnMajorAccess(&access_matrix, size);
+    let diagonal_sum: i32 = testDiagonalAccess(&access_matrix, size);
+    let random_sum: i32 = testRandomAccess(&access_matrix, size);
+
+    printlnInt(row_major_sum + col_major_sum + diagonal_sum + random_sum);
 }
 
 // Test row-major access pattern
-fn testRowMajorAccess(matrix: [i32; 256], size: i32) -> i32 {
+fn testRowMajorAccess(matrix: &[i32; 256], size: i32) -> i32 {
     let mut sum: i32 = 0;
     let mut i: i32 = 0;
     while (i < size) {
@@ -996,7 +1111,7 @@ fn testRowMajorAccess(matrix: [i32; 256], size: i32) -> i32 {
 }
 
 // Test column-major access pattern
-fn testColumnMajorAccess(matrix: [i32; 256], size: i32) -> i32 {
+fn testColumnMajorAccess(matrix: &[i32; 256], size: i32) -> i32 {
     let mut sum: i32 = 0;
     let mut j: i32 = 0;
     while (j < size) {
@@ -1011,9 +1126,9 @@ fn testColumnMajorAccess(matrix: [i32; 256], size: i32) -> i32 {
 }
 
 // Test diagonal access pattern
-fn testDiagonalAccess(matrix: [i32; 256], size: i32) -> i32 {
+fn testDiagonalAccess(matrix: &[i32; 256], size: i32) -> i32 {
     let mut sum: i32 = 0;
-    
+
     // Main diagonals
     let mut k: i32 = -(size - 1);
     while (k < size) {
@@ -1027,15 +1142,15 @@ fn testDiagonalAccess(matrix: [i32; 256], size: i32) -> i32 {
         }
         k = k + 1;
     }
-    
+
     return sum % 10000;
 }
 
 // Test random access pattern
-fn testRandomAccess(matrix: [i32; 256], size: i32) -> i32 {
+fn testRandomAccess(matrix: &[i32; 256], size: i32) -> i32 {
     let mut sum: i32 = 0;
     let mut seed: i32 = 7;
-    
+
     let mut access_count: i32 = 0;
     while (access_count < 100) {
         // Simple pseudo-random number generation
@@ -1043,49 +1158,49 @@ fn testRandomAccess(matrix: [i32; 256], size: i32) -> i32 {
         let row: i32 = seed % size;
         seed = (seed * 13 + 11) % 251;
         let col: i32 = seed % size;
-        
+
         sum = sum + matrix[(row * size + col) as usize];
         access_count = access_count + 1;
     }
-    
+
     return sum % 10000;
 }
 
 // Test edge cases and boundary conditions
 fn testMatrixEdgeCases() {
-    printInt(1740); // Edge cases start
-    
+    printlnInt(1740); // Edge cases start
+
     // Test 1: 1x1 matrix operations
     testSingleElementMatrix();
-    
+
     // Test 2: Empty and minimal matrices
     testMinimalMatrices();
-    
+
     // Test 3: Boundary value matrices
     testBoundaryValueMatrices();
-    
+
     // Test 4: Overflow and underflow conditions
     testOverflowConditions();
-    
-    printInt(1749); // Edge cases end
+
+    printlnInt(1749); // Edge cases end
 }
 
 // Test single element matrix
 fn testSingleElementMatrix() {
     let mut single_matrix: [i32; 1] = [42];
     let mut result_matrix: [i32; 1] = [0];
-    
+
     // Addition
     result_matrix[0] = single_matrix[0] + single_matrix[0];
-    printInt(result_matrix[0]);
-    
+    printlnInt(result_matrix[0]);
+
     // Multiplication
     result_matrix[0] = single_matrix[0] * single_matrix[0];
-    printInt(result_matrix[0]);
-    
+    printlnInt(result_matrix[0]);
+
     // Transpose (should be same)
     result_matrix[0] = single_matrix[0];
-    printInt(result_matrix[0]);
+    printlnInt(result_matrix[0]);
 }
 
 // Test minimal matrices
@@ -1093,19 +1208,19 @@ fn testMinimalMatrices() {
     // 2x2 matrix tests
     let mut matrix2x2: [i32; 4] = [1, 2, 3, 4];
     let mut result2x2: [i32; 4] = [0; 4];
-    
+
     // Transpose 2x2
     result2x2[0] = matrix2x2[0]; // [0,0] -> [0,0]
     result2x2[1] = matrix2x2[2]; // [1,0] -> [0,1]
     result2x2[2] = matrix2x2[1]; // [0,1] -> [1,0]
     result2x2[3] = matrix2x2[3]; // [1,1] -> [1,1]
-    
+
     let transpose_sum: i32 = result2x2[0] + result2x2[1] + result2x2[2] + result2x2[3];
-    printInt(transpose_sum);
-    
+    printlnInt(transpose_sum);
+
     // 2x2 determinant
     let det2x2: i32 = matrix2x2[0] * matrix2x2[3] - matrix2x2[1] * matrix2x2[2];
-    printInt(det2x2);
+    printlnInt(det2x2);
 }
 
 // Test boundary value matrices
@@ -1121,28 +1236,28 @@ fn testBoundaryValueMatrices() {
     large_value_matrix[6] = 15000;
     large_value_matrix[7] = -15000;
     large_value_matrix[8] = 0;
-    
+
     let mut sum: i32 = 0;
     let mut i: i32 = 0;
     while (i < 9) {
         sum = sum + large_value_matrix[i as usize];
         i = i + 1;
     }
-    printInt(sum);
-    
+    printlnInt(sum);
+
     // Matrix with all zeros
     let mut zero_matrix: [i32; 16] = [0; 16];
-    let zero_sum: i32 = calculateMatrixSum16(zero_matrix);
-    printInt(zero_sum);
-    
+    let zero_sum: i32 = calculateMatrixSum16(&zero_matrix);
+    printlnInt(zero_sum);
+
     // Matrix with all ones
     let mut ones_matrix: [i32; 16] = [1; 16];
-    let ones_sum: i32 = calculateMatrixSum16(ones_matrix);
-    printInt(ones_sum);
+    let ones_sum: i32 = calculateMatrixSum16(&ones_matrix);
+    printlnInt(ones_sum);
 }
 
 // Calculate sum for 4x4 matrix
-fn calculateMatrixSum16(matrix: [i32; 16]) -> i32 {
+fn calculateMatrixSum16(matrix: &[i32; 16]) -> i32 {
     let mut sum: i32 = 0;
     let mut i: i32 = 0;
     while (i < 16) {
@@ -1158,21 +1273,21 @@ fn testOverflowConditions() {
     let mut overflow_matrix_a: [i32; 4] = [1000, 2000, 3000, 4000];
     let mut overflow_matrix_b: [i32; 4] = [5000, 6000, 7000, 8000];
     let mut overflow_result: [i32; 4] = [0; 4];
-    
+
     // 2x2 matrix multiplication with potential overflow
-    overflow_result[0] = overflow_matrix_a[0] * overflow_matrix_b[0] + 
-                        overflow_matrix_a[1] * overflow_matrix_b[2];
-    overflow_result[1] = overflow_matrix_a[0] * overflow_matrix_b[1] + 
-                        overflow_matrix_a[1] * overflow_matrix_b[3];
-    overflow_result[2] = overflow_matrix_a[2] * overflow_matrix_b[0] + 
-                        overflow_matrix_a[3] * overflow_matrix_b[2];
-    overflow_result[3] = overflow_matrix_a[2] * overflow_matrix_b[1] + 
-                        overflow_matrix_a[3] * overflow_matrix_b[3];
-    
+    overflow_result[0] =
+        overflow_matrix_a[0] * overflow_matrix_b[0] + overflow_matrix_a[1] * overflow_matrix_b[2];
+    overflow_result[1] =
+        overflow_matrix_a[0] * overflow_matrix_b[1] + overflow_matrix_a[1] * overflow_matrix_b[3];
+    overflow_result[2] =
+        overflow_matrix_a[2] * overflow_matrix_b[0] + overflow_matrix_a[3] * overflow_matrix_b[2];
+    overflow_result[3] =
+        overflow_matrix_a[2] * overflow_matrix_b[1] + overflow_matrix_a[3] * overflow_matrix_b[3];
+
     // Report modulo results to prevent actual overflow
-    let safe_result: i32 = (overflow_result[0] % 100000) + 
-                          (overflow_result[1] % 100000) + 
-                          (overflow_result[2] % 100000) + 
-                          (overflow_result[3] % 100000);
-    printInt(safe_result);
+    let safe_result: i32 = (overflow_result[0] % 100000)
+        + (overflow_result[1] % 100000)
+        + (overflow_result[2] % 100000)
+        + (overflow_result[3] % 100000);
+    printlnInt(safe_result);
 }

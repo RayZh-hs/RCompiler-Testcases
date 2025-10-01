@@ -53,23 +53,23 @@ fn main() {
         i = i + 1;
     }
     
-    printInt(perform_tree_analysis(tree_nodes, tree_left, tree_right, tree_parent, tree_height, tree_size_subtree, root_index, node_count));
+    printlnInt(perform_tree_analysis(tree_nodes, tree_left, tree_right, tree_parent, tree_height, tree_size_subtree, root_index, node_count));
     
     let mut round: i32 = 0;
     while (round < simulation_rounds) {
         root_index = perform_tree_rebalancing(tree_nodes, tree_left, tree_right, tree_parent, tree_height, tree_size_subtree, root_index, node_count);
         
         let analysis_result: i32 = perform_comprehensive_tree_traversal(tree_nodes, tree_left, tree_right, tree_parent, tree_height, tree_size_subtree, root_index, node_count, round);
-        printInt(analysis_result);
+        printlnInt(analysis_result);
         
         let mathematical_result: i32 = compute_complex_tree_properties(tree_nodes, tree_left, tree_right, tree_parent, tree_height, tree_size_subtree, root_index, node_count, round);
-        printInt(mathematical_result);
+        printlnInt(mathematical_result);
         
         round = round + 1;
     }
     
     let final_validation: i32 = validate_tree_integrity(tree_nodes, tree_left, tree_right, tree_parent, tree_height, tree_size_subtree, root_index, node_count);
-    printInt(final_validation);
+    printlnInt(final_validation);
 }
 
 fn generate_pseudo_random_value(seed: i32, modulus: i32) -> i32 {

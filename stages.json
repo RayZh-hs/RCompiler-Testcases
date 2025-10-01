@@ -1,28 +1,28 @@
 {
     "gitInfo": {
-        "git_hash": "5c8fce1172c34e3e96ea1b751301edca5a8b9e52",
-        "git_time": "2025-09-29T19:26:17",
-        "id": 15341,
-        "last_updated": "2025-09-30 01:26:45"
+        "git_hash": "ba567ac37d8111af771f556953bc9b182bd57cf3",
+        "git_time": "2025-09-30T12:16:38",
+        "id": 15636,
+        "last_updated": "2025-10-01 01:44:44"
     },
     "stages": [
         {
-            "id": 38439,
-            "last_updated": "2025-09-30 01:26:45",
+            "id": 39324,
+            "last_updated": "2025-10-01 01:44:44",
             "name": "IR-1",
             "path": "/home/zhengwenxin/RCompiler-Testcases/IR-1",
             "testcase_count": 1
         },
         {
-            "id": 38438,
-            "last_updated": "2025-09-30 01:26:45",
+            "id": 39323,
+            "last_updated": "2025-10-01 01:44:44",
             "name": "semantic-1",
             "path": "/home/zhengwenxin/RCompiler-Testcases/semantic-1",
             "testcase_count": 222
         },
         {
-            "id": 38437,
-            "last_updated": "2025-09-30 01:26:45",
+            "id": 39322,
+            "last_updated": "2025-10-01 01:44:44",
             "name": "semantic-2",
             "path": "/home/zhengwenxin/RCompiler-Testcases/semantic-2",
             "testcase_count": 50

@@ -25,6 +25,7 @@ Details:
 // 6. Database-like operations with indexing and querying
 
 // Node structure for various data structures
+
 struct Node {
     value: i32,
     key: i32,
@@ -780,12 +781,12 @@ fn main() {
     let mut avl_tree: AVLTree = AVLTree::new();
     
     // Read tree operations
-    let tree_operations: i32 = readInt();
+    let tree_operations: i32 = getInt();
     let mut i: i32 = 0;
     while (i < tree_operations) {
-        let operation: i32 = readInt();
-        let key: i32 = readInt();
-        let value: i32 = readInt();
+        let operation: i32 = getInt();
+        let key: i32 = getInt();
+        let value: i32 = getInt();
         
         if operation == 1 {
             avl_tree.root = avl_tree.insert(avl_tree.root, key, value);
@@ -794,101 +795,101 @@ fn main() {
         } else if operation == 3 {
             let result: i32 = avl_tree.search(avl_tree.root, key);
             if result != -1 {
-                printInt(avl_tree.nodes[result as usize].value);
+                printlnInt(avl_tree.nodes[result as usize].value);
             } else {
-                printInt(-1);
+                printlnInt(-1);
             }
         }
         i += 1;
     }
     
     // Initialize Hash Table
-    let hash_capacity: i32 = readInt();
+    let hash_capacity: i32 = getInt();
     let mut hash_table: HashTable = HashTable::new(hash_capacity);
     
     // Read hash table operations
-    let hash_operations: i32 = readInt();
+    let hash_operations: i32 = getInt();
     i = 0;
     while (i < hash_operations) {
-        let operation: i32 = readInt();
-        let key: i32 = readInt();
+        let operation: i32 = getInt();
+        let key: i32 = getInt();
         
         if operation == 1 {
-            let value: i32 = readInt();
+            let value: i32 = getInt();
             hash_table.insert(key, value);
         } else if operation == 2 {
             let result: i32 = hash_table.search(key);
-            printInt(result);
+            printlnInt(result);
         } else if operation == 3 {
             let deleted: bool = hash_table.delete(key);
-            printInt(if deleted { 1 } else { 0 });
+            printlnInt(if deleted { 1 } else { 0 });
         }
         i += 1;
     }
     
     // Initialize LRU Cache
-    let cache_capacity: i32 = readInt();
+    let cache_capacity: i32 = getInt();
     let mut lru_cache: LRUCache = LRUCache::new(cache_capacity);
     
     // Read cache operations
-    let cache_operations: i32 = readInt();
+    let cache_operations: i32 = getInt();
     i = 0;
     while (i < cache_operations) {
-        let operation: i32 = readInt();
-        let key: i32 = readInt();
+        let operation: i32 = getInt();
+        let key: i32 = getInt();
         
         if operation == 1 {
-            let value: i32 = readInt();
+            let value: i32 = getInt();
             lru_cache.put(key, value);
         } else if operation == 2 {
             let result: i32 = lru_cache.get(key);
-            printInt(result);
+            printlnInt(result);
         }
         i += 1;
     }
     
     // Initialize Memory Manager
-    let memory_size: i32 = readInt();
+    let memory_size: i32 = getInt();
     let mut memory_manager: MemoryManager = MemoryManager::new(memory_size);
     
     // Read memory operations
-    let memory_operations: i32 = readInt();
+    let memory_operations: i32 = getInt();
     i = 0;
     while (i < memory_operations) {
-        let operation: i32 = readInt();
+        let operation: i32 = getInt();
         
         if operation == 1 {
-            let size: i32 = readInt();
+            let size: i32 = getInt();
             let block_id: i32 = memory_manager.allocate(size);
-            printInt(block_id);
+            printlnInt(block_id);
         } else if operation == 2 {
-            let block_id: i32 = readInt();
+            let block_id: i32 = getInt();
             let success: bool = memory_manager.deallocate(block_id);
-            printInt(if success { 1 } else { 0 });
+            printlnInt(if success { 1 } else { 0 });
         }
         i += 1;
     }
     
     // Output comprehensive statistics
-    printInt(avl_tree.node_count);
-    printInt(avl_tree.rotation_count);
-    printInt(avl_tree.search_operations);
+    printlnInt(avl_tree.node_count);
+    printlnInt(avl_tree.rotation_count);
+    printlnInt(avl_tree.search_operations);
     
-    printInt(hash_table.size);
-    printInt(hash_table.collision_count);
-    printInt(hash_table.resize_count);
+    printlnInt(hash_table.size);
+    printlnInt(hash_table.collision_count);
+    printlnInt(hash_table.resize_count);
     
     let cache_stats: [i32; 5] = lru_cache.get_cache_statistics();
     i = 0;
     while (i < 5) {
-        printInt(cache_stats[i as usize]);
+        printlnInt(cache_stats[i as usize]);
         i += 1;
     }
     
     let memory_stats: [i32; 6] = memory_manager.get_memory_statistics();
     i = 0;
     while (i < 6) {
-        printInt(memory_stats[i as usize]);
+        printlnInt(memory_stats[i as usize]);
         i += 1;
     }
     
@@ -899,6 +900,6 @@ fn main() {
     let memory_score: i32 = 100 - memory_stats[4]; // Inverse of fragmentation
 
     let total_score: i32 = tree_score + hash_score + cache_score + memory_score;
-    printInt(total_score);
+    printlnInt(total_score);
     exit(0);
 }

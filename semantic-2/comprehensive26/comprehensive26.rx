@@ -34,7 +34,7 @@ Advanced sorting algorithms with memory-efficient implementations
 
 fn main() {
     // Performance test marker - start
-    printInt(26000);
+    printlnInt(26000);
     
     // Database Engine Configuration
     let table_size: i32 = 1000;
@@ -68,13 +68,13 @@ fn main() {
     performHashTableTest(table_size);
     
     // Performance test marker - end
-    printInt(26999);
+    printlnInt(26999);
 }
 
 // Test 1: B+ Tree Index Operations
 // Tests complex tree algorithms and recursive function call optimization
 fn performBPlusTreeOperations(max_keys: i32) {
-    printInt(26001); // Start B+ tree test
+    printlnInt(26001); // Start B+ tree test
     
     // B+ Tree Node Structure (simplified)
     // Using arrays to simulate tree nodes
@@ -226,8 +226,8 @@ fn performBPlusTreeOperations(max_keys: i32) {
         i = i + 1;
     }
     
-    printInt(range_sum % 10000);
-    printInt(26002); // End B+ tree test
+    printlnInt(range_sum % 10000);
+    printlnInt(26002); // End B+ tree test
 }
 
 // Helper function for range queries in B+ tree
@@ -263,7 +263,7 @@ fn performRangeQuery(keys: [[i32; 10]; 100], children: [[i32; 11]; 100], is_leaf
 // Test 2: Query Execution Engine
 // Tests join algorithms and nested loop optimization
 fn performQueryExecutionTest(table_size: i32) {
-    printInt(26003); // Start query execution test
+    printlnInt(26003); // Start query execution test
     
     // Simulate two tables for join operations
     let mut table1_id: [i32; 200] = [0; 200];
@@ -305,7 +305,7 @@ fn performQueryExecutionTest(table_size: i32) {
         i = i + 1;
     }
     
-    printInt(nested_loop_result % 10000);
+    printlnInt(nested_loop_result % 10000);
     
     // Test 2: Hash Join simulation
     // Build hash table for smaller relation (table1)
@@ -341,7 +341,7 @@ fn performQueryExecutionTest(table_size: i32) {
         i = i + 1;
     }
     
-    printInt(hash_join_result % 10000);
+    printlnInt(hash_join_result % 10000);
     
     // Test 3: Sort-Merge Join
     // Sort both tables first (using bubble sort for simplicity)
@@ -365,8 +365,8 @@ fn performQueryExecutionTest(table_size: i32) {
         }
     }
     
-    printInt(merge_join_result % 10000);
-    printInt(26004); // End query execution test
+    printlnInt(merge_join_result % 10000);
+    printlnInt(26004); // End query execution test
 }
 
 // Helper function for table sorting
@@ -395,7 +395,7 @@ fn performTableSort(ids: [i32; 200], values: [i32; 200], size: i32) {
 // Test 3: Transaction Processing System
 // Tests concurrency control and deadlock detection algorithms
 fn performTransactionProcessingTest(max_transactions: i32) {
-    printInt(26005); // Start transaction processing test
+    printlnInt(26005); // Start transaction processing test
     
     // Transaction state management
     let mut transaction_states: [i32; 50] = [0; 50]; // 0=inactive, 1=active, 2=committed, 3=aborted
@@ -497,9 +497,9 @@ fn performTransactionProcessingTest(max_transactions: i32) {
         round = round + 1;
     }
     
-    printInt(committed_count);
-    printInt(aborted_count);
-    printInt(26006); // End transaction processing test
+    printlnInt(committed_count);
+    printlnInt(aborted_count);
+    printlnInt(26006); // End transaction processing test
 }
 
 // Deadlock detection using DFS
@@ -641,7 +641,7 @@ fn commitTransaction(transaction_id: i32, states: [i32; 50], locks: [[i32; 10]; 
 // Test 4: Buffer Pool Management
 // Tests cache replacement algorithms and memory optimization
 fn performBufferPoolTest(pool_size: i32) {
-    printInt(26007); // Start buffer pool test
+    printlnInt(26007); // Start buffer pool test
     
     // Buffer pool structures
     let mut buffer_pool: [i32; 100] = [-1; 100]; // Page IDs in buffer
@@ -752,11 +752,11 @@ fn performBufferPoolTest(pool_size: i32) {
     // Calculate hit ratio
     let hit_ratio = (buffer_hits * 100) / (buffer_hits + buffer_misses);
     
-    printInt(buffer_hits);
-    printInt(buffer_misses);
-    printInt(hit_ratio);
-    printInt(page_evictions);
-    printInt(26008); // End buffer pool test
+    printlnInt(buffer_hits);
+    printlnInt(buffer_misses);
+    printlnInt(hit_ratio);
+    printlnInt(page_evictions);
+    printlnInt(26008); // End buffer pool test
 }
 
 // Find free buffer slot
@@ -807,7 +807,7 @@ fn clockPageReplacement(buffer_pool: [i32; 100], pin_counts: [i32; 100],
 // Test 5: Query Optimization Engine
 // Tests cost-based optimization and complex decision trees
 fn performQueryOptimizationTest(table_size: i32) {
-    printInt(26009); // Start query optimization test
+    printlnInt(26009); // Start query optimization test
     
     // Table statistics for cost estimation
     let mut table_cardinalities: [i32; 5] = [100, 200, 150, 300, 250];
@@ -866,7 +866,7 @@ fn performQueryOptimizationTest(table_size: i32) {
         if (best_plan >= 0) {
             let actual_cost = simulatePlanExecution(plan_types[best_plan as usize], table_cardinalities, num_tables);
             let cost_accuracy = calculateCostAccuracy(plan_costs[best_plan as usize], actual_cost);
-            printInt(cost_accuracy);
+            printlnInt(cost_accuracy);
         }
         
         query_id = query_id + 1;
@@ -889,10 +889,10 @@ fn performQueryOptimizationTest(table_size: i32) {
         i = i + 1;
     }
     
-    printInt(nested_loop_count);
-    printInt(hash_join_count);
-    printInt(sort_merge_count);
-    printInt(26010); // End query optimization test
+    printlnInt(nested_loop_count);
+    printlnInt(hash_join_count);
+    printlnInt(sort_merge_count);
+    printlnInt(26010); // End query optimization test
 }
 
 // Cost estimation functions
@@ -1025,7 +1025,7 @@ fn calculateCostAccuracy(estimated_cost: i32, actual_cost: i32) -> i32 {
 // Test 6: Advanced Hash Table Operations
 // Tests dynamic resizing and collision resolution algorithms
 fn performHashTableTest(initial_size: i32) {
-    printInt(26011); // Start hash table test
+    printlnInt(26011); // Start hash table test
     
     // Hash table with linear probing
     let mut hash_table: [i32; 500] = [-1; 500];
@@ -1160,15 +1160,15 @@ fn performHashTableTest(initial_size: i32) {
     let linear_load_factor = (hash_entry_count * 100) / hash_table_size;
     let avg_chain_length = calculateAverageChainLength(chain_lengths, chain_table_size);
     
-    printInt(successful_inserts);
-    printInt(chain_successful_inserts);
-    printInt(collision_count);
-    printInt(linear_lookup_success);
-    printInt(chain_lookup_success);
-    printInt(linear_load_factor);
-    printInt(avg_chain_length);
-    printInt(rehash_count);
-    printInt(26012); // End hash table test
+    printlnInt(successful_inserts);
+    printlnInt(chain_successful_inserts);
+    printlnInt(collision_count);
+    printlnInt(linear_lookup_success);
+    printlnInt(chain_lookup_success);
+    printlnInt(linear_load_factor);
+    printlnInt(avg_chain_length);
+    printlnInt(rehash_count);
+    printlnInt(26012); // End hash table test
 }
 
 // Linear probing insertion
