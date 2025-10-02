@@ -44,5 +44,5 @@ jobs:
       - name: Commit and push changes
         run: |
           git add stages.json */ || true
-          git diff --cached --quiet || git commit -m "Daily update: $(date -u '+%Y-%m-%d %H:%M UTC')"
+          git diff --cached --quiet || git commit -m "Periodic update: $(date -u '+%Y-%m-%d %H:%M UTC')"
           git push
