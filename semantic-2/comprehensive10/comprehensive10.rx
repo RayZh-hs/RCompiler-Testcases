@@ -186,7 +186,7 @@ impl Graph {
             // Update distances to adjacent vertices
             let mut edge_idx: i32 = 0;
             while (edge_idx < self.edge_count) {
-                let edge = self.edges[edge_idx as usize];
+                let edge: Edge = self.edges[edge_idx as usize];
                 if (edge.from == u) {
                     let new_dist: i32 = self.dist[u as usize] + edge.weight;
                     if (new_dist < self.dist[edge.to as usize]) {
@@ -235,9 +235,9 @@ impl Graph {
         self.on_stack[u as usize] = true;
 
         // Go through all adjacent vertices
-        let mut i = 0;
+        let mut i: i32 = 0;
         while (i < self.adj_count[u as usize]) {
-            let v = self.adj_list[u as usize][i as usize];
+            let v: i32 = self.adj_list[u as usize][i as usize];
 
             if (self.disc[v as usize] == -1) {
                 // If v is not visited, recur for it
@@ -263,7 +263,7 @@ impl Graph {
             // Pop vertices from stack until u is found
             while (self.stack_top > 0) {
                 self.stack_top -= 1;
-                let w = self.stack[self.stack_top as usize];
+                let w: i32 = self.stack[self.stack_top as usize];
                 self.on_stack[w as usize] = false;
 
                 if (w == u) {
@@ -307,8 +307,8 @@ impl Graph {
     }
 
     fn union_sets(&mut self, x: i32, y: i32) {
-        let root_x = self.find_parent(x);
-        let root_y = self.find_parent(y);
+        let root_x: i32 = self.find_parent(x);
+        let root_y: i32 = self.find_parent(y);
 
         if (root_x != root_y) {
             if (self.rank[root_x as usize] < self.rank[root_y as usize]) {
@@ -355,9 +355,9 @@ impl Graph {
 
         // Process edges in sorted order
         while (edge_idx < self.edge_count && edges_added < self.vertices - 1) {
-            let edge = self.edges[edge_idx as usize];
-            let root_from = self.find_parent(edge.from);
-            let root_to = self.find_parent(edge.to);
+            let edge: Edge = self.edges[edge_idx as usize];
+            let root_from: i32 = self.find_parent(edge.from);
+            let root_to: i32 = self.find_parent(edge.to);
 
             // If including this edge doesn't cause cycle
             if (root_from != root_to) {
@@ -388,7 +388,7 @@ impl Graph {
         // Try all outgoing edges
         let mut edge_idx: i32 = 0;
         while (edge_idx < self.edge_count) {
-            let edge = self.edges[edge_idx as usize];
+            let edge: Edge = self.edges[edge_idx as usize];
             if (edge.from == current && !visited[edge.to as usize]) {
                 let residual_capacity: i32 = edge.capacity - edge.flow;
                 if (residual_capacity > 0) {
@@ -406,7 +406,7 @@ impl Graph {
                         // Find reverse edge and update its flow
                         let mut rev_idx: i32 = 0;
                         while (rev_idx < self.edge_count) {
-                            let rev_edge = self.edges[rev_idx as usize];
+                            let rev_edge: Edge = self.edges[rev_idx as usize];
                             if (rev_edge.from == edge.to && rev_edge.to == edge.from) {
                                 self.edges[rev_idx as usize].flow -= flow_sent;
                                 break;
@@ -471,7 +471,7 @@ impl Graph {
         printlnInt(self.mst_weight);
 
         // Calculate maximum flow
-        let max_flow_value = self.max_flow(source, sink);
+        let max_flow_value: i32 = self.max_flow(source, sink);
         printlnInt(max_flow_value);
     }
 }

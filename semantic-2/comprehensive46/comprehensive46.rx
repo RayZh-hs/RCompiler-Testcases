@@ -24,6 +24,7 @@ Function inlining for math and utility functions.
 // - Optimization of loops over pixels and objects.
 // - Function inlining for math and utility functions.
 
+const scale: i32 = 80; // Scale factor for fixed-point arithmetic
 fn main() {
     struct Vec3 { x: i32, y: i32, z: i32, }
     struct Ray { origin: Vec3, dir: Vec3, }
@@ -37,13 +38,12 @@ fn main() {
     let mut lights: [Light; 2] = [
         Light { pos: Vec3 {x:0,y:0,z:0}, intensity: 0 }; 2
     ];
-    let scale: i32 = 100; // Scale factor for fixed-point arithmetic
 
-    fn setup_scene(mut spheres: &mut [Sphere; 4], mut lights: &mut [Light; 2]) {
+    fn setup_scene(spheres: &mut [Sphere; 4], lights: &mut [Light; 2]) {
         spheres[0] = Sphere { center: Vec3 { x: 0, y: -1 * scale, z: 3 * scale }, radius: 1 * scale, color: Vec3 { x: 255, y: 0, z: 0 } };
         spheres[1] = Sphere { center: Vec3 { x: 2 * scale, y: 0, z: 4 * scale }, radius: 1 * scale, color: Vec3 { x: 0, y: 0, z: 255 } };
         spheres[2] = Sphere { center: Vec3 { x: -2 * scale, y: 0, z: 4 * scale }, radius: 1 * scale, color: Vec3 { x: 0, y: 255, z: 0 } };
-        spheres[3] = Sphere { center: Vec3 { x: 0, y: -501 * scale, z: 0 }, radius: 500 * scale, color: Vec3 { x: 200, y: 200, y: 0 } };
+        spheres[3] = Sphere { center: Vec3 { x: 0, y: -201 * scale, z: 0 }, radius: 200 * scale, color: Vec3 { x: 200, y: 200, z: 0 } };
         lights[0] = Light { pos: Vec3 { x: -20 * scale, y: 20 * scale, z: -20 * scale }, intensity: 150 };
         lights[1] = Light { pos: Vec3 { x: 20 * scale, y: 30 * scale, z: -10 * scale }, intensity: 120 };
     }
@@ -125,4 +125,5 @@ fn main() {
         y = y + 1;
     }
     printlnInt(checksum);
+    exit(0);
 }

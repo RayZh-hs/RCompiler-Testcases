@@ -29,7 +29,7 @@ fn main() {
     let mut compressed_data: [i32; 512] = [0; 512];
     let mut compressed_len: i32 = 0;
 
-    fn generate_input(mut data: &mut [i32; 512]) {
+    fn generate_input(data: &mut [i32; 512]) {
         let mut i: i32 = 0;
         while (i < 512) {
             if (i % 20 < 10) {
@@ -106,14 +106,13 @@ fn main() {
             compressed_len = compressed_len + 1;
             current_pos = current_pos + len;
         } else {
-            // Hidden Error: `literal_value` is defined inside an `if` block
-            // but used outside of it, which should cause a scope error.
+            // Fixed: declare and assign literal_value outside the inner if block
+            // to ensure it is always in scope.
+            let literal_value: i32 = input_data[current_pos as usize];
             if (compressed_len < 510) {
-                 let literal_value: i32 = input_data[current_pos as usize];
-                 compressed_data[compressed_len as usize] = 0; // Type 0: literal
-                 compressed_len = compressed_len + 1;
+                compressed_data[compressed_len as usize] = 0; // Type 0: literal
+                compressed_len = compressed_len + 1;
             }
-            // The next line will fail because `literal_value` is not in scope.
             compressed_data[compressed_len as usize] = literal_value;
             compressed_len = compressed_len + 1;
             current_pos = current_pos + 1;
@@ -128,4 +127,5 @@ fn main() {
     }
     printlnInt(checksum);
     printlnInt(compressed_len);
+    exit(0);
 }

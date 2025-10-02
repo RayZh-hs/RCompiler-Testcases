@@ -102,13 +102,13 @@ fn performBPlusTreeOperations(max_keys: i32) {
     // Perform insertions with tree rebalancing
     i = 0;
     while (i < max_keys && i < 100) {
-        let key_to_insert = insert_sequence[i as usize];
+        let key_to_insert: i32 = insert_sequence[i as usize];
         
         // Find leaf node for insertion
-        let mut current_node = root_node;
+        let mut current_node: i32 = root_node;
         while (!btree_is_leaf[current_node as usize]) {
-            let mut child_index = 0;
-            let mut j = 0;
+            let mut child_index: i32 = 0;
+            let mut j: i32 = 0;
             while (j < btree_key_count[current_node as usize]) {
                 if (key_to_insert > btree_keys[current_node as usize][j as usize]) {
                     child_index = j + 1;
@@ -121,8 +121,8 @@ fn performBPlusTreeOperations(max_keys: i32) {
         // Insert key into leaf node
         if (btree_key_count[current_node as usize] < 9) { // Not full
             // Simple insertion
-            let mut insert_pos = btree_key_count[current_node as usize];
-            let mut k = 0;
+            let mut insert_pos: i32 = btree_key_count[current_node as usize];
+            let mut k: i32 = 0;
             while (k < btree_key_count[current_node as usize]) {
                 if (key_to_insert < btree_keys[current_node as usize][k as usize]) {
                     insert_pos = k;
@@ -132,7 +132,7 @@ fn performBPlusTreeOperations(max_keys: i32) {
             }
             
             // Shift keys to make room
-            let mut shift_index = btree_key_count[current_node as usize];
+            let mut shift_index: i32 = btree_key_count[current_node as usize];
             while (shift_index > insert_pos) {
                 btree_keys[current_node as usize][shift_index as usize] = btree_keys[current_node as usize][shift_index as usize - 1];
                 shift_index = shift_index - 1;
@@ -143,7 +143,7 @@ fn performBPlusTreeOperations(max_keys: i32) {
         } else {
             // Node is full, need to split
             if (node_count < 99) {
-                let new_node = node_count;
+                let new_node: i32 = node_count;
                 node_count = node_count + 1;
                 
                 // Initialize new node
@@ -152,7 +152,7 @@ fn performBPlusTreeOperations(max_keys: i32) {
                 btree_parent[new_node as usize] = btree_parent[current_node as usize];
                 
                 // Move half the keys to new node
-                let mut move_index = 0;
+                let mut move_index: i32 = 0;
                 while (move_index < 5) {
                     btree_keys[new_node as usize][move_index as usize] = btree_keys[current_node as usize][move_index as usize + 5];
                     btree_keys[current_node as usize][move_index as usize + 5] = 0;
@@ -164,8 +164,8 @@ fn performBPlusTreeOperations(max_keys: i32) {
                 // Insert key into appropriate node
                 if (key_to_insert < btree_keys[new_node as usize][0]) {
                     // Insert into original node
-                    let mut insert_pos = 5;
-                    let mut k = 0;
+                    let mut insert_pos: i32 = 5;
+                    let mut k: i32 = 0;
                     while (k < 5) {
                         if (key_to_insert < btree_keys[current_node as usize][k as usize]) {
                             insert_pos = k;
@@ -174,7 +174,7 @@ fn performBPlusTreeOperations(max_keys: i32) {
                         k = k + 1;
                     }
                     
-                    let mut shift_index = 4;
+                    let mut shift_index: i32 = 4;
                     while (shift_index >= insert_pos) {
                         btree_keys[current_node as usize][shift_index as usize + 1] = btree_keys[current_node as usize][shift_index as usize];
                         if (shift_index == 0) { break; }
@@ -184,8 +184,8 @@ fn performBPlusTreeOperations(max_keys: i32) {
                     btree_keys[current_node as usize][insert_pos as usize] = key_to_insert;
                 } else {
                     // Insert into new node
-                    let mut insert_pos = 5;
-                    let mut k = 0;
+                    let mut insert_pos: i32 = 5;
+                    let mut k: i32 = 0;
                     while (k < 5) {
                         if (key_to_insert < btree_keys[new_node as usize][k as usize]) {
                             insert_pos = k;
@@ -194,7 +194,7 @@ fn performBPlusTreeOperations(max_keys: i32) {
                         k = k + 1;
                     }
                     
-                    let mut shift_index = 4;
+                    let mut shift_index: i32 = 4;
                     while (shift_index >= insert_pos) {
                         btree_keys[new_node as usize][shift_index as usize + 1] = btree_keys[new_node as usize][shift_index as usize];
                         if (shift_index == 0) { break; }
@@ -211,16 +211,16 @@ fn performBPlusTreeOperations(max_keys: i32) {
     }
     
     // Perform range queries to test tree traversal optimization
-    let mut range_sum = 0;
-    let mut query_count = 0;
+    let mut range_sum: i32 = 0;
+    let mut query_count: i32 = 0;
     i = 0;
     while (i < 20 && query_count < 100) {
-        let range_start = (i * 13 + 7) % 500 + 1;
-        let range_end = range_start + (i * 3 + 1) % 50 + 10;
+        let range_start: i32 = (i * 13 + 7) % 500 + 1;
+        let range_end: i32 = range_start + (i * 3 + 1) % 50 + 10;
         
         // Traverse tree to find keys in range
-        let mut current_sum = performRangeQuery(btree_keys, btree_children, btree_is_leaf, 
-                                               btree_key_count, root_node, range_start, range_end);
+        let mut current_sum: i32 = performRangeQuery(&btree_keys, &btree_children, &btree_is_leaf, 
+                                               &btree_key_count, root_node, range_start, range_end);
         range_sum = range_sum + current_sum;
         query_count = query_count + 1;
         i = i + 1;
@@ -231,13 +231,13 @@ fn performBPlusTreeOperations(max_keys: i32) {
 }
 
 // Helper function for range queries in B+ tree
-fn performRangeQuery(keys: [[i32; 10]; 100], children: [[i32; 11]; 100], is_leaf: [bool; 100],
-                    key_count: [i32; 100], node: i32, start: i32, end: i32) -> i32 {
-    let mut result_sum = 0;
+fn performRangeQuery(keys: &[[i32; 10]; 100], children: &[[i32; 11]; 100], is_leaf: &[bool; 100],
+                    key_count: &[i32; 100], node: i32, start: i32, end: i32) -> i32 {
+    let mut result_sum: i32 = 0;
     
     if (is_leaf[node as usize]) {
         // Leaf node - check all keys in range
-        let mut i = 0;
+        let mut i: i32 = 0;
         while (i < key_count[node as usize]) {
             if (keys[node as usize][i as usize] >= start && keys[node as usize][i as usize] <= end) {
                 result_sum = result_sum + keys[node as usize][i as usize];
@@ -246,10 +246,10 @@ fn performRangeQuery(keys: [[i32; 10]; 100], children: [[i32; 11]; 100], is_leaf
         }
     } else {
         // Internal node - recursively search children
-        let mut i = 0;
+        let mut i: i32 = 0;
         while (i <= key_count[node as usize]) {
             if (children[node as usize][i as usize] >= 0 && children[node as usize][i as usize] < 100) {
-                let child_sum = performRangeQuery(keys, children, is_leaf, key_count, 
+                let child_sum: i32 = performRangeQuery(keys, children, is_leaf, key_count, 
                                                 children[node as usize][i as usize], start, end);
                 result_sum = result_sum + child_sum;
             }
@@ -270,11 +270,11 @@ fn performQueryExecutionTest(table_size: i32) {
     let mut table1_value: [i32; 200] = [0; 200];
     let mut table2_id: [i32; 200] = [0; 200];
     let mut table2_value: [i32; 200] = [0; 200];
-    let mut table1_size = 0;
-    let mut table2_size = 0;
+    let mut table1_size: i32 = 0;
+    let mut table2_size: i32 = 0;
     
     // Initialize table1 with complex pattern
-    let mut i = 0;
+    let mut i: i32 = 0;
     while (i < table_size && i < 200) {
         table1_id[i as usize] = (i * 3 + 1) % 150 + 1;
         table1_value[i as usize] = (i * 7 + 11) % 1000 + 1;
@@ -292,10 +292,10 @@ fn performQueryExecutionTest(table_size: i32) {
     }
     
     // Test 1: Nested Loop Join
-    let mut nested_loop_result = 0;
+    let mut nested_loop_result: i32 = 0;
     i = 0;
     while (i < table1_size) {
-        let mut j = 0;
+        let mut j: i32 = 0;
         while (j < table2_size) {
             if (table1_id[i as usize] == table2_id[j as usize]) {
                 nested_loop_result = nested_loop_result + table1_value[i as usize] + table2_value[j as usize];
@@ -316,9 +316,9 @@ fn performQueryExecutionTest(table_size: i32) {
     // Build phase
     i = 0;
     while (i < table1_size) {
-        let hash_key = table1_id[i as usize] % 50;
+        let hash_key: i32 = table1_id[i as usize] % 50;
         if (hash_count[hash_key as usize] < 5) {
-            let slot = hash_count[hash_key as usize];
+            let slot: i32 = hash_count[hash_key as usize];
             hash_buckets[hash_key as usize][slot as usize] = table1_id[i as usize];
             hash_values[hash_key as usize][slot as usize] = table1_value[i as usize];
             hash_count[hash_key as usize] = hash_count[hash_key as usize] + 1;
@@ -327,11 +327,11 @@ fn performQueryExecutionTest(table_size: i32) {
     }
     
     // Probe phase
-    let mut hash_join_result = 0;
+    let mut hash_join_result: i32 = 0;
     i = 0;
     while (i < table2_size) {
-        let hash_key = table2_id[i as usize] % 50;
-        let mut bucket_index = 0;
+        let hash_key: i32 = table2_id[i as usize] % 50;
+        let mut bucket_index: i32 = 0;
         while (bucket_index < hash_count[hash_key as usize]) {
             if (hash_buckets[hash_key as usize][bucket_index as usize] == table2_id[i as usize]) {
                 hash_join_result = hash_join_result + hash_values[hash_key as usize][bucket_index as usize] + table2_value[i as usize];
@@ -345,13 +345,13 @@ fn performQueryExecutionTest(table_size: i32) {
     
     // Test 3: Sort-Merge Join
     // Sort both tables first (using bubble sort for simplicity)
-    performTableSort(table1_id, table1_value, table1_size);
-    performTableSort(table2_id, table2_value, table2_size);
+    performTableSort(&mut table1_id, &mut table1_value, table1_size);
+    performTableSort(&mut table2_id, &mut table2_value, table2_size);
     
     // Merge phase
-    let mut merge_join_result = 0;
-    let mut i1 = 0;
-    let mut i2 = 0;
+    let mut merge_join_result: i32 = 0;
+    let mut i1: i32 = 0;
+    let mut i2: i32 = 0;
     
     while (i1 < table1_size && i2 < table2_size) {
         if (table1_id[i1 as usize] == table2_id[i2 as usize]) {
@@ -370,19 +370,19 @@ fn performQueryExecutionTest(table_size: i32) {
 }
 
 // Helper function for table sorting
-fn performTableSort(ids: [i32; 200], values: [i32; 200], size: i32) {
-    let mut i = 0;
+fn performTableSort(ids: &mut [i32; 200], values: &mut [i32; 200], size: i32) {
+    let mut i: i32 = 0;
     while (i < size - 1) {
-        let mut j = 0;
+        let mut j: i32 = 0;
         while (j < size - 1 - i) {
             if (ids[j as usize] > ids[j as usize + 1]) {
                 // Swap ids
-                let temp_id = ids[j as usize];
+                let temp_id: i32 = ids[j as usize];
                 ids[j as usize] = ids[j as usize + 1];
                 ids[j as usize + 1] = temp_id;
                 
                 // Swap corresponding values
-                let temp_value = values[j as usize];
+                let temp_value: i32 = values[j as usize];
                 values[j as usize] = values[j as usize + 1];
                 values[j as usize + 1] = temp_value;
             }
@@ -413,17 +413,17 @@ fn performTransactionProcessingTest(max_transactions: i32) {
     let mut visited: [bool; 50] = [false; 50];
     let mut recursion_stack: [bool; 50] = [false; 50];
     
-    let mut active_transactions = 0;
-    let mut committed_count = 0;
-    let mut aborted_count = 0;
-    let mut current_time = 1;
+    let mut active_transactions: i32 = 0;
+    let mut committed_count: i32 = 0;
+    let mut aborted_count: i32 = 0;
+    let mut current_time: i32 = 1;
     
     // Simulate transaction execution
-    let mut round = 0;
+    let mut round: i32 = 0;
     while (round < 20 && active_transactions < max_transactions) {
         // Start new transactions
-        let mut new_transactions = (round % 3) + 1;
-        let mut i = 0;
+        let mut new_transactions: i32 = (round % 3) + 1;
+        let mut i: i32 = 0;
         while (i < new_transactions && active_transactions < max_transactions) {
             if (active_transactions < 50) {
                 transaction_states[active_transactions as usize] = 1; // Active
@@ -439,10 +439,10 @@ fn performTransactionProcessingTest(max_transactions: i32) {
         while (i < active_transactions) {
             if (transaction_states[i as usize] == 1) { // Active transaction
                 // Generate lock requests
-                let mut lock_requests = (i + round) % 3 + 1;
-                let mut j = 0;
+                let mut lock_requests: i32 = (i + round) % 3 + 1;
+                let mut j: i32 = 0;
                 while (j < lock_requests && transaction_lock_count[i as usize] < 10) {
-                    let resource_id = ((i * 7 + j * 11 + round * 3) % 100);
+                    let resource_id: i32 = ((i * 7 + j * 11 + round * 3) % 100);
                     
                     if (resource_locks[resource_id as usize] == -1) {
                         // Grant lock
@@ -466,15 +466,15 @@ fn performTransactionProcessingTest(max_transactions: i32) {
         }
         
         // Deadlock detection using DFS
-        let deadlock_detected = detectDeadlock(wait_for_graph, visited, recursion_stack, active_transactions);
+        let deadlock_detected: bool = detectDeadlock(&wait_for_graph, &mut visited, &mut recursion_stack, active_transactions);
         
         if (deadlock_detected) {
             // Abort youngest transaction in cycle
-            let victim_transaction = findVictimTransaction(transaction_start_time, transaction_states, active_transactions, current_time);
+            let victim_transaction: i32 = findVictimTransaction(&transaction_start_time, &transaction_states, active_transactions, current_time);
             if (victim_transaction >= 0) {
-                abortTransaction(victim_transaction, transaction_states, transaction_locks, 
-                               transaction_lock_count, resource_locks, lock_wait_queue, 
-                               wait_queue_count, wait_for_graph);
+                abortTransaction(victim_transaction, &mut transaction_states, &transaction_locks, 
+                               &mut transaction_lock_count, &mut resource_locks, &mut lock_wait_queue, 
+                               &mut wait_queue_count, &mut wait_for_graph);
                 aborted_count = aborted_count + 1;
             }
         }
@@ -484,9 +484,9 @@ fn performTransactionProcessingTest(max_transactions: i32) {
         while (i < active_transactions) {
             if (transaction_states[i as usize] == 1 && (current_time - transaction_start_time[i as usize]) > 3) {
                 if ((i + round) % 4 == 0) {
-                    commitTransaction(i, transaction_states, transaction_locks, 
-                                    transaction_lock_count, resource_locks, 
-                                    lock_wait_queue, wait_queue_count);
+                    commitTransaction(i, &mut transaction_states, &transaction_locks, 
+                                    &mut transaction_lock_count, &mut resource_locks, 
+                                    &mut lock_wait_queue, &mut wait_queue_count);
                     committed_count = committed_count + 1;
                 }
             }
@@ -503,9 +503,9 @@ fn performTransactionProcessingTest(max_transactions: i32) {
 }
 
 // Deadlock detection using DFS
-fn detectDeadlock(wait_graph: [[bool; 50]; 50], visited: [bool; 50], 
-                 rec_stack: [bool; 50], transaction_count: i32) -> bool {
-    let mut i = 0;
+fn detectDeadlock(wait_graph: &[[bool; 50]; 50], visited: &mut [bool; 50], 
+                 rec_stack: &mut [bool; 50], transaction_count: i32) -> bool {
+    let mut i: i32 = 0;
     while (i < transaction_count) {
         visited[i as usize] = false;
         rec_stack[i as usize] = false;
@@ -526,12 +526,12 @@ fn detectDeadlock(wait_graph: [[bool; 50]; 50], visited: [bool; 50],
 }
 
 // DFS helper for cycle detection
-fn detectCycleDFS(wait_graph: [[bool; 50]; 50], visited: [bool; 50], 
-                 rec_stack: [bool; 50], node: i32, transaction_count: i32) -> bool {
+fn detectCycleDFS(wait_graph: &[[bool; 50]; 50], visited: &mut [bool; 50], 
+                 rec_stack: &mut [bool; 50], node: i32, transaction_count: i32) -> bool {
     visited[node as usize] = true;
     rec_stack[node as usize] = true;
     
-    let mut i = 0;
+    let mut i: i32 = 0;
     while (i < transaction_count) {
         if (wait_graph[node as usize][i as usize]) {
             if (!visited[i as usize]) {
@@ -550,12 +550,12 @@ fn detectCycleDFS(wait_graph: [[bool; 50]; 50], visited: [bool; 50],
 }
 
 // Find victim transaction for deadlock resolution
-fn findVictimTransaction(start_times: [i32; 50], states: [i32; 50], 
-                        count: i32, current_time: i32) -> i32 {
-    let mut youngest_transaction = -1;
-    let mut latest_start_time = 0;
+fn findVictimTransaction(start_times: &[i32; 50], states: &[i32; 50], 
+                        count: i32, _current_time: i32) -> i32 {
+    let mut youngest_transaction: i32 = -1;
+    let mut latest_start_time: i32 = 0;
     
-    let mut i = 0;
+    let mut i: i32 = 0;
     while (i < count) {
         if (states[i as usize] == 1 && start_times[i as usize] > latest_start_time) {
             latest_start_time = start_times[i as usize];
@@ -568,25 +568,25 @@ fn findVictimTransaction(start_times: [i32; 50], states: [i32; 50],
 }
 
 // Abort a transaction and release its locks
-fn abortTransaction(transaction_id: i32, states: [i32; 50], locks: [[i32; 10]; 50],
-                   lock_counts: [i32; 50], resource_locks: [i32; 100],
-                   wait_queues: [[i32; 5]; 100], wait_counts: [i32; 100],
-                   wait_graph: [[bool; 50]; 50]) {
+fn abortTransaction(transaction_id: i32, states: &mut [i32; 50], locks: &[[i32; 10]; 50],
+                   lock_counts: &mut [i32; 50], resource_locks: &mut [i32; 100],
+                   wait_queues: &mut [[i32; 5]; 100], wait_counts: &mut [i32; 100],
+                   wait_graph: &mut [[bool; 50]; 50]) {
     states[transaction_id as usize] = 3; // Aborted
     
     // Release all locks held by this transaction
-    let mut i = 0;
+    let mut i: i32 = 0;
     while (i < lock_counts[transaction_id as usize]) {
-        let resource_id = locks[transaction_id as usize][i as usize];
+        let resource_id: i32 = locks[transaction_id as usize][i as usize];
         resource_locks[resource_id as usize] = -1;
         
         // Grant lock to next waiting transaction
         if (wait_counts[resource_id as usize] > 0) {
-            let next_transaction = wait_queues[resource_id as usize][0];
+            let next_transaction: i32 = wait_queues[resource_id as usize][0];
             resource_locks[resource_id as usize] = next_transaction;
             
             // Shift wait queue
-            let mut j = 0;
+            let mut j: i32 = 0;
             while (j < wait_counts[resource_id as usize] - 1) {
                 wait_queues[resource_id as usize][j as usize] = wait_queues[resource_id as usize][j as usize + 1];
                 j = j + 1;
@@ -608,24 +608,24 @@ fn abortTransaction(transaction_id: i32, states: [i32; 50], locks: [[i32; 10]; 5
 }
 
 // Commit a transaction and release its locks
-fn commitTransaction(transaction_id: i32, states: [i32; 50], locks: [[i32; 10]; 50],
-                    lock_counts: [i32; 50], resource_locks: [i32; 100],
-                    wait_queues: [[i32; 5]; 100], wait_counts: [i32; 100]) {
+fn commitTransaction(transaction_id: i32, states: &mut [i32; 50], locks: &[[i32; 10]; 50],
+                    lock_counts: &mut [i32; 50], resource_locks: &mut [i32; 100],
+                    wait_queues: &mut [[i32; 5]; 100], wait_counts: &mut [i32; 100]) {
     states[transaction_id as usize] = 2; // Committed
     
     // Release all locks held by this transaction
-    let mut i = 0;
+    let mut i: i32 = 0;
     while (i < lock_counts[transaction_id as usize]) {
-        let resource_id = locks[transaction_id as usize][i as usize];
+        let resource_id: i32 = locks[transaction_id as usize][i as usize];
         resource_locks[resource_id as usize] = -1;
         
         // Grant lock to next waiting transaction
         if (wait_counts[resource_id as usize] > 0) {
-            let next_transaction = wait_queues[resource_id as usize][0];
+            let next_transaction: i32 = wait_queues[resource_id as usize][0];
             resource_locks[resource_id as usize] = next_transaction;
             
             // Shift wait queue
-            let mut j = 0;
+            let mut j: i32 = 0;
             while (j < wait_counts[resource_id as usize] - 1) {
                 wait_queues[resource_id as usize][j as usize] = wait_queues[resource_id as usize][j as usize + 1];
                 j = j + 1;
@@ -655,20 +655,20 @@ fn performBufferPoolTest(pool_size: i32) {
     // Page table for tracking which pages are in buffer
     let mut page_to_buffer: [i32; 500] = [-1; 500]; // Maps page ID to buffer slot
     
-    let mut buffer_hits = 0;
-    let mut buffer_misses = 0;
-    let mut page_evictions = 0;
+    let mut buffer_hits: i32 = 0;
+    let mut buffer_misses: i32 = 0;
+    let mut page_evictions: i32 = 0;
     
     // Simulate database page access pattern
-    let mut access_count = 0;
-    let mut round = 0;
+    let mut access_count: i32 = 0;
+    let mut round: i32 = 0;
     
     while (round < 30 && access_count < 200) {
         // Generate page access pattern (mixture of sequential and random)
-        let mut pattern_type = round % 4;
-        let mut pages_in_pattern = (round % 5) + 3;
+        let mut pattern_type: i32 = round % 4;
+        let mut pages_in_pattern: i32 = (round % 5) + 3;
         
-        let mut i = 0;
+        let mut i: i32 = 0;
         while (i < pages_in_pattern && access_count < 200) {
             let mut page_id: i32;
             
@@ -687,7 +687,7 @@ fn performBufferPoolTest(pool_size: i32) {
             }
             
             // Check if page is in buffer pool
-            let buffer_slot = page_to_buffer[page_id as usize];
+            let buffer_slot: i32 = page_to_buffer[page_id as usize];
             
             if (buffer_slot >= 0 && buffer_pool[buffer_slot as usize] == page_id) {
                 // Buffer hit
@@ -699,7 +699,7 @@ fn performBufferPoolTest(pool_size: i32) {
                 buffer_misses = buffer_misses + 1;
                 
                 // Find free buffer slot or evict page
-                let mut free_slot = findFreeBufferSlot(buffer_pool, pool_size);
+                let mut free_slot: i32 = findFreeBufferSlot(&buffer_pool, pool_size);
                 
                 if (free_slot >= 0) {
                     // Use free slot
@@ -711,15 +711,15 @@ fn performBufferPoolTest(pool_size: i32) {
                     page_to_buffer[page_id as usize] = free_slot;
                 } else {
                     // Need to evict a page using CLOCK algorithm
-                    let evict_slot = clockPageReplacement(buffer_pool, buffer_pin_count, 
-                                                         buffer_reference_bit, clock_hand, pool_size);
+                    let evict_slot: i32 = clockPageReplacement(&buffer_pool, &buffer_pin_count, 
+                                                         &mut buffer_reference_bit, clock_hand, pool_size);
                     
                     if (evict_slot >= 0) {
                         // Update clock hand
                         clock_hand = (evict_slot + 1) % pool_size;
                         
                         // Evict old page
-                        let old_page_id = buffer_pool[evict_slot as usize];
+                        let old_page_id: i32 = buffer_pool[evict_slot as usize];
                         if (old_page_id >= 0 && old_page_id < 500) {
                             page_to_buffer[old_page_id as usize] = -1;
                         }
@@ -737,7 +737,7 @@ fn performBufferPoolTest(pool_size: i32) {
             }
             
             // Simulate page modifications (mark as dirty)
-            if (access_count % 3) == 0 && page_to_buffer[page_id as usize] >= 0 {
+            if ((access_count % 3) == 0 && page_to_buffer[page_id as usize] >= 0) {
                 buffer_dirty[(page_to_buffer[page_id as usize]) as usize] = true;
             }
             
@@ -750,7 +750,7 @@ fn performBufferPoolTest(pool_size: i32) {
     }
     
     // Calculate hit ratio
-    let hit_ratio = (buffer_hits * 100) / (buffer_hits + buffer_misses);
+    let hit_ratio: i32 = (buffer_hits * 100) / (buffer_hits + buffer_misses);
     
     printlnInt(buffer_hits);
     printlnInt(buffer_misses);
@@ -760,8 +760,8 @@ fn performBufferPoolTest(pool_size: i32) {
 }
 
 // Find free buffer slot
-fn findFreeBufferSlot(buffer_pool: [i32; 100], pool_size: i32) -> i32 {
-    let mut i = 0;
+fn findFreeBufferSlot(buffer_pool: &[i32; 100], pool_size: i32) -> i32 {
+    let mut i: i32 = 0;
     while (i < pool_size) {
         if (buffer_pool[i as usize] == -1) {
             return i;
@@ -772,10 +772,10 @@ fn findFreeBufferSlot(buffer_pool: [i32; 100], pool_size: i32) -> i32 {
 }
 
 // CLOCK page replacement algorithm
-fn clockPageReplacement(buffer_pool: [i32; 100], pin_counts: [i32; 100],
-                       reference_bits: [bool; 100], start_hand: i32, pool_size: i32) -> i32 {
-    let mut current_hand = start_hand;
-    let mut cycles = 0;
+fn clockPageReplacement(buffer_pool: &[i32; 100], pin_counts: &[i32; 100],
+                       reference_bits: &mut [bool; 100], start_hand: i32, pool_size: i32) -> i32 {
+    let mut current_hand: i32 = start_hand;
+    let mut cycles: i32 = 0;
     
     while (cycles < 2) {
         if (pin_counts[current_hand as usize] == 0) {
@@ -793,7 +793,7 @@ fn clockPageReplacement(buffer_pool: [i32; 100], pin_counts: [i32; 100],
     }
     
     // If no page can be evicted, return first unpinned page
-    let mut i = 0;
+    let mut i: i32 = 0;
     while (i < pool_size) {
         if (pin_counts[i as usize] == 0) {
             return i;
@@ -817,20 +817,20 @@ fn performQueryOptimizationTest(table_size: i32) {
     // Query plans and their costs
     let mut plan_costs: [i32; 20] = [0; 20];
     let mut plan_types: [i32; 20] = [0; 20]; // 0=nested loop, 1=hash join, 2=sort-merge
-    let mut plan_count = 0;
+    let mut plan_count: i32 = 0;
     
     // Simulate complex query optimization scenarios
-    let mut query_id = 0;
+    let mut query_id: i32 = 0;
     while (query_id < 10) {
         // Generate different join orders and access methods
-        let num_tables = (query_id % 3) + 2; // 2-4 tables
-        let mut best_cost = 999999;
-        let mut best_plan = -1;
+        let num_tables: i32 = (query_id % 3) + 2; // 2-4 tables
+        let mut best_cost: i32 = 999999;
+        let mut best_plan: i32 = -1;
         
         // Enumerate different join orders
-        let mut join_order = 0;
+        let mut join_order: i32 = 0;
         while (join_order < 6 && plan_count < 20) {
-            let mut current_cost = 0;
+            let mut current_cost: i32 = 0;
             
             // Cost estimation for different join algorithms
             if (join_order % 3 == 0) {
@@ -848,7 +848,7 @@ fn performQueryOptimizationTest(table_size: i32) {
             }
             
             // Add index selection cost
-            let index_cost = selectOptimalIndex(index_selectivities, num_tables, query_id);
+            let index_cost: i32 = selectOptimalIndex(index_selectivities, num_tables, query_id);
             current_cost = current_cost + index_cost;
             
             plan_costs[plan_count as usize] = current_cost;
@@ -864,8 +864,8 @@ fn performQueryOptimizationTest(table_size: i32) {
         
         // Simulate plan execution cost verification
         if (best_plan >= 0) {
-            let actual_cost = simulatePlanExecution(plan_types[best_plan as usize], table_cardinalities, num_tables);
-            let cost_accuracy = calculateCostAccuracy(plan_costs[best_plan as usize], actual_cost);
+            let actual_cost: i32 = simulatePlanExecution(plan_types[best_plan as usize], table_cardinalities, num_tables);
+            let cost_accuracy: i32 = calculateCostAccuracy(plan_costs[best_plan as usize], actual_cost);
             printlnInt(cost_accuracy);
         }
         
@@ -873,11 +873,11 @@ fn performQueryOptimizationTest(table_size: i32) {
     }
     
     // Analyze plan distribution
-    let mut nested_loop_count = 0;
-    let mut hash_join_count = 0;
-    let mut sort_merge_count = 0;
+    let mut nested_loop_count: i32 = 0;
+    let mut hash_join_count: i32 = 0;
+    let mut sort_merge_count: i32 = 0;
     
-    let mut i = 0;
+    let mut i: i32 = 0;
     while (i < plan_count) {
         if (plan_types[i as usize] == 0) {
             nested_loop_count = nested_loop_count + 1;
@@ -897,11 +897,11 @@ fn performQueryOptimizationTest(table_size: i32) {
 
 // Cost estimation functions
 fn estimateNestedLoopCost(cardinalities: [i32; 5], pages: [i32; 5], num_tables: i32, query_id: i32) -> i32 {
-    let mut cost = 0;
-    let mut i = 0;
+    let mut cost: i32 = 0;
+    let mut i: i32 = 0;
     while (i < num_tables - 1) {
-        let outer_table = i % 5;
-        let inner_table = (i + 1) % 5;
+        let outer_table: i32 = i % 5;
+        let inner_table: i32 = (i + 1) % 5;
         cost = cost + cardinalities[outer_table as usize] * pages[inner_table as usize];
         i = i + 1;
     }
@@ -909,11 +909,11 @@ fn estimateNestedLoopCost(cardinalities: [i32; 5], pages: [i32; 5], num_tables: 
 }
 
 fn estimateHashJoinCost(cardinalities: [i32; 5], pages: [i32; 5], num_tables: i32, query_id: i32) -> i32 {
-    let mut cost = 0;
-    let mut i = 0;
+    let mut cost: i32 = 0;
+    let mut i: i32 = 0;
     while (i < num_tables - 1) {
-        let table1 = i % 5;
-        let table2 = (i + 1) % 5;
+        let table1: i32 = i % 5;
+        let table2: i32 = (i + 1) % 5;
         cost = cost + pages[table1 as usize] + pages[table2 as usize]; // Scan both tables once
         cost = cost + (cardinalities[table1 as usize] / 10); // Hash table build cost
         i = i + 1;
@@ -922,14 +922,14 @@ fn estimateHashJoinCost(cardinalities: [i32; 5], pages: [i32; 5], num_tables: i3
 }
 
 fn estimateSortMergeCost(cardinalities: [i32; 5], pages: [i32; 5], num_tables: i32, query_id: i32) -> i32 {
-    let mut cost = 0;
-    let mut i = 0;
+    let mut cost: i32 = 0;
+    let mut i: i32 = 0;
     while (i < num_tables - 1) {
-        let table1 = i % 5;
-        let table2 = (i + 1) % 5;
+        let table1: i32 = i % 5;
+        let table2: i32 = (i + 1) % 5;
         // Sort cost: O(n log n)
-        let sort_cost1 = cardinalities[table1 as usize] * logBase2(cardinalities[table1 as usize]);
-        let sort_cost2 = cardinalities[table2 as usize] * logBase2(cardinalities[table2 as usize]);
+        let sort_cost1: i32 = cardinalities[table1 as usize] * logBase2(cardinalities[table1 as usize]);
+        let sort_cost2: i32 = cardinalities[table2 as usize] * logBase2(cardinalities[table2 as usize]);
         cost = cost + sort_cost1 + sort_cost2;
         cost = cost + pages[table1 as usize] + pages[table2 as usize]; // Scan cost
         i = i + 1;
@@ -953,14 +953,14 @@ fn logBase2(n: i32) -> i32 {
 
 // Index selection optimization
 fn selectOptimalIndex(selectivities: [[i32; 3]; 5], num_tables: i32, query_id: i32) -> i32 {
-    let mut total_index_cost = 0;
-    let mut i = 0;
+    let mut total_index_cost: i32 = 0;
+    let mut i: i32 = 0;
     while (i < num_tables) {
-        let table_idx = i % 5;
-        let predicate_type = (query_id + i) % 3;
+        let table_idx: i32 = i % 5;
+        let predicate_type: i32 = (query_id + i) % 3;
         
         // Choose index based on selectivity
-        let selectivity = selectivities[table_idx as usize][predicate_type as usize];
+        let selectivity: i32 = selectivities[table_idx as usize][predicate_type as usize];
         if (selectivity < 20) {
             total_index_cost = total_index_cost + 10; // High selectivity index
         } else if (selectivity < 40) {
@@ -975,32 +975,32 @@ fn selectOptimalIndex(selectivities: [[i32; 3]; 5], num_tables: i32, query_id: i
 
 // Simulate actual plan execution
 fn simulatePlanExecution(plan_type: i32, cardinalities: [i32; 5], num_tables: i32) -> i32 {
-    let mut execution_cost = 0;
+    let mut execution_cost: i32 = 0;
     
     if (plan_type == 0) {
         // Nested loop execution simulation
-        let mut i = 0;
+        let mut i: i32 = 0;
         while (i < num_tables - 1) {
-            let outer_size = cardinalities[i as usize % 5];
-            let inner_size = cardinalities[(i as usize + 1) % 5];
+            let outer_size: i32 = cardinalities[i as usize % 5];
+            let inner_size: i32 = cardinalities[(i as usize + 1) % 5];
             execution_cost = execution_cost + (outer_size * inner_size) / 100;
             i = i + 1;
         }
     } else if (plan_type == 1) {
         // Hash join execution simulation
-        let mut i = 0;
+        let mut i: i32 = 0;
         while (i < num_tables - 1) {
-            let table1_size = cardinalities[i as usize % 5];
-            let table2_size = cardinalities[(i as usize + 1) % 5];
+            let table1_size: i32 = cardinalities[i as usize % 5];
+            let table2_size: i32 = cardinalities[(i as usize + 1) % 5];
             execution_cost = execution_cost + table1_size + table2_size + (table1_size / 10);
             i = i + 1;
         }
     } else {
         // Sort-merge execution simulation
-        let mut i = 0;
+        let mut i: i32 = 0;
         while (i < num_tables - 1) {
-            let table1_size = cardinalities[i as usize % 5];
-            let table2_size = cardinalities[(i as usize + 1) % 5];
+            let table1_size: i32 = cardinalities[i as usize % 5];
+            let table2_size: i32 = cardinalities[(i as usize + 1) % 5];
             execution_cost = execution_cost + table1_size * 2 + table2_size * 2; // Sort overhead
             execution_cost = execution_cost + table1_size + table2_size; // Merge cost
             i = i + 1;
@@ -1012,13 +1012,13 @@ fn simulatePlanExecution(plan_type: i32, cardinalities: [i32; 5], num_tables: i3
 
 // Calculate cost estimation accuracy
 fn calculateCostAccuracy(estimated_cost: i32, actual_cost: i32) -> i32 {
-    let difference = if (estimated_cost > actual_cost) {
+    let difference: i32 = if (estimated_cost > actual_cost) {
         estimated_cost - actual_cost
     } else {
         actual_cost - estimated_cost
     };
     
-    let accuracy = 100 - ((difference * 100) / actual_cost);
+    let accuracy: i32 = 100 - ((difference * 100) / actual_cost);
     if (accuracy < 0) { 0 } else { accuracy }
 }
 
@@ -1042,25 +1042,25 @@ fn performHashTableTest(initial_size: i32) {
     let mut chain_table_size: i32 = 100;
     
     // Test 1: Linear probing hash table operations
-    let mut insert_operations = 0;
-    let mut successful_inserts = 0;
+    let mut insert_operations: i32 = 0;
+    let mut successful_inserts: i32 = 0;
     
     while (insert_operations < initial_size && insert_operations < 400) {
-        let key = (insert_operations * 17 + 23) % 2000 + 1;
-        let value = (insert_operations * 11 + 7) % 1000 + 1;
+        let key: i32 = (insert_operations * 17 + 23) % 2000 + 1;
+        let value: i32 = (insert_operations * 11 + 7) % 1000 + 1;
         
         // Check load factor and resize if necessary
-        let load_factor = (hash_entry_count * 100) / hash_table_size;
+        let load_factor: i32 = (hash_entry_count * 100) / hash_table_size;
         if (load_factor > 70 && hash_table_size < 250) {
             // Rehash to larger table
-            let old_size = hash_table_size;
+            let old_size: i32 = hash_table_size;
             hash_table_size = hash_table_size * 2;
             rehash_count = rehash_count + 1;
             
             // Save old entries
             let mut old_keys: [i32; 500] = [-1; 500];
             let mut old_values: [i32; 500] = [0; 500];
-            let mut i = 0;
+            let mut i: i32 = 0;
             while (i < old_size) {
                 old_keys[i as usize] = hash_table[i as usize];
                 old_values[i as usize] = hash_values[i as usize];
@@ -1082,16 +1082,16 @@ fn performHashTableTest(initial_size: i32) {
             i = 0;
             while (i < old_size) {
                 if (old_keys[i as usize] != -1) {
-                    insertLinearProbing(hash_table, hash_values, hash_table_size, 
-                                      old_keys[i as usize], old_values[i as usize], collision_count, hash_entry_count);
+                    let _ = insertLinearProbing(&mut hash_table, &mut hash_values, hash_table_size, 
+                                      old_keys[i as usize], old_values[i as usize], &mut collision_count, hash_entry_count);
                 }
                 i = i + 1;
             }
         }
         
         // Insert new entry
-        let insert_success = insertLinearProbing(hash_table, hash_values, hash_table_size, 
-                                               key, value, collision_count, hash_entry_count);
+        let insert_success: bool = insertLinearProbing(&mut hash_table, &mut hash_values, hash_table_size, 
+                                               key, value, &mut collision_count, hash_entry_count);
         if (insert_success) {
             successful_inserts = successful_inserts + 1;
             hash_entry_count = hash_entry_count + 1;
@@ -1101,18 +1101,18 @@ fn performHashTableTest(initial_size: i32) {
     }
     
     // Test 2: Chaining hash table operations
-    let mut chain_operations = 0;
-    let mut chain_successful_inserts = 0;
+    let mut chain_operations: i32 = 0;
+    let mut chain_successful_inserts: i32 = 0;
     
     while (chain_operations < initial_size && chain_operations < 300) {
-        let key = (chain_operations * 13 + 31) % 1500 + 1;
-        let value = (chain_operations * 19 + 5) % 800 + 1;
+        let key: i32 = (chain_operations * 13 + 31) % 1500 + 1;
+        let value: i32 = (chain_operations * 19 + 5) % 800 + 1;
         
-        let hash_index = key % chain_table_size;
+        let hash_index: i32 = key % chain_table_size;
         
         // Check if key already exists
-        let mut found = false;
-        let mut i = 0;
+        let mut found: bool = false;
+        let mut i: i32 = 0;
         while (i < chain_lengths[hash_index as usize] && i < 8) {
             if (chain_table[hash_index as usize][i as usize] == key) {
                 chain_values[hash_index as usize][i as usize] = value; // Update
@@ -1134,21 +1134,21 @@ fn performHashTableTest(initial_size: i32) {
     }
     
     // Test 3: Hash table lookup performance
-    let mut linear_lookup_success = 0;
-    let mut chain_lookup_success = 0;
-    let mut lookup_operations = 0;
+    let mut linear_lookup_success: i32 = 0;
+    let mut chain_lookup_success: i32 = 0;
+    let mut lookup_operations: i32 = 0;
     
     while (lookup_operations < 100) {
-        let search_key = (lookup_operations * 23 + 17) % 1000 + 1;
+        let search_key: i32 = (lookup_operations * 23 + 17) % 1000 + 1;
         
         // Linear probing lookup
-        let linear_result = lookupLinearProbing(hash_table, hash_table_size, search_key);
+        let linear_result: i32 = lookupLinearProbing(&hash_table, hash_table_size, search_key);
         if (linear_result >= 0) {
             linear_lookup_success = linear_lookup_success + 1;
         }
         
         // Chaining lookup
-        let chain_result = lookupChaining(chain_table, chain_lengths, chain_table_size, search_key);
+        let chain_result: i32 = lookupChaining(&chain_table, &chain_lengths, chain_table_size, search_key);
         if (chain_result >= 0) {
             chain_lookup_success = chain_lookup_success + 1;
         }
@@ -1157,8 +1157,8 @@ fn performHashTableTest(initial_size: i32) {
     }
     
     // Calculate statistics
-    let linear_load_factor = (hash_entry_count * 100) / hash_table_size;
-    let avg_chain_length = calculateAverageChainLength(chain_lengths, chain_table_size);
+    let linear_load_factor: i32 = (hash_entry_count * 100) / hash_table_size;
+    let avg_chain_length: i32 = calculateAverageChainLength(&chain_lengths, chain_table_size);
     
     printlnInt(successful_inserts);
     printlnInt(chain_successful_inserts);
@@ -1172,10 +1172,10 @@ fn performHashTableTest(initial_size: i32) {
 }
 
 // Linear probing insertion
-fn insertLinearProbing(table: [i32; 500], values: [i32; 500], table_size: i32,
-                      key: i32, value: i32, collision_count: i32, entry_count: i32) -> bool {
-    let mut hash_index = key % table_size;
-    let mut probe_count = 0;
+fn insertLinearProbing(table: &mut [i32; 500], values: &mut [i32; 500], table_size: i32,
+                      key: i32, value: i32, collision_count: &mut i32, _entry_count: i32) -> bool {
+    let mut hash_index: i32 = key % table_size;
+    let mut probe_count: i32 = 0;
     
     while (probe_count < table_size) {
         if (table[hash_index as usize] == -1) {
@@ -1189,7 +1189,7 @@ fn insertLinearProbing(table: [i32; 500], values: [i32; 500], table_size: i32,
             return true;
         } else {
             // Collision - probe next slot
-            collision_count = collision_count + 1;
+            *collision_count = *collision_count + 1;
             hash_index = (hash_index + 1) % table_size;
             probe_count = probe_count + 1;
         }
@@ -1199,9 +1199,9 @@ fn insertLinearProbing(table: [i32; 500], values: [i32; 500], table_size: i32,
 }
 
 // Linear probing lookup
-fn lookupLinearProbing(table: [i32; 500], table_size: i32, key: i32) -> i32 {
-    let mut hash_index = key % table_size;
-    let mut probe_count = 0;
+fn lookupLinearProbing(table: &[i32; 500], table_size: i32, key: i32) -> i32 {
+    let mut hash_index: i32 = key % table_size;
+    let mut probe_count: i32 = 0;
     
     while (probe_count < table_size) {
         if (table[hash_index as usize] == key) {
@@ -1218,10 +1218,10 @@ fn lookupLinearProbing(table: [i32; 500], table_size: i32, key: i32) -> i32 {
 }
 
 // Chaining lookup
-fn lookupChaining(table: [[i32; 8]; 100], lengths: [i32; 100], table_size: i32, key: i32) -> i32 {
-    let hash_index = key % table_size;
+fn lookupChaining(table: &[[i32; 8]; 100], lengths: &[i32; 100], table_size: i32, key: i32) -> i32 {
+    let hash_index: i32 = key % table_size;
     
-    let mut i = 0;
+    let mut i: i32 = 0;
     while (i < lengths[hash_index as usize] && i < 8) {
         if (table[hash_index as usize][i as usize] == key) {
             return i;
@@ -1233,11 +1233,11 @@ fn lookupChaining(table: [[i32; 8]; 100], lengths: [i32; 100], table_size: i32, 
 }
 
 // Calculate average chain length
-fn calculateAverageChainLength(lengths: [i32; 100], table_size: i32) -> i32 {
-    let mut total_length = 0;
-    let mut non_empty_chains = 0;
+fn calculateAverageChainLength(lengths: &[i32; 100], table_size: i32) -> i32 {
+    let mut total_length: i32 = 0;
+    let mut non_empty_chains: i32 = 0;
     
-    let mut i = 0;
+    let mut i: i32 = 0;
     while (i < table_size) {
         if (lengths[i as usize] > 0) {
             total_length = total_length + lengths[i as usize];

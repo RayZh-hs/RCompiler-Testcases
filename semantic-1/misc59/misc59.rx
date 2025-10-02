@@ -32,10 +32,10 @@ impl NumberOperations for Int {
         
         while (exponent > 0) {
             if (exponent % 2 == 1) {
-                result = ((result as i64 * base_mod as i64) % modulus.i as i64) as i32;
+                result = ((result as i32 * base_mod as i32) % modulus.i as i32) as i32;
             }
             exponent = exponent / 2;
-            base_mod = ((base_mod as i64 * base_mod as i64) % modulus.i as i64) as i32;
+            base_mod = ((base_mod as i32 * base_mod as i32) % modulus.i as i32) as i32;
         }
         
         return Int { i: result };

@@ -28,23 +28,21 @@ Branch prediction in the context of frequent conditional jumps in the VM program
 // - Function call overhead for handling VM subroutines and system calls.
 // - Branch prediction in the context of frequent conditional jumps in the VM program.
 
-let REGISTER_COUNT: i32 = 16;
-let MEMORY_SIZE: i32 = 2048;
-let STACK_SIZE: i32 = 256;
+const REGISTER_COUNT: i32 = 16;
+const MEMORY_SIZE: i32 = 2048;
+const STACK_SIZE: i32 = 256;
 
-// VM State
-let mut registers: [i32; 16];
-let mut memory: [i32; 2048];
-let mut stack: [i32; 256];
-
-let mut pc: i32; // Program Counter
-let mut sp: i32; // Stack Pointer
-let mut zf: bool; // Zero Flag
-let mut cf: bool; // Carry Flag
-let mut halt: bool;
-
-fn init_vm() {
-    let i: i32 = 0;
+fn init_vm(
+    registers: &mut [i32; 16],
+    memory: &mut [i32; 2048],
+    stack: &mut [i32; 256],
+    pc: &mut i32,
+    sp: &mut i32,
+    zf: &mut bool,
+    cf: &mut bool,
+    halt: &mut bool,
+) {
+    let mut i: i32 = 0;
     while (i < REGISTER_COUNT) {
         registers[i as usize] = 0;
         i = i + 1;
@@ -60,14 +58,14 @@ fn init_vm() {
         i = i + 1;
     }
 
-    pc = 0;
-    sp = STACK_SIZE;
-    zf = false;
-    cf = false;
-    halt = false;
+    *pc = 0;
+    *sp = STACK_SIZE;
+    *zf = false;
+    *cf = false;
+    *halt = false;
 }
 
-fn load_program() {
+fn load_program(memory: &mut [i32; 2048]) {
     // A complex program to test various instructions and logic.
     // This program calculates Fibonacci numbers iteratively and recursively,
     // performs some complex arithmetic, and tests conditional branches.
@@ -80,7 +78,7 @@ fn load_program() {
     // 22: CALL, 23: RET, 24: CMP_REG, 25: CMP_IMM
     // 26: PRINT_REG
 
-    let program: [i32; 200] = [
+    let program: [i32; 168] = [
         // --- Part 1: Iterative Fibonacci ---
         // R0: n, R1: a, R2: b, R3: temp, R4: counter
         2, 0, 15,       // MOV R0, 15 (Calculate Fib(15))
@@ -160,214 +158,252 @@ fn load_program() {
         23, 0, 0        // RET
     ];
 
-    let i: i32 = 0;
-    while (i < 200) {
+    let mut i: i32 = 0;
+    while (i < 168) {
         memory[i as usize] = program[i as usize];
         i = i + 1;
     }
 }
 
-fn fetch_decode_execute() {
-    while (halt == false) {
-        if (pc < 0 || pc >= MEMORY_SIZE) {
-            halt = true;
+fn fetch_decode_execute(
+    registers: &mut [i32; 16],
+    memory: &mut [i32; 2048],
+    stack: &mut [i32; 256],
+    pc: &mut i32,
+    sp: &mut i32,
+    zf: &mut bool,
+    cf: &mut bool,
+    halt: &mut bool,
+) {
+    while ((*halt) == false) {
+        if (((*pc) < 0 || (*pc) >= MEMORY_SIZE)) {
+            *halt = true;
         }
-        if (halt == true) {
+        if ((*halt) == true) {
             // loop exit
         } else {
-            let opcode: i32 = memory[pc as usize];
-            pc = pc + 1;
+            let opcode: i32 = memory[*pc as usize];
+            *pc = (*pc) + 1;
 
             // Simulating a switch statement with if-else if
             if (opcode == 0) { // HALT
-                halt = true;
-            } else if opcode == 1 { // MOV_REG
-                let r_dst: i32 = memory[pc as usize];
-                let r_src: i32 = memory[pc as usize+1];
+                *halt = true;
+            } else if (opcode == 1) { // MOV_REG
+                let r_dst: i32 = memory[*pc as usize];
+                let r_src: i32 = memory[*pc as usize + 1];
                 registers[r_dst as usize] = registers[r_src as usize];
-                pc = pc + 2;
-            } else if opcode == 2 { // MOV_IMM
-                let r_dst: i32 = memory[pc as usize];
-                let imm: i32 = memory[pc as usize+1];
+                *pc = (*pc) + 2;
+            } else if (opcode == 2) { // MOV_IMM
+                let r_dst: i32 = memory[*pc as usize];
+                let imm: i32 = memory[*pc as usize + 1];
                 registers[r_dst as usize] = imm;
-                pc = pc + 2;
-            } else if opcode == 3 { // ADD
-                let r_dst: i32 = memory[pc as usize];
-                let r_src: i32 = memory[pc as usize+1];
+                *pc = (*pc) + 2;
+            } else if (opcode == 3) { // ADD
+                let r_dst: i32 = memory[*pc as usize];
+                let r_src: i32 = memory[*pc as usize + 1];
                 let res: i32 = registers[r_dst as usize] + registers[r_src as usize];
                 // Simplified overflow check
-                if (registers[r_dst as usize] > 0 && registers[r_src as usize] > 0 && res < 0) {
-                    cf = true;
-                } else if registers[r_dst as usize] < 0 && registers[r_src as usize] < 0 && res > 0 {
-                    cf = true;
+                if ((registers[r_dst as usize] > 0 && registers[r_src as usize] > 0 && res < 0)) {
+                    *cf = true;
+                } else if ((registers[r_dst as usize] < 0 && registers[r_src as usize] < 0 && res > 0)) {
+                    *cf = true;
                 } else {
-                    cf = false;
+                    *cf = false;
                 }
                 registers[r_dst as usize] = res;
-                zf = res == 0;
-                pc = pc + 2;
-            } else if opcode == 4 { // SUB
-                let r_dst: i32 = memory[pc as usize];
-                let r_src: i32 = memory[pc as usize+1];
+                *zf = res == 0;
+                *pc = (*pc) + 2;
+            } else if (opcode == 4) { // SUB
+                let r_dst: i32 = memory[*pc as usize];
+                let r_src: i32 = memory[*pc as usize + 1];
                 let res: i32 = registers[r_dst as usize] - registers[r_src as usize];
                 // Simplified borrow check
-                if (registers[r_dst as usize] > 0 && registers[r_src as usize] < 0 && res < 0) {
-                    cf = true;
-                } else if registers[r_dst as usize] < 0 && registers[r_src as usize] > 0 && res > 0 {
-                    cf = true;
+                if ((registers[r_dst as usize] > 0 && registers[r_src as usize] < 0 && res < 0)) {
+                    *cf = true;
+                } else if ((registers[r_dst as usize] < 0 && registers[r_src as usize] > 0 && res > 0)) {
+                    *cf = true;
                 } else {
-                    cf = false;
+                    *cf = false;
                 }
                 registers[r_dst as usize] = res;
-                zf = res == 0;
-                pc = pc + 2;
-            } else if opcode == 5 { // MUL
-                let r_dst: i32 = memory[pc as usize];
-                let r_src: i32 = memory[pc as usize+1];
+                *zf = res == 0;
+                *pc = (*pc) + 2;
+            } else if (opcode == 5) { // MUL
+                let r_dst: i32 = memory[*pc as usize];
+                let r_src: i32 = memory[*pc as usize + 1];
                 registers[r_dst as usize] = registers[r_dst as usize] * registers[r_src as usize];
-                zf = registers[r_dst as usize] == 0;
-                pc = pc + 2;
-            } else if opcode == 6 { // DIV
-                let r_dst: i32 = memory[pc as usize];
-                let r_src: i32 = memory[pc as usize+1];
-                if (registers[r_src as usize] != 0) {
+                *zf = registers[r_dst as usize] == 0;
+                *pc = (*pc) + 2;
+            } else if (opcode == 6) { // DIV
+                let r_dst: i32 = memory[*pc as usize];
+                let r_src: i32 = memory[*pc as usize + 1];
+                if ((registers[r_src as usize] != 0)) {
                     registers[r_dst as usize] = registers[r_dst as usize] / registers[r_src as usize];
                 } else {
-                    halt = true; // Division by zero
+                    *halt = true; // Division by zero
                 }
-                zf = registers[r_dst as usize] == 0;
-                pc = pc + 2;
-            } else if opcode == 7 { // AND
-                let r_dst: i32 = memory[pc as usize];
-                let r_src: i32 = memory[pc as usize+1];
+                *zf = registers[r_dst as usize] == 0;
+                *pc = (*pc) + 2;
+            } else if (opcode == 7) { // AND
+                let r_dst: i32 = memory[*pc as usize];
+                let r_src: i32 = memory[*pc as usize + 1];
                 registers[r_dst as usize] = registers[r_dst as usize] & registers[r_src as usize];
-                zf = registers[r_dst as usize] == 0;
-                pc = pc + 2;
-            } else if opcode == 8 { // OR
-                let r_dst: i32 = memory[pc as usize];
-                let r_src: i32 = memory[pc as usize+1];
+                *zf = registers[r_dst as usize] == 0;
+                *pc = (*pc) + 2;
+            } else if (opcode == 8) { // OR
+                let r_dst: i32 = memory[*pc as usize];
+                let r_src: i32 = memory[*pc as usize + 1];
                 registers[r_dst as usize] = registers[r_dst as usize] | registers[r_src as usize];
-                zf = registers[r_dst as usize] == 0;
-                pc = pc + 2;
-            } else if opcode == 9 { // XOR
-                let r_dst: i32 = memory[pc as usize];
-                let r_src: i32 = memory[pc as usize+1];
+                *zf = registers[r_dst as usize] == 0;
+                *pc = (*pc) + 2;
+            } else if (opcode == 9) { // XOR
+                let r_dst: i32 = memory[*pc as usize];
+                let r_src: i32 = memory[*pc as usize + 1];
                 registers[r_dst as usize] = registers[r_dst as usize] ^ registers[r_src as usize];
-                zf = registers[r_dst as usize] == 0;
-                pc = pc + 2;
-            } else if opcode == 10 { // NOT
-                let r_dst: i32 = memory[pc as usize];
+                *zf = registers[r_dst as usize] == 0;
+                *pc = (*pc) + 2;
+            } else if (opcode == 10) { // NOT
+                let r_dst: i32 = memory[*pc as usize];
                 registers[r_dst as usize] = !registers[r_dst as usize];
-                zf = registers[r_dst as usize] == 0;
-                pc = pc + 1;
-            } else if opcode == 11 { // SHL
-                let r_dst: i32 = memory[pc as usize];
-                let imm: i32 = memory[pc as usize+1];
-                registers[r_dst as usize] = registers[r_dst as usize] << imm;
-                zf = registers[r_dst as usize] == 0;
-                pc = pc + 2;
-            } else if opcode == 12 { // SHR
-                let r_dst: i32 = memory[pc as usize];
-                let imm: i32 = memory[pc as usize+1];
-                registers[r_dst as usize] = registers[r_dst as usize] >> imm;
-                zf = registers[r_dst as usize] == 0;
-                pc = pc + 2;
-            } else if opcode == 13 { // PUSH
-                let r_src: i32 = memory[pc as usize];
-                sp = sp - 1;
-                stack[sp as usize] = registers[r_src as usize];
-                pc = pc + 1;
-            } else if opcode == 14 { // POP
-                let r_dst: i32 = memory[pc as usize];
-                registers[r_dst as usize] = stack[sp as usize];
-                sp = sp + 1;
-                pc = pc + 1;
-            } else if opcode == 15 { // LOAD
-                let r_dst: i32 = memory[pc as usize];
-                let r_addr: i32 = memory[pc as usize+1];
-                let offset: i32 = memory[pc as usize+2];
+                *zf = registers[r_dst as usize] == 0;
+                *pc = (*pc) + 1;
+            } else if (opcode == 11) { // SHL
+                let r_dst: i32 = memory[*pc as usize];
+                let imm: i32 = memory[*pc as usize + 1];
+                registers[r_dst as usize] = registers[r_dst as usize] << (imm as u32);
+                *zf = registers[r_dst as usize] == 0;
+                *pc = (*pc) + 2;
+            } else if (opcode == 12) { // SHR
+                let r_dst: i32 = memory[*pc as usize];
+                let imm: i32 = memory[*pc as usize + 1];
+                registers[r_dst as usize] = registers[r_dst as usize] >> (imm as u32);
+                *zf = registers[r_dst as usize] == 0;
+                *pc = (*pc) + 2;
+            } else if (opcode == 13) { // PUSH
+                let r_src: i32 = memory[*pc as usize];
+                *sp = (*sp) - 1;
+                stack[*sp as usize] = registers[r_src as usize];
+                *pc = (*pc) + 1;
+            } else if (opcode == 14) { // POP
+                let r_dst: i32 = memory[*pc as usize];
+                registers[r_dst as usize] = stack[*sp as usize];
+                *sp = (*sp) + 1;
+                *pc = (*pc) + 1;
+            } else if (opcode == 15) { // LOAD
+                let r_dst: i32 = memory[*pc as usize];
+                let r_addr: i32 = memory[*pc as usize + 1];
+                let offset: i32 = memory[*pc as usize + 2];
                 let addr: i32 = registers[r_addr as usize] + offset;
-                if (addr >= 0 && addr < MEMORY_SIZE) {
+                if ((addr >= 0 && addr < MEMORY_SIZE)) {
                     registers[r_dst as usize] = memory[addr as usize];
                 } else {
-                    halt = true;
+                    *halt = true;
                 }
-                pc = pc + 3;
-            } else if opcode == 16 { // STORE
-                let r_src: i32 = memory[pc as usize];
-                let r_addr: i32 = memory[pc as usize+1];
-                let offset: i32 = memory[pc as usize+2];
+                *pc = (*pc) + 3;
+            } else if (opcode == 16) { // STORE
+                let r_src: i32 = memory[*pc as usize];
+                let r_addr: i32 = memory[*pc as usize + 1];
+                let offset: i32 = memory[*pc as usize + 2];
                 let addr: i32 = registers[r_addr as usize] + offset;
-                if (addr >= 0 && addr < MEMORY_SIZE) {
+                if ((addr >= 0 && addr < MEMORY_SIZE)) {
                     memory[addr as usize] = registers[r_src as usize];
                 } else {
-                    halt = true;
+                    *halt = true;
                 }
-                pc = pc + 3;
-            } else if opcode == 17 { // JMP
-                pc = memory[pc as usize];
-            } else if opcode == 18 { // JZ
-                if (zf) {
-                    pc = memory[pc as usize];
+                *pc = (*pc) + 3;
+            } else if (opcode == 17) { // JMP
+                *pc = memory[*pc as usize];
+            } else if (opcode == 18) { // JZ
+                if ((*zf)) {
+                    *pc = memory[*pc as usize];
                 } else {
-                    pc = pc + 1;
+                    *pc = (*pc) + 1;
                 }
-            } else if opcode == 19 { // JNZ
-                if (!zf) {
-                    pc = memory[pc as usize];
+            } else if (opcode == 19) { // JNZ
+                if ((!*zf)) {
+                    *pc = memory[*pc as usize];
                 } else {
-                    pc = pc + 1;
+                    *pc = (*pc) + 1;
                 }
-            } else if opcode == 20 { // JC
-                if (cf) {
-                    pc = memory[pc as usize];
+            } else if (opcode == 20) { // JC
+                if ((*cf)) {
+                    *pc = memory[*pc as usize];
                 } else {
-                    pc = pc + 1;
+                    *pc = (*pc) + 1;
                 }
-            } else if opcode == 21 { // JNC
-                if (!cf) {
-                    pc = memory[pc as usize];
+            } else if (opcode == 21) { // JNC
+                if ((!*cf)) {
+                    *pc = memory[*pc as usize];
                 } else {
-                    pc = pc + 1;
+                    *pc = (*pc) + 1;
                 }
-            } else if opcode == 22 { // CALL
-                sp = sp - 1;
-                stack[sp as usize] = pc + 1; // Push return address
-                pc = memory[pc as usize];
-            } else if opcode == 23 { // RET
-                pc = stack[sp as usize];
-                sp = sp + 1;
-            } else if opcode == 24 { // CMP_REG
-                let r1: i32 = memory[pc as usize];
-                let r2: i32 = memory[pc as usize+1];
+            } else if (opcode == 22) { // CALL
+                *sp = (*sp) - 1;
+                stack[*sp as usize] = (*pc) + 1; // Push return address
+                *pc = memory[*pc as usize];
+            } else if (opcode == 23) { // RET
+                *pc = stack[*sp as usize];
+                *sp = (*sp) + 1;
+            } else if (opcode == 24) { // CMP_REG
+                let r1: i32 = memory[*pc as usize];
+                let r2: i32 = memory[*pc as usize + 1];
                 let val1: i32 = registers[r1 as usize];
                 let val2: i32 = registers[r2 as usize];
-                zf = val1 == val2;
-                cf = val1 < val2;
-                pc = pc + 2;
-            } else if opcode == 25 { // CMP_IMM
-                let r1: i32 = memory[pc as usize];
-                let imm: i32 = memory[pc as usize+1];
+                *zf = val1 == val2;
+                *cf = val1 < val2;
+                *pc = (*pc) + 2;
+            } else if (opcode == 25) { // CMP_IMM
+                let r1: i32 = memory[*pc as usize];
+                let imm: i32 = memory[*pc as usize + 1];
                 let val1: i32 = registers[r1 as usize];
-                zf = val1 == imm;
-                cf = val1 < imm;
-                pc = pc + 2;
-            } else if opcode == 26 { // PRINT_REG
-                let r_src: i32 = memory[pc as usize];
+                *zf = val1 == imm;
+                *cf = val1 < imm;
+                *pc = (*pc) + 2;
+            } else if (opcode == 26) { // PRINT_REG
+                let r_src: i32 = memory[*pc as usize];
                 printlnInt(registers[r_src as usize]);
-                pc = pc + 1;
+                *pc = (*pc) + 1;
             } else {
                 // Invalid opcode
-                halt = true;
+                *halt = true;
             }
         }
     }
 }
 
 fn main() {
-    init_vm();
-    load_program();
-    fetch_decode_execute();
+
+    let mut registers: [i32; 16] = [0; 16];
+    let mut memory: [i32; 2048] = [0; 2048];
+    let mut stack: [i32; 256] = [0; 256];
+
+    let mut pc: i32 = 0;
+    let mut sp: i32 = 0;
+    let mut zf: bool = false;
+    let mut cf: bool = false;
+    let mut halt: bool = false;
+
+    init_vm(
+        &mut registers,
+        &mut memory,
+        &mut stack,
+        &mut pc,
+        &mut sp,
+        &mut zf,
+        &mut cf,
+        &mut halt,
+    );
+    load_program(&mut memory);
+    fetch_decode_execute(
+        &mut registers,
+        &mut memory,
+        &mut stack,
+        &mut pc,
+        &mut sp,
+        &mut zf,
+        &mut cf,
+        &mut halt,
+    );
     
     // Final check to ensure halt worked
     if (halt) {

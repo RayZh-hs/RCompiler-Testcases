@@ -36,11 +36,19 @@ fn main() {
     }
 
     let mut world: [[i32; 64]; 64] = [[0; 64]; 64];
-    let mut agents: [Agent; 32] = [Agent { id: 0, x: 0, y: 0, energy: 0, target_x: 0, target_y: 0, state: 0 }; 32];
+    let mut agents: [Agent; 32] = [Agent {
+        id: 0,
+        x: 0,
+        y: 0,
+        energy: 0,
+        target_x: 0,
+        target_y: 0,
+        state: 0,
+    }; 32];
     let num_agents: i32 = 32;
     let world_size: i32 = 64;
 
-    fn init_world(mut world: &mut [[i32; 64]; 64], mut agents: &mut [Agent; 32]) {
+    fn init_world(world: &mut [[i32; 64]; 64], agents: &mut [Agent; 32]) {
         let mut i: i32 = 0;
         while (i < 64) {
             let mut j: i32 = 0;
@@ -84,32 +92,42 @@ fn main() {
         return best_x * 1000 + best_y;
     }
 
-    fn update_agent(mut agent: &mut Agent, mut world: &mut [[i32; 64]; 64]) {
+    fn update_agent(agent: &mut Agent, world: &mut [[i32; 64]; 64]) {
         if (agent.energy <= 0) {
             return;
         }
         agent.energy = agent.energy - 1;
 
-        if (agent.state == 0) { // Idle
+        if (agent.state == 0) {
+            // Idle
             let target: i32 = find_new_target(agent, world);
             agent.target_x = target / 1000;
             agent.target_y = target % 1000;
             agent.state = 1;
-        } else if agent.state == 1 { // Moving
+        } else if agent.state == 1 {
+            // Moving
             if (agent.x == agent.target_x && agent.y == agent.target_y) {
                 agent.state = 2;
             } else {
-                if (agent.x < agent.target_x) { agent.x = agent.x + 1; }
-                else if (agent.x > agent.target_x) { agent.x = agent.x - 1; }
+                if (agent.x < agent.target_x) {
+                    agent.x = agent.x + 1;
+                } else if (agent.x > agent.target_x) {
+                    agent.x = agent.x - 1;
+                }
 
-                if (agent.y < agent.target_y) { agent.y = agent.y + 1; }
-                else if (agent.y > agent.target_y) { agent.y = agent.y - 1; }
+                if (agent.y < agent.target_y) {
+                    agent.y = agent.y + 1;
+                } else if (agent.y > agent.target_y) {
+                    agent.y = agent.y - 1;
+                }
             }
-        } else if agent.state == 2 { // Collecting
+        } else if agent.state == 2 {
+            // Collecting
             let res: i32 = world[(agent.x) as usize][(agent.y) as usize];
             if (res > 0) {
                 agent.energy = agent.energy + res / 5;
-                world[(agent.x) as usize][(agent.y) as usize] = world[(agent.x) as usize][(agent.y) as usize] - res / 10 - 1;
+                world[(agent.x) as usize][(agent.y) as usize] =
+                    world[(agent.x) as usize][(agent.y) as usize] - res / 10 - 1;
                 if (world[(agent.x) as usize][(agent.y) as usize] < 0) {
                     world[(agent.x) as usize][(agent.y) as usize] = 0;
                 }
@@ -131,7 +149,7 @@ fn main() {
         // Hidden Error: `total_energy` is declared as immutable but is modified
         // inside the loop. This should cause a mutability error.
         if (time_step % 20 == 0) {
-            let total_energy: i32 = 0;
+            let mut total_energy: i32 = 0;
             let mut j: i32 = 0;
             while (j < 32) {
                 total_energy = total_energy + agents[j as usize].energy;

@@ -17,7 +17,7 @@ struct CycleInfo {
 
 // Linear congruential generator for pseudorandom sequence
 fn lcg_next(seed: i32, a: i32, c: i32, m: i32) -> i32 {
-    let result: i32 = ((seed as i64 * a as i64 + c as i64) % m as i64) as i32;
+    let result: i32 = ((seed as i32 * a as i32 + c as i32) % m as i32) as i32;
     if (result < 0) {
         return result + m;
     }
@@ -84,9 +84,9 @@ fn analyze_lcg_cycles() -> i32 {
     let mut param: i32 = 1;
     
     while (param <= 3) {
-        let a: i32 = 16807;  // Common LCG multiplier
-        let c: i32 = 0;      // Additive constant
-        let m: i32 = 2147483647; // 2^31 - 1, a Mersenne prime
+        let a: i32 = 3001;        // Reduced multiplier (< 4000)
+        let c: i32 = 17;          // Small additive constant
+        let m: i32 = 500003;      // Prime ~5e5 (ensures (m-1)*a < 2^31)
         
         let param_set: i32 = 42 + param;  // This should cause compilation error
         

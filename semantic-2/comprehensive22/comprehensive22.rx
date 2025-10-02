@@ -4,30 +4,819 @@ Test Target: comprehensive
 Author: Wenxin Zheng
 Time: 2025-08-17
 Verdict: Success
-Test Name: Advanced Graph Algorithms and Network Optimization
-Summary: This test comprehensively evaluates compiler optimizations for:
-Details:
-Complex graph traversal algorithms with multiple data structures
-Network flow optimization and shortest path computations
-Dynamic memory allocation patterns and pointer arithmetic optimization
-Complex recursive function call optimization
-Multi-dimensional array access pattern optimization
-Branch prediction for graph-based conditional logic
-Loop optimization in graph traversal contexts
 */
 
-// comprehensive22.rx - Advanced Graph Algorithms and Network Optimization
-// This test comprehensively evaluates compiler optimizations for:
-// - Complex graph traversal algorithms with multiple data structures
-// - Network flow optimization and shortest path computations
-// - Dynamic memory allocation patterns and pointer arithmetic optimization
-// - Complex recursive function call optimization
-// - Multi-dimensional array access pattern optimization
-// - Branch prediction for graph-based conditional logic
-// - Loop optimization in graph traversal contexts
+// Moved from original comprehensive1.rx
+// comprehensive22.rx - Comprehensive Test 1: Performance-Intensive Sorting and Matrix Operations
+// This test is designed to stress-test compiler optimizations including:
+// - Loop optimization and unrolling
+// - Function call optimization and inlining
+// - Array access optimization
+// - Branch prediction optimization
+// - Register allocation efficiency
+// - Arithmetic operation optimization
 
 fn main() {
-    print("comprehensive22\n");
+    // Performance test marker - start
+    printlnInt(1000);
+    
+    // Test 1: Multiple sorting algorithms on large datasets
+    // This tests compiler's ability to optimize nested loops and array accesses
+    performSortingBenchmark();
+    
+    // Test 2: Matrix multiplication and operations
+    // This tests compiler's ability to optimize multi-dimensional array access patterns
+    performMatrixOperations();
+    
+    // Test 3: Recursive algorithms with deep call stacks
+    // This tests function call optimization and stack management
+    performRecursiveOperations();
+    
+    // Test 4: Computational-intensive mathematical operations
+    // This tests arithmetic optimization and loop unrolling
+    performMathematicalOperations();
+    
+    // Test 5: Memory access pattern optimization
+    // This tests compiler's ability to optimize different memory access patterns
+    performMemoryAccessPatterns();
+    
+    // Performance test marker - end
+    printlnInt(9999);
 }
 
-// TODO: add more tests here
+// Test 1: Sorting Algorithm Performance Benchmark
+// Tests compiler optimization of array access, loop structures, and branching
+fn performSortingBenchmark() {
+    printlnInt(1001); // Start sorting benchmark
+    
+    let mut test_array: [i32; 1000] = [0; 1000];
+    
+    // Initialize with reverse-sorted data for worst-case performance
+    initializeReverseArray(&mut test_array, 1000);
+    
+    // Test Quick Sort - tests recursion optimization and branching
+    let mut quick_array: [i32; 1000] = [0; 1000];
+    copyArray(&test_array, &mut quick_array, 1000);
+    quickSort(&mut quick_array, 0, 999);
+    validateSortedArray(&quick_array, 1000);
+    
+    // Test Heap Sort - tests complex array indexing patterns
+    let mut heap_array: [i32; 1000] = [0; 1000];
+    copyArray(&test_array, &mut heap_array, 1000);
+    heapSort(&mut heap_array, 1000);
+    validateSortedArray(&heap_array, 1000);
+    
+    // Test Merge Sort - tests function call overhead optimization
+    let mut merge_array: [i32; 1000] = [0; 1000];
+    copyArray(&test_array, &mut merge_array, 1000);
+    mergeSort(&mut merge_array, 0, 999);
+    validateSortedArray(&merge_array, 1000);
+    
+    // Test Selection Sort - tests nested loop optimization
+    let mut selection_array: [i32; 1000] = [0; 1000];
+    copyArray(&test_array, &mut selection_array, 1000);
+    selectionSort(&mut selection_array, 1000);
+    validateSortedArray(&selection_array, 1000);
+    
+    printlnInt(1002); // End sorting benchmark
+}
+
+// Initialize array in reverse order for worst-case sorting performance
+fn initializeReverseArray(arr: &mut [i32; 1000], size: i32) {
+    let mut i: i32 = 0;
+    while (i < size) {
+        arr[i as usize] = size - i;
+        i += 1;
+    }
+}
+
+// Copy array - tests basic loop optimization
+fn copyArray(source: &[i32; 1000], dest: &mut [i32; 1000], size: i32) {
+    let mut i: i32 = 0;
+    while (i < size) {
+        dest[i as usize] = source[i as usize];
+        i += 1;
+    }
+}
+
+// Quick Sort implementation - tests recursion and branching optimization
+fn quickSort(arr: &mut [i32; 1000], low: i32, high: i32) {
+    if (low < high) {
+        let pivot_index: i32 = partition(arr, low, high);
+        quickSort(arr, low, pivot_index - 1);
+        quickSort(arr, pivot_index + 1, high);
+    }
+}
+
+// Partition function for quick sort - tests complex branching patterns
+fn partition(arr: &mut [i32; 1000], low: i32, high: i32) -> i32 {
+    let pivot: i32 = arr[high as usize];
+    let mut i: i32 = low - 1;
+    let mut j: i32 = low;
+    
+    while (j < high) {
+        if (arr[j as usize] <= pivot) {
+            i += 1;
+            swapElements(arr, i, j);
+        }
+        j += 1;
+    }
+    swapElements(arr, i + 1, high);
+    return i + 1;
+}
+
+// Swap elements - tests basic arithmetic and array access optimization
+fn swapElements(arr: &mut [i32; 1000], i: i32, j: i32) {
+    let temp: i32 = arr[i as usize];
+    arr[i as usize] = arr[j as usize];
+    arr[j as usize] = temp;
+}
+
+// Heap Sort - tests complex array indexing calculations
+fn heapSort(arr: &mut [i32; 1000], size: i32) {
+    // Build max heap - tests loop optimization with complex expressions
+    let mut i: i32 = size / 2 - 1;
+    while (i >= 0) {
+        heapify(arr, size, i);
+        i -= 1;
+    }
+    
+    // Extract elements from heap
+    i = size - 1;
+    while (i > 0) {
+        swapElements(arr, 0, i);
+        heapify(arr, i, 0);
+        i -= 1;
+    }
+}
+
+// Heapify operation - tests recursive calls and complex arithmetic
+fn heapify(arr: &mut [i32; 1000], size: i32, root: i32) {
+    let mut largest: i32 = root;
+    let left: i32 = 2 * root + 1;
+    let right: i32 = 2 * root + 2;
+    
+    if (left < size && arr[left as usize] > arr[largest as usize]) {
+        largest = left;
+    }
+    
+    if (right < size && arr[right as usize] > arr[largest as usize]) {
+        largest = right;
+    }
+    
+    if (largest != root) {
+        swapElements(arr, root, largest);
+        heapify(arr, size, largest);
+    }
+}
+
+// Merge Sort - tests function call optimization and temporary array handling
+fn mergeSort(arr: &mut [i32; 1000], left: i32, right: i32) {
+    if (left < right) {
+        let mid: i32 = left + (right - left) / 2;
+        mergeSort(arr, left, mid);
+        mergeSort(arr, mid + 1, right);
+        merge(arr, left, mid, right);
+    }
+}
+
+// Merge operation - tests complex array copying and comparison patterns
+fn merge(arr: &mut [i32; 1000], left: i32, mid: i32, right: i32) {
+    let left_size: i32 = mid - left + 1;
+    let right_size: i32 = right - mid;
+    
+    // Create temporary arrays - tests memory allocation optimization
+    let mut left_array: [i32; 500] = [0; 500];
+    let mut right_array: [i32; 500] = [0; 500];
+    
+    // Copy data to temporary arrays
+    let mut i: i32 = 0;
+    while (i < left_size) {
+        left_array[i as usize] = arr[(left + i) as usize];
+        i += 1;
+    }
+    
+    let mut j: i32 = 0;
+    while (j < right_size) {
+        right_array[j as usize] = arr[(mid + 1 + j) as usize];
+        j += 1;
+    }
+    
+    // Merge the temporary arrays back
+    i = 0;
+    j = 0;
+    let mut k: i32 = left;
+    
+    while (i < left_size && j < right_size) {
+        if (left_array[i as usize] <= right_array[j as usize]) {
+            arr[k as usize] = left_array[i as usize];
+            i += 1;
+        } else {
+            arr[k as usize] = right_array[j as usize];
+            j += 1;
+        }
+        k += 1;
+    }
+    
+    // Copy remaining elements
+    while (i < left_size) {
+        arr[k as usize] = left_array[i as usize];
+        i += 1;
+        k += 1;
+    }
+    
+    while (j < right_size) {
+        arr[k as usize] = right_array[j as usize];
+        j += 1;
+        k += 1;
+    }
+}
+
+// Selection Sort - tests nested loop optimization
+fn selectionSort(arr: &mut [i32; 1000], size: i32) {
+    let mut i: i32 = 0;
+    while (i < size - 1) {
+        let mut min_index: i32 = i;
+        let mut j: i32 = i + 1;
+        
+        while (j < size) {
+            if (arr[j as usize] < arr[min_index as usize]) {
+                min_index = j;
+            }
+            j += 1;
+        }
+        
+        if (min_index != i) {
+            swapElements(arr, i, min_index);
+        }
+        i += 1;
+    }
+}
+
+// Validate that array is sorted - tests optimization of validation loops
+fn validateSortedArray(arr: &[i32; 1000], size: i32) {
+    let mut i: i32 = 0;
+    let mut is_sorted: i32 = 1;
+    
+    while (i < size - 1) {
+        if (arr[i as usize] > arr[(i + 1) as usize]) {
+            is_sorted = 0;
+            break;
+        }
+        i += 1;
+    }
+    
+    if (is_sorted == 1) {
+        printlnInt(2000); // Validation successful
+    } else {
+        printlnInt(2001); // Validation failed
+    }
+}
+
+// Test 2: Matrix Operations Performance
+// Tests compiler optimization of multi-dimensional array access patterns
+fn performMatrixOperations() {
+    printlnInt(2002); // Start matrix operations
+    
+    // Initialize matrices - tests loop initialization optimization
+    let mut matrix_a: [i32; 400] = [0; 400]; // 20x20 matrix
+    let mut matrix_b: [i32; 400] = [0; 400]; // 20x20 matrix
+    let mut result_matrix: [i32; 400] = [0; 400]; // 20x20 result matrix
+    
+    initializeMatrix(&mut matrix_a, 20);
+    initializeMatrix(&mut matrix_b, 20);
+    
+    // Matrix multiplication - tests triple nested loop optimization
+    matrixMultiply(&matrix_a, &matrix_b, &mut result_matrix, 20);
+    
+    // Matrix transpose - tests memory access pattern optimization
+    let mut transposed: [i32; 400] = [0; 400];
+    matrixTranspose(&result_matrix, &mut transposed, 20);
+    
+    // Calculate matrix determinant (for smaller submatrix) - tests recursive optimization
+    let determinant: i32 = calculateDeterminant(&result_matrix, 10);
+    printlnInt(determinant); // -62098000
+    
+    printlnInt(2003); // End matrix operations
+}
+
+// Initialize matrix with specific pattern - tests nested loop with arithmetic
+fn initializeMatrix(matrix: &mut [i32; 400], size: i32) {
+    let mut i: i32 = 0;
+    while (i < size) {
+        let mut j: i32 = 0;
+        while (j < size) {
+            matrix[(i * size + j) as usize] = ((i + 1) * (j + 1)) % 50;
+            j += 1;
+        }
+        i += 1;
+    }
+}
+
+// Matrix multiplication - tests triple nested loop optimization
+fn matrixMultiply(a: &[i32; 400], b: &[i32; 400], result: &mut [i32; 400], size: i32) {
+    let mut i: i32 = 0;
+    while (i < size) {
+        let mut j: i32 = 0;
+        while (j < size) {
+            result[(i * size + j) as usize] = 0;
+            let mut k: i32 = 0;
+            while (k < size) {
+                result[(i * size + j) as usize] += a[(i * size + k) as usize] * b[(k * size + j) as usize];
+                k += 1;
+            }
+            j += 1;
+        }
+        i += 1;
+    }
+}
+
+// Matrix transpose - tests memory access pattern optimization
+fn matrixTranspose(source: &[i32; 400], dest: &mut [i32; 400], size: i32) {
+    let mut i: i32 = 0;
+    while (i < size) {
+        let mut j: i32 = 0;
+        while (j < size) {
+            dest[(j * size + i) as usize] = source[(i * size + j) as usize];
+            j += 1;
+        }
+        i += 1;
+    }
+}
+
+// Calculate determinant using cofactor expansion - tests deep recursion optimization
+fn calculateDeterminant(matrix: &[i32; 400], size: i32) -> i32 {
+    if (size == 1) {
+        return matrix[0];
+    }
+    
+    if (size == 2) {
+        return matrix[0] * matrix[3] - matrix[1] * matrix[2];
+    }
+    
+    let mut determinant: i32 = 0;
+    let mut sign: i32 = 1;
+    let mut col: i32 = 0;
+    
+    while (col < size) {
+        let mut minor: [i32; 81] = [0; 81]; // 9x9 minor matrix
+        createMinorMatrix(matrix, &mut minor, size, 0, col);
+        determinant += sign * matrix[col as usize] * calculateDeterminantSmall(&minor, size - 1);
+        sign = -sign;
+        col += 1;
+    }
+    
+    return determinant;
+}
+
+// Create minor matrix for determinant calculation
+fn createMinorMatrix(source: &[i32; 400], minor: &mut [i32; 81], size: i32, skip_row: i32, skip_col: i32) {
+    let mut minor_i: i32 = 0;
+    let mut i: i32 = 0;
+    
+    while (i < size) {
+        if (i != skip_row) {
+            let mut minor_j: i32 = 0;
+            let mut j: i32 = 0;
+            
+            while (j < size) {
+                if (j != skip_col) {
+                    minor[(minor_i * (size - 1) + minor_j) as usize] = source[(i * size + j) as usize];
+                    minor_j += 1;
+                }
+                j += 1;
+            }
+            minor_i += 1;
+        }
+        i += 1;
+    }
+}
+
+// Calculate determinant for smaller matrices
+fn calculateDeterminantSmall(matrix: &[i32; 81], size: i32) -> i32 {
+    if (size == 1) {
+        return matrix[0];
+    }
+    
+    if (size == 2) {
+        return matrix[0] * matrix[3] - matrix[1] * matrix[2];
+    }
+    
+    // For simplicity, use approximation for larger matrices
+    let mut sum: i32 = 0;
+    let mut i: i32 = 0;
+    while (i < size) {
+        sum += matrix[(i * size + i) as usize]; // Sum of diagonal elements
+        i += 1;
+    }
+    return sum;
+}
+
+// Test 3: Recursive Operations Performance
+// Tests function call optimization, stack management, and tail recursion
+fn performRecursiveOperations() {
+    printlnInt(3001); // Start recursive operations
+    
+    // Test deep recursion with Fibonacci - tests memoization opportunity
+    let fib_result: i32 = fibonacciIterative(30); // Use iterative to avoid stack overflow
+    printlnInt(fib_result);
+    
+    // Test factorial calculation - tests tail recursion optimization
+    let fact_result: i32 = factorialIterative(10);
+    printlnInt(fact_result);
+    
+    // Test Ackermann function (limited depth) - tests function call overhead
+    let ack_result: i32 = ackermannLimited(3, 5);
+    printlnInt(ack_result);
+    
+    // Test tree traversal simulation - tests recursive data structure handling
+    let tree_sum: i32 = simulateTreeTraversal(10);
+    printlnInt(tree_sum);
+    
+    printlnInt(3002); // End recursive operations
+}
+
+// Iterative Fibonacci to test loop optimization instead of recursion
+fn fibonacciIterative(n: i32) -> i32 {
+    if (n <= 1) {
+        return n;
+    }
+    
+    let mut prev: i32 = 0;
+    let mut curr: i32 = 1;
+    let mut i: i32 = 2;
+    
+    while (i <= n) {
+        let temp: i32 = curr;
+        curr = prev + curr;
+        prev = temp;
+        i += 1;
+    }
+    
+    return curr;
+}
+
+// Iterative factorial to test loop optimization
+fn factorialIterative(n: i32) -> i32 {
+    let mut result: i32 = 1;
+    let mut i: i32 = 2;
+    
+    while (i <= n) {
+        result *= i;
+        i += 1;
+    }
+    
+    return result;
+}
+
+// Limited Ackermann function to test function calls without stack overflow
+fn ackermannLimited(m: i32, n: i32) -> i32 {
+    if (m == 0) {
+        return n + 1;
+    }
+    
+    if (m == 1) {
+        return n + 2;
+    }
+    
+    if (m == 2) {
+        return 2 * n + 3;
+    }
+    
+    if (m == 3) {
+        return 8 * (n + 1) - 3;
+    }
+    
+    // For higher m values, use approximation
+    return m * n + 42;
+}
+
+// Simulate tree traversal without actual tree structure
+fn simulateTreeTraversal(depth: i32) -> i32 {
+    if (depth <= 0) {
+        return 1;
+    }
+    
+    // Simulate binary tree traversal
+    let left_sum: i32 = simulateTreeTraversal(depth - 1);
+    let right_sum: i32 = simulateTreeTraversal(depth - 1);
+    
+    return left_sum + right_sum + depth;
+}
+
+// Test 4: Mathematical Operations Performance
+// Tests arithmetic optimization, loop unrolling, and mathematical function optimization
+fn performMathematicalOperations() {
+    printlnInt(4001); // Start mathematical operations
+    
+    // Test prime number generation - tests division optimization
+    let prime_count: i32 = countPrimesUpTo(1000);
+    printlnInt(prime_count);
+    
+    // Test greatest common divisor computation - tests modulo optimization
+    let gcd_result: i32 = performGcdOperations();
+    printlnInt(gcd_result);
+    
+    // Test power computation - tests multiplication optimization
+    let power_result: i32 = performPowerOperations();
+    printlnInt(power_result);
+    
+    // Test square root approximation - tests division and comparison optimization
+    let sqrt_result: i32 = performSquareRootOperations();
+    printlnInt(sqrt_result);
+    
+    printlnInt(4002); // End mathematical operations
+}
+
+// Count prime numbers up to n - tests division and loop optimization
+fn countPrimesUpTo(limit: i32) -> i32 {
+    let mut count: i32 = 0;
+    let mut num: i32 = 2;
+    
+    while (num <= limit) {
+        if (isPrimeOptimized(num) == 1) {
+            count += 1;
+        }
+        num += 1;
+    }
+    
+    return count;
+}
+
+// Optimized prime checking - tests early termination and division optimization
+fn isPrimeOptimized(n: i32) -> i32 {
+    if (n <= 1) {
+        return 0;
+    }
+    
+    if (n <= 3) {
+        return 1;
+    }
+    
+    if (n % 2 == 0 || n % 3 == 0) {
+        return 0;
+    }
+    
+    let mut i: i32 = 5;
+    while (i * i <= n) {
+        if (n % i == 0 || n % (i + 2) == 0) {
+            return 0;
+        }
+        i += 6;
+    }
+    
+    return 1;
+}
+
+// Perform multiple GCD operations - tests modulo optimization
+fn performGcdOperations() -> i32 {
+    let mut total_gcd: i32 = 0;
+    let mut i: i32 = 1;
+    
+    while (i <= 100) {
+        let mut j: i32 = 1;
+        while (j <= 100) {
+            total_gcd += gcdEuclidean(i * 17, j * 23);
+            j += 10;
+        }
+        i += 10;
+    }
+    
+    return total_gcd % 10000; // Prevent overflow
+}
+
+// Euclidean GCD algorithm - tests modulo and comparison optimization
+fn gcdEuclidean(a: i32, b: i32) -> i32 {
+    let mut x: i32 = a;
+    let mut y: i32 = b;
+    
+    while (y != 0) {
+        let temp: i32 = y;
+        y = x % y;
+        x = temp;
+    }
+    
+    return x;
+}
+
+// Perform power operations - tests multiplication optimization
+fn performPowerOperations() -> i32 {
+    let mut total: i32 = 0;
+    let mut base: i32 = 2;
+    
+    while (base <= 10) {
+        let mut exp: i32 = 1;
+        while (exp <= 10) {
+            total += fastPower(base, exp, 1000); // Prevent overflow
+            exp += 1;
+        }
+        base += 1;
+    }
+    
+    return total % 10000;
+}
+
+// Fast power computation using exponentiation by squaring
+fn fastPower(base: i32, exp: i32, m: i32) -> i32 {
+    if (exp == 0) {
+        return 1;
+    }
+    
+    let mut result: i32 = 1;
+    let mut current_base: i32 = base;
+    let mut current_exp: i32 = exp;
+    
+    while (current_exp > 0) {
+        if (current_exp % 2 == 1) {
+            result *= current_base;
+            result %= m;
+        }
+        current_base *= current_base;
+        current_base %= m;
+        current_exp /= 2;
+    }
+    
+    return result;
+}
+
+// Perform square root operations - tests division and approximation optimization
+fn performSquareRootOperations() -> i32 {
+    let mut total: i32 = 0;
+    let mut num: i32 = 1;
+    
+    while (num <= 100) {
+        total += integerSquareRoot(num);
+        num += 1;
+    }
+    
+    return total;
+}
+
+// Integer square root using binary search - tests division and comparison optimization
+fn integerSquareRoot(n: i32) -> i32 {
+    if (n == 0) {
+        return 0;
+    }
+    
+    let mut left: i32 = 1;
+    let mut right: i32 = n;
+    let mut result: i32 = 0;
+    
+    while (left <= right) {
+        let mid: i32 = left + (right - left) / 2;
+        
+        if (mid <= n / mid) { // Avoid overflow in mid * mid
+            result = mid;
+            left = mid + 1;
+        } else {
+            right = mid - 1;
+        }
+    }
+    
+    return result;
+}
+
+// Test 5: Memory Access Pattern Optimization
+// Tests compiler's ability to optimize different memory access patterns
+fn performMemoryAccessPatterns() {
+    printlnInt(5001); // Start memory access patterns
+    
+    // Test sequential access pattern
+    let sequential_result: i32 = testSequentialAccess();
+    printlnInt(sequential_result);
+    
+    // Test strided access pattern
+    let strided_result: i32 = testStridedAccess();
+    printlnInt(strided_result);
+    
+    // Test random access pattern
+    let random_result: i32 = testRandomAccess();
+    printlnInt(random_result);
+    
+    // Test blocked access pattern
+    let blocked_result: i32 = testBlockedAccess();
+    printlnInt(blocked_result);
+    
+    printlnInt(5002); // End memory access patterns
+}
+
+// Test sequential memory access - tests cache optimization
+fn testSequentialAccess() -> i32 {
+    let mut large_array: [i32; 2000] = [0; 2000];
+    let mut sum: i32 = 0;
+    
+    // Initialize with sequential pattern
+    let mut i: i32 = 0;
+    while (i < 2000) {
+        large_array[i as usize] = i % 100;
+        i += 1;
+    }
+    
+    // Sequential access
+    i = 0;
+    while (i < 2000) {
+        sum += large_array[i as usize];
+        i += 1;
+    }
+    
+    return sum % 10000;
+}
+
+// Test strided memory access - tests prefetch optimization
+fn testStridedAccess() -> i32 {
+    let mut large_array: [i32; 2000] = [0; 2000];
+    let mut sum: i32 = 0;
+    
+    // Initialize array
+    let mut i: i32 = 0;
+    while (i < 2000) {
+        large_array[i as usize] = i % 100;
+        i += 1;
+    }
+    
+    // Strided access with step size 7
+    i = 0;
+    while (i < 2000) {
+        sum += large_array[i as usize];
+        i += 7;
+    }
+    
+    return sum % 10000;
+}
+
+// Test pseudo-random memory access - tests branch prediction and cache misses
+fn testRandomAccess() -> i32 {
+    let mut large_array: [i32; 2000] = [0; 2000];
+    let mut sum: i32 = 0;
+    
+    // Initialize array
+    let mut i: i32 = 0;
+    while (i < 2000) {
+        large_array[i as usize] = i % 100;
+        i += 1;
+    }
+    
+    // Pseudo-random access using linear congruential generator
+    let mut index: i32 = 1;
+    i = 0;
+    while (i < 1000) {
+        index = (index.wrapping_mul(1664525).wrapping_add(1013904223)) % 2000;
+        if (index < 0) {
+            index = -index;
+        }
+        sum += large_array[index as usize];
+        i += 1;
+    }
+    
+    return sum % 10000;
+}
+
+// Test blocked memory access - tests loop tiling optimization
+fn testBlockedAccess() -> i32 {
+    let mut matrix: [i32; 1600] = [0; 1600]; // 40x40 matrix
+    let mut sum: i32 = 0;
+    
+    // Initialize matrix
+    let mut i: i32 = 0;
+    while (i < 40) {
+        let mut j: i32 = 0;
+        while (j < 40) {
+            matrix[(i * 40 + j) as usize] = (i + j) % 100;
+            j += 1;
+        }
+        i += 1;
+    }
+    
+    // Blocked access with 8x8 blocks
+    let mut block_i: i32 = 0;
+    while (block_i < 40) {
+        let mut block_j: i32 = 0;
+        while (block_j < 40) {
+            // Process 8x8 block
+            i = block_i;
+            let mut end_i: i32 = block_i + 8;
+            if (end_i > 40) {
+                end_i = 40;
+            }
+            
+            while (i < end_i) {
+                let mut j: i32 = block_j;
+                let mut end_j: i32 = block_j + 8;
+                if (end_j > 40) {
+                    end_j = 40;
+                }
+                
+                while (j < end_j) {
+                    sum += matrix[(i * 40 + j) as usize];
+                    j += 1;
+                }
+                i += 1;
+            }
+            
+            block_j += 8;
+        }
+        block_i += 8;
+    }
+    
+    return sum % 10000;
+}

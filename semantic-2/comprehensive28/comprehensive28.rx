@@ -46,35 +46,35 @@ fn main() {
     let mut root_index: i32 = -1;
     
     let mut i: i32 = 0;
-    while (i < tree_size) {
+    while ((i < tree_size)) {
         let value: i32 = generate_pseudo_random_value(i * 17 + 23, 1000);
-        root_index = insert_into_bst(tree_nodes, tree_left, tree_right, tree_parent, tree_height, tree_size_subtree, root_index, value, node_count);
+        root_index = insert_into_bst(&mut tree_nodes, &mut tree_left, &mut tree_right, &mut tree_parent, &mut tree_height, &mut tree_size_subtree, root_index, value, node_count);
         node_count = node_count + 1;
         i = i + 1;
     }
     
-    printlnInt(perform_tree_analysis(tree_nodes, tree_left, tree_right, tree_parent, tree_height, tree_size_subtree, root_index, node_count));
+    printlnInt(perform_tree_analysis(&tree_nodes, &tree_left, &tree_right, &tree_parent, &tree_height, &tree_size_subtree, root_index, node_count));
     
     let mut round: i32 = 0;
-    while (round < simulation_rounds) {
-        root_index = perform_tree_rebalancing(tree_nodes, tree_left, tree_right, tree_parent, tree_height, tree_size_subtree, root_index, node_count);
+    while ((round < simulation_rounds)) {
+        root_index = perform_tree_rebalancing(&tree_nodes, &mut tree_left, &mut tree_right, &mut tree_parent, &mut tree_height, &mut tree_size_subtree, root_index, node_count);
         
-        let analysis_result: i32 = perform_comprehensive_tree_traversal(tree_nodes, tree_left, tree_right, tree_parent, tree_height, tree_size_subtree, root_index, node_count, round);
+        let analysis_result: i32 = perform_comprehensive_tree_traversal(&tree_nodes, &tree_left, &tree_right, &tree_parent, &tree_height, &tree_size_subtree, root_index, node_count, round);
         printlnInt(analysis_result);
         
-        let mathematical_result: i32 = compute_complex_tree_properties(tree_nodes, tree_left, tree_right, tree_parent, tree_height, tree_size_subtree, root_index, node_count, round);
+        let mathematical_result: i32 = compute_complex_tree_properties(&tree_nodes, &tree_left, &tree_right, &tree_parent, &tree_height, &tree_size_subtree, root_index, node_count, round);
         printlnInt(mathematical_result);
         
         round = round + 1;
     }
     
-    let final_validation: i32 = validate_tree_integrity(tree_nodes, tree_left, tree_right, tree_parent, tree_height, tree_size_subtree, root_index, node_count);
+    let final_validation: i32 = validate_tree_integrity(&tree_nodes, &tree_left, &tree_right, &tree_parent, &tree_height, &tree_size_subtree, root_index, node_count);
     printlnInt(final_validation);
 }
 
 fn generate_pseudo_random_value(seed: i32, modulus: i32) -> i32 {
     let mut result: i32 = seed;
-    result = result * 1103515245;
+    result = result * 15;
     result = result + 12345;
     if (result < 0) {
         result = -result;
@@ -82,7 +82,7 @@ fn generate_pseudo_random_value(seed: i32, modulus: i32) -> i32 {
     result % modulus
 }
 
-fn insert_into_bst(nodes: [i32; 200], left: [i32; 200], right: [i32; 200], parent: [i32; 200], height: [i32; 200], subtree_size: [i32; 200], root: i32, value: i32, node_index: i32) -> i32 {
+fn insert_into_bst(nodes: &mut [i32; 200], left: &mut [i32; 200], right: &mut [i32; 200], parent: &mut [i32; 200], height: &mut [i32; 200], subtree_size: &mut [i32; 200], root: i32, value: i32, node_index: i32) -> i32 {
     nodes[node_index as usize] = value;
     left[node_index as usize] = -1;
     right[node_index as usize] = -1;
@@ -90,16 +90,16 @@ fn insert_into_bst(nodes: [i32; 200], left: [i32; 200], right: [i32; 200], paren
     height[node_index as usize] = 1;
     subtree_size[node_index as usize] = 1;
     
-    if (root == -1) {
+    if ((root == -1)) {
         return node_index;
     }
     
     let mut current: i32 = root;
     let mut inserted: bool = false;
     
-    while (!inserted) {
-        if (value < nodes[current as usize]) {
-            if (left[current as usize] == -1) {
+    while ((!inserted)) {
+        if ((value < nodes[current as usize])) {
+            if ((left[current as usize] == -1)) {
                 left[current as usize] = node_index;
                 parent[node_index as usize] = current;
                 inserted = true;
@@ -107,7 +107,7 @@ fn insert_into_bst(nodes: [i32; 200], left: [i32; 200], right: [i32; 200], paren
                 current = left[current as usize];
             }
         } else {
-            if (right[current as usize] == -1) {
+            if ((right[current as usize] == -1)) {
                 right[current as usize] = node_index;
                 parent[node_index as usize] = current;
                 inserted = true;
@@ -117,22 +117,22 @@ fn insert_into_bst(nodes: [i32; 200], left: [i32; 200], right: [i32; 200], paren
         }
     }
     
-    update_tree_properties_bottom_up(tree_nodes, tree_left, tree_right, tree_parent, tree_height, tree_size_subtree, node_index);
+    update_tree_properties_bottom_up(&*nodes, &*left, &*right, &*parent, height, subtree_size, node_index);
     
     root
 }
 
-fn update_tree_properties_bottom_up(nodes: [i32; 200], left: [i32; 200], right: [i32; 200], parent: [i32; 200], height: [i32; 200], subtree_size: [i32; 200], start_node: i32) {
+fn update_tree_properties_bottom_up(nodes: &[i32; 200], left: &[i32; 200], right: &[i32; 200], parent: &[i32; 200], height: &mut [i32; 200], subtree_size: &mut [i32; 200], start_node: i32) {
     let mut current: i32 = start_node;
     
-    while (current != -1) {
-        let left_height: i32 = if (left[current as usize] == -1) { 0 } else { height[(left[current as usize]) as usize] };
-        let right_height: i32 = if (right[current as usize] == -1) { 0 } else { height[(right[current as usize]) as usize] };
+    while ((current != -1)) {
+        let left_height: i32 = if ((left[current as usize] == -1)) { 0 } else { height[(left[current as usize]) as usize] };
+        let right_height: i32 = if ((right[current as usize] == -1)) { 0 } else { height[(right[current as usize]) as usize] };
         
         height[current as usize] = max(left_height, right_height) + 1;
         
-        let left_size: i32 = if (left[current as usize] == -1) { 0 } else { subtree_size[(left[current as usize]) as usize] };
-        let right_size: i32 = if (right[current as usize] == -1) { 0 } else { subtree_size[(right[current as usize]) as usize] };
+        let left_size: i32 = if ((left[current as usize] == -1)) { 0 } else { subtree_size[(left[current as usize]) as usize] };
+        let right_size: i32 = if ((right[current as usize] == -1)) { 0 } else { subtree_size[(right[current as usize]) as usize] };
         
         subtree_size[current as usize] = left_size + right_size + 1;
         
@@ -152,8 +152,8 @@ fn abs(x: i32) -> i32 {
     if (x < 0) { -x } else { x }
 }
 
-fn perform_tree_analysis(nodes: [i32; 200], left: [i32; 200], right: [i32; 200], parent: [i32; 200], height: [i32; 200], subtree_size: [i32; 200], root: i32, node_count: i32) -> i32 {
-    if (root == -1) {
+fn perform_tree_analysis(nodes: &[i32; 200], left: &[i32; 200], right: &[i32; 200], parent: &[i32; 200], height: &[i32; 200], subtree_size: &[i32; 200], root: i32, node_count: i32) -> i32 {
+    if ((root == -1)) {
         return 0;
     }
     
@@ -169,13 +169,13 @@ fn perform_tree_analysis(nodes: [i32; 200], left: [i32; 200], right: [i32; 200],
     complexity_metric % 10000
 }
 
-fn compute_tree_balance_factor(nodes: [i32; 200], left: [i32; 200], right: [i32; 200], parent: [i32; 200], height: [i32; 200], subtree_size: [i32; 200], node: i32) -> i32 {
-    if (node == -1) {
+fn compute_tree_balance_factor(nodes: &[i32; 200], left: &[i32; 200], right: &[i32; 200], parent: &[i32; 200], height: &[i32; 200], subtree_size: &[i32; 200], node: i32) -> i32 {
+    if ((node == -1)) {
         return 0;
     }
     
-    let left_height: i32 = if (left[node as usize] == -1) { 0 } else { height[(left[node as usize]) as usize] };
-    let right_height: i32 = if (right[node as usize] == -1) { 0 } else { height[(right[node as usize]) as usize] };
+    let left_height: i32 = if ((left[node as usize] == -1)) { 0 } else { height[(left[node as usize]) as usize] };
+    let right_height: i32 = if ((right[node as usize] == -1)) { 0 } else { height[(right[node as usize]) as usize] };
     
     let current_balance: i32 = abs(left_height - right_height);
     
@@ -185,14 +185,14 @@ fn compute_tree_balance_factor(nodes: [i32; 200], left: [i32; 200], right: [i32;
     current_balance + left_balance + right_balance
 }
 
-fn compute_all_paths_sum(nodes: [i32; 200], left: [i32; 200], right: [i32; 200], parent: [i32; 200], height: [i32; 200], subtree_size: [i32; 200], node: i32, current_sum: i32, depth: i32) -> i32 {
-    if (node == -1) {
+fn compute_all_paths_sum(nodes: &[i32; 200], left: &[i32; 200], right: &[i32; 200], parent: &[i32; 200], height: &[i32; 200], subtree_size: &[i32; 200], node: i32, current_sum: i32, depth: i32) -> i32 {
+    if ((node == -1)) {
         return 0;
     }
     
     let new_sum: i32 = current_sum + nodes[node as usize] * (depth + 1);
     
-    if (left[node as usize] == -1 && right[node as usize] == -1) {
+    if ((left[node as usize] == -1 && right[node as usize] == -1)) {
         return new_sum;
     }
     
@@ -202,8 +202,8 @@ fn compute_all_paths_sum(nodes: [i32; 200], left: [i32; 200], right: [i32; 200],
     left_paths + right_paths
 }
 
-fn compute_node_depth_variance(nodes: [i32; 200], left: [i32; 200], right: [i32; 200], parent: [i32; 200], height: [i32; 200], subtree_size: [i32; 200], node: i32, depth: i32) -> i32 {
-    if (node == -1) {
+fn compute_node_depth_variance(nodes: &[i32; 200], left: &[i32; 200], right: &[i32; 200], parent: &[i32; 200], height: &[i32; 200], subtree_size: &[i32; 200], node: i32, depth: i32) -> i32 {
+    if ((node == -1)) {
         return 0;
     }
     
@@ -215,13 +215,13 @@ fn compute_node_depth_variance(nodes: [i32; 200], left: [i32; 200], right: [i32;
     current_variance + left_variance + right_variance
 }
 
-fn perform_tree_rebalancing(nodes: [i32; 200], left: [i32; 200], right: [i32; 200], parent: [i32; 200], height: [i32; 200], subtree_size: [i32; 200], root: i32, node_count: i32) -> i32 {
+fn perform_tree_rebalancing(nodes: &[i32; 200], left: &mut [i32; 200], right: &mut [i32; 200], parent: &mut [i32; 200], height: &mut [i32; 200], subtree_size: &mut [i32; 200], root: i32, node_count: i32) -> i32 {
     let mut rebalance_operations: i32 = 0;
     let mut current_root: i32 = root;
     
     let mut i: i32 = 0;
-    while (i < node_count && rebalance_operations < 5) {
-        if (needs_rebalancing(nodes, left, right, parent, height, subtree_size, i)) {
+    while ((i < node_count && rebalance_operations < 5)) {
+        if ((needs_rebalancing(nodes, &*left, &*right, &*parent, &*height, &*subtree_size, i))) {
             current_root = perform_rotation_at_node(nodes, left, right, parent, height, subtree_size, current_root, i);
             rebalance_operations = rebalance_operations + 1;
         }
@@ -231,43 +231,43 @@ fn perform_tree_rebalancing(nodes: [i32; 200], left: [i32; 200], right: [i32; 20
     current_root
 }
 
-fn needs_rebalancing(nodes: [i32; 200], left: [i32; 200], right: [i32; 200], parent: [i32; 200], height: [i32; 200], subtree_size: [i32; 200], node: i32) -> bool {
-    if (node == -1) {
+fn needs_rebalancing(nodes: &[i32; 200], left: &[i32; 200], right: &[i32; 200], parent: &[i32; 200], height: &[i32; 200], subtree_size: &[i32; 200], node: i32) -> bool {
+    if ((node == -1)) {
         return false;
     }
     
-    let left_height: i32 = if (left[node as usize] == -1) { 0 } else { height[(left[node as usize]) as usize] };
-    let right_height: i32 = if (right[node as usize] == -1) { 0 } else { height[(right[node as usize]) as usize] };
+    let left_height: i32 = if ((left[node as usize] == -1)) { 0 } else { height[(left[node as usize]) as usize] };
+    let right_height: i32 = if ((right[node as usize] == -1)) { 0 } else { height[(right[node as usize]) as usize] };
     
     abs(left_height - right_height) > 2
 }
 
-fn perform_rotation_at_node(nodes: [i32; 200], left: [i32; 200], right: [i32; 200], parent: [i32; 200], height: [i32; 200], subtree_size: [i32; 200], root: i32, node: i32) -> i32 {
-    if (node == -1) {
+fn perform_rotation_at_node(nodes: &[i32; 200], left: &mut [i32; 200], right: &mut [i32; 200], parent: &mut [i32; 200], height: &mut [i32; 200], subtree_size: &mut [i32; 200], root: i32, node: i32) -> i32 {
+    if ((node == -1)) {
         return root;
     }
     
-    let left_height: i32 = if (left[node as usize] == -1) { 0 } else { height[(left[node as usize]) as usize] };
-    let right_height: i32 = if (right[node as usize] == -1) { 0 } else { height[(right[node as usize]) as usize] };
+    let left_height: i32 = if ((left[node as usize] == -1)) { 0 } else { height[(left[node as usize]) as usize] };
+    let right_height: i32 = if ((right[node as usize] == -1)) { 0 } else { height[(right[node as usize]) as usize] };
     
-    if (left_height > right_height + 1) {
+    if ((left_height > right_height + 1)) {
         return perform_right_rotation(nodes, left, right, parent, height, subtree_size, root, node);
-    } else if (right_height > left_height + 1) {
+    } else if ((right_height > left_height + 1)) {
         return perform_left_rotation(nodes, left, right, parent, height, subtree_size, root, node);
     }
     
     root
 }
 
-fn perform_right_rotation(nodes: [i32; 200], left: [i32; 200], right: [i32; 200], parent: [i32; 200], height: [i32; 200], subtree_size: [i32; 200], root: i32, node: i32) -> i32 {
-    if (left[node as usize] == -1) {
+fn perform_right_rotation(nodes: &[i32; 200], left: &mut [i32; 200], right: &mut [i32; 200], parent: &mut [i32; 200], height: &mut [i32; 200], subtree_size: &mut [i32; 200], root: i32, node: i32) -> i32 {
+    if ((left[node as usize] == -1)) {
         return root;
     }
     
     let new_root_candidate: i32 = left[node as usize];
     
     left[node as usize] = right[new_root_candidate as usize];
-    if (right[new_root_candidate as usize] != -1) {
+    if ((right[new_root_candidate as usize] != -1)) {
         parent[(right[new_root_candidate as usize]) as usize] = node;
     }
     
@@ -275,32 +275,32 @@ fn perform_right_rotation(nodes: [i32; 200], left: [i32; 200], right: [i32; 200]
     parent[new_root_candidate as usize] = parent[node as usize];
     parent[node as usize] = new_root_candidate;
     
-    if (parent[new_root_candidate as usize] != -1) {
-        if (left[(parent[new_root_candidate as usize]) as usize] == node) {
+    if ((parent[new_root_candidate as usize] != -1)) {
+        if ((left[(parent[new_root_candidate as usize]) as usize] == node)) {
             left[(parent[new_root_candidate as usize]) as usize] = new_root_candidate;
         } else {
             right[(parent[new_root_candidate as usize]) as usize] = new_root_candidate;
         }
     }
     
-    update_tree_properties_bottom_up(nodes, left, right, parent, height, subtree_size, node);
+    update_tree_properties_bottom_up(nodes, &*left, &*right, &*parent, height, subtree_size, node);
     
-    if (root == node) {
+    if ((root == node)) {
         return new_root_candidate;
     } else {
         return root;
     }
 }
 
-fn perform_left_rotation(nodes: [i32; 200], left: [i32; 200], right: [i32; 200], parent: [i32; 200], height: [i32; 200], subtree_size: [i32; 200], root: i32, node: i32) -> i32 {
-    if (right[node as usize] == -1) {
+fn perform_left_rotation(nodes: &[i32; 200], left: &mut [i32; 200], right: &mut [i32; 200], parent: &mut [i32; 200], height: &mut [i32; 200], subtree_size: &mut [i32; 200], root: i32, node: i32) -> i32 {
+    if ((right[node as usize] == -1)) {
         return root;
     }
     
     let new_root_candidate: i32 = right[node as usize];
     
     right[node as usize] = left[new_root_candidate as usize];
-    if (left[new_root_candidate as usize] != -1) {
+    if ((left[new_root_candidate as usize] != -1)) {
         parent[(left[new_root_candidate as usize]) as usize] = node;
     }
     
@@ -308,24 +308,24 @@ fn perform_left_rotation(nodes: [i32; 200], left: [i32; 200], right: [i32; 200],
     parent[new_root_candidate as usize] = parent[node as usize];
     parent[node as usize] = new_root_candidate;
     
-    if (parent[new_root_candidate as usize] != -1) {
-        if (left[(parent[new_root_candidate as usize]) as usize] == node) {
+    if ((parent[new_root_candidate as usize] != -1)) {
+        if ((left[(parent[new_root_candidate as usize]) as usize] == node)) {
             left[(parent[new_root_candidate as usize]) as usize] = new_root_candidate;
         } else {
             right[(parent[new_root_candidate as usize]) as usize] = new_root_candidate;
         }
     }
     
-    update_tree_properties_bottom_up(nodes, left, right, parent, height, subtree_size, node);
+    update_tree_properties_bottom_up(nodes, &*left, &*right, &*parent, height, subtree_size, node);
     
-    if (root == node) {
+    if ((root == node)) {
         return new_root_candidate;
     } else {
         return root;
     }
 }
 
-fn perform_comprehensive_tree_traversal(nodes: [i32; 200], left: [i32; 200], right: [i32; 200], parent: [i32; 200], height: [i32; 200], subtree_size: [i32; 200], root: i32, node_count: i32, round: i32) -> i32 {
+fn perform_comprehensive_tree_traversal(nodes: &[i32; 200], left: &[i32; 200], right: &[i32; 200], parent: &[i32; 200], height: &[i32; 200], subtree_size: &[i32; 200], root: i32, node_count: i32, round: i32) -> i32 {
     let inorder_sum: i32 = perform_inorder_traversal_with_computation(nodes, left, right, parent, height, subtree_size, root, round);
     let preorder_sum: i32 = perform_preorder_traversal_with_computation(nodes, left, right, parent, height, subtree_size, root, round);
     let postorder_sum: i32 = perform_postorder_traversal_with_computation(nodes, left, right, parent, height, subtree_size, root, round);
@@ -339,8 +339,8 @@ fn perform_comprehensive_tree_traversal(nodes: [i32; 200], left: [i32; 200], rig
     combined_result
 }
 
-fn perform_inorder_traversal_with_computation(nodes: [i32; 200], left: [i32; 200], right: [i32; 200], parent: [i32; 200], height: [i32; 200], subtree_size: [i32; 200], node: i32, multiplier: i32) -> i32 {
-    if (node == -1) {
+fn perform_inorder_traversal_with_computation(nodes: &[i32; 200], left: &[i32; 200], right: &[i32; 200], parent: &[i32; 200], height: &[i32; 200], subtree_size: &[i32; 200], node: i32, multiplier: i32) -> i32 {
+    if ((node == -1)) {
         return 0;
     }
     
@@ -351,8 +351,8 @@ fn perform_inorder_traversal_with_computation(nodes: [i32; 200], left: [i32; 200
     left_sum + current_contribution + right_sum
 }
 
-fn perform_preorder_traversal_with_computation(nodes: [i32; 200], left: [i32; 200], right: [i32; 200], parent: [i32; 200], height: [i32; 200], subtree_size: [i32; 200], node: i32, multiplier: i32) -> i32 {
-    if (node == -1) {
+fn perform_preorder_traversal_with_computation(nodes: &[i32; 200], left: &[i32; 200], right: &[i32; 200], parent: &[i32; 200], height: &[i32; 200], subtree_size: &[i32; 200], node: i32, multiplier: i32) -> i32 {
+    if ((node == -1)) {
         return 0;
     }
     
@@ -363,8 +363,8 @@ fn perform_preorder_traversal_with_computation(nodes: [i32; 200], left: [i32; 20
     current_contribution + left_sum + right_sum
 }
 
-fn perform_postorder_traversal_with_computation(nodes: [i32; 200], left: [i32; 200], right: [i32; 200], parent: [i32; 200], height: [i32; 200], subtree_size: [i32; 200], node: i32, multiplier: i32) -> i32 {
-    if (node == -1) {
+fn perform_postorder_traversal_with_computation(nodes: &[i32; 200], left: &[i32; 200], right: &[i32; 200], parent: &[i32; 200], height: &[i32; 200], subtree_size: &[i32; 200], node: i32, multiplier: i32) -> i32 {
+    if ((node == -1)) {
         return 0;
     }
     
@@ -375,37 +375,37 @@ fn perform_postorder_traversal_with_computation(nodes: [i32; 200], left: [i32; 2
     left_sum + right_sum + current_contribution
 }
 
-fn perform_level_order_traversal_simulation(nodes: [i32; 200], left: [i32; 200], right: [i32; 200], parent: [i32; 200], height: [i32; 200], subtree_size: [i32; 200], root: i32, node_count: i32, round: i32) -> i32 {
+fn perform_level_order_traversal_simulation(nodes: &[i32; 200], left: &[i32; 200], right: &[i32; 200], parent: &[i32; 200], height: &[i32; 200], subtree_size: &[i32; 200], root: i32, node_count: i32, round: i32) -> i32 {
     let mut queue: [i32; 200] = [-1; 200];
     let mut queue_front: i32 = 0;
     let mut queue_rear: i32 = 0;
     let mut level_sum: i32 = 0;
     let mut current_level: i32 = 1;
     
-    if (root == -1) {
+    if ((root == -1)) {
         return 0;
     }
     
     queue[queue_rear as usize] = root;
     queue_rear = queue_rear + 1;
     
-    while (queue_front < queue_rear) {
+    while ((queue_front < queue_rear)) {
         let level_size: i32 = queue_rear - queue_front;
         let mut level_contribution: i32 = 0;
         let mut processed_in_level: i32 = 0;
         
-        while (processed_in_level < level_size && queue_front < queue_rear) {
+        while ((processed_in_level < level_size && queue_front < queue_rear)) {
             let current_node: i32 = queue[queue_front as usize];
             queue_front = queue_front + 1;
             
             level_contribution = level_contribution + nodes[current_node as usize] * current_level + height[current_node as usize] * (round + 1);
             
-            if (left[current_node as usize] != -1) {
+            if ((left[current_node as usize] != -1)) {
                 queue[queue_rear as usize] = left[current_node as usize];
                 queue_rear = queue_rear + 1;
             }
             
-            if (right[current_node as usize] != -1) {
+            if ((right[current_node as usize] != -1)) {
                 queue[queue_rear as usize] = right[current_node as usize];
                 queue_rear = queue_rear + 1;
             }
@@ -420,8 +420,8 @@ fn perform_level_order_traversal_simulation(nodes: [i32; 200], left: [i32; 200],
     level_sum
 }
 
-fn compute_diagonal_traversal_sum(nodes: [i32; 200], left: [i32; 200], right: [i32; 200], parent: [i32; 200], height: [i32; 200], subtree_size: [i32; 200], node: i32, diagonal_level: i32, round: i32) -> i32 {
-    if (node == -1) {
+fn compute_diagonal_traversal_sum(nodes: &[i32; 200], left: &[i32; 200], right: &[i32; 200], parent: &[i32; 200], height: &[i32; 200], subtree_size: &[i32; 200], node: i32, diagonal_level: i32, round: i32) -> i32 {
+    if ((node == -1)) {
         return 0;
     }
     
@@ -433,7 +433,7 @@ fn compute_diagonal_traversal_sum(nodes: [i32; 200], left: [i32; 200], right: [i
     current_contribution + left_diagonal + right_diagonal
 }
 
-fn compute_complex_tree_properties(nodes: [i32; 200], left: [i32; 200], right: [i32; 200], parent: [i32; 200], height: [i32; 200], subtree_size: [i32; 200], root: i32, node_count: i32, round: i32) -> i32 {
+fn compute_complex_tree_properties(nodes: &[i32; 200], left: &[i32; 200], right: &[i32; 200], parent: &[i32; 200], height: &[i32; 200], subtree_size: &[i32; 200], root: i32, node_count: i32, round: i32) -> i32 {
     let fibonacci_sum: i32 = compute_fibonacci_sum_for_nodes(nodes, left, right, parent, height, subtree_size, root, round);
     let prime_factor_sum: i32 = compute_prime_factor_analysis(nodes, left, right, parent, height, subtree_size, root, node_count);
     let recursive_depth_product: i32 = compute_recursive_depth_product(nodes, left, right, parent, height, subtree_size, root, 1, round);
@@ -447,8 +447,8 @@ fn compute_complex_tree_properties(nodes: [i32; 200], left: [i32; 200], right: [
     final_result
 }
 
-fn compute_fibonacci_sum_for_nodes(nodes: [i32; 200], left: [i32; 200], right: [i32; 200], parent: [i32; 200], height: [i32; 200], subtree_size: [i32; 200], node: i32, round: i32) -> i32 {
-    if (node == -1) {
+fn compute_fibonacci_sum_for_nodes(nodes: &[i32; 200], left: &[i32; 200], right: &[i32; 200], parent: &[i32; 200], height: &[i32; 200], subtree_size: &[i32; 200], node: i32, round: i32) -> i32 {
+    if ((node == -1)) {
         return 0;
     }
     
@@ -479,8 +479,8 @@ fn compute_fibonacci_iterative(n: i32) -> i32 {
     b % 10000
 }
 
-fn compute_prime_factor_analysis(nodes: [i32; 200], left: [i32; 200], right: [i32; 200], parent: [i32; 200], height: [i32; 200], subtree_size: [i32; 200], node: i32, node_count: i32) -> i32 {
-    if (node == -1) {
+fn compute_prime_factor_analysis(nodes: &[i32; 200], left: &[i32; 200], right: &[i32; 200], parent: &[i32; 200], height: &[i32; 200], subtree_size: &[i32; 200], node: i32, node_count: i32) -> i32 {
+    if ((node == -1)) {
         return 0;
     }
     
@@ -516,8 +516,8 @@ fn count_prime_factors(n: i32) -> i32 {
     count
 }
 
-fn compute_recursive_depth_product(nodes: [i32; 200], left: [i32; 200], right: [i32; 200], parent: [i32; 200], height: [i32; 200], subtree_size: [i32; 200], node: i32, depth: i32, round: i32) -> i32 {
-    if (node == -1) {
+fn compute_recursive_depth_product(nodes: &[i32; 200], left: &[i32; 200], right: &[i32; 200], parent: &[i32; 200], height: &[i32; 200], subtree_size: &[i32; 200], node: i32, depth: i32, round: i32) -> i32 {
+    if ((node == -1)) {
         return 1;
     }
     
@@ -529,8 +529,8 @@ fn compute_recursive_depth_product(nodes: [i32; 200], left: [i32; 200], right: [
     (current_factor * left_product % 10000 * right_product % 10000) % 100000
 }
 
-fn perform_mathematical_sequence_analysis(nodes: [i32; 200], left: [i32; 200], right: [i32; 200], parent: [i32; 200], height: [i32; 200], subtree_size: [i32; 200], node: i32, round: i32) -> i32 {
-    if (node == -1) {
+fn perform_mathematical_sequence_analysis(nodes: &[i32; 200], left: &[i32; 200], right: &[i32; 200], parent: &[i32; 200], height: &[i32; 200], subtree_size: &[i32; 200], node: i32, round: i32) -> i32 {
+    if ((node == -1)) {
         return 0;
     }
     
@@ -593,15 +593,15 @@ fn compute_quadratic_sequence_sum(base: i32, multiplier: i32, rounds: i32) -> i3
     sum
 }
 
-fn perform_nested_loop_computation_on_tree(nodes: [i32; 200], left: [i32; 200], right: [i32; 200], parent: [i32; 200], height: [i32; 200], subtree_size: [i32; 200], root: i32, node_count: i32, round: i32) -> i32 {
+fn perform_nested_loop_computation_on_tree(nodes: &[i32; 200], left: &[i32; 200], right: &[i32; 200], parent: &[i32; 200], height: &[i32; 200], subtree_size: &[i32; 200], root: i32, node_count: i32, round: i32) -> i32 {
     let mut total_computation: i32 = 0;
     
     let mut i: i32 = 0;
-    while (i < node_count) {
+    while ((i < node_count)) {
         let mut j: i32 = 0;
-        while (j < min(subtree_size[i as usize], 15)) {
+        while ((j < min(subtree_size[i as usize], 15))) {
             let mut k: i32 = 0;
-            while (k < min(height[i as usize], 8)) {
+            while ((k < min(height[i as usize], 8))) {
                 let computation_value: i32 = (nodes[i as usize] * (j + 1) * (k + 1) + round * (i + 1)) % 1000;
                 total_computation = (total_computation + computation_value) % 100000;
                 
@@ -640,7 +640,7 @@ fn perform_inner_nested_computation(node_value: i32, outer_index: i32, inner_ind
     computation
 }
 
-fn validate_tree_integrity(nodes: [i32; 200], left: [i32; 200], right: [i32; 200], parent: [i32; 200], height: [i32; 200], subtree_size: [i32; 200], root: i32, node_count: i32) -> i32 {
+fn validate_tree_integrity(nodes: &[i32; 200], left: &[i32; 200], right: &[i32; 200], parent: &[i32; 200], height: &[i32; 200], subtree_size: &[i32; 200], root: i32, node_count: i32) -> i32 {
     let structure_validation: i32 = validate_tree_structure_recursive(nodes, left, right, parent, height, subtree_size, root, -1);
     let property_validation: i32 = validate_tree_properties_comprehensive(nodes, left, right, parent, height, subtree_size, root, node_count);
     let consistency_validation: i32 = validate_tree_consistency_checks(nodes, left, right, parent, height, subtree_size, root, node_count);
@@ -652,12 +652,12 @@ fn validate_tree_integrity(nodes: [i32; 200], left: [i32; 200], right: [i32; 200
     final_integrity_score % 1000000
 }
 
-fn validate_tree_structure_recursive(nodes: [i32; 200], left: [i32; 200], right: [i32; 200], parent: [i32; 200], height: [i32; 200], subtree_size: [i32; 200], node: i32, expected_parent: i32) -> i32 {
-    if (node == -1) {
+fn validate_tree_structure_recursive(nodes: &[i32; 200], left: &[i32; 200], right: &[i32; 200], parent: &[i32; 200], height: &[i32; 200], subtree_size: &[i32; 200], node: i32, expected_parent: i32) -> i32 {
+    if ((node == -1)) {
         return 1;
     }
     
-    if (parent[node as usize] != expected_parent) {
+    if ((parent[node as usize] != expected_parent)) {
         return 0;
     }
     
@@ -669,8 +669,8 @@ fn validate_tree_structure_recursive(nodes: [i32; 200], left: [i32; 200], right:
     left_validation * right_validation * bst_property
 }
 
-fn validate_bst_property_at_node(nodes: [i32; 200], left: [i32; 200], right: [i32; 200], parent: [i32; 200], height: [i32; 200], subtree_size: [i32; 200], node: i32) -> i32 {
-    if (node == -1) {
+fn validate_bst_property_at_node(nodes: &[i32; 200], left: &[i32; 200], right: &[i32; 200], parent: &[i32; 200], height: &[i32; 200], subtree_size: &[i32; 200], node: i32) -> i32 {
+    if ((node == -1)) {
         return 1;
     }
     
@@ -680,48 +680,48 @@ fn validate_bst_property_at_node(nodes: [i32; 200], left: [i32; 200], right: [i3
     let left_valid: bool = left[node as usize] == -1 || left_max < nodes[node as usize];
     let right_valid: bool = right[node as usize] == -1 || right_min > nodes[node as usize];
     
-    if (left_valid && right_valid) { 1 } else { 0 }
+    if ((left_valid && right_valid)) { 1 } else { 0 }
 }
 
-fn find_maximum_in_subtree(nodes: [i32; 200], left: [i32; 200], right: [i32; 200], parent: [i32; 200], height: [i32; 200], subtree_size: [i32; 200], node: i32) -> i32 {
-    if (node == -1) {
+fn find_maximum_in_subtree(nodes: &[i32; 200], left: &[i32; 200], right: &[i32; 200], parent: &[i32; 200], height: &[i32; 200], subtree_size: &[i32; 200], node: i32) -> i32 {
+    if ((node == -1)) {
         return -100000;
     }
     
     let mut current: i32 = node;
-    while (right[current as usize] != -1) {
+    while ((right[current as usize] != -1)) {
         current = right[current as usize];
     }
     
     nodes[current as usize]
 }
 
-fn find_minimum_in_subtree(nodes: [i32; 200], left: [i32; 200], right: [i32; 200], parent: [i32; 200], height: [i32; 200], subtree_size: [i32; 200], node: i32) -> i32 {
-    if (node == -1) {
+fn find_minimum_in_subtree(nodes: &[i32; 200], left: &[i32; 200], right: &[i32; 200], parent: &[i32; 200], height: &[i32; 200], subtree_size: &[i32; 200], node: i32) -> i32 {
+    if ((node == -1)) {
         return 100000;
     }
     
     let mut current: i32 = node;
-    while (left[current as usize] != -1) {
+    while ((left[current as usize] != -1)) {
         current = left[current as usize];
     }
     
     nodes[current as usize]
 }
 
-fn validate_tree_properties_comprehensive(nodes: [i32; 200], left: [i32; 200], right: [i32; 200], parent: [i32; 200], height: [i32; 200], subtree_size: [i32; 200], root: i32, node_count: i32) -> i32 {
+fn validate_tree_properties_comprehensive(nodes: &[i32; 200], left: &[i32; 200], right: &[i32; 200], parent: &[i32; 200], height: &[i32; 200], subtree_size: &[i32; 200], root: i32, node_count: i32) -> i32 {
     let mut validation_score: i32 = 0;
     
     let mut i: i32 = 0;
-    while (i < node_count) {
+    while ((i < node_count)) {
         let expected_height: i32 = compute_expected_height(nodes, left, right, parent, height, subtree_size, i);
         let expected_size: i32 = compute_expected_subtree_size(nodes, left, right, parent, height, subtree_size, i);
         
-        if (expected_height == height[i as usize]) {
+        if ((expected_height == height[i as usize])) {
             validation_score = validation_score + 10;
         }
         
-        if (expected_size == subtree_size[i as usize]) {
+        if ((expected_size == subtree_size[i as usize])) {
             validation_score = validation_score + 15;
         }
         
@@ -731,39 +731,39 @@ fn validate_tree_properties_comprehensive(nodes: [i32; 200], left: [i32; 200], r
     validation_score
 }
 
-fn compute_expected_height(nodes: [i32; 200], left: [i32; 200], right: [i32; 200], parent: [i32; 200], height: [i32; 200], subtree_size: [i32; 200], node: i32) -> i32 {
-    if (node == -1) {
+fn compute_expected_height(nodes: &[i32; 200], left: &[i32; 200], right: &[i32; 200], parent: &[i32; 200], height: &[i32; 200], subtree_size: &[i32; 200], node: i32) -> i32 {
+    if ((node == -1)) {
         return 0;
     }
     
-    let left_height: i32 = if (left[node as usize] == -1) { 0 } else { compute_expected_height(nodes, left, right, parent, height, subtree_size, left[node as usize]) };
-    let right_height: i32 = if (right[node as usize] == -1) { 0 } else { compute_expected_height(nodes, left, right, parent, height, subtree_size, right[node as usize]) };
+    let left_height: i32 = if ((left[node as usize] == -1)) { 0 } else { compute_expected_height(nodes, left, right, parent, height, subtree_size, left[node as usize]) };
+    let right_height: i32 = if ((right[node as usize] == -1)) { 0 } else { compute_expected_height(nodes, left, right, parent, height, subtree_size, right[node as usize]) };
     
     max(left_height, right_height) + 1
 }
 
-fn compute_expected_subtree_size(nodes: [i32; 200], left: [i32; 200], right: [i32; 200], parent: [i32; 200], height: [i32; 200], subtree_size: [i32; 200], node: i32) -> i32 {
-    if (node == -1) {
+fn compute_expected_subtree_size(nodes: &[i32; 200], left: &[i32; 200], right: &[i32; 200], parent: &[i32; 200], height: &[i32; 200], subtree_size: &[i32; 200], node: i32) -> i32 {
+    if ((node == -1)) {
         return 0;
     }
     
-    let left_size: i32 = if left[node as usize] == -1 { 0 } else { compute_expected_subtree_size(nodes, left, right, parent, height, subtree_size, left[node as usize]) };
-    let right_size: i32 = if right[node as usize] == -1 { 0 } else { compute_expected_subtree_size(nodes, left, right, parent, height, subtree_size, right[node as usize]) };
+    let left_size: i32 = if ((left[node as usize] == -1)) { 0 } else { compute_expected_subtree_size(nodes, left, right, parent, height, subtree_size, left[node as usize]) };
+    let right_size: i32 = if ((right[node as usize] == -1)) { 0 } else { compute_expected_subtree_size(nodes, left, right, parent, height, subtree_size, right[node as usize]) };
     
     left_size + right_size + 1
 }
 
-fn validate_tree_consistency_checks(nodes: [i32; 200], left: [i32; 200], right: [i32; 200], parent: [i32; 200], height: [i32; 200], subtree_size: [i32; 200], root: i32, node_count: i32) -> i32 {
+fn validate_tree_consistency_checks(nodes: &[i32; 200], left: &[i32; 200], right: &[i32; 200], parent: &[i32; 200], height: &[i32; 200], subtree_size: &[i32; 200], root: i32, node_count: i32) -> i32 {
     let mut consistency_score: i32 = 0;
     
-    let mut reachable_nodes: i32 = count_reachable_nodes_from_root(nodes, left, right, parent, height, subtree_size, root);
+    let reachable_nodes: i32 = count_reachable_nodes_from_root(nodes, left, right, parent, height, subtree_size, root);
     
-    if (reachable_nodes == node_count) {
+    if ((reachable_nodes == node_count)) {
         consistency_score = consistency_score + 100;
     }
     
     let cycle_check: i32 = detect_cycles_in_tree(nodes, left, right, parent, height, subtree_size, root, node_count);
-    if (cycle_check == 0) {
+    if ((cycle_check == 0)) {
         consistency_score = consistency_score + 200;
     }
     
@@ -773,8 +773,8 @@ fn validate_tree_consistency_checks(nodes: [i32; 200], left: [i32; 200], right: 
     consistency_score
 }
 
-fn count_reachable_nodes_from_root(nodes: [i32; 200], left: [i32; 200], right: [i32; 200], parent: [i32; 200], height: [i32; 200], subtree_size: [i32; 200], node: i32) -> i32 {
-    if (node == -1) {
+fn count_reachable_nodes_from_root(nodes: &[i32; 200], left: &[i32; 200], right: &[i32; 200], parent: &[i32; 200], height: &[i32; 200], subtree_size: &[i32; 200], node: i32) -> i32 {
+    if ((node == -1)) {
         return 0;
     }
     
@@ -784,18 +784,18 @@ fn count_reachable_nodes_from_root(nodes: [i32; 200], left: [i32; 200], right: [
     1 + left_count + right_count
 }
 
-fn detect_cycles_in_tree(nodes: [i32; 200], left: [i32; 200], right: [i32; 200], parent: [i32; 200], height: [i32; 200], subtree_size: [i32; 200], root: i32, node_count: i32) -> i32 {
+fn detect_cycles_in_tree(nodes: &[i32; 200], left: &[i32; 200], right: &[i32; 200], parent: &[i32; 200], height: &[i32; 200], subtree_size: &[i32; 200], root: i32, node_count: i32) -> i32 {
     let mut visited: [bool; 200] = [false; 200];
     
-    perform_dfs_cycle_detection(nodes, left, right, parent, height, subtree_size, root, visited)
+    perform_dfs_cycle_detection(nodes, left, right, parent, height, subtree_size, root, &mut visited)
 }
 
-fn perform_dfs_cycle_detection(nodes: [i32; 200], left: [i32; 200], right: [i32; 200], parent: [i32; 200], height: [i32; 200], subtree_size: [i32; 200], node: i32, visited: [bool; 200]) -> i32 {
-    if (node == -1) {
+fn perform_dfs_cycle_detection(nodes: &[i32; 200], left: &[i32; 200], right: &[i32; 200], parent: &[i32; 200], height: &[i32; 200], subtree_size: &[i32; 200], node: i32, visited: &mut [bool; 200]) -> i32 {
+    if ((node == -1)) {
         return 0;
     }
     
-    if (visited[node as usize]) {
+    if ((visited[node as usize])) {
         return 1;
     }
     
@@ -809,16 +809,16 @@ fn perform_dfs_cycle_detection(nodes: [i32; 200], left: [i32; 200], right: [i32;
     left_cycle + right_cycle
 }
 
-fn check_balance_consistency(nodes: [i32; 200], left: [i32; 200], right: [i32; 200], parent: [i32; 200], height: [i32; 200], subtree_size: [i32; 200], node: i32) -> i32 {
-    if (node == -1) {
+fn check_balance_consistency(nodes: &[i32; 200], left: &[i32; 200], right: &[i32; 200], parent: &[i32; 200], height: &[i32; 200], subtree_size: &[i32; 200], node: i32) -> i32 {
+    if ((node == -1)) {
         return 0;
     }
     
-    let left_height: i32 = if left[node as usize] == -1 { 0 } else { height[(left[node as usize]) as usize] };
-    let right_height: i32 = if right[node as usize] == -1 { 0 } else { height[(right[node as usize]) as usize] };
+    let left_height: i32 = if ((left[node as usize] == -1)) { 0 } else { height[(left[node as usize]) as usize] };
+    let right_height: i32 = if ((right[node as usize] == -1)) { 0 } else { height[(right[node as usize]) as usize] };
     
     let balance_factor: i32 = abs(left_height - right_height);
-    let balance_score: i32 = if balance_factor <= 3 { 10 } else { 0 };
+    let balance_score: i32 = if ((balance_factor <= 3)) { 10 } else { 0 };
     
     let left_balance: i32 = check_balance_consistency(nodes, left, right, parent, height, subtree_size, left[node as usize]);
     let right_balance: i32 = check_balance_consistency(nodes, left, right, parent, height, subtree_size, right[node as usize]);
@@ -826,14 +826,14 @@ fn check_balance_consistency(nodes: [i32; 200], left: [i32; 200], right: [i32; 2
     balance_score + left_balance + right_balance
 }
 
-fn validate_edge_cases_and_boundaries(nodes: [i32; 200], left: [i32; 200], right: [i32; 200], parent: [i32; 200], height: [i32; 200], subtree_size: [i32; 200], root: i32, node_count: i32) -> i32 {
+fn validate_edge_cases_and_boundaries(nodes: &[i32; 200], left: &[i32; 200], right: &[i32; 200], parent: &[i32; 200], height: &[i32; 200], subtree_size: &[i32; 200], root: i32, node_count: i32) -> i32 {
     let mut edge_case_score: i32 = 0;
     
-    if (root == -1 && node_count == 0) {
+    if ((root == -1 && node_count == 0)) {
         edge_case_score = edge_case_score + 50;
     }
     
-    if (root != -1 && parent[root as usize] == -1) {
+    if ((root != -1 && parent[root as usize] == -1)) {
         edge_case_score = edge_case_score + 30;
     }
     
@@ -843,24 +843,24 @@ fn validate_edge_cases_and_boundaries(nodes: [i32; 200], left: [i32; 200], right
     let leaf_nodes: i32 = count_leaf_nodes(nodes, left, right, parent, height, subtree_size, root);
     let internal_nodes: i32 = node_count - leaf_nodes;
     
-    if (leaf_nodes > 0 && internal_nodes >= 0) {
+    if ((leaf_nodes > 0 && internal_nodes >= 0)) {
         edge_case_score = edge_case_score + 25;
     }
     
     let max_depth: i32 = find_maximum_depth(nodes, left, right, parent, height, subtree_size, root, 0);
-    if (max_depth > 0 && max_depth <= node_count) {
+    if ((max_depth > 0 && max_depth <= node_count)) {
         edge_case_score = edge_case_score + 20;
     }
     
     edge_case_score
 }
 
-fn count_single_node_subtrees(nodes: [i32; 200], left: [i32; 200], right: [i32; 200], parent: [i32; 200], height: [i32; 200], subtree_size: [i32; 200], node: i32) -> i32 {
-    if (node == -1) {
+fn count_single_node_subtrees(nodes: &[i32; 200], left: &[i32; 200], right: &[i32; 200], parent: &[i32; 200], height: &[i32; 200], subtree_size: &[i32; 200], node: i32) -> i32 {
+    if ((node == -1)) {
         return 0;
     }
     
-    let is_single_node: i32 = if left[node as usize] == -1 && right[node as usize] == -1 { 1 } else { 0 };
+    let is_single_node: i32 = if ((left[node as usize] == -1 && right[node as usize] == -1)) { 1 } else { 0 };
     
     let left_single: i32 = count_single_node_subtrees(nodes, left, right, parent, height, subtree_size, left[node as usize]);
     let right_single: i32 = count_single_node_subtrees(nodes, left, right, parent, height, subtree_size, right[node as usize]);
@@ -868,12 +868,12 @@ fn count_single_node_subtrees(nodes: [i32; 200], left: [i32; 200], right: [i32; 
     is_single_node + left_single + right_single
 }
 
-fn count_leaf_nodes(nodes: [i32; 200], left: [i32; 200], right: [i32; 200], parent: [i32; 200], height: [i32; 200], subtree_size: [i32; 200], node: i32) -> i32 {
-    if (node == -1) {
+fn count_leaf_nodes(nodes: &[i32; 200], left: &[i32; 200], right: &[i32; 200], parent: &[i32; 200], height: &[i32; 200], subtree_size: &[i32; 200], node: i32) -> i32 {
+    if ((node == -1)) {
         return 0;
     }
     
-    if (left[node as usize] == -1 && right[node as usize] == -1) {
+    if ((left[node as usize] == -1 && right[node as usize] == -1)) {
         return 1;
     }
     
@@ -883,8 +883,8 @@ fn count_leaf_nodes(nodes: [i32; 200], left: [i32; 200], right: [i32; 200], pare
     left_leaves + right_leaves
 }
 
-fn find_maximum_depth(nodes: [i32; 200], left: [i32; 200], right: [i32; 200], parent: [i32; 200], height: [i32; 200], subtree_size: [i32; 200], node: i32, current_depth: i32) -> i32 {
-    if (node == -1) {
+fn find_maximum_depth(nodes: &[i32; 200], left: &[i32; 200], right: &[i32; 200], parent: &[i32; 200], height: &[i32; 200], subtree_size: &[i32; 200], node: i32, current_depth: i32) -> i32 {
+    if ((node == -1)) {
         return current_depth;
     }
     

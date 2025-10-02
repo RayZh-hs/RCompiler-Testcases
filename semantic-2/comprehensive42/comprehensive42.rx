@@ -27,9 +27,10 @@ Scope resolution for variables across different allocation phases.
 fn main() {
     let mut heap: [i32; 1024] = [0; 1024];
     let mut free_list_head: i32 = 0;
-    let mut total_blocks: i32 = 0;
+    // Total number of blocks in the heap (heap_size / block_size)
+    let total_blocks: i32 = 1024 / 16; // 64
 
-    fn init_heap(mut heap: &mut [i32; 1024], mut free_list_head: &mut i32) {
+    fn init_heap(heap: &mut [i32; 1024], free_list_head: &mut i32) {
         let heap_size: i32 = 1024;
         let block_size: i32 = 16;
         let num_blocks: i32 = heap_size / block_size;
@@ -43,7 +44,7 @@ fn main() {
         *free_list_head = 0;
     }
 
-    fn alloc(mut heap: &mut [i32; 1024], mut free_list_head: &mut i32) -> i32 {
+    fn alloc(heap: &mut [i32; 1024], free_list_head: &mut i32) -> i32 {
         if (*free_list_head == -1) {
             return -1; // Out of memory
         }
@@ -53,7 +54,7 @@ fn main() {
         return block_addr;
     }
 
-    fn free(mut heap: &mut [i32; 1024], mut free_list_head: &mut i32, addr: i32) {
+    fn free(heap: &mut [i32; 1024], free_list_head: &mut i32, addr: i32) {
         heap[addr as usize] = *free_list_head;
         *free_list_head = addr;
     }
@@ -108,8 +109,9 @@ fn main() {
         i = i + 1;
     }
 
-    // Hidden Error: `fragmentation_metric` is defined in a nested scope
-    // but used later, which should cause a scope error.
+    // Compute fragmentation metric when enough blocks are active.
+    // Hoisted variable to avoid scope error & guard against divide-by-zero.
+    let mut fragmentation_metric: i32 = 0; // 0 means either fully used or not computed.
     if (active_blocks > 40) {
         let mut max_contiguous_free: i32 = 0;
         let mut current_contiguous: i32 = 0;
@@ -125,7 +127,13 @@ fn main() {
             }
             current_ptr = next_ptr;
         }
-        let fragmentation_metric: i32 = max_contiguous_free * 100 / (1024 / 16 - active_blocks);
+        // Safe denominator: remaining free blocks. If zero, fragmentation is defined as 0.
+        let remaining_free: i32 = total_blocks - active_blocks; // could be 0
+        if (remaining_free > 0) {
+            fragmentation_metric = max_contiguous_free * 100 / remaining_free;
+        } else {
+            fragmentation_metric = 0; // No free space -> treat as no measurable fragmentation.
+        }
     }
 
     if (active_blocks < 48) {
@@ -150,7 +158,7 @@ fn main() {
         i = i + 1;
     }
 
-    // This line will cause a compile error because `fragmentation_metric` is out of scope.
-    printlnInt(fragmentation_metric);
+    printlnInt(fragmentation_metric); // 0 if not computed or fully allocated
     printlnInt(final_check_sum);
+    exit(0);
 }
