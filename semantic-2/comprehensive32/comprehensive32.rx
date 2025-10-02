@@ -71,6 +71,7 @@ fn main() {
     printlnInt(error_res);
 
     printlnInt(9999);
+    exit(0);
 }
 
 fn generate_text(text: &mut [i32; TEXT_SIZE], seed: i32) {

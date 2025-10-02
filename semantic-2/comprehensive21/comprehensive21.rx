@@ -782,4 +782,5 @@ fn test_large_scale_performance() {
 
 fn main() {
     test_large_scale_performance();
+    exit(0);
 }

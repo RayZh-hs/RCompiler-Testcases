@@ -75,6 +75,7 @@ fn main() {
     printlnInt(error_sum);
 
     printlnInt(9999);
+    exit(0);
 }
 
 fn initialize_pool(tree: &mut Tree) {

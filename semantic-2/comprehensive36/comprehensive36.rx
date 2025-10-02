@@ -381,4 +381,5 @@ fn main() {
     let mut inner_error_var: i32 = 1;
     error_var = inner_error_var;
     inner_error_var = 2;
+    exit(0);
 }

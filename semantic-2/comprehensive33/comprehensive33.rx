@@ -76,6 +76,7 @@ fn main() {
 
     final_report(&world);
     printlnInt(9999);
+    exit(0);
 }
 
 fn initialize_world(world: &mut World, seed: i32) {

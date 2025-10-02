@@ -1,4 +1,3 @@
-
 /*
 Test Package: Semantic-2
 Test Target: comprehensive
@@ -51,6 +50,7 @@ fn main() {
 
     // Performance test marker - end
     printlnInt(2999);
+    exit(0);
 }
 
 // Test 1: Complex Control Flow Patterns

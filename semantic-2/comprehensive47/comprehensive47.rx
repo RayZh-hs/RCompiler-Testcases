@@ -168,4 +168,5 @@ fn main() {
         i = i + 1;
     }
     printlnInt(best_fitness);
+    exit(0);
 }

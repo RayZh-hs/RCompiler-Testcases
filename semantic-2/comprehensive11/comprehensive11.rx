@@ -358,7 +358,7 @@ fn evaluateParityFunction(input: i32) -> bool {
     let mut temp: i32 = input;
 
     while (temp > 0) {
-        if (temp & 1) != 0 {
+        if ((temp & 1) != 0) {
             parity = !parity;
         }
         temp = temp / 2;
@@ -373,7 +373,7 @@ fn evaluateMajorityFunction(input: i32) -> bool {
     let mut temp: i32 = input;
 
     while (temp > 0) {
-        if (temp & 1) != 0 {
+        if ((temp & 1) != 0) {
             count = count + 1;
         }
         temp = temp / 2;
@@ -388,7 +388,7 @@ fn evaluateThresholdFunction(input: i32) -> bool {
     let mut temp: i32 = input;
 
     while (temp > 0) {
-        if (temp & 1) != 0 {
+        if ((temp & 1) != 0) {
             count = count + 1;
         }
         temp = temp / 2;
@@ -545,7 +545,7 @@ fn initializeSearchData(mut data: [i32; 5000]) {
     let mut i: i32 = 0;
     let mut seed: i32 = 54321;
 
-    while i < 5000 {
+    while (i < 5000) {
         seed = pm_rand_update(seed);
         if (seed < 0) {
             seed = -seed;
@@ -560,14 +560,14 @@ fn performBooleanFilter(data: [i32; 5000]) -> i32 {
     let mut filtered_count: i32 = 0;
     let mut i: i32 = 0;
 
-    while i < 5000 {
+    while (i < 5000) {
         let condition1: bool = data[i as usize] > 1000;
         let condition2: bool = data[i as usize] % 2 == 0;
         let condition3: bool = data[i as usize] < 8000;
         let condition4: bool = isPrime(data[i as usize] % 100);
 
         // Complex Boolean filter condition
-        if (condition1 && condition2) || (condition3 && condition4) {
+        if ((condition1 && condition2) || (condition3 && condition4)) {
             filtered_count = filtered_count + 1;
         }
 
@@ -582,7 +582,7 @@ fn performMultiCriteriaSearch(data: [i32; 5000]) -> i32 {
     let mut match_count: i32 = 0;
     let mut i: i32 = 0;
 
-    while i < 5000 {
+    while (i < 5000) {
         let criteria_met: i32 = countCriteriaMet(data[i as usize]);
 
         // Boolean condition based on number of criteria met
@@ -612,7 +612,7 @@ fn countCriteriaMet(value: i32) -> i32 {
     if (value < 2000) {
         count = count + 1;
     }
-    if (value % 100) > 50 {
+    if ((value % 100) > 50) {
         count = count + 1;
     }
 
@@ -624,7 +624,7 @@ fn performBooleanRangeSearch(data: [i32; 5000]) -> i32 {
     let mut range_matches: i32 = 0;
     let mut i: i32 = 0;
 
-    while i < 5000 {
+    while (i < 5000) {
         let in_range1: bool = (data[i as usize] >= 1000) && (data[i as usize] <= 3000);
         let in_range2: bool = (data[i as usize] >= 6000) && (data[i as usize] <= 8000);
         let in_range3: bool = (data[i as usize] >= 500) && (data[i as usize] <= 1500);
@@ -699,7 +699,7 @@ fn getNextTrafficState(
 
     if (current_state == 0) {
         // Red
-        if (time % 60) > 30 || (pedestrian && !traffic) {
+        if ((time % 60) > 30 || (pedestrian && !traffic)) {
             return 1; // Change to green
         }
     } else if (current_state == 1) {
@@ -828,7 +828,7 @@ fn isPrime(n: i32) -> bool {
     }
 
     let mut i: i32 = 5;
-    while i * i <= n {
+    while (i * i <= n) {
         if (n % i == 0 || n % (i + 2) == 0) {
             return false;
         }

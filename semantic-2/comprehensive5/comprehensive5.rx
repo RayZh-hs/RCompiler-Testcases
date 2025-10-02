@@ -50,6 +50,7 @@ fn main() {
 
     // Performance test marker - end
     printlnInt(1599);
+    exit(0);
 }
 
 // Test 1: Memory Access Patterns

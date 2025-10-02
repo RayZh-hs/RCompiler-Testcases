@@ -143,6 +143,7 @@ fn main() {
     printlnInt(warehouse_stock_A);
     printlnInt(warehouse_stock_B);
     printlnInt(warehouse_stock_C);
+    exit(0);
 }
 
 fn perform_audit(stock_a: i32, stock_b: i32, stock_c: i32, revenue: i32) -> i32 {

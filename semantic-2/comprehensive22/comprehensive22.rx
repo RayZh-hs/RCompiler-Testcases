@@ -42,6 +42,7 @@ fn main() {
     
     // Performance test marker - end
     printlnInt(9999);
+    exit(0);
 }
 
 // Test 1: Sorting Algorithm Performance Benchmark

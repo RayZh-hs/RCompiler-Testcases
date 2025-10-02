@@ -70,6 +70,7 @@ fn main() {
     
     let final_validation: i32 = validate_tree_integrity(&tree_nodes, &tree_left, &tree_right, &tree_parent, &tree_height, &tree_size_subtree, root_index, node_count);
     printlnInt(final_validation);
+    exit(0);
 }
 
 fn generate_pseudo_random_value(seed: i32, modulus: i32) -> i32 {

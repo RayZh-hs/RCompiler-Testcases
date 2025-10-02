@@ -61,6 +61,7 @@ fn main() {
     printlnInt(error_val);
 
     printlnInt(9999);
+    exit(0);
 }
 
 fn generate_maze(maze: &mut [[i32; MAZE_SIZE as usize]; MAZE_SIZE as usize], seed: i32) {

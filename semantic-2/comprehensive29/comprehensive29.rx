@@ -411,4 +411,5 @@ fn main() {
     } else {
         printlnInt(9999);
     }
+    exit(0);
 }

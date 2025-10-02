@@ -307,6 +307,7 @@ fn main() {
     printlnInt(avg_memory_access_time);
     printlnInt(final_fragmentation);
     printlnInt(working_set_window);
+    exit(0);
 }
 
 // Generate complex memory access patterns for testing

@@ -43,6 +43,7 @@ fn main() {
     testMemoryEdgeCases();
 
     printlnInt(1899); // Test end marker
+    exit(0);
 }
 
 // Memory pool management with different allocation strategies

@@ -50,6 +50,7 @@ fn main() {
     
     // Performance test marker - end
     printlnInt(1699);
+    exit(0);
 }
 
 // Test 1: String Search Algorithms

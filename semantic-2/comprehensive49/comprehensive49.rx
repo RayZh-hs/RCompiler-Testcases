@@ -70,6 +70,7 @@ fn main() {
     }
 
     print_memory_state(&mut memory);
+    exit(0);
 }
 
 fn allocate(memory: &mut [i32; 1024], size: i32) -> i32 {

@@ -162,7 +162,7 @@ impl MathEngine {
         while (i < self.matrix_size - 1) {
             // Find pivot
             let mut max_row: i32 = i;
-            let mut max_val: i32 = if lu_matrix[i as usize][i as usize] < 0 {
+            let mut max_val: i32 = if (lu_matrix[i as usize][i as usize] < 0) {
                 -lu_matrix[i as usize][i as usize]
             } else {
                 lu_matrix[i as usize][i as usize]
@@ -170,7 +170,7 @@ impl MathEngine {
 
             let mut k: i32 = i + 1;
             while (k < self.matrix_size) {
-                let abs_val: i32 = if lu_matrix[k as usize][i as usize] < 0 {
+                let abs_val: i32 = if (lu_matrix[k as usize][i as usize] < 0) {
                     -lu_matrix[k as usize][i as usize]
                 } else {
                     lu_matrix[k as usize][i as usize]
@@ -314,7 +314,7 @@ impl MathEngine {
                 if (diff <= 1) {
                     // Check if this is actually a root
                     if (self.evaluate_polynomial(next_x) == 0
-                        || (if self.evaluate_polynomial(next_x) < 0 {
+                        || (if (self.evaluate_polynomial(next_x) < 0) {
                             -self.evaluate_polynomial(next_x)
                         } else {
                             self.evaluate_polynomial(next_x)
@@ -324,11 +324,11 @@ impl MathEngine {
                         let mut is_new_root: bool = true;
                         let mut j: i32 = 0;
                         while (j < self.root_count) {
-                            let root_diff: i32 = if self.roots[j as usize] > next_x {
-                                self.roots[j as usize] - next_x
-                            } else {
-                                next_x - self.roots[j as usize]
-                            };
+                            let root_diff: i32 = if (self.roots[j as usize] > next_x) {
+                                    self.roots[j as usize] - next_x
+                                } else {
+                                    next_x - self.roots[j as usize]
+                                };
                             if (root_diff <= 2) {
                                 is_new_root = false;
                                 break;

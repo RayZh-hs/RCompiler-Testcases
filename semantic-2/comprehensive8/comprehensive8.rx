@@ -50,6 +50,7 @@ fn main() {
     
     // Performance test marker - end
     printlnInt(1899);
+    exit(0);
 }
 
 // Test 1: Classic Dynamic Programming Problems
@@ -107,9 +108,9 @@ fn initializeSequence(mut sequence: [i32; 100], size: i32) {
     let mut seed: i32 = 145;
     let mut i: i32 = 0;
     
-    while (i < size) {
+        while (i < size) {
         seed = (seed * 1664 + 101223) % 214647;
-        if (seed < 0) {
+            if (seed < 0) {
             seed = -seed;
         }
         sequence[i as usize] = seed % 1000;
@@ -153,7 +154,7 @@ fn coinChangeDP(amount: i32) -> i32 {
         let mut coin_idx: i32 = 0;
         while (coin_idx < 5) {
             let coin: i32 = coins[coin_idx as usize];
-            if (coin <= i && dp[(i - coin) as usize] + 1 < dp[i as usize]) {
+                if (coin <= i && dp[(i - coin) as usize] + 1 < dp[i as usize]) {
                 dp[i as usize] = dp[(i - coin) as usize] + 1;
             }
             coin_idx = coin_idx + 1;
@@ -389,11 +390,11 @@ fn palindromePartitioningDP(string: [i32; 50], length: i32) -> i32 {
     while (i < length) {
         let mut j: i32 = 0;
         while (j < length) {
-            if i == j {
+            if (i == j) {
                 is_palindrome[(i * length + j) as usize] = true;
-            } else if i + 1 == j {
+            } else if (i + 1 == j) {
                 is_palindrome[(i * length + j) as usize] = (string[i as usize] == string[j as usize]);
-            } else if i < j {
+            } else if (i < j) {
                 is_palindrome[(i * length + j) as usize] = (string[i as usize] == string[j as usize]) && 
                     is_palindrome[((i + 1) * length + (j - 1)) as usize];
             }
@@ -408,10 +409,10 @@ fn palindromePartitioningDP(string: [i32; 50], length: i32) -> i32 {
         dp[i as usize] = i; // Maximum cuts needed
         let mut j: i32 = 0;
         while (j <= i) {
-            if is_palindrome[(j * length + i) as usize] {
-                if j == 0 {
+            if (is_palindrome[(j * length + i) as usize]) {
+                if (j == 0) {
                     dp[i as usize] = 0;
-                } else if dp[(j - 1) as usize] + 1 < dp[i as usize] {
+                } else if (dp[(j - 1) as usize] + 1 < dp[i as usize]) {
                     dp[i as usize] = dp[(j - 1) as usize] + 1;
                 }
             }
@@ -432,20 +433,20 @@ fn stringReconstructionDP(string: [i32; 50], length: i32) -> i32 {
     let mut i: i32 = 1;
     while (i <= length) {
         // Single character
-        if i >= 1 && string[(i - 1) as usize] >= 65 && string[(i - 1) as usize] <= 90 {
+        if (i >= 1 && string[(i - 1) as usize] >= 65 && string[(i - 1) as usize] <= 90) {
             dp[i as usize] = dp[i as usize] + dp[(i - 1) as usize];
         }
         
         // Two character combination
-        if i >= 2 && string[(i - 2) as usize] >= 65 && string[(i - 2) as usize] <= 90 &&
-           string[(i - 1) as usize] >= 65 && string[(i - 1) as usize] <= 90 {
+        if (i >= 2 && string[(i - 2) as usize] >= 65 && string[(i - 2) as usize] <= 90 &&
+           string[(i - 1) as usize] >= 65 && string[(i - 1) as usize] <= 90) {
             dp[i as usize] = dp[i as usize] + dp[(i - 2) as usize];
         }
         
         // Three character combination (less common)
-        if i >= 3 && string[(i - 3) as usize] >= 65 && string[(i - 3) as usize] <= 90 &&
+        if (i >= 3 && string[(i - 3) as usize] >= 65 && string[(i - 3) as usize] <= 90 &&
            string[(i - 2) as usize] >= 65 && string[(i - 2) as usize] <= 90 &&
-           string[(i - 1) as usize] >= 65 && string[(i - 1) as usize] <= 90 {
+           string[(i - 1) as usize] >= 65 && string[(i - 1) as usize] <= 90) {
             dp[i as usize] = dp[i as usize] + dp[(i - 3) as usize] / 2; // Reduced weight
         }
         
@@ -492,7 +493,7 @@ fn knapsackDP(num_items: i32, capacity: i32) -> i32 {
     let mut seed: i32 = 111;
     while (i < num_items) {
         seed = (seed * 525 + 390422) % 483647;
-        if seed < 0 {
+        if (seed < 0) {
             seed = -seed;
         }
         weights[i as usize] = 1 + (seed % 20);
@@ -511,9 +512,9 @@ fn knapsackDP(num_items: i32, capacity: i32) -> i32 {
             dp[(i * (capacity + 1) + w) as usize] = dp[(((i - 1) * (capacity + 1)) + w) as usize];
             
             // Take item i-1 if possible
-            if weights[(i - 1) as usize] <= w {
+        if (weights[(i - 1) as usize] <= w) {
                 let take_value: i32 = values[(i - 1) as usize] + dp[(((i - 1) * (capacity + 1)) + (w - weights[(i - 1) as usize])) as usize];
-                if take_value > dp[(i * (capacity + 1) + w) as usize] {
+                if (take_value > dp[(i * (capacity + 1) + w) as usize]) {
                     dp[(i * (capacity + 1) + w) as usize] = take_value;
                 }
             }
@@ -536,7 +537,7 @@ fn unboundedKnapsackDP(num_items: i32, capacity: i32) -> i32 {
     let mut seed: i32 = 222;
     while (i < num_items) {
         seed = (seed * 1664 + 904223) % 83647;
-        if seed < 0 {
+        if (seed < 0) {
             seed = -seed;
         }
         weights[i as usize] = 1 + (seed % 15);
@@ -551,9 +552,9 @@ fn unboundedKnapsackDP(num_items: i32, capacity: i32) -> i32 {
     while (w <= capacity) {
         i = 0;
         while (i < num_items) {
-            if weights[i as usize] <= w {
+            if (weights[i as usize] <= w) {
                 let new_value: i32 = values[i as usize] + dp[(w - weights[i as usize]) as usize];
-                if new_value > dp[w as usize] {
+                if (new_value > dp[w as usize]) {
                     dp[w as usize] = new_value;
                 }
             }
@@ -575,7 +576,7 @@ fn jobSchedulingDP(num_jobs: i32) -> i32 {
     let mut seed: i32 = 33;
     while (i < num_jobs) {
         seed = (seed * 1664 + 904223) % 83647;
-        if seed < 0 {
+        if (seed < 0) {
             seed = -seed;
         }
         profits[i as usize] = 10 + (seed % 100);
@@ -588,7 +589,7 @@ fn jobSchedulingDP(num_jobs: i32) -> i32 {
     while (i < num_jobs - 1) {
         let mut j: i32 = 0;
         while (j < num_jobs - i - 1) {
-            if profits[j as usize] < profits[(j + 1) as usize] {
+            if (profits[j as usize] < profits[(j + 1) as usize]) {
                 // Swap profits
                 let temp_profit: i32 = profits[j as usize];
                 profits[j as usize] = profits[(j + 1) as usize];
@@ -614,7 +615,7 @@ fn jobSchedulingDP(num_jobs: i32) -> i32 {
         
         // Find available slot
         while (slot >= 0) {
-            if slot < 20 && !schedule[slot as usize] {
+            if (slot < 20 && !schedule[slot as usize]) {
                 schedule[slot as usize] = true;
                 total_profit = total_profit + profits[i as usize];
                 break;
@@ -638,7 +639,7 @@ fn partitionProblemDP(num_elements: i32) -> i32 {
     let mut seed: i32 = 44;
     while (i < num_elements) {
         seed = (seed * 1664 + 904223) % 83647;
-        if seed < 0 {
+        if (seed < 0) {
             seed = -seed;
         }
         elements[i as usize] = 1 + (seed % 50);
@@ -647,7 +648,7 @@ fn partitionProblemDP(num_elements: i32) -> i32 {
     }
     
     // Check if partition is possible
-    if total_sum % 2 != 0 {
+    if (total_sum % 2 != 0) {
         return 0; // Cannot partition odd sum into two equal parts
     }
     
@@ -665,7 +666,7 @@ fn partitionProblemDP(num_elements: i32) -> i32 {
         i = i + 1;
     }
     
-    if dp[target as usize] {
+    if (dp[target as usize]) {
         return 1; // Partition possible
     } else {
         return 0; // Partition not possible
@@ -681,7 +682,7 @@ fn matrixChainMultiplicationDP(num_matrices: i32) -> i32 {
     let mut i: i32 = 0;
     while (i <= num_matrices) {
         seed = (seed * 1664 + 904223) % 83647;
-        if seed < 0 {
+        if (seed < 0) {
             seed = -seed;
         }
         dimensions[i as usize] = 10 + (seed % 50);
@@ -705,7 +706,7 @@ fn matrixChainMultiplicationDP(num_matrices: i32) -> i32 {
                 let cost: i32 = dp[(((i - 1) * 20) + (k - 1)) as usize] + dp[((k * 20) + (j - 1)) as usize] + 
                                dimensions[(i - 1) as usize] * dimensions[k as usize] * dimensions[j as usize];
                 
-                if cost < dp[(((i - 1) * 20) + (j - 1)) as usize] {
+                if (cost < dp[(((i - 1) * 20) + (j - 1)) as usize]) {
                     dp[(((i - 1) * 20) + (j - 1)) as usize] = cost;
                 }
                 
@@ -749,7 +750,7 @@ fn optimalGameStrategyDP(num_coins: i32) -> i32 {
     let mut seed: i32 = 66;
     while (i < num_coins) {
         seed = (seed * 1664 + 904223) % 83647;
-        if seed < 0 {
+        if (seed < 0) {
             seed = -seed;
         }
         coins[i as usize] = 1 + (seed % 100);
@@ -779,7 +780,7 @@ fn optimalGameStrategyDP(num_coins: i32) -> i32 {
             // Player chooses coin j, opponent plays optimally on [i, j-1]
             let choose_j: i32 = coins[j as usize] - dp[(i * 20 + (j - 1)) as usize];
             
-            if choose_i > choose_j {
+            if (choose_i > choose_j) {
                 dp[(i * 20 + j) as usize] = choose_i;
             } else {
                 dp[(i * 20 + j) as usize] = choose_j;
@@ -802,7 +803,7 @@ fn coinGameDP(num_coins: i32) -> i32 {
     let mut seed: i32 = 77;
     while (i < num_coins) {
         seed = (seed * 1664 + 904223) % 83647;
-        if seed < 0 {
+        if (seed < 0) {
             seed = -seed;
         }
         coins[i as usize] = 1 + (seed % 50);
@@ -816,8 +817,8 @@ fn coinGameDP(num_coins: i32) -> i32 {
     i = 0;
     while (i < num_coins) {
         dp[(i * 30 + i) as usize] = coins[i as usize];
-        if i + 1 < num_coins {
-            if coins[i as usize] > coins[(i + 1) as usize] {
+    if (i + 1 < num_coins) {
+            if (coins[i as usize] > coins[(i + 1) as usize]) {
                 dp[(i * 30 + (i + 1)) as usize] = coins[i as usize];
             } else {
                 dp[(i * 30 + (i + 1)) as usize] = coins[(i + 1) as usize];
@@ -835,7 +836,7 @@ fn coinGameDP(num_coins: i32) -> i32 {
             
             // Take from left
             let take_left: i32 = coins[i as usize] + 
-                if dp[(((i + 2) * 30) + j) as usize] < dp[(((i + 1) * 30) + (j - 1)) as usize] {
+                if (dp[(((i + 2) * 30) + j) as usize] < dp[(((i + 1) * 30) + (j - 1)) as usize]) {
                     dp[(((i + 2) * 30) + j) as usize]
                 } else {
                     dp[(((i + 1) * 30) + (j - 1)) as usize]
@@ -843,13 +844,13 @@ fn coinGameDP(num_coins: i32) -> i32 {
             
             // Take from right
             let take_right: i32 = coins[j as usize] + 
-                if dp[(i * 30 + (j - 2)) as usize] < dp[(((i + 1) * 30) + (j - 1)) as usize] {
+                if (dp[(i * 30 + (j - 2)) as usize] < dp[(((i + 1) * 30) + (j - 1)) as usize]) {
                     dp[(i * 30 + (j - 2)) as usize]
                 } else {
                     dp[(((i + 1) * 30) + (j - 1)) as usize]
                 };
             
-            if take_left > take_right {
+            if (take_left > take_right) {
                 dp[(i * 30 + j) as usize] = take_left;
             } else {
                 dp[(i * 30 + j) as usize] = take_right;
@@ -870,9 +871,9 @@ fn nimGameDP(num_piles: i32) -> i32 {
     // Initialize pile sizes
     let mut i: i32 = 0;
     let mut seed: i32 = 88;
-    while i < num_piles {
+    while (i < num_piles) {
         seed = (seed * 1664 + 904223) % 83647;
-        if seed < 0 {
+            if (seed < 0) {
             seed = -seed;
         }
         piles[i as usize] = 1 + (seed % 20);
@@ -882,7 +883,7 @@ fn nimGameDP(num_piles: i32) -> i32 {
     // Calculate Nim-sum (XOR of all pile sizes)
     let mut nim_sum: i32 = 0;
     i = 0;
-    while i < num_piles {
+    while (i < num_piles) {
         nim_sum = nim_sum ^ piles[i as usize]; // XOR operation
         i = i + 1;
     }
@@ -890,9 +891,9 @@ fn nimGameDP(num_piles: i32) -> i32 {
     // Count winning moves
     let mut winning_moves: i32 = 0;
     i = 0;
-    while i < num_piles {
+    while (i < num_piles) {
         let target: i32 = nim_sum ^ piles[i as usize];
-        if target < piles[i as usize] {
+            if (target < piles[i as usize]) {
             winning_moves = winning_moves + (piles[i as usize] - target);
         }
         i = i + 1;
@@ -927,7 +928,7 @@ fn digitDP(number: i32) -> i32 {
     let mut temp: i32 = number;
     
     // Extract digits
-    while temp > 0 {
+    while (temp > 0) {
         digits[digit_count as usize] = temp % 10;
         temp = temp / 10;
         digit_count = digit_count + 1;
@@ -935,7 +936,7 @@ fn digitDP(number: i32) -> i32 {
     
     // Reverse digits array
     let mut i: i32 = 0;
-    while i < digit_count / 2 {
+    while (i < digit_count / 2) {
         let swap_temp: i32 = digits[i as usize];
         digits[i as usize] = digits[(digit_count - 1 - i) as usize];
         digits[(digit_count - 1 - i) as usize] = swap_temp;
@@ -949,16 +950,16 @@ fn digitDP(number: i32) -> i32 {
 
 fn digitDPRecursive(digits: [i32; 10], digit_count: i32, pos: i32, 
                    sum_mod: i32, tight: bool, mut dp: [i32; 100]) -> i32 {
-    if pos == digit_count {
-        if sum_mod == 0 {
+    if (pos == digit_count) {
+    if (sum_mod == 0) {
             return 1;
         } else {
             return 0;
         }
     }
     
-    let state: i32 = pos * 10 + sum_mod * 2 + if tight { 1 } else { 0 };
-    if state < 100 && dp[state as usize] != 0 {
+    let state: i32 = pos * 10 + sum_mod * 2 + if (tight) { 1 } else { 0 };
+    if (state < 100 && dp[state as usize] != 0) {
         return dp[state as usize];
     }
     
@@ -970,7 +971,7 @@ fn digitDPRecursive(digits: [i32; 10], digit_count: i32, pos: i32,
     
     let mut result: i32 = 0;
     let mut digit: i32 = 0;
-    while digit <= limit {
+    while (digit <= limit) {
         let new_sum_mod: i32 = (sum_mod + digit) % 3;
         let new_tight: bool = tight && (digit == limit);
         result = result + digitDPRecursive(digits, digit_count, pos + 1, 
@@ -978,7 +979,7 @@ fn digitDPRecursive(digits: [i32; 10], digit_count: i32, pos: i32,
         digit = digit + 1;
     }
     
-    if state < 100 {
+    if (state < 100) {
         dp[state as usize] = result;
     }
     result
@@ -991,14 +992,14 @@ fn bitmaskDP(num_cities: i32) -> i32 {
     // Initialize distances
     let mut i: i32 = 0;
     let mut seed: i32 = 99;
-    while i < num_cities {
+    while (i < num_cities) {
         let mut j: i32 = 0;
-        while j < num_cities {
-            if i == j {
+    while (j < num_cities) {
+            if (i == j) {
                 distances[(i * num_cities + j) as usize] = 0;
             } else {
                 seed = (seed * 1664 + 904223) % 83647;
-                if seed < 0 {
+                if (seed < 0) {
                     seed = -seed;
                 }
                 distances[(i * num_cities + j) as usize] = 1 + (seed % 100);
@@ -1011,7 +1012,7 @@ fn bitmaskDP(num_cities: i32) -> i32 {
     // DP with bitmask
     let total_states: i32 = 1;
     let mut shift: i32 = 0;
-    while shift < num_cities {
+    while (shift < num_cities) {
         // total_states *= 2; // This would be total_states << 1
         shift = shift + 1;
     }
@@ -1019,11 +1020,11 @@ fn bitmaskDP(num_cities: i32) -> i32 {
     // Simplified TSP for small number of cities
     let mut min_cost: i32 = 999999;
     let mut mask: i32 = 1;
-    while mask < 32768 && mask < total_states { // Limit to prevent overflow
+    while (mask < 32768 && mask < total_states) { // Limit to prevent overflow
         let visited_count: i32 = countSetBits(mask);
-        if visited_count == num_cities && (mask & 1) != 0 {
+        if (visited_count == num_cities && (mask & 1) != 0) {
             let cost: i32 = calculateTourCost(mask, distances, num_cities);
-            if cost < min_cost {
+            if (cost < min_cost) {
                 min_cost = cost;
             }
         }
@@ -1038,7 +1039,7 @@ fn countSetBits(n: i32) -> i32 {
     let mut count: i32 = 0;
     let mut temp: i32 = n;
     
-    while temp > 0 {
+    while (temp > 0) {
         count = count + (temp & 1);
         temp = temp / 2;
     }
@@ -1052,7 +1053,7 @@ fn calculateTourCost(mask: i32, distances: [i32; 225], num_cities: i32) -> i32 {
     let mut prev_city: i32 = 0;
     let mut city: i32 = 1;
     
-    while city < num_cities {
+    while (city < num_cities) {
         if (mask & (1 << city)) != 0 {
             cost = cost + distances[(prev_city * num_cities + city) as usize];
             prev_city = city;
@@ -1075,9 +1076,9 @@ fn treeDP(num_nodes: i32) -> i32 {
     // Initialize tree and node values
     let mut seed: i32 = 111;
     let mut i: i32 = 0;
-    while i < num_nodes {
+    while (i < num_nodes) {
         seed = (seed * 1664 + 904223) % 83647;
-        if seed < 0 {
+    if (seed < 0) {
             seed = -seed;
         }
         node_values[i as usize] = 1 + (seed % 50);
@@ -1086,7 +1087,7 @@ fn treeDP(num_nodes: i32) -> i32 {
     
     // Create simple tree structure
     i = 1;
-    while i < num_nodes {
+    while (i < num_nodes) {
         let parent: i32 = (i - 1) / 2;
         tree[(parent * num_nodes + i) as usize] = 1;
         tree[(i * num_nodes + parent) as usize] = 1;
@@ -1106,14 +1107,14 @@ fn treeDPRecursive(tree: [i32; 400], node_values: [i32; 20], num_nodes: i32,
     exclude_dp[node as usize] = 0;
     
     let mut child: i32 = 0;
-    while child < num_nodes {
-            if tree[(node * num_nodes + child) as usize] == 1 && child != parent {
+    while (child < num_nodes) {
+            if (tree[(node * num_nodes + child) as usize] == 1 && child != parent) {
             let child_result: i32 = treeDPRecursive(tree, node_values, num_nodes, 
                                                    child, node, include_dp, exclude_dp);
             
             include_dp[node as usize] = include_dp[node as usize] + exclude_dp[child as usize];
             exclude_dp[node as usize] = exclude_dp[node as usize] + 
-                if include_dp[child as usize] > exclude_dp[child as usize] {
+                if (include_dp[child as usize] > exclude_dp[child as usize]) {
                     include_dp[child as usize]
                 } else {
                     exclude_dp[child as usize]
@@ -1122,7 +1123,7 @@ fn treeDPRecursive(tree: [i32; 400], node_values: [i32; 20], num_nodes: i32,
         child = child + 1;
     }
     
-    if include_dp[node as usize] > exclude_dp[node as usize] {
+    if (include_dp[node as usize] > exclude_dp[node as usize]) {
         return include_dp[node as usize];
     } else {
         return exclude_dp[node as usize];

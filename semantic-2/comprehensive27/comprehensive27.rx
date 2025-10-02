@@ -54,6 +54,7 @@ fn main() {
     printlnInt(integration_result);
 
     printlnInt(99); // End marker
+    exit(0);
 }
 
 // Cache system constants

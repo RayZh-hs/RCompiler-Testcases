@@ -247,4 +247,5 @@ fn main() {
         t = t + 1;
     }
     printlnInt(final_sum);
+    exit(0);
 }

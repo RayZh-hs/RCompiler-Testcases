@@ -78,6 +78,7 @@ fn main() {
         printlnInt(state);
         i = i + 1;
     }
+    exit(0);
 }
 
 fn process_event(current_state: i32, event: i32, payload: i32, seq: i32, ack: i32, ret_count: i32) -> i32 {

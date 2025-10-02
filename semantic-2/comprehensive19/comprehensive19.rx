@@ -662,4 +662,5 @@ fn test_comprehensive_operations() {
 
 fn main() {
     test_comprehensive_operations();
+    exit(0);
 }

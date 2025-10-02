@@ -316,4 +316,5 @@ fn main() {
     } else {
         printlnInt(888);
     }
+    exit(0);
 }

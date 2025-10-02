@@ -62,6 +62,7 @@ fn main() {
     
     // Performance test marker - end
     printlnInt(25999);
+    exit(0);
 }
 
 // Test 1: Basic Consensus Algorithm Implementation

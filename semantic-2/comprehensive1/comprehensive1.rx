@@ -289,4 +289,5 @@ fn main() {
         printlnInt(node_pool[i].ans);
         i += 1;
     }
+    exit(0);
 }

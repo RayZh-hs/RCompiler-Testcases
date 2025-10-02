@@ -171,4 +171,5 @@ fn main() {
         i = i + 1;
     }
     printlnInt(final_world_sum);
+    exit(0);
 }

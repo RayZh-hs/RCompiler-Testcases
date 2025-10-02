@@ -60,6 +60,7 @@ fn main() {
     load_program(&mut vm);
     execute(&mut vm);
     printlnInt(9999);
+    exit(0);
 }
 
 fn load_program(vm: &mut VM) {

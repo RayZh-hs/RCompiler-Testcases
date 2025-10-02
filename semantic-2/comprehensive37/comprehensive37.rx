@@ -320,4 +320,5 @@ fn main() {
         i = i + 1;
     }
     printlnInt(vm_state);
+    exit(0);
 }

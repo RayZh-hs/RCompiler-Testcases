@@ -874,4 +874,5 @@ fn test_complex_control_flow() {
 
 fn main() {
     test_complex_control_flow();
+    exit(0);
 }

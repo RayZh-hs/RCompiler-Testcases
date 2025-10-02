@@ -69,6 +69,7 @@ fn main() {
     
     // Performance test marker - end
     printlnInt(26999);
+    exit(0);
 }
 
 // Test 1: B+ Tree Index Operations

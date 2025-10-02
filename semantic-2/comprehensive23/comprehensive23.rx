@@ -211,6 +211,7 @@ fn main() {
     printlnInt(failed_elections);
     printlnInt(total_messages);
     printlnInt(consensus_rounds);
+    exit(0);
 }
 
 // Simulate dynamic network conditions with partitions and healing

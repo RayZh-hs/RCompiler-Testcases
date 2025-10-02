@@ -198,7 +198,7 @@ impl SortingAnalyzer {
                     self.swap_elements(lt, i);
                     lt += 1;
                     i += 1;
-                } else if self.data[i as usize] > pivot {
+                } else if (self.data[i as usize] > pivot) {
                     self.swap_elements(i, gt);
                     gt -= 1;
                 } else {

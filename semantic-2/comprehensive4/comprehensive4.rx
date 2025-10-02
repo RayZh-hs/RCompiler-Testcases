@@ -50,6 +50,7 @@ fn main() {
 
     // Performance test marker - end
     printlnInt(1499);
+    exit(0);
 }
 
 // Test 1: Deep Recursive Algorithms

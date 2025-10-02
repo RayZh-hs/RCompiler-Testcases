@@ -318,4 +318,5 @@ fn main() {
         p = p + 1;
     }
     printlnInt(final_val);
+    exit(0);
 }
