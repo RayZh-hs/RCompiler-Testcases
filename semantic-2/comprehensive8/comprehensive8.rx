@@ -331,12 +331,11 @@ fn editDistanceDP(string1: [i32; 50], string2: [i32; 50], len1: i32, len2: i32) 
                 let delete: i32 = dp[(((i - 1) * (len2 + 1)) + j) as usize] + 1;
                 let replace: i32 = dp[(((i - 1) * (len2 + 1)) + (j - 1)) as usize] + 1;
                 
-                let min_val: i32;
-                if (insert < delete) {
-                    min_val = insert;
+                let min_val: i32 = if (insert < delete) {
+                    insert
                 } else {
-                    min_val = delete;
-                }
+                    delete
+                };
                 
                 if (replace < min_val) {
                     dp[(i * (len2 + 1) + j) as usize] = replace;

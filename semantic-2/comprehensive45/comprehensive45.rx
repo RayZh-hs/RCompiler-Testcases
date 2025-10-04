@@ -85,12 +85,11 @@ fn main() {
     let window_size: i32 = 128;
 
     while (current_pos < 512) {
-        let search_buffer_start: i32;
-        if (current_pos > window_size) {
-            search_buffer_start = current_pos - window_size;
+        let search_buffer_start: i32 = if (current_pos > window_size) {
+            current_pos - window_size
         } else {
-            search_buffer_start = 0;
-        }
+            0
+        };
 
         let match_result: i32 = find_longest_match(&input_data, current_pos, search_buffer_start);
 

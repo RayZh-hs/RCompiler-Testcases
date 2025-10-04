@@ -195,8 +195,7 @@ fn perform_recovery(state: i32, payload: i32) -> i32 {
 fn another_layer_of_protocol(event: i32, data: i32) -> i32 {
     let mut result: i32 = data;
     if (event == 2) { // DATA
-        let mut i: i32;
-        i = 0;
+        let mut i: i32 = 0;
         while (i < 5) {
             result = result + i;
             i = i + 1;

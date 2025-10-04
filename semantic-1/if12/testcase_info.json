@@ -7,7 +7,7 @@
     "compilememorylimit": 256,
     "compiletimelimit": 15,
     "exitcode": 0,
-    "id": 3527222,
+    "id": 3642428,
     "input_path": "src/if12/if12.in",
     "input_visible": 1,
     "metainfo": {
@@ -27,6 +27,6 @@
     "runtimememorylimit": 256,
     "source_path": "src/if12/if12.rx",
     "source_visible": 1,
-    "stage_id": 40670,
+    "stage_id": 41936,
     "stage_name": "semantic-1"
 }

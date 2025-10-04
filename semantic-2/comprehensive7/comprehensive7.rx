@@ -59,33 +59,33 @@ fn testGraphTraversalAlgorithms() {
     
     // Create adjacency matrix for graph (50x50 nodes)
     let mut graph: [i32; 2500] = [0; 2500];
-    initializeGraph(graph, 50);
+    initializeGraph(&mut graph, 50);
     
     // Test Depth-First Search
-    let dfs_result: i32 = depthFirstSearch(graph, 50, 0);
+    let dfs_result: i32 = depthFirstSearch(&graph, 50, 0);
     printlnInt(dfs_result);
     
     // Test Breadth-First Search  
-    let bfs_result: i32 = breadthFirstSearch(graph, 50, 0);
+    let bfs_result: i32 = breadthFirstSearch(&graph, 50, 0);
     printlnInt(bfs_result);
     
     // Test iterative DFS
-    let iterative_dfs_result: i32 = iterativeDepthFirstSearch(graph, 50, 0);
+    let iterative_dfs_result: i32 = iterativeDepthFirstSearch(&graph, 50, 0);
     printlnInt(iterative_dfs_result);
     
     // Test cycle detection
-    let cycle_result: i32 = detectCycles(graph, 50);
+    let cycle_result: i32 = detectCycles(&graph, 50);
     printlnInt(cycle_result);
     
     printlnInt(1702); // End graph traversal test
 }
 
 // Initialize graph with edges
-fn initializeGraph(mut graph: [i32; 2500], size: i32) {
+fn initializeGraph(graph: &mut [i32; 2500], size: i32) {
     let mut i: i32 = 0;
     
     // Initialize adjacency matrix to 0
-        while (i < size * size) {
+    while (i < size * size) {
         graph[i as usize] = 0;
         i = i + 1;
     }
@@ -94,8 +94,8 @@ fn initializeGraph(mut graph: [i32; 2500], size: i32) {
     i = 0;
     while (i < size) {
         let mut j: i32 = 0;
-            while (j < size) {
-                if (i != j && ((i + j) % 7 == 0 || (i * j) % 11 == 0) ) {
+        while (j < size) {
+            if ((i != j) && (((i + j) % 7 == 0) || ((i * j) % 11 == 0))) {
                 graph[(i * size + j) as usize] = 1 + (i + j) % 10; // Edge weight
                 graph[(j * size + i) as usize] = 1 + (i + j) % 10; // Make undirected
             }
@@ -106,19 +106,19 @@ fn initializeGraph(mut graph: [i32; 2500], size: i32) {
 }
 
 // Depth-First Search (recursive)
-fn depthFirstSearch(mut graph: [i32; 2500], size: i32, start: i32) -> i32 {
+fn depthFirstSearch(graph: &[i32; 2500], size: i32, start: i32) -> i32 {
     let mut visited: [bool; 50] = [false; 50];
-        return dfsRecursive(graph, size, start, visited);
+    return dfsRecursive(graph, size, start, &mut visited);
 }
 
-fn dfsRecursive(mut graph: [i32; 2500], size: i32, node: i32, mut visited: [bool; 50]) -> i32 {
+fn dfsRecursive(graph: &[i32; 2500], size: i32, node: i32, visited: &mut [bool; 50]) -> i32 {
     visited[node as usize] = true;
     let mut nodes_visited: i32 = 1;
     
     let mut neighbor: i32 = 0;
     while (neighbor < size) {
-            if (graph[(node * size + neighbor) as usize] > 0 && !visited[neighbor as usize]) {
-                nodes_visited = nodes_visited + dfsRecursive(graph, size, neighbor, visited);
+        if ((graph[(node * size + neighbor) as usize] > 0) && (!visited[neighbor as usize])) {
+            nodes_visited = nodes_visited + dfsRecursive(graph, size, neighbor, visited);
         }
         neighbor = neighbor + 1;
     }
@@ -127,7 +127,7 @@ fn dfsRecursive(mut graph: [i32; 2500], size: i32, node: i32, mut visited: [bool
 }
 
 // Breadth-First Search (iterative with queue simulation)
-fn breadthFirstSearch(mut graph: [i32; 2500], size: i32, start: i32) -> i32 {
+fn breadthFirstSearch(graph: &[i32; 2500], size: i32, start: i32) -> i32 {
     let mut visited: [bool; 50] = [false; 50];
     let mut queue: [i32; 50] = [-1; 50];
     let mut queue_front: i32 = 0;
@@ -147,7 +147,7 @@ fn breadthFirstSearch(mut graph: [i32; 2500], size: i32, start: i32) -> i32 {
         // Visit all unvisited neighbors
         let mut neighbor: i32 = 0;
         while (neighbor < size) {
-                if (graph[(current_node * size + neighbor) as usize] > 0 && (!visited[neighbor as usize])) {
+            if ((graph[(current_node * size + neighbor) as usize] > 0) && (!visited[neighbor as usize])) {
                 visited[neighbor as usize] = true;
                 queue[queue_rear as usize] = neighbor;
                 queue_rear = queue_rear + 1;
@@ -160,9 +160,9 @@ fn breadthFirstSearch(mut graph: [i32; 2500], size: i32, start: i32) -> i32 {
 }
 
 // Iterative Depth-First Search using stack
-fn iterativeDepthFirstSearch(mut graph: [i32; 2500], size: i32, start: i32) -> i32 {
+fn iterativeDepthFirstSearch(graph: &[i32; 2500], size: i32, start: i32) -> i32 {
     let mut visited: [bool; 50] = [false; 50];
-    let mut stack: [i32; 50] = [-1; 50];
+    let mut stack: [i32; 1250] = [-1; 1250]; // |G| ^ 2 / 2 theoretically
     let mut stack_top: i32 = 0;
     let mut nodes_visited: i32 = 0;
     
@@ -182,7 +182,7 @@ fn iterativeDepthFirstSearch(mut graph: [i32; 2500], size: i32, start: i32) -> i
             // Push all unvisited neighbors onto stack
             let mut neighbor: i32 = 0;
             while (neighbor < size) {
-                if (graph[(current_node * size + neighbor) as usize] > 0 && (!visited[neighbor as usize])) {
+                if ((graph[(current_node * size + neighbor) as usize] > 0) && (!visited[neighbor as usize])) {
                     stack[stack_top as usize] = neighbor;
                     stack_top = stack_top + 1;
                 }
@@ -195,7 +195,7 @@ fn iterativeDepthFirstSearch(mut graph: [i32; 2500], size: i32, start: i32) -> i
 }
 
 // Detect cycles in graph using DFS
-fn detectCycles(mut graph: [i32; 2500], size: i32) -> i32 {
+fn detectCycles(graph: &[i32; 2500], size: i32) -> i32 {
     let mut visited: [bool; 50] = [false; 50];
     let mut in_recursion_stack: [bool; 50] = [false; 50];
     let mut cycles_found: i32 = 0;
@@ -203,7 +203,7 @@ fn detectCycles(mut graph: [i32; 2500], size: i32) -> i32 {
     let mut i: i32 = 0;
     while (i < size) {
         if (!visited[i as usize]) {
-            if (dfsCycleDetection(graph, size, i, visited, in_recursion_stack)) {
+            if (dfsCycleDetection(graph, size, i, &mut visited, &mut in_recursion_stack)) {
                 cycles_found = cycles_found + 1;
             }
         }
@@ -213,21 +213,21 @@ fn detectCycles(mut graph: [i32; 2500], size: i32) -> i32 {
     return cycles_found;
 }
 
-fn dfsCycleDetection(mut graph: [i32; 2500], size: i32, node: i32, 
-                    mut visited: [bool; 50], mut in_recursion_stack: [bool; 50]) -> bool {
+fn dfsCycleDetection(graph: &[i32; 2500], size: i32, node: i32, 
+                    visited: &mut [bool; 50], in_recursion_stack: &mut [bool; 50]) -> bool {
     visited[node as usize] = true;
     in_recursion_stack[node as usize] = true;
     
     let mut neighbor: i32 = 0;
     while (neighbor < size) {
         if (graph[(node * size + neighbor) as usize] > 0) {
-                if (!visited[neighbor as usize]) {
-                    if (dfsCycleDetection(graph, size, neighbor, visited, in_recursion_stack)) {
-                        return true;
-                    }
-                } else if (in_recursion_stack[neighbor as usize]) {
+            if (!visited[neighbor as usize]) {
+                if (dfsCycleDetection(graph, size, neighbor, visited, in_recursion_stack)) {
                     return true;
                 }
+            } else if (in_recursion_stack[neighbor as usize]) {
+                return true;
+            }
         }
         neighbor = neighbor + 1;
     }
@@ -241,25 +241,25 @@ fn testShortestPathAlgorithms() {
     printlnInt(1703); // Start shortest path test
     
     let mut graph: [i32; 2500] = [0; 2500];
-    initializeWeightedGraph(graph, 50);
+    initializeWeightedGraph(&mut graph, 50);
     
     // Test Dijkstra's algorithm
-    let dijkstra_result: i32 = dijkstraShortestPath(graph, 50, 0);
+    let dijkstra_result: i32 = dijkstraShortestPath(&graph, 50, 0);
     printlnInt(dijkstra_result);
     
     // Test Floyd-Warshall algorithm (limited size)
-    let floyd_result: i32 = floydWarshallAllPairs(graph, 20);
+    let floyd_result: i32 = floydWarshallAllPairs(&graph, 20);
     printlnInt(floyd_result);
     
     // Test Bellman-Ford algorithm
-    let bellman_result: i32 = bellmanFordShortestPath(graph, 50, 0);
+    let bellman_result: i32 = bellmanFordShortestPath(&graph, 50, 0);
     printlnInt(bellman_result);
     
     printlnInt(1704); // End shortest path test
 }
 
 // Initialize weighted graph
-fn initializeWeightedGraph(mut graph: [i32; 2500], size: i32) {
+fn initializeWeightedGraph(graph: &mut [i32; 2500], size: i32) {
     let mut i: i32 = 0;
     
     // Initialize with infinity (represented by 9999)
@@ -280,7 +280,7 @@ fn initializeWeightedGraph(mut graph: [i32; 2500], size: i32) {
     while (i < size) {
         let mut j: i32 = 0;
         while (j < size) {
-            if (i != j && ((i + j) % 5 == 0 || (i * 2 + j) % 7 == 0)) {
+            if ((i != j) && (((i + j) % 5 == 0) || ((i * 2 + j) % 7 == 0))) {
                 let weight: i32 = 1 + ((i + j) % 15);
                 graph[(i * size + j) as usize] = weight;
             }
@@ -291,7 +291,7 @@ fn initializeWeightedGraph(mut graph: [i32; 2500], size: i32) {
 }
 
 // Dijkstra's shortest path algorithm
-fn dijkstraShortestPath(mut graph: [i32; 2500], size: i32, start: i32) -> i32 {
+fn dijkstraShortestPath(graph: &[i32; 2500], size: i32, start: i32) -> i32 {
     let mut distances: [i32; 50] = [9999; 50];
     let mut visited: [bool; 50] = [false; 50];
     let mut total_distance: i32 = 0;
@@ -306,7 +306,7 @@ fn dijkstraShortestPath(mut graph: [i32; 2500], size: i32, start: i32) -> i32 {
         let mut i: i32 = 0;
         
         while (i < size) {
-            if (!visited[i as usize] && distances[i as usize] < min_distance) {
+            if ((!visited[i as usize]) && (distances[i as usize] < min_distance)) {
                 min_distance = distances[i as usize];
                 min_node = i;
             }
@@ -323,7 +323,7 @@ fn dijkstraShortestPath(mut graph: [i32; 2500], size: i32, start: i32) -> i32 {
         // Update distances to neighbors
         i = 0;
         while (i < size) {
-            if (!visited[i as usize] && graph[(min_node * size + i) as usize] != 9999) {
+            if ((!visited[i as usize]) && (graph[(min_node * size + i) as usize] != 9999)) {
                 let new_distance: i32 = distances[min_node as usize] + graph[(min_node * size + i) as usize];
                 if (new_distance < distances[i as usize]) {
                     distances[i as usize] = new_distance;
@@ -339,13 +339,9 @@ fn dijkstraShortestPath(mut graph: [i32; 2500], size: i32, start: i32) -> i32 {
 }
 
 // Floyd-Warshall all-pairs shortest path
-fn floydWarshallAllPairs(mut graph: [i32; 2500], size: i32) -> i32 {
+fn floydWarshallAllPairs(graph: &[i32; 2500], size: i32) -> i32 {
     // Create distance matrix (limited to 20x20 for performance)
-    let actual_size: i32 = if (size > 20) {
-        20
-    } else {
-        size
-    };
+    let actual_size: i32 = if (size > 20) { 20 } else { size };
     
     let mut distances: [i32; 400] = [9999; 400];
     
@@ -367,8 +363,8 @@ fn floydWarshallAllPairs(mut graph: [i32; 2500], size: i32) -> i32 {
         while (i < actual_size) {
             let mut j: i32 = 0;
             while (j < actual_size) {
-                if (distances[(i * actual_size + k) as usize] != 9999 && 
-                   distances[(k * actual_size + j) as usize] != 9999) {
+                if ((distances[(i * actual_size + k) as usize] != 9999) && 
+                   (distances[(k * actual_size + j) as usize] != 9999)) {
                     let new_distance: i32 = distances[(i * actual_size + k) as usize] + distances[(k * actual_size + j) as usize];
                     if (new_distance < distances[(i * actual_size + j) as usize]) {
                         distances[(i * actual_size + j) as usize] = new_distance;
@@ -387,7 +383,7 @@ fn floydWarshallAllPairs(mut graph: [i32; 2500], size: i32) -> i32 {
     while (i < actual_size) {
         let mut j: i32 = 0;
         while (j < actual_size) {
-            if (i != j && distances[(i * actual_size + j) as usize] != 9999) {
+            if ((i != j) && (distances[(i * actual_size + j) as usize] != 9999)) {
                 total_distance = total_distance + distances[(i * actual_size + j) as usize];
             }
             j = j + 1;
@@ -399,10 +395,11 @@ fn floydWarshallAllPairs(mut graph: [i32; 2500], size: i32) -> i32 {
 }
 
 // Bellman-Ford shortest path algorithm
-fn bellmanFordShortestPath(mut graph: [i32; 2500], size: i32, start: i32) -> i32 {
+fn bellmanFordShortestPath(graph: &[i32; 2500], size: i32, start: i32) -> i32 {
     let mut distances: [i32; 50] = [9999; 50];
     distances[start as usize] = 0;
     
+    let mut negative_cycles: i32 = 0;
     // Relax edges size-1 times
     let mut iteration: i32 = 0;
     while (iteration < size - 1) {
@@ -410,7 +407,7 @@ fn bellmanFordShortestPath(mut graph: [i32; 2500], size: i32, start: i32) -> i32
         while (i < size) {
             let mut j: i32 = 0;
             while (j < size) {
-                if (graph[(i * size + j) as usize] != 9999 && distances[i as usize] != 9999) {
+                if ((graph[(i * size + j) as usize] != 9999) && (distances[i as usize] != 9999)) {
                     let new_distance: i32 = distances[i as usize] + graph[(i * size + j) as usize];
                     if (new_distance < distances[j as usize]) {
                         negative_cycles = negative_cycles + 1;
@@ -424,12 +421,11 @@ fn bellmanFordShortestPath(mut graph: [i32; 2500], size: i32, start: i32) -> i32
     }
     
     // Check for negative cycles (one more iteration)
-    let mut negative_cycles: i32 = 0;
     let mut i: i32 = 0;
     while (i < size) {
         let mut j: i32 = 0;
         while (j < size) {
-            if (graph[(i * size + j) as usize] != 9999 && distances[i as usize] != 9999) {
+            if ((graph[(i * size + j) as usize] != 9999) && (distances[i as usize] != 9999)) {
                 let new_distance: i32 = distances[i as usize] + graph[(i * size + j) as usize];
                 if (new_distance < distances[j as usize]) {
                     negative_cycles = negative_cycles + 1;
@@ -458,21 +454,21 @@ fn testMinimumSpanningTreeAlgorithms() {
     printlnInt(1705); // Start MST test
     
     let mut graph: [i32; 2500] = [0; 2500];
-    initializeWeightedGraph(graph, 50);
+    initializeWeightedGraph(&mut graph, 50);
     
     // Test Kruskal's algorithm
-    let kruskal_result: i32 = kruskalMST(graph, 50);
+    let kruskal_result: i32 = kruskalMST(&graph, 50);
     printlnInt(kruskal_result);
     
     // Test Prim's algorithm
-    let prim_result: i32 = primMST(graph, 50);
+    let prim_result: i32 = primMST(&graph, 50);
     printlnInt(prim_result);
     
     printlnInt(1706); // End MST test
 }
 
 // Kruskal's MST algorithm (simplified without Union-Find)
-fn kruskalMST(mut graph: [i32; 2500], size: i32) -> i32 {
+fn kruskalMST(graph: &[i32; 2500], size: i32) -> i32 {
     // Create edge list
     let mut edges: [i32; 1500] = [0; 1500]; // [weight, src, dest] triplets
     let mut edge_count: i32 = 0;
@@ -482,10 +478,10 @@ fn kruskalMST(mut graph: [i32; 2500], size: i32) -> i32 {
     while (i < size && edge_count < 500) {
         let mut j: i32 = i + 1;
         while (j < size && edge_count < 500) {
-            if (graph[(i * size + j) as usize] != 9999 && graph[(i * size + j) as usize] != 0) {
-                edges[edge_count as usize * 3] = graph[(i * size + j) as usize]; // weight
-                edges[edge_count as usize * 3 + 1] = i; // source
-                edges[edge_count as usize * 3 + 2] = j; // destination
+            if ((graph[(i * size + j) as usize] != 9999) && (graph[(i * size + j) as usize] != 0)) {
+                edges[(edge_count as usize) * 3] = graph[(i * size + j) as usize]; // weight
+                edges[(edge_count as usize) * 3 + 1] = i; // source
+                edges[(edge_count as usize) * 3 + 2] = j; // destination
                 edge_count = edge_count + 1;
             }
             j = j + 1;
@@ -494,7 +490,7 @@ fn kruskalMST(mut graph: [i32; 2500], size: i32) -> i32 {
     }
     
     // Sort edges by weight (simple bubble sort)
-    sortEdgesByWeight(edges, edge_count);
+    sortEdgesByWeight(&mut edges, edge_count);
     
     // Build MST using simple cycle detection
     let mut mst_weight: i32 = 0;
@@ -502,9 +498,9 @@ fn kruskalMST(mut graph: [i32; 2500], size: i32) -> i32 {
     let mut edge_index: i32 = 0;
     
     while (edge_index < edge_count && mst_edges < size - 1) {
-        let weight: i32 = edges[edge_index as usize * 3];
-        let src: i32 = edges[edge_index as usize * 3 + 1];
-        let dest: i32 = edges[edge_index as usize * 3 + 2];
+        let weight: i32 = edges[(edge_index as usize) * 3];
+        let src: i32 = edges[(edge_index as usize) * 3 + 1];
+        let dest: i32 = edges[(edge_index as usize) * 3 + 2];
         
         // Simple check: add edge if it doesn't create obvious cycles
         if (src != dest) {
@@ -519,24 +515,24 @@ fn kruskalMST(mut graph: [i32; 2500], size: i32) -> i32 {
 }
 
 // Sort edges by weight using bubble sort
-fn sortEdgesByWeight(mut edges: [i32; 1500], edge_count: i32) {
+fn sortEdgesByWeight(edges: &mut [i32; 1500], edge_count: i32) {
     let mut i: i32 = 0;
     while (i < edge_count - 1) {
         let mut j: i32 = 0;
         while (j < edge_count - i - 1) {
-            if (edges[j as usize * 3] > edges[(j as usize + 1) * 3]) {
+            if (edges[(j as usize) * 3] > edges[((j as usize) + 1) * 3]) {
                 // Swap edges
-                let temp_weight: i32 = edges[j as usize * 3];
-                let temp_src: i32 = edges[j as usize * 3 + 1];
-                let temp_dest: i32 = edges[j as usize * 3 + 2];
+                let temp_weight: i32 = edges[(j as usize) * 3];
+                let temp_src: i32 = edges[(j as usize) * 3 + 1];
+                let temp_dest: i32 = edges[(j as usize) * 3 + 2];
                 
-                edges[j as usize * 3] = edges[(j as usize + 1) * 3];
-                edges[j as usize * 3 + 1] = edges[(j as usize + 1) * 3 + 1];
-                edges[j as usize * 3 + 2] = edges[(j as usize + 1) * 3 + 2];
+                edges[(j as usize) * 3] = edges[((j as usize) + 1) * 3];
+                edges[(j as usize) * 3 + 1] = edges[((j as usize) + 1) * 3 + 1];
+                edges[(j as usize) * 3 + 2] = edges[((j as usize) + 1) * 3 + 2];
                 
-                edges[(j as usize + 1) * 3] = temp_weight;
-                edges[(j as usize + 1) * 3 + 1] = temp_src;
-                edges[(j as usize + 1) * 3 + 2] = temp_dest;
+                edges[((j as usize) + 1) * 3] = temp_weight;
+                edges[((j as usize) + 1) * 3 + 1] = temp_src;
+                edges[((j as usize) + 1) * 3 + 2] = temp_dest;
             }
             j = j + 1;
         }
@@ -545,7 +541,7 @@ fn sortEdgesByWeight(mut edges: [i32; 1500], edge_count: i32) {
 }
 
 // Prim's MST algorithm
-fn primMST(mut graph: [i32; 2500], size: i32) -> i32 {
+fn primMST(graph: &[i32; 2500], size: i32) -> i32 {
     let mut key: [i32; 50] = [9999; 50];
     let mut mst_set: [bool; 50] = [false; 50];
     let mut mst_weight: i32 = 0;
@@ -560,7 +556,7 @@ fn primMST(mut graph: [i32; 2500], size: i32) -> i32 {
         let mut v: i32 = 0;
         
         while (v < size) {
-            if (!mst_set[v as usize] && key[v as usize] < min_key) {
+            if ((!mst_set[v as usize]) && (key[v as usize] < min_key)) {
                 min_key = key[v as usize];
                 min_index = v;
             }
@@ -577,8 +573,8 @@ fn primMST(mut graph: [i32; 2500], size: i32) -> i32 {
         // Update key values of adjacent vertices
         v = 0;
         while (v < size) {
-                if (!mst_set[v as usize] && graph[(min_index * size + v) as usize] != 9999 &&
-                    graph[(min_index * size + v) as usize] != 0 && graph[(min_index * size + v) as usize] < key[v as usize]) {
+            if ((!mst_set[v as usize]) && (graph[(min_index * size + v) as usize] != 9999) &&
+                (graph[(min_index * size + v) as usize] != 0) && (graph[(min_index * size + v) as usize] < key[v as usize])) {
                 key[v as usize] = graph[(min_index * size + v) as usize];
             }
             v = v + 1;
@@ -595,21 +591,21 @@ fn testNetworkFlowAlgorithms() {
     printlnInt(1707); // Start network flow test
     
     let mut capacity: [i32; 900] = [0; 900]; // 30x30 capacity matrix
-    initializeFlowNetwork(capacity, 30);
+    initializeFlowNetwork(&mut capacity, 30);
     
     // Test Ford-Fulkerson max flow
-    let max_flow_result: i32 = fordFulkersonMaxFlow(capacity, 30, 0, 29);
+    let max_flow_result: i32 = fordFulkersonMaxFlow(&capacity, 30, 0, 29);
     printlnInt(max_flow_result);
     
     // Test min-cost max flow (simplified)
-    let min_cost_result: i32 = minCostMaxFlow(capacity, 30);
+    let min_cost_result: i32 = minCostMaxFlow(&capacity, 30);
     printlnInt(min_cost_result);
     
     printlnInt(1708); // End network flow test
 }
 
 // Initialize flow network
-fn initializeFlowNetwork(mut capacity: [i32; 900], size: i32) {
+fn initializeFlowNetwork(capacity: &mut [i32; 900], size: i32) {
     let mut i: i32 = 0;
     
     // Initialize all capacities to 0
@@ -639,7 +635,7 @@ fn initializeFlowNetwork(mut capacity: [i32; 900], size: i32) {
 }
 
 // Ford-Fulkerson max flow algorithm
-fn fordFulkersonMaxFlow(mut capacity: [i32; 900], size: i32, source: i32, sink: i32) -> i32 {
+fn fordFulkersonMaxFlow(capacity: &[i32; 900], size: i32, source: i32, sink: i32) -> i32 {
     let mut residual: [i32; 900] = [0; 900];
     let mut max_flow: i32 = 0;
     
@@ -654,7 +650,7 @@ fn fordFulkersonMaxFlow(mut capacity: [i32; 900], size: i32, source: i32, sink: 
     let mut iteration: i32 = 0;
     while (iteration < 100) { // Limit iterations
         let mut parent: [i32; 30] = [-1; 30];
-        let flow: i32 = bfsAugmentingPath(residual, size, source, sink, parent);
+        let flow: i32 = bfsAugmentingPath(&residual, size, source, sink, &mut parent);
         
         if (flow == 0) {
             break; // No more augmenting paths
@@ -678,7 +674,7 @@ fn fordFulkersonMaxFlow(mut capacity: [i32; 900], size: i32, source: i32, sink: 
 }
 
 // BFS to find augmenting path
-fn bfsAugmentingPath(residual: [i32; 900], size: i32, source: i32, sink: i32, mut parent: [i32; 30]) -> i32 {
+fn bfsAugmentingPath(residual: &[i32; 900], size: i32, source: i32, sink: i32, parent: &mut [i32; 30]) -> i32 {
     let mut visited: [bool; 30] = [false; 30];
     let mut queue: [i32; 30] = [-1; 30];
     let mut queue_front: i32 = 0;
@@ -695,7 +691,7 @@ fn bfsAugmentingPath(residual: [i32; 900], size: i32, source: i32, sink: i32, mu
         
         let mut v: i32 = 0;
         while (v < size) {
-                if (!visited[v as usize] && residual[(u * size + v) as usize] > 0) {
+            if ((!visited[v as usize]) && (residual[(u * size + v) as usize] > 0)) {
                 queue[queue_rear as usize] = v;
                 queue_rear = queue_rear + 1;
                 visited[v as usize] = true;
@@ -725,7 +721,7 @@ fn bfsAugmentingPath(residual: [i32; 900], size: i32, source: i32, sink: i32, mu
 }
 
 // Simplified min-cost max flow
-fn minCostMaxFlow(capacity: [i32; 900], size: i32) -> i32 {
+fn minCostMaxFlow(capacity: &[i32; 900], size: i32) -> i32 {
     let mut total_cost: i32 = 0;
     let mut total_flow: i32 = 0;
     
@@ -735,12 +731,7 @@ fn minCostMaxFlow(capacity: [i32; 900], size: i32) -> i32 {
         let mut j: i32 = 0;
         while (j < size) {
             if (capacity[(i * size + j) as usize] > 0) {
-                let distance: i32;
-                if (i > j) {
-                    distance = i - j;
-                } else {
-                    distance = j - i;
-                }
+                let distance: i32 = if (i > j) { i - j } else { j - i };
                 total_cost = total_cost + capacity[(i * size + j) as usize] * distance;
                 total_flow = total_flow + capacity[(i * size + j) as usize];
             }
@@ -757,36 +748,36 @@ fn testGraphConnectivityAlgorithms() {
     printlnInt(1709); // Start connectivity test
     
     let mut graph: [i32; 2500] = [0; 2500];
-    initializeGraph(graph, 50);
+    initializeGraph(&mut graph, 50);
     
     // Test connected components
-    let components_result: i32 = findConnectedComponents(graph, 50);
+    let components_result: i32 = findConnectedComponents(&graph, 50);
     printlnInt(components_result);
     
     // Test strongly connected components (for directed graph)
-    let scc_result: i32 = findStronglyConnectedComponents(graph, 50);
+    let scc_result: i32 = findStronglyConnectedComponents(&graph, 50);
     printlnInt(scc_result);
     
     // Test articulation points
-    let articulation_result: i32 = findArticulationPoints(graph, 50);
+    let articulation_result: i32 = findArticulationPoints(&mut graph, 50);
     printlnInt(articulation_result);
     
     // Test bridges
-    let bridges_result: i32 = findBridges(graph, 50);
+    let bridges_result: i32 = findBridges(&mut graph, 50);
     printlnInt(bridges_result);
     
     printlnInt(1710); // End connectivity test
 }
 
 // Find connected components using DFS
-fn findConnectedComponents(mut graph: [i32; 2500], size: i32) -> i32 {
+fn findConnectedComponents(graph: &[i32; 2500], size: i32) -> i32 {
     let mut visited: [bool; 50] = [false; 50];
     let mut components: i32 = 0;
     
     let mut i: i32 = 0;
     while (i < size) {
-            if (!visited[i as usize]) {
-            dfsComponentTraversal(graph, size, i, visited);
+        if (!visited[i as usize]) {
+            dfsComponentTraversal(graph, size, i, &mut visited);
             components = components + 1;
         }
         i = i + 1;
@@ -795,12 +786,12 @@ fn findConnectedComponents(mut graph: [i32; 2500], size: i32) -> i32 {
     return components;
 }
 
-fn dfsComponentTraversal(mut graph: [i32; 2500], size: i32, node: i32, mut visited: [bool; 50]) {
+fn dfsComponentTraversal(graph: &[i32; 2500], size: i32, node: i32, visited: &mut [bool; 50]) {
     visited[node as usize] = true;
     
     let mut neighbor: i32 = 0;
     while (neighbor < size) {
-        if (graph[(node * size + neighbor) as usize] > 0 && (!visited[neighbor as usize])) {
+        if ((graph[(node * size + neighbor) as usize] > 0) && (!visited[neighbor as usize])) {
             dfsComponentTraversal(graph, size, neighbor, visited);
         }
         neighbor = neighbor + 1;
@@ -808,7 +799,7 @@ fn dfsComponentTraversal(mut graph: [i32; 2500], size: i32, node: i32, mut visit
 }
 
 // Find strongly connected components using Kosaraju's algorithm
-fn findStronglyConnectedComponents(mut graph: [i32; 2500], size: i32) -> i32 {
+fn findStronglyConnectedComponents(graph: &[i32; 2500], size: i32) -> i32 {
     let mut visited: [bool; 50] = [false; 50];
     let mut finish_order: [i32; 50] = [0; 50];
     let mut finish_index: i32 = 0;
@@ -816,8 +807,8 @@ fn findStronglyConnectedComponents(mut graph: [i32; 2500], size: i32) -> i32 {
     // First DFS to get finish times
     let mut i: i32 = 0;
     while (i < size) {
-            if (!visited[i as usize]) {
-            dfsFinishTime(graph, size, i, visited, finish_order, &mut finish_index);
+        if (!visited[i as usize]) {
+            dfsFinishTime(graph, size, i, &mut visited, &mut finish_order, &mut finish_index);
         }
         i = i + 1;
     }
@@ -846,8 +837,8 @@ fn findStronglyConnectedComponents(mut graph: [i32; 2500], size: i32) -> i32 {
     i = finish_index - 1;
     while (i >= 0) {
         let node: i32 = finish_order[i as usize];
-            if (!visited[node as usize]) {
-            dfsComponentTraversal(transpose, size, node, visited);
+        if (!visited[node as usize]) {
+            dfsComponentTraversal(&transpose, size, node, &mut visited);
             scc_count = scc_count + 1;
         }
         i = i - 1;
@@ -856,13 +847,13 @@ fn findStronglyConnectedComponents(mut graph: [i32; 2500], size: i32) -> i32 {
     return scc_count;
 }
 
-fn dfsFinishTime(mut graph: [i32; 2500], size: i32, node: i32, mut visited: [bool; 50], 
-                mut finish_order: [i32; 50], finish_index: &mut i32) {
+fn dfsFinishTime(graph: &[i32; 2500], size: i32, node: i32, visited: &mut [bool; 50], 
+                finish_order: &mut [i32; 50], finish_index: &mut i32) {
     visited[node as usize] = true;
     
     let mut neighbor: i32 = 0;
     while (neighbor < size) {
-        if (graph[(node * size + neighbor) as usize] > 0 && (!visited[neighbor as usize])) {
+        if ((graph[(node * size + neighbor) as usize] > 0) && (!visited[neighbor as usize])) {
             dfsFinishTime(graph, size, neighbor, visited, finish_order, finish_index);
         }
         neighbor = neighbor + 1;
@@ -873,13 +864,13 @@ fn dfsFinishTime(mut graph: [i32; 2500], size: i32, node: i32, mut visited: [boo
 }
 
 // Find articulation points (simplified)
-fn findArticulationPoints(mut graph: [i32; 2500], size: i32) -> i32 {
+fn findArticulationPoints(graph: &mut [i32; 2500], size: i32) -> i32 {
     let mut articulation_points: i32 = 0;
     
     // For each vertex, temporarily remove it and check connectivity
     let mut vertex: i32 = 0;
     while (vertex < size) {
-        let original_components: i32 = findConnectedComponents(graph, size);
+        let original_components: i32 = findConnectedComponents(&*graph, size);
         
         // Temporarily remove vertex by setting its edges to 0
         let mut temp_edges: [i32; 50] = [0; 50];
@@ -891,7 +882,7 @@ fn findArticulationPoints(mut graph: [i32; 2500], size: i32) -> i32 {
             i = i + 1;
         }
         
-        let new_components: i32 = findConnectedComponents(graph, size);
+        let new_components: i32 = findConnectedComponents(&*graph, size);
         
         // Restore edges
         i = 0;
@@ -912,7 +903,7 @@ fn findArticulationPoints(mut graph: [i32; 2500], size: i32) -> i32 {
 }
 
 // Find bridges (simplified)
-fn findBridges(mut graph: [i32; 2500], size: i32) -> i32 {
+fn findBridges(graph: &mut [i32; 2500], size: i32) -> i32 {
     let mut bridges: i32 = 0;
     
     // For each edge, temporarily remove it and check connectivity
@@ -921,14 +912,14 @@ fn findBridges(mut graph: [i32; 2500], size: i32) -> i32 {
         let mut j: i32 = i + 1;
         while (j < size) {
             if (graph[(i * size + j) as usize] > 0) {
-                let original_components: i32 = findConnectedComponents(graph, size);
+                let original_components: i32 = findConnectedComponents(&*graph, size);
                 
                 // Temporarily remove edge
                 let temp_weight: i32 = graph[(i * size + j) as usize];
                 graph[(i * size + j) as usize] = 0;
                 graph[(j * size + i) as usize] = 0;
                 
-                let new_components: i32 = findConnectedComponents(graph, size);
+                let new_components: i32 = findConnectedComponents(&*graph, size);
                 
                 // Restore edge
                 graph[(i * size + j) as usize] = temp_weight;
