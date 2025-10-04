@@ -761,7 +761,7 @@ fn testRandomAccess() -> i32 {
     let mut index: i32 = 1;
     i = 0;
     while (i < 1000) {
-        index = (index.wrapping_mul(1664525).wrapping_add(1013904223)) % 2000;
+        index = (index * 6527 + 13904223) % 2000;
         if (index < 0) {
             index = -index;
         }

@@ -77,7 +77,7 @@ impl SortingAnalyzer {
     // Initialize data array with input
     fn initialize_data(&mut self, size: i32) {
         self.size = size;
-        let mut i = 0;
+        let mut i: i32 = 0;
         while (i < size) {
             self.data[i as usize] = getInt();
             i += 1;
@@ -94,7 +94,7 @@ impl SortingAnalyzer {
 
     // Copy data for independent sorting tests
     fn copy_to_temp(&mut self) {
-        let mut i = 0;
+        let mut i: i32 = 0;
         while (i < self.size) {
             self.temp_array[i as usize] = self.data[i as usize];
             i += 1;
@@ -104,7 +104,7 @@ impl SortingAnalyzer {
 
     // Restore data from temp array
     fn restore_from_temp(&mut self) {
-        let mut i = 0;
+        let mut i: i32 = 0;
         while (i < self.size) {
             self.data[i as usize] = self.temp_array[i as usize];
             i += 1;

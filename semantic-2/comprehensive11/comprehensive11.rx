@@ -17,12 +17,12 @@ Truth table computation optimization
 
 // Unified RNG: Park–Miller (a=16807, m=2147483647) using Schrage method to avoid overflow
 fn pm_rand_update(x: i32) -> i32 {
-    let a = 16807;
-    let m = 2147483647;
-    let q = 127773; // m / a
-    let r = 2836; // m % a
-    let mut k = x / q;
-    let mut new_x = a * (x - k * q) - r * k;
+    let a: i32 = 16807;
+    let m: i32 = 2147483647;
+    let q: i32 = 127773; // m / a
+    let r: i32 = 2836; // m % a
+    let mut k: i32 = x / q;
+    let mut new_x: i32 = a * (x - k * q) - r * k;
     if (new_x <= 0) {
         new_x += m;
     }

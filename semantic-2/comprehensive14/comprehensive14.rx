@@ -139,8 +139,8 @@ impl AVLTree {
     
     fn update_height(&mut self, node: i32) {
         if (node != -1) {
-            let left_height = self.get_height(self.nodes[node as usize].left);
-            let right_height = self.get_height(self.nodes[node as usize].right);
+            let left_height: i32 = self.get_height(self.nodes[node as usize].left);
+            let right_height: i32 = self.get_height(self.nodes[node as usize].right);
             self.nodes[node as usize].height = 1 + if (left_height > right_height) { left_height } else { right_height };
             self.nodes[node as usize].balance_factor = self.get_balance(node);
         }

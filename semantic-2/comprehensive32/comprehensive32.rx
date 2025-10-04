@@ -14,17 +14,17 @@ Function calls with multiple array-based arguments.
 Branch prediction in text analysis loops.
 */
 
-
-
 // Unified RNG: Park–Miller (a=16807, m=2147483647) using Schrage method to avoid overflow
 fn pm_rand_update(x: i32) -> i32 {
-    let a = 16807;
-    let m = 2147483647;
-    let q = 127773; // m / a
-    let r = 2836;   // m % a
-    let mut k = x / q;
-    let mut new_x = a * (x - k * q) - r * k;
-    if (new_x <= 0) { new_x += m; }
+    let a: i32 = 16807;
+    let m: i32 = 2147483647;
+    let q: i32 = 127773; // m / a
+    let r: i32 = 2836; // m % a
+    let mut k: i32 = x / q;
+    let mut new_x: i32 = a * (x - k * q) - r * k;
+    if (new_x <= 0) {
+        new_x += m;
+    }
     return new_x;
 }
 
@@ -45,15 +45,22 @@ fn main() {
 
     let mut pattern1: [i32; PATTERN_SIZE] = [0; PATTERN_SIZE];
     let pattern1_len: i32 = 3;
-    pattern1[0] = 65; pattern1[1] = 66; pattern1[2] = 67;
+    pattern1[0] = 65;
+    pattern1[1] = 66;
+    pattern1[2] = 67;
 
     let mut pattern2: [i32; PATTERN_SIZE] = [0; PATTERN_SIZE];
     let pattern2_len: i32 = 5;
-    pattern2[0] = 88; pattern2[1] = 89; pattern2[2] = 90; pattern2[3] = 88; pattern2[4] = 89;
+    pattern2[0] = 88;
+    pattern2[1] = 89;
+    pattern2[2] = 90;
+    pattern2[3] = 88;
+    pattern2[4] = 89;
 
     let mut pattern3: [i32; PATTERN_SIZE] = [0; PATTERN_SIZE];
     let pattern3_len: i32 = 2;
-    pattern3[0] = 100; pattern3[1] = 100;
+    pattern3[0] = 100;
+    pattern3[1] = 100;
 
     let mut count1: i32 = find_pattern(&text, &pattern1, pattern1_len);
     printlnInt(count1);
@@ -114,7 +121,12 @@ fn find_pattern(text: &[i32; TEXT_SIZE], pattern: &[i32; PATTERN_SIZE], p_len: i
     return count;
 }
 
-fn find_pattern_with_wildcard(text: &[i32; TEXT_SIZE], pattern: &[i32; PATTERN_SIZE], p_len: i32, wildcard: i32) -> i32 {
+fn find_pattern_with_wildcard(
+    text: &[i32; TEXT_SIZE],
+    pattern: &[i32; PATTERN_SIZE],
+    p_len: i32,
+    wildcard: i32,
+) -> i32 {
     let mut count: i32 = 0;
     let mut i: i32 = 0;
     while (i <= TEXT_SIZE as i32 - p_len) {
@@ -139,11 +151,14 @@ fn find_complex_pattern(text: &[i32; TEXT_SIZE]) -> i32 {
     let mut count: i32 = 0;
     let mut i: i32 = 0;
     while (i < TEXT_SIZE as i32 - 5) {
-        if (text[i as usize] == text[i as usize + 3] && text[i as usize+1] == text[i as usize+4] && text[i as usize] < text[i as usize+2]) {
+        if (text[i as usize] == text[i as usize + 3]
+            && text[i as usize + 1] == text[i as usize + 4]
+            && text[i as usize] < text[i as usize + 2])
+        {
             let mut sum: i32 = 0;
             let mut k: i32 = 0;
             while (k < 5) {
-                sum = sum + text[(i+k) as usize];
+                sum = sum + text[(i + k) as usize];
                 k = k + 1;
             }
             if (sum > 350) {
@@ -289,7 +304,7 @@ fn another_level_of_search(text: &[i32; TEXT_SIZE]) {
         let mut found: bool = true;
         let mut j: i32 = 0;
         while (j < PATTERN_SIZE as i32) {
-            if (text[(i+j) as usize] != pattern[j as usize]) {
+            if (text[(i + j) as usize] != pattern[j as usize]) {
                 found = false;
                 break;
             }

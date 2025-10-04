@@ -15,6 +15,6 @@ enum Color {
 }
 
 fn main() {
-    let c = Color::Blue(5);
+    let c: Color = Color::Blue(5);
     exit(0);
 }

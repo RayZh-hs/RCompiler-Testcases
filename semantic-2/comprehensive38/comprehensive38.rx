@@ -64,14 +64,16 @@ fn split_child(pools: &mut Pools, parent_idx: i32, child_idx_in_parent: i32, chi
 
     let mut j: i32 = 0;
     while (j < MIN_KEYS) {
-        pools.node_pool_keys[new_node_idx as usize][j as usize] = pools.node_pool_keys[child_idx as usize][(j + MIN_KEYS + 1) as usize];
+        pools.node_pool_keys[new_node_idx as usize][j as usize] =
+            pools.node_pool_keys[child_idx as usize][(j + MIN_KEYS + 1) as usize];
         j = j + 1;
     }
 
     if (!pools.node_pool_is_leaf[child_idx as usize]) {
         j = 0;
         while (j < MIN_KEYS + 1) {
-            pools.node_pool_children[new_node_idx as usize][j as usize] = pools.node_pool_children[child_idx as usize][(j + MIN_KEYS + 1) as usize];
+            pools.node_pool_children[new_node_idx as usize][j as usize] =
+                pools.node_pool_children[child_idx as usize][(j + MIN_KEYS + 1) as usize];
             j = j + 1;
         }
     }
@@ -80,19 +82,23 @@ fn split_child(pools: &mut Pools, parent_idx: i32, child_idx_in_parent: i32, chi
 
     j = pools.node_pool_num_keys[parent_idx as usize];
     while (j > child_idx_in_parent) {
-        pools.node_pool_children[parent_idx as usize][j as usize + 1] = pools.node_pool_children[parent_idx as usize][j as usize];
+        pools.node_pool_children[parent_idx as usize][j as usize + 1] =
+            pools.node_pool_children[parent_idx as usize][j as usize];
         j = j - 1;
     }
     pools.node_pool_children[parent_idx as usize][child_idx_in_parent as usize + 1] = new_node_idx;
 
     j = pools.node_pool_num_keys[parent_idx as usize] - 1;
     while (j >= child_idx_in_parent) {
-        pools.node_pool_keys[parent_idx as usize][j as usize + 1] = pools.node_pool_keys[parent_idx as usize][j as usize];
+        pools.node_pool_keys[parent_idx as usize][j as usize + 1] =
+            pools.node_pool_keys[parent_idx as usize][j as usize];
         j = j - 1;
     }
 
-    pools.node_pool_keys[parent_idx as usize][child_idx_in_parent as usize] = pools.node_pool_keys[child_idx as usize][MIN_KEYS as usize];
-    pools.node_pool_num_keys[parent_idx as usize] = pools.node_pool_num_keys[parent_idx as usize] + 1;
+    pools.node_pool_keys[parent_idx as usize][child_idx_in_parent as usize] =
+        pools.node_pool_keys[child_idx as usize][MIN_KEYS as usize];
+    pools.node_pool_num_keys[parent_idx as usize] =
+        pools.node_pool_num_keys[parent_idx as usize] + 1;
 }
 
 fn insert_non_full(pools: &mut Pools, node_idx: i32, key: i32) {
@@ -106,11 +112,13 @@ fn insert_non_full(pools: &mut Pools, node_idx: i32, key: i32) {
             if (pools.node_pool_keys[node_idx as usize][i as usize] <= key) {
                 break;
             }
-            pools.node_pool_keys[node_idx as usize][i as usize + 1] = pools.node_pool_keys[node_idx as usize][i as usize];
+            pools.node_pool_keys[node_idx as usize][i as usize + 1] =
+                pools.node_pool_keys[node_idx as usize][i as usize];
             i = i - 1;
         }
         pools.node_pool_keys[node_idx as usize][(i + 1) as usize] = key;
-        pools.node_pool_num_keys[node_idx as usize] = pools.node_pool_num_keys[node_idx as usize] + 1;
+        pools.node_pool_num_keys[node_idx as usize] =
+            pools.node_pool_num_keys[node_idx as usize] + 1;
     } else {
         while (i >= 0) {
             if (pools.node_pool_keys[node_idx as usize][i as usize] <= key) {
@@ -120,13 +128,19 @@ fn insert_non_full(pools: &mut Pools, node_idx: i32, key: i32) {
         }
         i = i + 1;
         let child_to_insert_idx: i32 = pools.node_pool_children[node_idx as usize][i as usize];
-        if (child_to_insert_idx >= 0 && pools.node_pool_num_keys[child_to_insert_idx as usize] == MAX_KEYS) {
+        if (child_to_insert_idx >= 0
+            && pools.node_pool_num_keys[child_to_insert_idx as usize] == MAX_KEYS)
+        {
             split_child(pools, node_idx, i, child_to_insert_idx);
             if (key > pools.node_pool_keys[node_idx as usize][i as usize]) {
                 i = i + 1;
             }
         }
-        insert_non_full(pools, pools.node_pool_children[node_idx as usize][i as usize], key);
+        insert_non_full(
+            pools,
+            pools.node_pool_children[node_idx as usize][i as usize],
+            key,
+        );
     }
 }
 
@@ -183,13 +197,21 @@ fn traverse_and_sum(pools: &Pools, node_idx: i32) -> i32 {
 
     while (i < pools.node_pool_num_keys[node_idx as usize]) {
         if (!is_leaf) {
-            sum = sum + traverse_and_sum(pools, pools.node_pool_children[node_idx as usize][i as usize]);
+            sum = sum
+                + traverse_and_sum(
+                    pools,
+                    pools.node_pool_children[node_idx as usize][i as usize],
+                );
         }
         sum = sum + pools.node_pool_keys[node_idx as usize][i as usize];
         i = i + 1;
     }
     if (!is_leaf) {
-        sum = sum + traverse_and_sum(pools, pools.node_pool_children[node_idx as usize][i as usize]);
+        sum = sum
+            + traverse_and_sum(
+                pools,
+                pools.node_pool_children[node_idx as usize][i as usize],
+            );
     }
     return sum;
 }
@@ -205,7 +227,7 @@ fn get_height(pools: &Pools, node_idx: i32) -> i32 {
 }
 
 fn main() {
-    let mut pools = Pools {
+    let mut pools: Pools = Pools {
         node_pool_keys: [[0; 5]; POOL_SIZE],
         node_pool_children: [[-1; 6]; POOL_SIZE],
         node_pool_is_leaf: [false; POOL_SIZE],

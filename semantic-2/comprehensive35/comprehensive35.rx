@@ -14,17 +14,17 @@ Correct handling of variable lifetimes across complex scopes.
 Function calls within deeply nested loops.
 */
 
-
-
 // Unified RNG: Park–Miller (a=16807, m=2147483647) using Schrage method to avoid overflow
 fn pm_rand_update(x: i32) -> i32 {
-    let a = 16807;
-    let m = 2147483647;
-    let q = 127773; // m / a
-    let r = 2836;   // m % a
-    let mut k = x / q;
-    let mut new_x = a * (x - k * q) - r * k;
-    if (new_x <= 0) { new_x += m; }
+    let a: i32 = 16807;
+    let m: i32 = 2147483647;
+    let q: i32 = 127773; // m / a
+    let r: i32 = 2836; // m % a
+    let k: i32 = x / q;
+    let mut new_x: i32 = a * (x - k * q) - r * k;
+    if (new_x <= 0) {
+        new_x += m;
+    }
     return new_x;
 }
 
@@ -36,48 +36,54 @@ fn pm_rand_update(x: i32) -> i32 {
 // - Correct handling of variable lifetimes across complex scopes.
 // - Function calls within deeply nested loops.
 
-const MAZE_SIZE: i32 = 20;
+const MAZE_SIZE: usize = 20;
 const MAX_STEPS: i32 = 1000;
 
 fn main() {
-    let mut maze: [[i32; MAZE_SIZE as usize]; MAZE_SIZE as usize] = [[0; MAZE_SIZE as usize]; MAZE_SIZE as usize];
+    let mut maze: [[i32; MAZE_SIZE]; MAZE_SIZE] = [[0; MAZE_SIZE]; MAZE_SIZE];
     generate_maze(&mut maze, 54321);
 
-    let mut start_x: i32 = 1;
-    let mut start_y: i32 = 1;
-    maze[start_y as usize][start_x as usize] = 0;
+    let start_x: usize = 1;
+    let start_y: usize = 1;
+    maze[start_y][start_x] = 0;
 
-    let mut end_x: i32 = MAZE_SIZE - 2;
-    let mut end_y: i32 = MAZE_SIZE - 2;
-    maze[end_y as usize][end_x as usize] = 0;
+    let end_x: usize = MAZE_SIZE - 2;
+    let end_y: usize = MAZE_SIZE - 2;
+    maze[end_y][end_x] = 0;
 
-    let mut path_len: i32 = solve_maze(&mut maze, start_x, start_y, end_x, end_y);
+    let path_len: i32 = solve_maze(
+        &mut maze,
+        start_x as i32,
+        start_y as i32,
+        end_x as i32,
+        end_y as i32,
+    );
     printlnInt(path_len);
 
-    let mut puzzle_result: i32 = solve_logic_puzzle();
+    let puzzle_result: i32 = solve_logic_puzzle();
     printlnInt(puzzle_result);
 
-    let mut error_val: i32 = run_control_flow_puzzle();
+    let error_val: i32 = run_control_flow_puzzle();
     printlnInt(error_val);
 
     printlnInt(9999);
     exit(0);
 }
 
-fn generate_maze(maze: &mut [[i32; MAZE_SIZE as usize]; MAZE_SIZE as usize], seed: i32) {
+fn generate_maze(maze: &mut [[i32; MAZE_SIZE]; MAZE_SIZE], seed: i32) {
     let mut current_seed: i32 = seed;
-    let mut i: i32 = 0;
+    let mut i: usize = 0;
     while (i < MAZE_SIZE) {
-        let mut j: i32 = 0;
+        let mut j: usize = 0;
         while (j < MAZE_SIZE) {
             if (i == 0 || j == 0 || i == MAZE_SIZE - 1 || j == MAZE_SIZE - 1) {
-                maze[i as usize][j as usize] = 1;
+                maze[i][j] = 1;
             } else {
                 current_seed = (pm_rand_update(current_seed) / 65536) % 32768;
                 if (current_seed % 4 == 0) {
-                    maze[i as usize][j as usize] = 1;
+                    maze[i][j] = 1;
                 } else {
-                    maze[i as usize][j as usize] = 0;
+                    maze[i][j] = 0;
                 }
             }
             j = j + 1;
@@ -86,7 +92,13 @@ fn generate_maze(maze: &mut [[i32; MAZE_SIZE as usize]; MAZE_SIZE as usize], see
     }
 }
 
-fn solve_maze(maze: &mut [[i32; MAZE_SIZE as usize]; MAZE_SIZE as usize], start_x: i32, start_y: i32, end_x: i32, end_y: i32) -> i32 {
+fn solve_maze(
+    maze: &mut [[i32; MAZE_SIZE]; MAZE_SIZE],
+    start_x: i32,
+    start_y: i32,
+    end_x: i32,
+    end_y: i32,
+) -> i32 {
     let mut x: i32 = start_x;
     let mut y: i32 = start_y;
     let mut steps: i32 = 0;
@@ -104,10 +116,15 @@ fn solve_maze(maze: &mut [[i32; MAZE_SIZE as usize]; MAZE_SIZE as usize], start_
             let mut next_x: i32 = x;
             let mut next_y: i32 = y;
 
-            if (next_dir == 0) { next_y = next_y - 1; }
-            else if (next_dir == 1) { next_x = next_x + 1; }
-            else if (next_dir == 2) { next_y = next_y + 1; }
-            else { next_x = next_x - 1; }
+            if (next_dir == 0) {
+                next_y = next_y - 1;
+            } else if (next_dir == 1) {
+                next_x = next_x + 1;
+            } else if (next_dir == 2) {
+                next_y = next_y + 1;
+            } else {
+                next_x = next_x - 1;
+            }
 
             if (maze[next_y as usize][next_x as usize] == 0) {
                 x = next_x;
@@ -142,7 +159,17 @@ fn solve_logic_puzzle() -> i32 {
         d = (i / 125 % 5) + 1;
         e = (i / 625 % 5) + 1;
 
-        if (a == b || a == c || a == d || a == e || b == c || b == d || b == e || c == d || c == e || d == e) {
+        if (a == b
+            || a == c
+            || a == d
+            || a == e
+            || b == c
+            || b == d
+            || b == e
+            || c == d
+            || c == e
+            || d == e)
+        {
             i = i + 1;
             continue;
         }
@@ -153,11 +180,26 @@ fn solve_logic_puzzle() -> i32 {
         let mut cond4: bool = (d != 1);
         let mut cond5: bool = (e == 4);
 
-        if (a == 3) != (cond1) { i = i + 1; continue; }
-        if (b == 2) != (cond2) { i = i + 1; continue; }
-        if (c == 4) != (cond3) { i = i + 1; continue; }
-        if (d == 1) != (cond4) { i = i + 1; continue; }
-        if (e == 3) != (cond5) { i = i + 1; continue; }
+        if (a == 3) != (cond1) {
+            i = i + 1;
+            continue;
+        }
+        if (b == 2) != (cond2) {
+            i = i + 1;
+            continue;
+        }
+        if (c == 4) != (cond3) {
+            i = i + 1;
+            continue;
+        }
+        if (d == 1) != (cond4) {
+            i = i + 1;
+            continue;
+        }
+        if (e == 3) != (cond5) {
+            i = i + 1;
+            continue;
+        }
 
         return a * 10000 + b * 1000 + c * 100 + d * 10 + e;
         i = i + 1;

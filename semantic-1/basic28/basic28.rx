@@ -13,8 +13,8 @@ fn encrypt(input: &[char; 16], output: &mut [i32; 16], shift: i32) {
         let c: char = input[i];
         let base: char = if (c >= 'a' && c <= 'z') { 'a' } else if (c >= 'A' && c <= 'Z') { 'A' } else { '\0' };
         if (base != '\0') {
-            let offset = c as i32 - base as i32;
-            let new_offset = (offset + shift) % 26;
+            let offset: i32 = c as i32 - base as i32;
+            let new_offset: i32 = (offset + shift) % 26;
             output[i] = base as i32 + new_offset;
         } else {
             output[i] = c as i32;

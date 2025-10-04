@@ -235,7 +235,7 @@ fn simulate_cache_fill(address: i32, l1_cache: &mut [i32; 256], l2_cache: &mut [
     let l1_tag: i32 = address / (get_cache_line_size() * 16);
 
     // Find LRU way in L1
-    let lru_way: i32 = find_lru_way_l1(&l1_cache, l1_index);
+    let lru_way: i32 = find_lru_way_l1(l1_cache, l1_index);
     let cache_entry_base: i32 = (l1_index * get_associativity() + lru_way) * 4;
 
     l1_cache[cache_entry_base as usize] = l1_tag;
@@ -247,7 +247,7 @@ fn simulate_cache_fill(address: i32, l1_cache: &mut [i32; 256], l2_cache: &mut [
     let l2_index: i32 = (address / get_cache_line_size()) % 64;
     let l2_tag: i32 = address / (get_cache_line_size() * 64);
 
-    let l2_lru_way: i32 = find_lru_way_l2(&l2_cache, l2_index);
+    let l2_lru_way: i32 = find_lru_way_l2(l2_cache, l2_index);
     let l2_entry_base: i32 = (l2_index * 8 + l2_lru_way) * 4;
 
     l2_cache[l2_entry_base as usize] = l2_tag;

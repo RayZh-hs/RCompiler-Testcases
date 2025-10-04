@@ -165,7 +165,7 @@ impl StringProcessor {
         // Count character frequencies and basic statistics
         i = 0;
         while (i < self.text_length) {
-            let ch = self.text[i as usize];
+            let ch: i32 = self.text[i as usize];
             if (ch >= 0 && ch < 256) {
                 self.char_frequency[ch as usize] += 1;
             }
@@ -223,7 +223,7 @@ impl StringProcessor {
                     self.suffix_array[(i + 1) as usize],
                 ) > 0)
                 {
-                    let temp = self.suffix_array[i as usize];
+                    let temp: i32 = self.suffix_array[i as usize];
                     self.suffix_array[i as usize] = self.suffix_array[(i + 1) as usize];
                     self.suffix_array[(i + 1) as usize] = temp;
                     sorted = false;
@@ -274,7 +274,7 @@ impl StringProcessor {
                 continue;
             }
 
-            let j = self.suffix_array[(self.rank_array[i as usize] + 1) as usize];
+            let j: i32 = self.suffix_array[(self.rank_array[i as usize] + 1) as usize];
 
             while (i + k < self.text_length
                 && j + k < self.text_length
@@ -333,7 +333,7 @@ impl StringProcessor {
         // Fill bad character array
         i = 0;
         while (i < pattern_len) {
-            let ch = self.patterns[pattern_index as usize][i as usize];
+            let ch: i32 = self.patterns[pattern_index as usize][i as usize];
             if (ch >= 0 && ch < 256) {
                 self.bad_char[ch as usize] = i;
             }
@@ -379,10 +379,10 @@ impl StringProcessor {
 
         let mut i: i32 = 1;
         while (i < self.text_length) {
-            self.text_hash[i as usize] = (self.text_hash[(i - 1) as usize] % self.mod_value
-                * self.base % self.mod_value
-                + self.text[i as usize] % self.mod_value)
-                % self.mod_value;
+            self.text_hash[i as usize] =
+                (self.text_hash[(i - 1) as usize] % self.mod_value * self.base % self.mod_value
+                    + self.text[i as usize] % self.mod_value)
+                    % self.mod_value;
             i += 1;
         }
     }
@@ -569,7 +569,7 @@ impl StringProcessor {
             i += 1;
         }
 
-        let mut j = 0;
+        let mut j: i32 = 0;
         while (j <= str2_len) {
             self.dp_matrix[0][j as usize] = j;
             j += 1;

@@ -1194,8 +1194,8 @@ fn testMemoryCorruption() {
 
     // Allocate several blocks
     let block1: i32 = allocateBlock200(&mut test_memory, 0, 20);
-    let _block2: i32 = allocateBlock200(&mut test_memory, 0, 24);
-    let _block3: i32 = allocateBlock200(&mut test_memory, 0, 16);
+    let block2: i32 = allocateBlock200(&mut test_memory, 0, 24);
+    let block3: i32 = allocateBlock200(&mut test_memory, 0, 16);
 
     // Simulate corruption by writing past block boundary
     if block1 >= 0 && block1 + 30 < 200 {

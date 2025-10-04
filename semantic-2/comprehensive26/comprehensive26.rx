@@ -1227,7 +1227,7 @@ fn performHashTableTest(initial_size: i32) {
             i = 0;
             while (i < old_size) {
                 if (old_keys[i as usize] != -1) {
-                    let _ = insertLinearProbing(
+                    insertLinearProbing(
                         &mut hash_table,
                         &mut hash_values,
                         hash_table_size,
