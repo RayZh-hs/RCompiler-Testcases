@@ -632,7 +632,7 @@ impl StringProcessor {
                 }
 
                 total_entropy += frequency * log_approx;
-                self.code_lengths[i as usize] = if log_approx > 0 { log_approx } else { 1 };
+                self.code_lengths[i as usize] = if (log_approx > 0) { log_approx } else { 1 };
             }
             i += 1;
         }

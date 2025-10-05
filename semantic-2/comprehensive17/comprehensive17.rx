@@ -776,7 +776,7 @@ fn sparseMatrixAddition(
             result_values[result_count as usize] = values1[i1 as usize];
             result_count = result_count + 1;
             i1 = i1 + 1;
-        } else if pos1 > pos2 {
+        } else if (pos1 > pos2) {
             result_rows[result_count as usize] = rows2[i2 as usize];
             result_cols[result_count as usize] = cols2[i2 as usize];
             result_values[result_count as usize] = values2[i2 as usize];

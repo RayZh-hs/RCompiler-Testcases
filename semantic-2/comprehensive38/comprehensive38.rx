@@ -294,12 +294,12 @@ fn main() {
     printlnInt(new_height);
 
     let mut final_check: i32 = 0;
-    if search_recursive(&pools, pools.root_node_idx, 503) {
+    if (search_recursive(&pools, pools.root_node_idx, 503)) {
         final_check = 1;
     }
     printlnInt(final_check);
 
-    if !search_recursive(&pools, pools.root_node_idx, 999) {
+    if (!search_recursive(&pools, pools.root_node_idx, 999)) {
         final_check = 2;
     }
     printlnInt(final_check);

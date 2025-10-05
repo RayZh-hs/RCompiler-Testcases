@@ -244,7 +244,7 @@ fn hash_table_insert(table: &mut HashTable, key: i32, value: i32) -> bool {
     // Check if key already exists
     let mut current: i32 = table.buckets[bucket_index as usize];
     while (current != NULL_INDEX) {
-        if table.entries[current as usize].key == key {
+        if (table.entries[current as usize].key == key) {
             table.entries[current as usize].value = value; // Update existing
             return true;
         }
@@ -278,7 +278,7 @@ fn hash_table_search(table: &HashTable, key: i32) -> i32 {
     let mut current: i32 = table.buckets[bucket_index as usize];
 
     while (current != NULL_INDEX) {
-        if table.entries[current as usize].key == key {
+        if (table.entries[current as usize].key == key) {
             return table.entries[current as usize].value;
         }
         current = table.entries[current as usize].next;
@@ -294,7 +294,7 @@ fn hash_table_delete(table: &mut HashTable, key: i32) -> bool {
     let mut prev: i32 = NULL_INDEX;
 
     while (current != NULL_INDEX) {
-        if table.entries[current as usize].key == key {
+        if (table.entries[current as usize].key == key) {
             // Remove from chain
             if (prev == NULL_INDEX) {
                 table.buckets[bucket_index as usize] = table.entries[current as usize].next;
@@ -354,7 +354,7 @@ fn list_search(manager: &LinkedListManager, pool: &MemoryPool, list_id: i32, dat
 
     let mut current: i32 = manager.heads[list_id as usize];
     while (current != NULL_INDEX) {
-        if pool.nodes[current as usize].data == data {
+        if (pool.nodes[current as usize].data == data) {
             return true;
         }
         current = pool.nodes[current as usize].next;
@@ -378,7 +378,7 @@ fn list_delete(
     let mut prev: i32 = NULL_INDEX;
 
     while (current != NULL_INDEX) {
-        if pool.nodes[current as usize].data == data {
+        if (pool.nodes[current as usize].data == data) {
             if (prev == NULL_INDEX) {
                 manager.heads[list_id as usize] = pool.nodes[current as usize].next;
             } else {
@@ -460,7 +460,7 @@ fn list_merge_sorted(
     }
 
     // Append remaining nodes
-    let remaining: i32 = if ptr1 != NULL_INDEX { ptr1 } else { ptr2 };
+    let remaining: i32 = if (ptr1 != NULL_INDEX) { ptr1 } else { ptr2 };
     if (remaining != NULL_INDEX) {
         if (result_tail != NULL_INDEX) {
             pool.nodes[result_tail as usize].next = remaining;

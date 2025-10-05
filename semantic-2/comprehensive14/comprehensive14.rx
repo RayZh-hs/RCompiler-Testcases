@@ -288,13 +288,13 @@ impl AVLTree {
         if (key < self.nodes[root as usize].key) {
             let new_left: i32 = self.delete_node(self.nodes[root as usize].left, key);
             self.nodes[root as usize].left = new_left;
-            if new_left != -1 {
+            if (new_left != -1) {
                 self.nodes[new_left as usize].parent = root;
             }
         } else if (key > self.nodes[root as usize].key) {
             let new_right: i32 = self.delete_node(self.nodes[root as usize].right, key);
             self.nodes[root as usize].right = new_right;
-            if new_right != -1 {
+            if (new_right != -1) {
                 self.nodes[new_right as usize].parent = root;
             }
         } else {
@@ -325,7 +325,7 @@ impl AVLTree {
             
             let new_right: i32 = self.delete_node(self.nodes[root as usize].right, self.nodes[temp as usize].key);
             self.nodes[root as usize].right = new_right;
-            if new_right != -1 {
+            if (new_right != -1) {
                 self.nodes[new_right as usize].parent = root;
             }
         }
@@ -343,7 +343,7 @@ impl AVLTree {
         if (balance > 1 && self.get_balance(self.nodes[root as usize].left) < 0) {
             let new_left: i32 = self.left_rotate(self.nodes[root as usize].left);
             self.nodes[root as usize].left = new_left;
-            if new_left != -1 {
+            if (new_left != -1) {
                 self.nodes[new_left as usize].parent = root;
             }
             return self.right_rotate(root);
@@ -358,7 +358,7 @@ impl AVLTree {
         if (balance < -1 && self.get_balance(self.nodes[root as usize].right) > 0) {
             let new_right: i32 = self.right_rotate(self.nodes[root as usize].right);
             self.nodes[root as usize].right = new_right;
-            if new_right != -1 {
+            if (new_right != -1) {
                 self.nodes[new_right as usize].parent = root;
             }
             return self.left_rotate(root);
@@ -368,7 +368,7 @@ impl AVLTree {
     }
     
     fn inorder_traversal(&self, root: i32, result: &mut [i32; 1000], index: &mut i32) {
-        if root != -1 && *index < 1000 {
+        if (root != -1 && *index < 1000) {
             self.inorder_traversal(self.nodes[root as usize].left, result, index);
             result[*index as usize] = self.nodes[root as usize].value;
             *index += 1;
@@ -411,7 +411,7 @@ impl HashTable {
     
     fn hash_function(&self, key: i32) -> i32 {
         let hash_value: i32 = ((self.hash_a * key + self.hash_b) % self.hash_p) % self.capacity;
-        if hash_value < 0 {
+        if (hash_value < 0) {
             return hash_value + self.capacity;
         }
         return hash_value;
@@ -431,18 +431,18 @@ impl HashTable {
         }
         
         // Add new key-value pair
-        if self.bucket_sizes[index as usize] < 20 {
+        if (self.bucket_sizes[index as usize] < 20) {
             self.keys[index as usize][self.bucket_sizes[index as usize] as usize] = key;
             self.buckets[index as usize][self.bucket_sizes[index as usize] as usize] = value;
             self.bucket_sizes[index as usize] += 1;
             self.size += 1;
             
-            if self.bucket_sizes[index as usize] > 1 {
+            if (self.bucket_sizes[index as usize] > 1) {
                 self.collision_count += 1;
             }
             
             // Check if resize is needed
-            if self.size > self.capacity * 3 / 4 {
+            if (self.size > self.capacity * 3 / 4) {
                 self.resize();
             }
         }
@@ -486,7 +486,7 @@ impl HashTable {
     }
     
     fn resize(&mut self) {
-        if self.capacity >= 900 {
+        if (self.capacity >= 900) {
             return; // Prevent overflow
         }
         
@@ -498,7 +498,7 @@ impl HashTable {
         
         // Initialize new larger table
         self.capacity = self.capacity * 2;
-        if self.capacity > 1000 {
+        if (self.capacity > 1000) {
             self.capacity = 1000;
         }
         
@@ -561,13 +561,13 @@ impl LRUCache {
     fn get(&mut self, key: i32) -> i32 {
         self.access_count += 1;
         
-        if key < 0 || key >= 10000 {
+        if (key < 0 || key >= 10000) {
             self.miss_count += 1;
             return -1;
         }
         
         let index: i32 = self.key_to_index[key as usize];
-        if index == -1 {
+        if (index == -1) {
             self.miss_count += 1;
             return -1;
         }
@@ -579,19 +579,19 @@ impl LRUCache {
     }
     
     fn put(&mut self, key: i32, value: i32) {
-        if key < 0 || key >= 10000 {
+        if (key < 0 || key >= 10000) {
             return;
         }
         
         let existing_index: i32 = self.key_to_index[key as usize];
-        if existing_index != -1 {
+        if (existing_index != -1) {
             // Update existing entry
             self.cache_data[existing_index as usize] = value;
             self.update_usage_order(existing_index);
             return;
         }
         
-        if self.size < self.capacity {
+        if (self.size < self.capacity) {
             // Add new entry
             let new_index: i32 = self.size;
             self.cache_keys[new_index as usize] = key;
@@ -615,7 +615,7 @@ impl LRUCache {
             
             // Remove old mapping and add new entry
             let old_key: i32 = self.cache_keys[lru_index as usize];
-            if old_key >= 0 && old_key < 10000 {
+            if (old_key >= 0 && old_key < 10000) {
                 self.key_to_index[old_key as usize] = -1;
             }
             
@@ -670,7 +670,7 @@ impl MemoryManager {
     }
     
     fn allocate(&mut self, size: i32) -> i32 {
-        if size <= 0 || size > self.free_memory {
+        if (size <= 0 || size > self.free_memory) {
             return -1;
         }
         
@@ -683,7 +683,7 @@ impl MemoryManager {
                 self.memory_blocks[i as usize] = i; // Block ID
                 
                 // Split block if necessary
-                if self.block_sizes[i as usize] > size {
+                if (self.block_sizes[i as usize] > size) {
                     let remaining_size: i32 = self.block_sizes[i as usize] - size;
                     self.block_sizes[i as usize] = size;
                     
@@ -712,7 +712,7 @@ impl MemoryManager {
     }
     
     fn deallocate(&mut self, block_id: i32) -> bool {
-        if block_id < 0 || block_id >= 10000 || !self.block_status[block_id as usize] {
+        if (block_id < 0 || block_id >= 10000 || !self.block_status[block_id as usize]) {
             return false;
         }
         
@@ -749,14 +749,14 @@ impl MemoryManager {
         while (i < 10000) {
             if (!self.block_status[i as usize] && self.block_sizes[i as usize] > 0) {
                 free_block_count += 1;
-                if self.block_sizes[i as usize] > largest_free_block {
+                if (self.block_sizes[i as usize] > largest_free_block) {
                     largest_free_block = self.block_sizes[i as usize];
                 }
             }
             i += 1;
         }
         
-        if self.free_memory > 0 {
+        if (self.free_memory > 0) {
             self.fragmentation_score = 100 - (largest_free_block * 100) / self.free_memory;
         } else {
             self.fragmentation_score = 0;
@@ -788,13 +788,13 @@ fn main() {
         let key: i32 = getInt();
         let value: i32 = getInt();
         
-        if operation == 1 {
+        if (operation == 1) {
             avl_tree.root = avl_tree.insert(avl_tree.root, key, value);
-        } else if operation == 2 {
+        } else if (operation == 2) {
             avl_tree.root = avl_tree.delete_node(avl_tree.root, key);
-        } else if operation == 3 {
+        } else if (operation == 3) {
             let result: i32 = avl_tree.search(avl_tree.root, key);
-            if result != -1 {
+            if (result != -1) {
                 printlnInt(avl_tree.nodes[result as usize].value);
             } else {
                 printlnInt(-1);
@@ -814,15 +814,15 @@ fn main() {
         let operation: i32 = getInt();
         let key: i32 = getInt();
         
-        if operation == 1 {
+        if (operation == 1) {
             let value: i32 = getInt();
             hash_table.insert(key, value);
-        } else if operation == 2 {
+        } else if (operation == 2) {
             let result: i32 = hash_table.search(key);
             printlnInt(result);
-        } else if operation == 3 {
+        } else if (operation == 3) {
             let deleted: bool = hash_table.delete(key);
-            printlnInt(if deleted { 1 } else { 0 });
+            printlnInt(if (deleted) { 1 } else { 0 });
         }
         i += 1;
     }
@@ -838,10 +838,10 @@ fn main() {
         let operation: i32 = getInt();
         let key: i32 = getInt();
         
-        if operation == 1 {
+        if (operation == 1) {
             let value: i32 = getInt();
             lru_cache.put(key, value);
-        } else if operation == 2 {
+        } else if (operation == 2) {
             let result: i32 = lru_cache.get(key);
             printlnInt(result);
         }
@@ -858,14 +858,14 @@ fn main() {
     while (i < memory_operations) {
         let operation: i32 = getInt();
         
-        if operation == 1 {
+        if (operation == 1) {
             let size: i32 = getInt();
             let block_id: i32 = memory_manager.allocate(size);
             printlnInt(block_id);
-        } else if operation == 2 {
+        } else if (operation == 2) {
             let block_id: i32 = getInt();
             let success: bool = memory_manager.deallocate(block_id);
-            printlnInt(if success { 1 } else { 0 });
+            printlnInt(if (success) { 1 } else { 0 });
         }
         i += 1;
     }

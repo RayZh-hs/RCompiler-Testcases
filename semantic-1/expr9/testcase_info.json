@@ -7,7 +7,7 @@
     "compilememorylimit": 256,
     "compiletimelimit": 15,
     "exitcode": 0,
-    "id": 3741123,
+    "id": 3750405,
     "input_path": "src/expr9/expr9.in",
     "input_visible": 1,
     "metainfo": {
@@ -27,6 +27,6 @@
     "runtimememorylimit": 256,
     "source_path": "src/expr9/expr9.rx",
     "source_visible": 1,
-    "stage_id": 43019,
+    "stage_id": 43121,
     "stage_name": "semantic-1"
 }

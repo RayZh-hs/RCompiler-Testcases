@@ -180,23 +180,23 @@ fn solve_logic_puzzle() -> i32 {
         let mut cond4: bool = (d != 1);
         let mut cond5: bool = (e == 4);
 
-        if (a == 3) != (cond1) {
+        if ((a == 3) != (cond1)) {
             i = i + 1;
             continue;
         }
-        if (b == 2) != (cond2) {
+        if ((b == 2) != (cond2)) {
             i = i + 1;
             continue;
         }
-        if (c == 4) != (cond3) {
+        if ((c == 4) != (cond3)) {
             i = i + 1;
             continue;
         }
-        if (d == 1) != (cond4) {
+        if ((d == 1) != (cond4)) {
             i = i + 1;
             continue;
         }
-        if (e == 3) != (cond5) {
+        if ((e == 3) != (cond5)) {
             i = i + 1;
             continue;
         }

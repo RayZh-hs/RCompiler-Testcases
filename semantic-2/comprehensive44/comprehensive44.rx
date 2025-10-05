@@ -104,7 +104,7 @@ fn main() {
             agent.target_x = target / 1000;
             agent.target_y = target % 1000;
             agent.state = 1;
-        } else if agent.state == 1 {
+        } else if (agent.state == 1) {
             // Moving
             if (agent.x == agent.target_x && agent.y == agent.target_y) {
                 agent.state = 2;
@@ -121,7 +121,7 @@ fn main() {
                     agent.y = agent.y - 1;
                 }
             }
-        } else if agent.state == 2 {
+        } else if (agent.state == 2) {
             // Collecting
             let res: i32 = world[(agent.x) as usize][(agent.y) as usize];
             if (res > 0) {

@@ -1053,7 +1053,7 @@ fn calculateTourCost(mask: i32, distances: [i32; 225], num_cities: i32) -> i32 {
     let mut city: i32 = 1;
     
     while (city < num_cities) {
-        if (mask & (1 << city)) != 0 {
+        if ((mask & (1 << city)) != 0) {
             cost = cost + distances[(prev_city * num_cities + city) as usize];
             prev_city = city;
         }

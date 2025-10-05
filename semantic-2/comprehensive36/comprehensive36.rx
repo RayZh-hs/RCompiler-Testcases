@@ -281,7 +281,7 @@ fn main() {
     while (r < 50) {
         let mut s: i32 = 0;
         while (s < 50) {
-            if (r * s) % 3 == 0 {
+            if ((r * s) % 3 == 0) {
                 complex_calc = complex_calc + r - s;
             } else {
                 complex_calc = complex_calc + s - r;

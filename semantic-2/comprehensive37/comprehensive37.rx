@@ -194,25 +194,25 @@ fn execute_cycle(memory: &mut [i32; 1024], pc: &mut i32, stack: &mut [i32; 256],
 
     if (instruction == HALT) {
         *running = false;
-    } else if instruction == PUSH {
+    } else if (instruction == PUSH) {
         let value: i32 = memory[*pc as usize];
         *pc = *pc + 1;
         push_stack(stack, sp, value);
-    } else if instruction == POP {
+    } else if (instruction == POP) {
         pop_stack(stack, sp);
-    } else if instruction == ADD {
+    } else if (instruction == ADD) {
         let b: i32 = pop_stack(stack, sp);
         let a: i32 = pop_stack(stack, sp);
         push_stack(stack, sp, a + b);
-    } else if instruction == SUB {
+    } else if (instruction == SUB) {
         let b: i32 = pop_stack(stack, sp);
         let a: i32 = pop_stack(stack, sp);
         push_stack(stack, sp, a - b);
-    } else if instruction == MUL {
+    } else if (instruction == MUL) {
         let b: i32 = pop_stack(stack, sp);
         let a: i32 = pop_stack(stack, sp);
         push_stack(stack, sp, a * b);
-    } else if instruction == DIV {
+    } else if (instruction == DIV) {
         let b: i32 = pop_stack(stack, sp);
         let a: i32 = pop_stack(stack, sp);
         if (b != 0) {
@@ -220,26 +220,26 @@ fn execute_cycle(memory: &mut [i32; 1024], pc: &mut i32, stack: &mut [i32; 256],
         } else {
             *running = false;
         }
-    } else if instruction == PRINT {
+    } else if (instruction == PRINT) {
         let val: i32 = pop_stack(stack, sp);
         printlnInt(val);
-    } else if instruction == JMP {
+    } else if (instruction == JMP) {
         *pc = memory[*pc as usize];
-    } else if instruction == JZ {
+    } else if (instruction == JZ) {
         let val: i32 = pop_stack(stack, sp);
         if (val == 0) {
             *pc = memory[*pc as usize];
         } else {
             *pc = *pc + 1;
         }
-    } else if instruction == JNZ {
+    } else if (instruction == JNZ) {
         let val: i32 = pop_stack(stack, sp);
         if (val != 0) {
             *pc = memory[*pc as usize];
         } else {
             *pc = *pc + 1;
         }
-    } else if instruction == EQ {
+    } else if (instruction == EQ) {
         let b: i32 = pop_stack(stack, sp);
         let a: i32 = pop_stack(stack, sp);
         if (a == b) {
@@ -247,7 +247,7 @@ fn execute_cycle(memory: &mut [i32; 1024], pc: &mut i32, stack: &mut [i32; 256],
         } else {
             push_stack(stack, sp, 0);
         }
-    } else if instruction == LT {
+    } else if (instruction == LT) {
         let b: i32 = pop_stack(stack, sp);
         let a: i32 = pop_stack(stack, sp);
         if (a < b) {
@@ -255,17 +255,17 @@ fn execute_cycle(memory: &mut [i32; 1024], pc: &mut i32, stack: &mut [i32; 256],
         } else {
             push_stack(stack, sp, 0);
         }
-    } else if instruction == STORE {
+    } else if (instruction == STORE) {
         let addr: i32 = memory[*pc as usize];
         *pc = *pc + 1;
         let val: i32 = pop_stack(stack, sp);
         memory[addr as usize] = val;
-    } else if instruction == LOAD {
+    } else if (instruction == LOAD) {
         let addr: i32 = memory[*pc as usize];
         *pc = *pc + 1;
         let val: i32 = memory[addr as usize];
         push_stack(stack, sp, val);
-    } else if instruction == DUP {
+    } else if (instruction == DUP) {
         let val: i32 = stack[*sp as usize];
         push_stack(stack, sp, val);
     }
