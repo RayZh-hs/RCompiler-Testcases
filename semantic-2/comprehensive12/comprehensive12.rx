@@ -690,7 +690,7 @@ impl DataProcessor {
 
     fn execute_matrix_operations(&mut self) {
         // Create transformation matrix based on data patterns
-        self.matrix_size = if self.size < 100 { self.size } else { 100 };
+        self.matrix_size = if (self.size < 100) { self.size } else { 100 };
 
         let mut i: i32 = 0;
         while (i < self.matrix_size) {

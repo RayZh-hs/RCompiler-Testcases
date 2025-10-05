@@ -631,7 +631,7 @@ impl LRUCache {
     }
     
     fn get_cache_statistics(&self) -> [i32; 5] {
-        let hit_rate: i32 = if self.access_count > 0 { (self.hit_count * 100) / self.access_count } else { 0 };
+        let hit_rate: i32 = if (self.access_count > 0) { (self.hit_count * 100) / self.access_count } else { 0 };
         [self.hit_count, self.miss_count, self.access_count, hit_rate, self.size]
     }
 }
