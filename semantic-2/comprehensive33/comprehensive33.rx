@@ -41,6 +41,10 @@ const GRID_HEIGHT: i32 = 50;
 const NUM_AGENTS: i32 = 20;
 const SIMULATION_TICKS: i32 = 100;
 
+const GRID_WIDTH_USIZE: usize = 50;
+const GRID_HEIGHT_USIZE: usize = 50;
+const NUM_AGENTS_USIZE: usize = 20;
+
 struct Agent {
     id: i32,
     x: i32,
@@ -52,13 +56,13 @@ struct Agent {
 }
 
 struct World {
-    grid: [[i32; GRID_WIDTH as usize]; GRID_HEIGHT as usize],
-    agents: [Agent; NUM_AGENTS as usize],
+    grid: [[i32; GRID_WIDTH_USIZE]; GRID_HEIGHT_USIZE],
+    agents: [Agent; NUM_AGENTS_USIZE],
 }
 
 fn main() {
     let mut world: World = World {
-        grid: [[0; GRID_WIDTH as usize]; GRID_HEIGHT as usize],
+        grid: [[0; GRID_WIDTH_USIZE]; GRID_HEIGHT_USIZE],
         agents: [Agent {
             id: 0,
             x: 0,
@@ -67,7 +71,7 @@ fn main() {
             target_x: 0,
             target_y: 0,
             active: false,
-        }; NUM_AGENTS as usize],
+        }; NUM_AGENTS_USIZE],
     };
 
     initialize_world(&mut world, 98765);
@@ -298,7 +302,7 @@ fn provoke_error(world: &mut World) {
 
 fn another_simulation_scenario() {
     let mut world: World = World {
-        grid: [[0; GRID_WIDTH as usize]; GRID_HEIGHT as usize],
+        grid: [[0; GRID_WIDTH_USIZE]; GRID_HEIGHT_USIZE],
         agents: [Agent {
             id: 0,
             x: 0,
@@ -307,7 +311,7 @@ fn another_simulation_scenario() {
             target_x: 0,
             target_y: 0,
             active: false,
-        }; NUM_AGENTS as usize],
+        }; NUM_AGENTS_USIZE],
     };
     initialize_world(&mut world, 11223);
     let mut i: i32 = 0;
