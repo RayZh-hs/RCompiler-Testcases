@@ -7,9 +7,9 @@
     "compilememorylimit": 256,
     "compiletimelimit": 15,
     "exitcode": 0,
-    "id": 3770948,
+    "id": 3899804,
     "input_path": "src/comprehensive22/comprehensive22.in",
-    "input_visible": 0,
+    "input_visible": 1,
     "metainfo": {
         "caseauthor": "Wenxin Zheng",
         "comment": "",
@@ -18,7 +18,7 @@
     "name": "comprehensive22",
     "name_visible": 0,
     "output_path": "src/comprehensive22/comprehensive22.out",
-    "output_visible": 0,
+    "output_visible": 1,
     "provide": [
         "compilestderr",
         "compileexitcode"
@@ -26,7 +26,7 @@
     "runtimelimit": -1,
     "runtimememorylimit": 256,
     "source_path": "src/comprehensive22/comprehensive22.rx",
-    "source_visible": 0,
-    "stage_id": 43348,
+    "source_visible": 1,
+    "stage_id": 44764,
     "stage_name": "semantic-2"
 }
