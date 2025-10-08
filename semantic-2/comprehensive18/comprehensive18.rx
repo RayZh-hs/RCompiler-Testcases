@@ -456,7 +456,7 @@ fn findFreeNode(
 }
 
 // Mark node and its ancestors as allocated/split
-fn markNodeAsAllocated(buddy_tree: &mut [i32; 512], mut node: i32, _level: i32, _max_depth: i32) {
+fn markNodeAsAllocated(buddy_tree: &mut [i32; 512], mut node: i32, level_unused: i32, max_depth_unused: i32) {
     buddy_tree[node as usize] = 1; // Mark as allocated
 
     // Mark ancestors as split
@@ -474,7 +474,7 @@ fn markNodeAsAllocated(buddy_tree: &mut [i32; 512], mut node: i32, _level: i32, 
 }
 
 // Buddy deallocation
-fn buddyDeallocate(buddy_tree: &mut [i32; 512], _depth: i32, node: i32) {
+fn buddyDeallocate(buddy_tree: &mut [i32; 512], depth_unused: i32, node: i32) {
     if (node >= 0 && node < 511) {
         buddy_tree[node as usize] = 0; // Mark as free
 
@@ -627,7 +627,7 @@ fn initializeObjectGraph(
 // Mark phase of garbage collection
 fn performMarkPhase(
     object_pool: &[i32; 1000],
-    _object_refs: &[i32; 500],
+    object_refs: &[i32; 500],
     root_set: &[i32; 50],
     gc_marks: &mut [i32; 200],
     root_count: i32,
@@ -645,7 +645,7 @@ fn performMarkPhase(
     while (i < root_count) {
         let root_object: i32 = root_set[i as usize];
         marked_count =
-            marked_count + markObject(object_pool, _object_refs, gc_marks, root_object, 0);
+            marked_count + markObject(object_pool, object_refs, gc_marks, root_object, 0);
         i = i + 1;
     }
 
@@ -655,7 +655,7 @@ fn performMarkPhase(
 // Recursively mark an object and its references
 fn markObject(
     object_pool: &[i32; 1000],
-    _object_refs: &[i32; 500],
+    object_refs: &[i32; 500],
     gc_marks: &mut [i32; 200],
     object_addr: i32,
     depth: i32,
@@ -680,11 +680,11 @@ fn markObject(
 
         if (ref1 > 0 && ref1 < 1000) {
             marked_count =
-                marked_count + markObject(object_pool, _object_refs, gc_marks, ref1, depth + 1);
+                marked_count + markObject(object_pool, object_refs, gc_marks, ref1, depth + 1);
         }
         if (ref2 > 0 && ref2 < 1000) {
             marked_count =
-                marked_count + markObject(object_pool, _object_refs, gc_marks, ref2, depth + 1);
+                marked_count + markObject(object_pool, object_refs, gc_marks, ref2, depth + 1);
         }
     }
 
@@ -1252,7 +1252,7 @@ fn initializeMemoryPool200(memory: &mut [i32; 200]) {
     }
 }
 
-fn allocateBlock100(memory: &mut [i32; 100], _free_head: i32, size: i32) -> i32 {
+fn allocateBlock100(memory: &mut [i32; 100], free_head_unused: i32, size: i32) -> i32 {
     if (size <= 0 || size > 96) {
         return -1;
     }
@@ -1266,7 +1266,7 @@ fn allocateBlock100(memory: &mut [i32; 100], _free_head: i32, size: i32) -> i32 
     return -1;
 }
 
-fn allocateBlock50(memory: &mut [i32; 50], _free_head: i32, size: i32) -> i32 {
+fn allocateBlock50(memory: &mut [i32; 50], free_head_unused: i32, size: i32) -> i32 {
     if (size <= 0 || size > 46) {
         return -1;
     }
@@ -1289,7 +1289,7 @@ fn allocateBlock50(memory: &mut [i32; 50], _free_head: i32, size: i32) -> i32 {
     return -1;
 }
 
-fn allocateBlock200(memory: &mut [i32; 200], _free_head: i32, size: i32) -> i32 {
+fn allocateBlock200(memory: &mut [i32; 200], free_head_unused: i32, size: i32) -> i32 {
     if (size <= 0 || size > 196) {
         return -1;
     }

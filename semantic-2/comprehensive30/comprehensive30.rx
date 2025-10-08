@@ -89,6 +89,7 @@ fn main() {
     }
 
     printlnInt(9999);
+    exit(0);
 }
 
 fn init_heap(heap: &mut [i32; HEAP_SIZE], free_list_head: &mut i32) {
@@ -351,5 +352,4 @@ fn another_level_of_scope() {
 
     let temp_ptr_for_error: i32 = my_malloc(&mut heap, &mut free_list_head, 1);
     my_free(&mut heap, &mut free_list_head, temp_ptr_for_error);
-    exit(0);
 }
