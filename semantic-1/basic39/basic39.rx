@@ -19,7 +19,7 @@ fn stack_pop(stack: &mut [i32; 10], top: &mut usize) -> i32 {
         *top -= 1;
         let v: i32 = stack[*top];
         return v;
-    }
+    };
     -1
 }
 
@@ -30,7 +30,7 @@ fn stack_is_empty(top: usize) -> bool {
 fn stack_peek(stack: &[i32; 10], top: usize) -> i32 {
     if (top > 0) {
         return stack[top - 1];
-    }
+    };
     -1
 }
 

@@ -241,7 +241,7 @@ fn fetch_decode_execute(
                     registers[r_dst as usize] = registers[r_dst as usize] / registers[r_src as usize];
                 } else {
                     *halt = true; // Division by zero
-                }
+                };
                 *zf = registers[r_dst as usize] == 0;
                 *pc = (*pc) + 2;
             } else if (opcode == 7) { // AND
@@ -298,7 +298,7 @@ fn fetch_decode_execute(
                     registers[r_dst as usize] = memory[addr as usize];
                 } else {
                     *halt = true;
-                }
+                };
                 *pc = (*pc) + 3;
             } else if (opcode == 16) { // STORE
                 let r_src: i32 = memory[*pc as usize];
@@ -309,7 +309,7 @@ fn fetch_decode_execute(
                     memory[addr as usize] = registers[r_src as usize];
                 } else {
                     *halt = true;
-                }
+                };
                 *pc = (*pc) + 3;
             } else if (opcode == 17) { // JMP
                 *pc = memory[*pc as usize];

@@ -23,7 +23,7 @@ fn interpolation_search(a: [i32; ARR], key: i32) -> i32 {
         } else {
             high = pos - 1;
         }
-    }
+    };
     -1
 }
 

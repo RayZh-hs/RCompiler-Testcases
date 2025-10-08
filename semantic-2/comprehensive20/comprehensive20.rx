@@ -328,7 +328,7 @@ fn execute_action(action_id: i32, fsm: &mut FSM, context: &mut i32) -> i32 {
                 result = result % 1000;
             }
             i = i + 1;
-        }
+        };
         *context = result % 100;
         return action_id;
     }

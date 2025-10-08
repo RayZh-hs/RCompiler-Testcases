@@ -718,7 +718,7 @@ fn matrixChainMultiplicationDP(num_matrices: i32) -> i32 {
     }
     
     // answer is dp(1, num_matrices) -> dp[(0*20 + (num_matrices-1))]
-    return dp[((0 * 20) + (num_matrices - 1)) as usize];
+    return dp[(num_matrices - 1) as usize];
 }
 
 // Test 4: Game Theory DP
@@ -790,7 +790,7 @@ fn optimalGameStrategyDP(num_coins: i32) -> i32 {
         length = length + 1;
     }
     
-    return dp[(0 * 20 + (num_coins - 1)) as usize];
+    return dp[(num_coins - 1) as usize];
 }
 
 // Coin Game DP
@@ -860,7 +860,7 @@ fn coinGameDP(num_coins: i32) -> i32 {
         length = length + 1;
     }
     
-    return dp[(0 * 30 + (num_coins - 1)) as usize];
+    return dp[(num_coins - 1) as usize];
 }
 
 // Nim Game DP
@@ -872,7 +872,7 @@ fn nimGameDP(num_piles: i32) -> i32 {
     let mut seed: i32 = 88;
     while (i < num_piles) {
         seed = (seed * 1664 + 904223) % 83647;
-            if (seed < 0) {
+        if (seed < 0) {
             seed = -seed;
         }
         piles[i as usize] = 1 + (seed % 20);
@@ -892,7 +892,7 @@ fn nimGameDP(num_piles: i32) -> i32 {
     i = 0;
     while (i < num_piles) {
         let target: i32 = nim_sum ^ piles[i as usize];
-            if (target < piles[i as usize]) {
+        if (target < piles[i as usize]) {
             winning_moves = winning_moves + (piles[i as usize] - target);
         }
         i = i + 1;
@@ -950,7 +950,7 @@ fn digitDP(number: i32) -> i32 {
 fn digitDPRecursive(digits: [i32; 10], digit_count: i32, pos: i32, 
                    sum_mod: i32, tight: bool, mut dp: [i32; 100]) -> i32 {
     if (pos == digit_count) {
-    if (sum_mod == 0) {
+        if (sum_mod == 0) {
             return 1;
         } else {
             return 0;

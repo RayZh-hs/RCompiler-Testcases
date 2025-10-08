@@ -650,7 +650,7 @@ fn access_l1_cache(
     time: i32,
 ) -> bool {
     let set_index: i32 = (address / 64) % 64;
-    let tag: i32 = address / (64 * 64);
+    let tag: i32 = (address / 64) / 64;
 
     // Check for hit
     let mut i: i32 = 0;
@@ -682,7 +682,7 @@ fn access_l2_cache(
     time: i32,
 ) -> bool {
     let set_index: i32 = (address / 64) % 128;
-    let tag: i32 = address / (64 * 128);
+    let tag: i32 = (address / 64) / 128;
 
     // Check for hit
     let mut i: i32 = 0;

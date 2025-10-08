@@ -45,7 +45,7 @@ impl Board {
                 return self.grid[i][0]
             }
             i += 1;
-        }
+        };
         -1
     }
 }
