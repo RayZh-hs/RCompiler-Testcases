@@ -7,7 +7,7 @@
     "compilememorylimit": 256,
     "compiletimelimit": 15,
     "exitcode": 0,
-    "id": 4016922,
+    "id": 4163250,
     "input_path": "src/comprehensive23/comprehensive23.in",
     "input_visible": 1,
     "metainfo": {
@@ -27,6 +27,6 @@
     "runtimememorylimit": 256,
     "source_path": "src/comprehensive23/comprehensive23.rx",
     "source_visible": 1,
-    "stage_id": 46051,
+    "stage_id": 47659,
     "stage_name": "semantic-2"
 }

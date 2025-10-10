@@ -408,7 +408,7 @@ fn analyze_version_differences(tree: &PersistentSegmentTree,
                               version1: i32,
                               version2: i32,
                               depth: i32) -> i32 {  // ERROR: Function name collision
-    if depth > 10 {
+    if (depth > 10) {
         return 0;
     }
 
