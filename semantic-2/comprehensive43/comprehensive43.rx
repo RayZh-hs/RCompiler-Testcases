@@ -70,7 +70,7 @@ fn main() {
     // Hidden Error: This function is declared to take an immutable program array,
     // but it tries to modify it. This should cause a mutability conflict error.
     fn self_modify_code(prog: &mut [i32; 256], pc: i32) {
-        if (pc > 10 && prog[pc as usize-1] == 15) { // If previous instruction was DUP
+        if (pc > 10 && prog[pc as usize-1] == 15) { // If (previous instruction was DUP)
             prog[pc as usize] = 2; // Change next instruction to POP
         }
     }

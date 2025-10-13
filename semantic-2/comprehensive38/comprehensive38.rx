@@ -328,7 +328,7 @@ fn main() {
     let mut m: i32 = 0;
     while (m < 10) {
         if (m > 5) {
-            let mut inner_error_flag: bool = true;
+            let mut error_flag: bool = true;
         }
         m = m + 1;
     }

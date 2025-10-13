@@ -176,7 +176,7 @@ fn fetch_decode_execute(
     halt: &mut bool,
 ) {
     while ((*halt) == false) {
-        if (((*pc) < 0 || (*pc) >= MEMORY_SIZE)) {
+        if ((*pc) < 0 || (*pc) >= MEMORY_SIZE) {
             *halt = true;
         }
         if ((*halt) == true) {
@@ -203,9 +203,9 @@ fn fetch_decode_execute(
                 let r_src: i32 = memory[*pc as usize + 1];
                 let res: i32 = registers[r_dst as usize] + registers[r_src as usize];
                 // Simplified overflow check
-                if ((registers[r_dst as usize] > 0 && registers[r_src as usize] > 0 && res < 0)) {
+                if (registers[r_dst as usize] > 0 && registers[r_src as usize] > 0 && res < 0) {
                     *cf = true;
-                } else if ((registers[r_dst as usize] < 0 && registers[r_src as usize] < 0 && res > 0)) {
+                } else if (registers[r_dst as usize] < 0 && registers[r_src as usize] < 0 && res > 0) {
                     *cf = true;
                 } else {
                     *cf = false;
@@ -218,9 +218,9 @@ fn fetch_decode_execute(
                 let r_src: i32 = memory[*pc as usize + 1];
                 let res: i32 = registers[r_dst as usize] - registers[r_src as usize];
                 // Simplified borrow check
-                if ((registers[r_dst as usize] > 0 && registers[r_src as usize] < 0 && res < 0)) {
+                if (registers[r_dst as usize] > 0 && registers[r_src as usize] < 0 && res < 0) {
                     *cf = true;
-                } else if ((registers[r_dst as usize] < 0 && registers[r_src as usize] > 0 && res > 0)) {
+                } else if (registers[r_dst as usize] < 0 && registers[r_src as usize] > 0 && res > 0) {
                     *cf = true;
                 } else {
                     *cf = false;
@@ -237,7 +237,7 @@ fn fetch_decode_execute(
             } else if (opcode == 6) { // DIV
                 let r_dst: i32 = memory[*pc as usize];
                 let r_src: i32 = memory[*pc as usize + 1];
-                if ((registers[r_src as usize] != 0)) {
+                if (registers[r_src as usize] != 0) {
                     registers[r_dst as usize] = registers[r_dst as usize] / registers[r_src as usize];
                 } else {
                     *halt = true; // Division by zero
@@ -294,7 +294,7 @@ fn fetch_decode_execute(
                 let r_addr: i32 = memory[*pc as usize + 1];
                 let offset: i32 = memory[*pc as usize + 2];
                 let addr: i32 = registers[r_addr as usize] + offset;
-                if ((addr >= 0 && addr < MEMORY_SIZE)) {
+                if (addr >= 0 && addr < MEMORY_SIZE) {
                     registers[r_dst as usize] = memory[addr as usize];
                 } else {
                     *halt = true;
@@ -305,7 +305,7 @@ fn fetch_decode_execute(
                 let r_addr: i32 = memory[*pc as usize + 1];
                 let offset: i32 = memory[*pc as usize + 2];
                 let addr: i32 = registers[r_addr as usize] + offset;
-                if ((addr >= 0 && addr < MEMORY_SIZE)) {
+                if (addr >= 0 && addr < MEMORY_SIZE) {
                     memory[addr as usize] = registers[r_src as usize];
                 } else {
                     *halt = true;
@@ -314,25 +314,25 @@ fn fetch_decode_execute(
             } else if (opcode == 17) { // JMP
                 *pc = memory[*pc as usize];
             } else if (opcode == 18) { // JZ
-                if ((*zf)) {
+                if (*zf) {
                     *pc = memory[*pc as usize];
                 } else {
                     *pc = (*pc) + 1;
                 }
             } else if (opcode == 19) { // JNZ
-                if ((!*zf)) {
+                if (!*zf) {
                     *pc = memory[*pc as usize];
                 } else {
                     *pc = (*pc) + 1;
                 }
             } else if (opcode == 20) { // JC
-                if ((*cf)) {
+                if (*cf) {
                     *pc = memory[*pc as usize];
                 } else {
                     *pc = (*pc) + 1;
                 }
             } else if (opcode == 21) { // JNC
-                if ((!*cf)) {
+                if (!*cf) {
                     *pc = memory[*pc as usize];
                 } else {
                     *pc = (*pc) + 1;

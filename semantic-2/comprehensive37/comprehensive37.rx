@@ -7,7 +7,7 @@ Verdict: Success
 Test Name: Simple Virtual Machine Interpreter
 Summary: This test comprehensively evaluates compiler optimizations for:
 Details:
-Large switch-like control flow (if-else-if chains) for opcode dispatch.
+Large switch-like control flow (if-else-if (chains) for opcode dispatch.)
 Array-based stack and instruction memory manipulation.
 Loop optimization for the main fetch-decode-execute cycle.
 Integer arithmetic and logical operations within a simulated environment.

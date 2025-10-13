@@ -776,7 +776,7 @@ fn checkProposalAgreement(
         i = i + 1;
     }
     
-    return found_first; // Agreement if at least one valid proposal exists
+    return found_first; // Agreement if (at least one valid proposal exists)
 }
 
 fn verifyHonestNodeAgreement(

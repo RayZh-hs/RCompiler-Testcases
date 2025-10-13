@@ -23,6 +23,7 @@ Conditional logic for node processing based on type and value.
 // - Conditional logic for node processing based on type and value.
 
 const NODE_POOL_SIZE: i32 = 512;
+const NODE_POOL_USIZE: usize = 512;
 const NODE_SIZE: i32 = 4;
 
 const TYPE_INTERNAL: i32 = 1;
@@ -36,14 +37,14 @@ struct Node {
 }
 
 struct Tree {
-    pool: [Node; NODE_POOL_SIZE as usize],
+    pool: [Node; NODE_POOL_USIZE],
     root: i32,
     next_free: i32,
 }
 
 fn main() {
     let mut tree: Tree = Tree {
-        pool: [Node { node_type: 0, value: 0, left: -1, right: -1 }; NODE_POOL_SIZE as usize],
+        pool: [Node { node_type: 0, value: 0, left: -1, right: -1 }; NODE_POOL_USIZE],
         root: -1,
         next_free: 0,
     };
@@ -84,7 +85,7 @@ fn initialize_pool(tree: &mut Tree) {
         tree.pool[i as usize].left = i + 1;
         i = i + 1;
     }
-    tree.pool[NODE_POOL_SIZE as usize - 1].left = -1;
+    tree.pool[NODE_POOL_USIZE - 1].left = -1;
     tree.next_free = 0;
 }
 
@@ -244,7 +245,7 @@ fn free_tree(tree: &mut Tree, node_idx: i32) {
 
 fn another_tree_operation() {
     let mut tree: Tree = Tree {
-        pool: [Node { node_type: 0, value: 0, left: -1, right: -1 }; NODE_POOL_SIZE as usize],
+        pool: [Node { node_type: 0, value: 0, left: -1, right: -1 }; NODE_POOL_USIZE],
         root: -1,
         next_free: 0,
     };
@@ -258,7 +259,7 @@ fn another_tree_operation() {
 
 fn yet_another_scenario() {
     let mut tree: Tree = Tree {
-        pool: [Node { node_type: 0, value: 0, left: -1, right: -1 }; NODE_POOL_SIZE as usize],
+        pool: [Node { node_type: 0, value: 0, left: -1, right: -1 }; NODE_POOL_USIZE],
         root: -1,
         next_free: 0,
     };

@@ -158,7 +158,7 @@ fn main() {
         i = i + 1;
     }
 
-    printlnInt(fragmentation_metric); // 0 if not computed or fully allocated
+    printlnInt(fragmentation_metric); // 0 if (not computed or fully allocated)
     printlnInt(final_check_sum);
     exit(0);
 }

@@ -456,7 +456,7 @@ fn findFreeNode(
 }
 
 // Mark node and its ancestors as allocated/split
-fn markNodeAsAllocated(buddy_tree: &mut [i32; 512], mut node: i32, level_unused: i32, max_depth_unused: i32) {
+fn markNodeAsAllocated(buddy_tree: &mut [i32; 512], mut node: i32, level: i32, max_depth: i32) {
     buddy_tree[node as usize] = 1; // Mark as allocated
 
     // Mark ancestors as split
@@ -474,7 +474,7 @@ fn markNodeAsAllocated(buddy_tree: &mut [i32; 512], mut node: i32, level_unused:
 }
 
 // Buddy deallocation
-fn buddyDeallocate(buddy_tree: &mut [i32; 512], depth_unused: i32, node: i32) {
+fn buddyDeallocate(buddy_tree: &mut [i32; 512], depth: i32, node: i32) {
     if (node >= 0 && node < 511) {
         buddy_tree[node as usize] = 0; // Mark as free
 
@@ -1252,7 +1252,7 @@ fn initializeMemoryPool200(memory: &mut [i32; 200]) {
     }
 }
 
-fn allocateBlock100(memory: &mut [i32; 100], free_head_unused: i32, size: i32) -> i32 {
+fn allocateBlock100(memory: &mut [i32; 100], free_head: i32, size: i32) -> i32 {
     if (size <= 0 || size > 96) {
         return -1;
     }
@@ -1266,7 +1266,7 @@ fn allocateBlock100(memory: &mut [i32; 100], free_head_unused: i32, size: i32) -
     return -1;
 }
 
-fn allocateBlock50(memory: &mut [i32; 50], free_head_unused: i32, size: i32) -> i32 {
+fn allocateBlock50(memory: &mut [i32; 50], free_head: i32, size: i32) -> i32 {
     if (size <= 0 || size > 46) {
         return -1;
     }
@@ -1289,7 +1289,7 @@ fn allocateBlock50(memory: &mut [i32; 50], free_head_unused: i32, size: i32) -> 
     return -1;
 }
 
-fn allocateBlock200(memory: &mut [i32; 200], free_head_unused: i32, size: i32) -> i32 {
+fn allocateBlock200(memory: &mut [i32; 200], free_head: i32, size: i32) -> i32 {
     if (size <= 0 || size > 196) {
         return -1;
     }
@@ -1331,8 +1331,8 @@ fn validateMemoryIntegrity(memory: &[i32; 200], size: i32) -> i32 {
     while (i < size - 4) {
         if (memory[i as usize] > 0
             && memory[i as usize] <= 100
-            && (memory[i as usize + 1] == 0 || memory[i as usize + 1] == 1)
-        ) {
+            && (memory[i as usize + 1] == 0 || memory[i as usize + 1] == 1))
+        {
             valid_blocks = valid_blocks + 1;
         }
 

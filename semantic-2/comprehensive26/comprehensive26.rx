@@ -631,7 +631,7 @@ fn findVictimTransaction(
     start_times: &[i32; 50],
     states: &[i32; 50],
     count: i32,
-    current_time_unused: i32,
+    current_time: i32,
 ) -> i32 {
     let mut youngest_transaction: i32 = -1;
     let mut latest_start_time: i32 = 0;
@@ -1340,7 +1340,7 @@ fn insertLinearProbing(
     key: i32,
     value: i32,
     collision_count: &mut i32,
-    entry_count_unused: i32,
+    entry_count: i32,
 ) -> bool {
     let mut hash_index: i32 = key % table_size;
     let mut probe_count: i32 = 0;
