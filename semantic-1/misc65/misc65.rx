@@ -9,7 +9,7 @@ Comment: Fast Walsh-Hadamard Transform with subset sum convolution with recursio
 
 // Fast Walsh-Hadamard Transform with XOR/OR/AND Convolutions
 // Advanced number-theoretic transform for subset sum convolution and bit manipulation
-const P: i32 = (1 << 15) + 3;
+const P: i32 = 32771;
 
 struct WalshHadamardProcessor {
     input_array: [i32; 1024],

@@ -347,7 +347,7 @@ fn run_memory_manager() -> i32 {
 
     // Initialize free block list with entire heap
     free_blocks[0] = 0; // Start address
-    free_blocks[1] = 16384 * 4; // Size in bytes
+    free_blocks[1] = 65536; // Size in bytes, 16384 * 4
     free_count = 1;
 
     let mut allocation_index: i32 = 0;

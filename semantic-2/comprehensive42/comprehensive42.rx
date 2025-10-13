@@ -28,7 +28,7 @@ fn main() {
     let mut heap: [i32; 1024] = [0; 1024];
     let mut free_list_head: i32 = 0;
     // Total number of blocks in the heap (heap_size / block_size)
-    let total_blocks: i32 = 1024 / 16; // 64
+    let total_blocks: i32 = 64; // 1024 / 16
 
     fn init_heap(heap: &mut [i32; 1024], free_list_head: &mut i32) {
         let heap_size: i32 = 1024;
