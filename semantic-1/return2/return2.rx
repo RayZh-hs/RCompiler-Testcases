@@ -10,5 +10,5 @@ Comment: exit function test, only `i32` can be returned
 fn main() {
     let a: String = 3.to_string();
     let b: i32 = getInt() + 1;
-    exit(b)
+    exit(b);
 }

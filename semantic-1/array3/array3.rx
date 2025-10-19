@@ -8,7 +8,7 @@ Comment: array test, multiple dimensions and array length
 */
 
 fn main() {
-    const MATRIX: [[u32; 3]; 2] = [
+    let matrix: [[u32; 3]; 2] = [
         [1, 2, 3],
         [4, 5, 6],
     ];
