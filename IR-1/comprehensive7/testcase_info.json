@@ -1,0 +1,32 @@
+{
+    "active": 1,
+    "cmp": [
+        "compileexitcode"
+    ],
+    "compileexitcode": 0,
+    "compilememorylimit": 256,
+    "compiletimelimit": 15,
+    "exitcode": 0,
+    "id": 4939120,
+    "input_path": "src/comprehensive7/comprehensive7.in",
+    "input_visible": 1,
+    "metainfo": {
+        "caseauthor": "Wenxin Zheng",
+        "comment": "",
+        "lastmodified": "2025-08-17"
+    },
+    "name": "comprehensive7",
+    "name_visible": 0,
+    "output_path": "src/comprehensive7/comprehensive7.out",
+    "output_visible": 1,
+    "provide": [
+        "compilestderr",
+        "compileexitcode"
+    ],
+    "runtimelimit": -1,
+    "runtimememorylimit": 256,
+    "source_path": "src/comprehensive7/comprehensive7.rx",
+    "source_visible": 1,
+    "stage_id": 56181,
+    "stage_name": "IR-1"
+}
