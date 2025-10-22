@@ -3,7 +3,7 @@ Test Package: Semantic-2
 Test Target: comprehensive
 Author: Wenxin Zheng
 Time: 2025-08-17
-Verdict: Success
+Verdict: Pass
 */
 
 // Moved from original comprehensive1.rx

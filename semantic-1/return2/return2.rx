@@ -3,7 +3,7 @@ Test Package: Semantic-1
 Test Target: return
 Author: Wenxin Zheng
 Time: 2025-08-07
-Verdict: Success
+Verdict: Pass
 Comment: exit function test, only `i32` can be returned
 */
 

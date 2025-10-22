@@ -3,7 +3,7 @@ Test Package: Semantic-2
 Test Target: comprehensive
 Author: Wenxin Zheng
 Time: 2025-08-17
-Verdict: Success
+Verdict: Pass
 Test Name: Comprehensive Test 11: Boolean Logic and Optimization Test
 Summary: This test focuses on compiler optimization of Boolean operations including:
 Details:

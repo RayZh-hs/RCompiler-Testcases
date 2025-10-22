@@ -3,7 +3,7 @@ Test Package: Semantic-1
 Test Target: loop
 Author: Wenxin Zheng
 Time: 2025-08-08
-Verdict: Success
+Verdict: Pass
 Comment: loop test, sieve of Eratosthenes algorithm with while loops and array operations
 */
 

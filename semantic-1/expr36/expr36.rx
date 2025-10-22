@@ -3,7 +3,7 @@ Test Package: Semantic-1
 Test Target: expr
 Author: Wenxin Zheng
 Time: 2025-08-08
-Verdict: Success
+Verdict: Pass
 Comment: Disjoint set with path compression, union by rank, and Kruskal's algorithm simulation
 */
 

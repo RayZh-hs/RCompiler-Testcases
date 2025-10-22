@@ -3,7 +3,7 @@ Test Package: Semantic-2
 Test Target: comprehensive
 Author: venillalemon
 Time: 2025-09-04
-Verdict: Success
+Verdict: Pass
 Comment: Comprehensive test of segment tree merging
 */
 

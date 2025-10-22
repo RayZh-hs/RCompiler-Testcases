@@ -3,7 +3,7 @@ Test Package: Semantic-1
 Test Target: if
 Author: Wenxin Zheng
 Time: 2025-08-08
-Verdict: Success
+Verdict: Pass
 Comment: if statement test, if expression as value assignment
 */
 

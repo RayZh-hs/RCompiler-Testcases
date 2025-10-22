@@ -3,7 +3,7 @@ Test Package: Semantic-1
 Test Target: misc
 Author: Wenxin Zheng
 Time: 2025-08-08
-Verdict: Success
+Verdict: Pass
 Comment: Pollard's rho algorithm for integer factorization with recursive optimization
 */
 

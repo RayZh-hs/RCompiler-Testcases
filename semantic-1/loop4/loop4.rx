@@ -3,7 +3,7 @@ Test Package: Semantic-1
 Test Target: loop
 Author: Wenxin Zheng
 Time: 2025-08-08
-Verdict: Success
+Verdict: Pass
 Comment: loop test, nested infinite loops with break condition using flag variable
 */
 

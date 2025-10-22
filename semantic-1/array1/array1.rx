@@ -3,7 +3,7 @@ Test Package: Semantic-1
 Test Target: array
 Author: Wenxin Zheng
 Time: 2025-08-07
-Verdict: Success
+Verdict: Pass
 Comment: array test, basic array declaration
 */
 
