@@ -7,8 +7,7 @@ Verdict: Fail
 Comment: Expression error: Invalid operator expression - consecutive operators
 */
 
-// Error: Invalid operator expression - consecutive operators
 fn main() {
-    let x: i32 = 5 + * 3;  // Invalid: + followed by * without operand
+    let x: i32 = 5 + * 3; 
     exit(0);
 }
